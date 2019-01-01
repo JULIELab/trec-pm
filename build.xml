@@ -22,10 +22,14 @@
         </condition>
     </target>
     <target name="get.trec.sample.eval" if="script.available">
-
         <get src="https://trec.nist.gov/data/clinical/sample_eval.pl"
              dest="${project.build.directory}/lib/sample_eval.pl"
              verbose="false" usetimestamp="true"/>
+    </target>
+    <target name="get.trec.sample.fallback" unless="script.available">
+        <get src="file:resources/sample_eval.pl"
+             dest="${project.build.directory}/lib/sample_eval.pl"
+             verbose="false" usetimestamp="false"/>
     </target>
     <target name="get.gene.info">
         <get src="ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz"
@@ -34,6 +38,7 @@
         <gunzip src="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info.gz"/>
     </target>
 
-    <target name="go" depends="create.lib.dir, build.trec.eval.patch, test.if.evalscript.is.available, get.trec.sample.eval, get.gene.info"/>
+    <target name="go"
+            depends="create.lib.dir, build.trec.eval.patch, test.if.evalscript.is.available, get.trec.sample.eval, get.trec.sample.fallback, get.gene.info"/>
 
 </project>

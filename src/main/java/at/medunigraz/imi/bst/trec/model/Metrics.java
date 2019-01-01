@@ -36,7 +36,11 @@ public class Metrics {
 
 	public void merge(Metrics b) {
 		// TODO check for duplicate keys, e.g. "infAP"
-		metrics.putAll(b.metrics);
+		try {
+			metrics.putAll(b.metrics);
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public double getNDCG() {

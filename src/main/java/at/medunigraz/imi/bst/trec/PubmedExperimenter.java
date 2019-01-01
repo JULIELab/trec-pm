@@ -15,9 +15,9 @@ public class PubmedExperimenter {
 		final File extraBoostTemplate = new File(
 				PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
 
-		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.INTERNAL;
+		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
 		final Experiment.Task target = Experiment.Task.PUBMED;
-		final int year = 2018;
+		final int year = 2017;
 
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();

@@ -78,6 +78,8 @@ public class Experiment extends Thread {
             Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
             for (Map.Entry<String, Metrics> entry : metrics.entrySet()) {
                 String topic = entry.getKey();
+                if (topic == null)
+					throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + output.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
                 entry.getValue().merge(sampleEvalMetrics.get(topic));
             }
         }
