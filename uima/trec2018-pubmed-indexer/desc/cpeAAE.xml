@@ -6,8 +6,8 @@
         <delegateAnalysisEngine key="JCoRe Abstract Database Multiplier">
             <import location="JCoRe Abstract Database Multiplier.xml"/>
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="de.julielab.jcore.consumer.es.ElasticSearchConsumer">
-            <import location="de.julielab.jcore.consumer.es.ElasticSearchConsumer.xml"/>
+        <delegateAnalysisEngine key="JCoRe ElasticSearch Consumer">
+            <import location="JCoRe ElasticSearch Consumer.xml"/>
         </delegateAnalysisEngine>
     </delegateAnalysisEngineSpecifiers>
     <analysisEngineMetaData>
@@ -17,7 +17,7 @@
         <flowConstraints>
             <fixedFlow>
                 <node>JCoRe Abstract Database Multiplier</node>
-                <node>de.julielab.jcore.consumer.es.ElasticSearchConsumer</node>
+                <node>JCoRe ElasticSearch Consumer</node>
             </fixedFlow>
         </flowConstraints>
         <capabilities/>

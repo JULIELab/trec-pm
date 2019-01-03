@@ -9,7 +9,7 @@ import java.util.Set;
 public class SigirPubmedExperimenter {
     public static void main(String[] args) {
         final File baseline = new File(
-                PubmedExperimenter.class.getResource("/templates/biomedical_articles/baseline.json").getFile());
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline.json").getFile());
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
         final Experiment.Task target = Experiment.Task.PUBMED;
@@ -20,13 +20,19 @@ public class SigirPubmedExperimenter {
 
 
         builder.newExperiment().withName("baseline").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline);
+
+        builder.newExperiment().withName("baselinewr").withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(baseline).withWordRemoval();
 
-        builder.newExperiment().withName("baseline").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+        builder.newExperiment().withName("genes").withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(baseline).withWordRemoval().withGeneSynonym().withGeneDescription();
 
-        builder.newExperiment().withName("baseline").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+        builder.newExperiment().withName("diseases").withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(baseline).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
+
+        builder.newExperiment().withName("genedis").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
 
 
         Set<Experiment> experiments = builder.build();

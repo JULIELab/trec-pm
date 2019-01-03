@@ -142,7 +142,7 @@
         <dependency>
             <groupId>de.julielab</groupId>
             <artifactId>jcore-topic-indexing-ae</artifactId>
-            <version>2.3.4-SNAPSHOT</version>
+            <version>2.3.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-beanutils</groupId>

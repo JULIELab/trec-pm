@@ -12,17 +12,26 @@
         <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
             <import location="JCoRe OpenNLP POS Tagger.xml"/>
         </delegateAnalysisEngine>
+        <delegateAnalysisEngine key="JCoRe Stanford Lemmatizer">
+            <import location="JCoRe Stanford Lemmatizer.xml"/>
+        </delegateAnalysisEngine>
         <delegateAnalysisEngine key="JCoRe AcronymAnnotator">
             <import location="JCoRe AcronymAnnotator.xml"/>
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="jules-linnaeus-species-ae">
-            <import location="jules-linnaeus-species-ae.xml"/>
+        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
+            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="jcore-banner-ae">
-            <import location="jcore-banner-ae.xml"/>
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
         </delegateAnalysisEngine>
         <delegateAnalysisEngine key="JCoRe BioSEM Event Annotator">
             <import location="JCoRe BioSEM Event Annotator.xml"/>
+        </delegateAnalysisEngine>
+        <delegateAnalysisEngine key="JCoRe Likelihood Detection AE">
+            <import location="JCoRe Likelihood Detection AE.xml"/>
+        </delegateAnalysisEngine>
+        <delegateAnalysisEngine key="JCoRe Likelihood Assignment AE">
+            <import location="JCoRe Likelihood Assignment AE.xml"/>
         </delegateAnalysisEngine>
         <delegateAnalysisEngine key="de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator">
             <import location="de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator.xml"/>
@@ -38,10 +47,13 @@
                 <node>JCoRe Sentence Annotator</node>
                 <node>JCoRe Token Annotator</node>
                 <node>JCoRe OpenNLP POS Tagger</node>
+                <node>JCoRe Stanford Lemmatizer</node>
                 <node>JCoRe AcronymAnnotator</node>
-                <node>jules-linnaeus-species-ae</node>
-                <node>jcore-banner-ae</node>
+                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
+                <node>JCoRe BANNER AE for Biomedical English</node>
                 <node>JCoRe BioSEM Event Annotator</node>
+                <node>JCoRe Likelihood Detection AE</node>
+                <node>JCoRe Likelihood Assignment AE</node>
                 <node>de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator</node>
             </fixedFlow>
         </flowConstraints>

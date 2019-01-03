@@ -178,6 +178,12 @@
             <nameValuePair>
                 <name>AdditionalTableSchemas</name>
                 <value>
+                    <array/>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>AdditionalTables</name>
+                <value>
                     <array>
                         <string>de.julielab.jcore.types.Gene</string>
                         <string>de.julielab.jcore.types.Organism</string>

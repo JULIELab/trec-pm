@@ -4,7 +4,7 @@
         <runner>
             <name>CPERunner</name>
 	    <pipelinepath>/home/faessler/Coding/git/ourtrecpm/uima/preprocessing</pipelinepath>
-            <numthreads>14</numthreads>
+            <numthreads>1</numthreads>
         </runner>
     </runners>
 </configuration>
