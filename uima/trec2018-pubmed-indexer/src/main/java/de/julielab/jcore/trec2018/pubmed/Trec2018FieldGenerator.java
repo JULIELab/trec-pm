@@ -22,7 +22,7 @@ import java.util.List;
 public class Trec2018FieldGenerator extends FieldGenerator {
 
 
-    private static final Set<String> unwantedGsFields = new HashSet<>(Arrays.asList("unified_id", "title", "abstract"));
+    private static final Set<String> unwantedGsFields = new HashSet<>(Arrays.asList("unified_id", "title", "abstract", "major_mesh", "minor_mesh", "trec_doc_id",  "trec_topic_number", "trec_topic_other2", "trec_topic_other2", "trec_topic_other3"));
 
     public Trec2018FieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
@@ -33,7 +33,7 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addDocId(jCas, document);
         addTitle(jCas, document);
         addAbstract(jCas, document);
-        addAbstractSections(jCas, document);
+        //addAbstractSections(jCas, document);
         addPublicationDate(jCas, document);
         addMeshTags(jCas, document);
         addDocumentSource(jCas, document);
@@ -109,22 +109,6 @@ public class Trec2018FieldGenerator extends FieldGenerator {
                 // Here we add all the GS information about the document. Note that this often includes multiple
                 // records because documents are repeated across topics
                 Map<String, Integer> gsHeaderMap = filterBoard.gsHeaderMap;
-                for (String header : gsHeaderMap.keySet()) {
-                    if (unwantedGsFields.contains(header) || StringUtils.isBlank(header))
-                        continue;
-                    String value = record.get(header);
-                    if (!StringUtils.isBlank(value)) {
-                        ArrayFieldValue fValue = (ArrayFieldValue) document.get(header);
-                        // We must add the value in both if-else-paths because the document won't keep empty arrays
-                        if (fValue == null) {
-                            fValue = new ArrayFieldValue();
-                            fValue.add(new RawToken(value));
-                            document.addField(header, fValue);
-                        } else {
-                            fValue.add(new RawToken(value));
-                        }
-                    }
-                }
 
                 // Here we add the GS information for each topic separately. By making this a sub-document,
                 // the resulting field will be called 'topic_<topicNr>.<record header>' and thus make it possible

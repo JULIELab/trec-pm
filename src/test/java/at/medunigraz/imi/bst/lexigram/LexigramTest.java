@@ -2,6 +2,8 @@ package at.medunigraz.imi.bst.lexigram;
 
 import org.junit.*;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;

@@ -4,7 +4,19 @@
         <mkdir dir="${project.build.directory}/lib"/>
     </target>
 
-    <target name="build.trec.eval.patch">
+    <target name="test.if.nist.is.available">
+        <condition property="nist.available">
+            <socket server="https://trec.nist.gov/" port="443"/>
+        </condition>
+    </target>
+    <target name="test.if.trec.eval.is.available">
+        <available file="${project.build.directory}/lib/trec_eval" property="trec.eval.available"/>
+    </target>
+    <target name="test.if.gene.info.is.available">
+        <available file="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info" property="gene.info.available"/>
+    </target>
+
+    <target name="build.trec.eval.patch" unless="trec.eval.available">
         <!-- We're affected by https://github.com/usnistgov/trec_eval/issues/14 on GCC-7 -->
         <get src="https://github.com/bgamari/trec_eval/archive/8c56e931127d53cff52945ca7d07c5270c190da1.zip"
              dest="${project.build.directory}/lib/trec_eval_patched.zip"
@@ -16,22 +28,17 @@
         <move file="${project.build.directory}/lib/trec_eval-8c56e931127d53cff52945ca7d07c5270c190da1/trec_eval"
               tofile="${project.build.directory}/lib/trec_eval"/>
     </target>
-    <target name="test.if.evalscript.is.available">
-        <condition property="script.available">
-            <socket server="https://trec.nist.gov/" port="443"/>
-        </condition>
-    </target>
     <target name="get.trec.sample.eval" if="script.available">
         <get src="https://trec.nist.gov/data/clinical/sample_eval.pl"
              dest="${project.build.directory}/lib/sample_eval.pl"
              verbose="false" usetimestamp="true"/>
     </target>
-    <target name="get.trec.sample.fallback" unless="script.available">
+    <target name="get.trec.sample.fallback" unless="nist.available">
         <get src="file:resources/sample_eval.pl"
              dest="${project.build.directory}/lib/sample_eval.pl"
              verbose="false" usetimestamp="false"/>
     </target>
-    <target name="get.gene.info">
+    <target name="get.gene.info" unless="gene.info.available">
         <get src="ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz"
              dest="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info.gz"
              verbose="false" usetimestamp="true"/>
@@ -39,6 +46,6 @@
     </target>
 
     <target name="go"
-            depends="create.lib.dir, build.trec.eval.patch, test.if.evalscript.is.available, get.trec.sample.eval, get.trec.sample.fallback, get.gene.info"/>
+            depends="create.lib.dir, test.if.nist.is.available, test.if.trec.eval.is.available, test.if.gene.info.is.available, build.trec.eval.patch, get.trec.sample.eval, get.trec.sample.fallback, get.gene.info"/>
 
 </project>
