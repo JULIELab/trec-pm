@@ -8,7 +8,7 @@
           "fields": {{biomedical_articles/fields.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": 1
+          "boost": {{disease_boost}}
         }
       },
       {
@@ -17,10 +17,10 @@
           "fields": {{biomedical_articles/fields.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": 0.1
+          "boost": {{disease_prefterm_boost}}
         }
       },
-      {{diseaseSynonyms:biomedical_articles/disease_synonym.json}},
+      {{diseaseSynonyms:sigir19_experiments_biomed/disease_synonym_boost.json}},
       {{diseaseHypernyms:biomedical_articles/disease_hypernym.json}},
       {{match_all.json}}
     ]

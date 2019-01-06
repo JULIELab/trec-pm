@@ -53,10 +53,14 @@ public class ExperimentsBuilder {
         return this;
     }
 
-    public ExperimentsBuilder withSubTemplate(File template, String... properties) {
+    public ExperimentsBuilder withSubTemplate(File template, Map<String, String> properties) {
         Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator, array2Map(properties)));
+        buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator, properties));
         return this;
+    }
+
+    public ExperimentsBuilder withSubTemplate(File template, String... properties) {
+        return withSubTemplate(template, array2Map(properties));
     }
 
     public ExperimentsBuilder withKeyword(String value) {

@@ -2,9 +2,8 @@ package at.medunigraz.imi.bst.trec.query;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -49,7 +48,19 @@ public class TemplateQueryDecorator extends MapQueryDecorator {
 		map(topic.getAttributes());
 		map(templateProperties);
 		setJSONQuery(cleanup(getJSONQuery()));
+		checkDanglingTemplates(getJSONQuery());
 		return decoratedQuery.query(topic);
+	}
+
+	private void checkDanglingTemplates(String jsonQuery) {
+		Pattern p = Pattern.compile("\\{\\{([^}]+)\\}\\}");
+		final Matcher matcher = p.matcher(jsonQuery);
+		Set<String> missingTemplates = new HashSet<>();
+		while (matcher.find()) {
+			missingTemplates.add(matcher.group(1));
+		}
+		if (!missingTemplates.isEmpty())
+			throw new IllegalStateException("The following template properties have not been set: " + missingTemplates);
 	}
 
 	protected static String readTemplate(File template) {

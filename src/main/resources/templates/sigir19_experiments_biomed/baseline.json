@@ -1,8 +1,8 @@
 {
 	"bool": {
 		"must": [
-			{{sigir19_experiments_biomed/baseline_disease.json}},
-			{{sigir19_experiments_biomed/baseline_gene.json}}
+			{{sigir19_experiments_biomed/disease.json}},
+			{{sigir19_experiments_biomed/gene.json}}
 		]
 	}
 }

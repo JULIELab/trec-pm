@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[diseaseSynonyms]}}",
+    "fields": {{biomedical_articles/fields.json}},
+    "tie_breaker": 0.3,
+    "type": "phrase",
+    "boost": {{disease_syn_boost}}
+  }
+}

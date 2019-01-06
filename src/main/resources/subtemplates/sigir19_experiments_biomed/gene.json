@@ -8,12 +8,12 @@
           "fields": {{biomedical_articles/fields.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": 1
+          "boost": {{gene_boost}}
         }
       },
-      {{geneSynonyms:biomedical_articles/gene_synonym.json}},
+      {{geneSynonyms:sigir19_experiments_biomed/gene_synonym_boost.json}},
       {{geneHypernyms:biomedical_articles/gene_hypernym.json}},
-      {{geneDescriptions:biomedical_articles/gene_description.json}}
+      {{geneDescriptions:sigir19_experiments_biomed/gene_description_boost.json}}
     ]
   }
 }

@@ -32,7 +32,6 @@ public class ElasticSearchQuery implements Query {
 		} else {
 			es = new ElasticSearch(index);
 		}
-		
 		return es.query(new JSONObject(jsonQuery));
 	}
 	
