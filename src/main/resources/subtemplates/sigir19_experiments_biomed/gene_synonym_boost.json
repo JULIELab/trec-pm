@@ -1,7 +1,7 @@
 {
   "multi_match": {
     "query": "{{[geneSynonyms]}}",
-    "fields": {{biomedical_articles/fields.json}},
+    "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
     "tie_breaker": 0.3,
     "type": "phrase",
     "boost": {{gene_syn_boost}}

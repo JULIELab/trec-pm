@@ -5,7 +5,7 @@
       {
         "multi_match": {
           "query": "{{disease}}",
-          "fields": {{biomedical_articles/fields.json}},
+          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
           "boost": {{disease_boost}}
@@ -14,7 +14,7 @@
       {
         "multi_match": {
           "query": "{{diseasePreferredTerm}}",
-          "fields": {{biomedical_articles/fields.json}},
+          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
           "boost": {{disease_prefterm_boost}}
