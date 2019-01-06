@@ -12,6 +12,10 @@ public class SigirPubmedExperimenter {
     public static void main(String[] args) {
         final File baseline = new File(
                 PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline.json").getFile());
+        final File baselinePlusGeneField = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline_plus_genefield.json").getFile());
+        final File baselineOnlyGeneField = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline_only_genefield.json").getFile());
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
         final Experiment.Task target = Experiment.Task.PUBMED;
@@ -19,10 +23,10 @@ public class SigirPubmedExperimenter {
 
 
         Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("disease_boost", "1");
+        templateProperties.put("disease_boost", "1.5");
         templateProperties.put("disease_prefterm_boost", "1");
         templateProperties.put("disease_syn_boost", "1");
-        templateProperties.put("gene_boost", "1");
+        templateProperties.put("gene_boost", "1.5");
         templateProperties.put("gene_syn_boost", "1");
         templateProperties.put("gene_desc_boost", "1");
 
@@ -34,12 +38,18 @@ public class SigirPubmedExperimenter {
 //        builder.newExperiment().withName("baselinewr").withYear(year).withGoldStandard(goldStandard).withTarget(target)
 //                .withSubTemplate(baseline, templateProperties).withWordRemoval();
 
-        builder.newExperiment().withName("diseases").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
+//        builder.newExperiment().withName("diseases").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
 
-//        builder.newExperiment().withName("genes").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
-//
+        builder.newExperiment().withName("genesnotitbst").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+        //builder.newExperiment().withName("genesplus").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+          //      .withSubTemplate(baselinePlusGeneField, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+       // builder.newExperiment().withName("genesonly").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+         //       .withSubTemplate(baselineOnlyGeneField, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
 //        builder.newExperiment().withName("genedis").withYear(year).withGoldStandard(goldStandard).withTarget(target)
 //                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
 
