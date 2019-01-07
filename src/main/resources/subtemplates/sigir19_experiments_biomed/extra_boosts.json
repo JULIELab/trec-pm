@@ -1,0 +1,6 @@
+{
+  "match": {
+    "_type": "extra",
+    "boost": {{extra_boost}}
+  }
+}

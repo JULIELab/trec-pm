@@ -4,7 +4,6 @@ import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ public class SuperSigirPubmedExperimenter {
         final File noClassifierTemplate = new File(
                 PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
         final File gsClassifierTemplate = new File(
-                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/hpipubgspm.json").getFile());
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/hpipub_gspm_must.json").getFile());
         final File mustClassifierTemplate = new File(
                 PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/hpipubboost_must.json").getFile());
 

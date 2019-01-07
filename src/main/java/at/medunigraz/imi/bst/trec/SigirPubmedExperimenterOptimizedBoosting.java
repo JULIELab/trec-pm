@@ -30,6 +30,7 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("cancer_boost", "1");
         templateProperties.put("chemo_boost", "1");
         templateProperties.put("dna_boost", "1");
+        templateProperties.put("extra_boost", "1");
 
         runExperiments(templateProperties, goldStandard, target, year);
     }
