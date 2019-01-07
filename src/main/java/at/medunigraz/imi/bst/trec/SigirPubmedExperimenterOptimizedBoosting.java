@@ -33,6 +33,6 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("extra_boost", "1");
         templateProperties.put("pm_gs_boost", "1");
 
-        runExperiments(templateProperties, goldStandard, target, year, "", suffix);
+        runExperiments(templateProperties, goldStandard, target, year, "", "");
     }
 }

@@ -34,6 +34,6 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
         templateProperties.put("pm_gs_boost", "1");
         templateProperties.put("non_mel_boost", "-1");
 
-        runExperiments(templateProperties, goldStandard, target, year, "", suffix);
+        runExperiments(templateProperties, goldStandard, target, year, "", "");
     }
 }
