@@ -1,0 +1,13 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "gene genotype DNA base",
+        "fields": {{sigir19_experiments_biomed/fields_boost.json}},
+        "tie_breaker": 0.3,
+        "type": "best_fields"
+        "boost": {{dna_boost}}
+      }
+    }
+  }
+}

@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class SigirPubmedExperimenter {
-    public static void main(String[] args) {
+public class SuperSigirPubmedExperimenter {
+
+
+    protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year) {
         final File baseline = new File(
                 PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline.json").getFile());
         final File baselinePlusGeneField = new File(
@@ -18,25 +20,17 @@ public class SigirPubmedExperimenter {
                 PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline_only_genefield.json").getFile());
         final File withPositiveBoosters = new File(
                 PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/with_pos_boosters.json").getFile());
+        final File withPositiveAndNegativeBoosters = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/with_pos_neg_boosters.json").getFile());
+        final File withPosNegBoostersAdditionalSignals = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/with_pos_neg_boosters_additional_signals.json").getFile());
+        final File noClassifierTemplate = new File(
+                PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final File gsClassifierTemplate = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/hpipubgspm.json").getFile());
+        final File mustClassifierTemplate = new File(
+                PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/hpipubboost_must.json").getFile());
 
-
-        final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
-        final Experiment.Task target = Experiment.Task.PUBMED;
-        final int year = 2017;
-
-
-        Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("disease_boost", "1.5");
-        templateProperties.put("disease_prefterm_boost", "1");
-        templateProperties.put("disease_syn_boost", "1");
-        templateProperties.put("gene_boost", "1.5");
-        templateProperties.put("gene_syn_boost", "1");
-        templateProperties.put("gene_desc_boost", "1");
-        templateProperties.put("title_boost", "");
-        templateProperties.put("abstract_boost", "");
-        templateProperties.put("keyword_boost", "");
-        templateProperties.put("meshTags_boost", "");
-        templateProperties.put("genes_field_boost", "");
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
 
@@ -47,6 +41,9 @@ public class SigirPubmedExperimenter {
                 .withSubTemplate(baseline, templateProperties).withWordRemoval();
 
         builder.newExperiment().withName("diseases").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
+
+        builder.newExperiment().withName("diseaseslptb").withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
 
         builder.newExperiment().withName("genesnodesc").withYear(year).withGoldStandard(goldStandard).withTarget(target)
@@ -70,7 +67,22 @@ public class SigirPubmedExperimenter {
         builder.newExperiment().withName("genespb").withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(withPositiveBoosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
 
+        builder.newExperiment().withName("genedispb").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(withPositiveBoosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
 
+        builder.newExperiment().withName("genedispbnb").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(withPositiveAndNegativeBoosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+        builder.newExperiment().withName("genedisbstadd").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(withPosNegBoostersAdditionalSignals, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+        builder.newExperiment().withName("hpipubboost_must").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(mustClassifierTemplate).withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
+
+        builder.newExperiment().withName("hpipubgspm").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(gsClassifierTemplate, "pm_gs_boost", "1").withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
 
         Set<Experiment> experiments = builder.build();
 

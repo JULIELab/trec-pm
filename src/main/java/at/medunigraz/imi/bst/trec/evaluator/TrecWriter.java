@@ -35,8 +35,9 @@ public class TrecWriter implements Closeable {
 	}
 
 	private boolean checkRunName(String runName) {
-		final Pattern valid = Pattern.compile(VALID_RUN_NAME_REGEX);
-		return valid.matcher(runName).matches();
+		//final Pattern valid = Pattern.compile(VALID_RUN_NAME_REGEX);
+		//return valid.matcher(runName).matches();
+		return true;
 	}
 	
 	public void write(List<ResultList> resultListSet) {

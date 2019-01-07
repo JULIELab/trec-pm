@@ -1,0 +1,13 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "cancer carcinoma tumor",
+        "fields": {{sigir19_experiments_biomed/fields_boost.json}},
+        "tie_breaker": 0.3,
+        "type": "best_fields"
+        "boost": {{cancer_boost}}
+      }
+    }
+  }
+}
