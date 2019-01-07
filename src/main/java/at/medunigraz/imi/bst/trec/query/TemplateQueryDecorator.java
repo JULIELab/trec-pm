@@ -55,7 +55,7 @@ public class TemplateQueryDecorator extends MapQueryDecorator {
 		try {
 			return decoratedQuery.query(topic);
 		} catch (JSONException e) {
-			LOG.error("JSON exception when trying to build template from {}", template);
+			LOG.error("JSON exception when trying to build template from {}: {}", template, getJSONQuery());
 			throw e;
 		}
 	}

@@ -1,6 +1,8 @@
 {
   "match": {
-    "_type": "extra",
-    "boost": {{extra_boost}}
+    "_type": {
+      "query": "extra",
+      "boost": {{extra_boost}}
+    }
   }
 }

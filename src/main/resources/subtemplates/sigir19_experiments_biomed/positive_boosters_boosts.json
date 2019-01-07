@@ -4,8 +4,8 @@
       "multi_match": {
         "query": "gefitinib treatment survival prognostic clinical prognosis therapy outcome resistance Gleason targets",
         "fields": [
-          "title^2",
-          "abstract"
+          "title{{title_boost}}",
+          "abstract{{abstract_boost}"
         ],
         "tie_breaker": 0.3,
         "type": "best_fields",

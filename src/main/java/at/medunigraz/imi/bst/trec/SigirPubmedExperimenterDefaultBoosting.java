@@ -26,13 +26,14 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
         templateProperties.put("meshTags_boost", "");
         templateProperties.put("genes_field_boost", "");
         templateProperties.put("pos_words_boost", "1");
-        templateProperties.put("neg_words_boost", "1");
+        templateProperties.put("neg_words_boost", "-1");
         templateProperties.put("cancer_boost", "1");
         templateProperties.put("chemo_boost", "1");
         templateProperties.put("dna_boost", "1");
         templateProperties.put("extra_boost", "1");
         templateProperties.put("pm_gs_boost", "1");
+        templateProperties.put("non_mel_boost", "-1");
 
-        runExperiments(templateProperties, goldStandard, target, year);
+        runExperiments(templateProperties, goldStandard, target, year, "", suffix);
     }
 }

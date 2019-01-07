@@ -10,7 +10,11 @@
 			{{sigir19_experiments_biomed/chemotherapy_boosts.json}},
 			{{sigir19_experiments_biomed/cancer_boosts.json}},
 			{{sigir19_experiments_biomed/dna_boosts.json}},
-			{{sigir19_experiments_biomed/extra_boosts.json}}
+			{{sigir19_experiments_biomed/extra_boosts.json}},
+			{{sigir19_experiments_biomed/pm_gs.json}}
+		],
+		"must_not": [
+			{{biomedical_articles/non_melanoma.json}}
 		]
 	}
 }

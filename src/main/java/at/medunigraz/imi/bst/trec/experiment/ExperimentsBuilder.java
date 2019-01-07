@@ -14,6 +14,7 @@ public class ExperimentsBuilder {
     private Set<Experiment> experiments = new HashSet<>();
 
     private Experiment buildingExp = null;
+    private String statsDir;
 
     public ExperimentsBuilder() {
     }
@@ -21,6 +22,8 @@ public class ExperimentsBuilder {
     public ExperimentsBuilder newExperiment() {
         validate();
         buildingExp = new Experiment();
+        if (statsDir != null)
+            withStatsDir(statsDir);
         return this;
     }
 
@@ -158,6 +161,11 @@ public class ExperimentsBuilder {
         return this;
     }
 
+    public ExperimentsBuilder withStatsDir(String dir) {
+        buildingExp.setStatsDir(dir);
+        return this;
+    }
+
     public Set<Experiment> build() {
         validate();
         return experiments;
@@ -184,5 +192,9 @@ public class ExperimentsBuilder {
             }
         }
         return map;
+    }
+
+    public void setDefaultStatsDir(String statsDir) {
+        this.statsDir = statsDir;
     }
 }

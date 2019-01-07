@@ -31,6 +31,8 @@ public class Experiment extends Thread {
 
 	private String experimentName = null;
 
+    private String statsDir = "stats/";
+
 	public Metrics allMetrics = null;
 	
 	public static enum Task {
@@ -41,7 +43,15 @@ public class Experiment extends Thread {
 		INTERNAL, OFFICIAL
 	}
 
-	@Override
+    public String getStatsDir() {
+        return statsDir;
+    }
+
+    public void setStatsDir(String statsDir) {
+        this.statsDir = statsDir.endsWith(File.separator) ? statsDir : statsDir + File.separator;
+    }
+
+    @Override
 	public void run() {
 		final String name = getExperimentId() + " with decorators " + decorator.getName();
 
@@ -84,11 +94,15 @@ public class Experiment extends Thread {
             }
         }
 
-		XMLStatsWriter xsw = new XMLStatsWriter(new File("stats/" + this.goldStandard + "_" + getExperimentId() + ".xml"));
+        File statsDirFile = new File(statsDir);
+        if (!statsDirFile.exists())
+            statsDirFile.mkdir();
+
+		XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + this.goldStandard + "_" + getExperimentId() + ".xml"));
 		xsw.write(metrics);
 		xsw.close();
 
-		CSVStatsWriter csw = new CSVStatsWriter(new File("stats/" + this.goldStandard + "_" + getExperimentId() + ".csv"));
+		CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + this.goldStandard + "_" + getExperimentId() + ".csv"));
 		csw.write(metrics);
 		csw.close();
 
