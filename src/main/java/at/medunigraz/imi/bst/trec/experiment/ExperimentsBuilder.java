@@ -163,6 +163,10 @@ public class ExperimentsBuilder {
         return experiments;
     }
 
+    public Experiment getCurrentExperiment() {
+        return buildingExp;
+    }
+
     private void validate() {
         if (buildingExp != null) {
             this.experiments.add(buildingExp);
