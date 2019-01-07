@@ -8,7 +8,7 @@
           "abstract"
         ],
         "tie_breaker": 0.3,
-        "type": "best_fields"
+        "type": "best_fields",
         "boost": {{pos_words_boost}}
       }
     }

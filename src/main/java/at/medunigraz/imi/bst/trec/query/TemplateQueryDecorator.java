@@ -10,9 +10,12 @@ import org.apache.commons.io.FileUtils;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONException;
 
 public class TemplateQueryDecorator extends MapQueryDecorator {
-	
+	private static final Logger LOG = LogManager.getLogger();
 	protected File template;
 	private final Map<String, String> templateProperties;
 
@@ -49,7 +52,12 @@ public class TemplateQueryDecorator extends MapQueryDecorator {
 		map(templateProperties);
 		setJSONQuery(cleanup(getJSONQuery()));
 		checkDanglingTemplates(getJSONQuery());
-		return decoratedQuery.query(topic);
+		try {
+			return decoratedQuery.query(topic);
+		} catch (JSONException e) {
+			LOG.error("JSON exception when trying to build template from {}", template);
+			throw e;
+		}
 	}
 
 	private void checkDanglingTemplates(String jsonQuery) {

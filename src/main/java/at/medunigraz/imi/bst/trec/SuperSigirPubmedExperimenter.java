@@ -48,7 +48,7 @@ public class SuperSigirPubmedExperimenter {
         final File[] templateFiles = file.listFiles(f -> !f.getName().equals(".DS_Store"));
         Map<String, TemplateSet> templateMap = new HashMap<>();
         for (File template : templateFiles) {
-            String base = template.getName().replace("gspm_must", "").replace("gspm_should", "");
+            String base = template.getName().replace(".json", "").replace("_gspm_must", "").replace("_gspm_should", "");
             final TemplateSet set = templateMap.compute(base, (k, v) -> v != null ? v : new TemplateSet());
             if (template.getName().contains("gspm_must"))
                 set.setGspmMust(template);
