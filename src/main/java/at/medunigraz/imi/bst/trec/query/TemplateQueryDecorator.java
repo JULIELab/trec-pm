@@ -38,6 +38,8 @@ public class TemplateQueryDecorator extends MapQueryDecorator {
 	 */
 	public TemplateQueryDecorator(File template, Query decoratedQuery, Map<String, String> templateProperties) {
 		super(decoratedQuery);
+		if (template == null)
+            throw new IllegalArgumentException("The passed template is null");
 		this.template = template;
 		// XXX This cannot be called here anymore, as the final template generated may depend on the topic
 		//loadTemplate(null);

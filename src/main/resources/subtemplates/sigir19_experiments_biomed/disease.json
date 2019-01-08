@@ -1,6 +1,6 @@
 {
   "dis_max": {
-    "boost": 1.0,
+    "boost": {{disease_boost}},
     "queries": [
       {
         "multi_match": {
@@ -8,7 +8,7 @@
           "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": {{disease_boost}}
+          "boost": {{disease_topic_boost}}
         }
       },
       {

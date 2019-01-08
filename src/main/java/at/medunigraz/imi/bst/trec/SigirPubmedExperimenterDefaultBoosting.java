@@ -15,9 +15,11 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
 
         Map<String, String> templateProperties = new HashMap<>();
         templateProperties.put("disease_boost", "1");
+        templateProperties.put("disease_topic_boost", "1");
         templateProperties.put("disease_prefterm_boost", "1");
         templateProperties.put("disease_syn_boost", "1");
         templateProperties.put("gene_boost", "1");
+        templateProperties.put("gene_topic_boost", "1");
         templateProperties.put("gene_syn_boost", "1");
         templateProperties.put("gene_desc_boost", "1");
         templateProperties.put("title_boost", "");

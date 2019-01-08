@@ -60,6 +60,9 @@ public class Experiment extends Thread {
 		File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
 		TopicSet topicSet = new TopicSet(example);
 
+        File resultsDir = new File("results");
+        if (!resultsDir.exists())
+            resultsDir.mkdir();
 		File output = new File("results/" + getExperimentId() + ".trec_results");
 		final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
 		TrecWriter tw = new TrecWriter(output, runName);
@@ -68,6 +71,10 @@ public class Experiment extends Thread {
 		List<ResultList> resultListSet = new ArrayList<>();
 		for (Topic topic : topicSet.getTopics()) {
 			List<Result> results = decorator.query(topic);
+
+
+            if (results.isEmpty())
+                throw new IllegalStateException("RESULT EMPTY for " + experimentName);
 
 			ResultList resultList = new ResultList(topic);
 			resultList.setResults(results);

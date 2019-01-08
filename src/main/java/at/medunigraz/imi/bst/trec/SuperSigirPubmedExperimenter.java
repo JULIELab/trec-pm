@@ -14,7 +14,7 @@ public class SuperSigirPubmedExperimenter {
 
 
     protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 19)
+        if (templateProperties.size() > 21)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
@@ -63,12 +63,12 @@ public class SuperSigirPubmedExperimenter {
 
     private static void addExperimentsWithGoldStandardPmClassifierShould(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
         Function<String, File> getTemplate = name -> templates.get(name).getGspmShould();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_should"+suffix);
+        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_should" + suffix);
     }
 
     private static void addExperimentsWithGoldStandardPmClassifierMust(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
         Function<String, File> getTemplate = name -> templates.get(name).getGspmMust();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_must"+suffix);
+        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_must" + suffix);
     }
 
     private static void addExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, Function<String, File> getTemplate, String suffix) {
@@ -142,6 +142,8 @@ public class SuperSigirPubmedExperimenter {
         }
 
         public File getGspmMust() {
+            if (gspmMust == null)
+                throw new IllegalStateException("The GSPM MUST template for the base template " + base.getAbsolutePath() + " is null");
             return gspmMust;
         }
 
@@ -150,6 +152,8 @@ public class SuperSigirPubmedExperimenter {
         }
 
         public File getGspmShould() {
+            if (gspmShould == null)
+                throw new IllegalStateException("The GSPM SHOULD template for the base template " + base.getAbsolutePath() + " is null");
             return gspmShould;
         }
 
