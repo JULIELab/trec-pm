@@ -22,7 +22,7 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("gene_topic_boost", "1");
         templateProperties.put("gene_syn_boost", "0.7");
         templateProperties.put("gene_desc_boost", "0.1");
-        templateProperties.put("title_boost", "^2");
+        templateProperties.put("title_boost", "");
         templateProperties.put("abstract_boost", "");
         templateProperties.put("keyword_boost", "");
         templateProperties.put("meshTags_boost", "");
@@ -35,7 +35,8 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("extra_boost", "1");
         templateProperties.put("pm_gs_boost", "1");
         templateProperties.put("pm_boost", "1");
-        templateProperties.put("non_mel_boost", "-1");
+        // Doesn't seem to do anything, the whole non-melanoma query part doesn't show much influence (none?)
+        templateProperties.put("non_mel_boost", "-10");
 
         runExperiments(templateProperties, goldStandard, target, year, "", "");
     }

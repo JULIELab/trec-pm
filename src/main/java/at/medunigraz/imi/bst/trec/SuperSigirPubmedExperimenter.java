@@ -97,51 +97,55 @@ public class SuperSigirPubmedExperimenter {
         File with_pos_neg_boosters_additional_signals = getTemplate.apply("with_pos_neg_boosters_additional_signals");
         File with_pos_neg_boosters_additional_signals_extra = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra");
         File with_pos_neg_boosters_additional_signals_extra_nonmel = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel");
+        File with_pos_neg_boosters_additional_signals_extra_nonmel_should = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel_should");
 
-//        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties);
-//
-//        builder.newExperiment().withName("baselinewr" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval();
-//
-//        builder.newExperiment().withName("diseases" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
-//
-//        builder.newExperiment().withName("diseasesptb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
-//
-//        builder.newExperiment().withName("genesnodesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym();
-//
-//        builder.newExperiment().withName("genes" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genesplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline_plus_genefield, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genesonly" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline_only_genefield, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genedis" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_boosters, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genespb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_boosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genedispbnb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("posnegbstadd" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("posnegbstaddextra" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties);
+
+        builder.newExperiment().withName("baselinewr" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval();
+
+        builder.newExperiment().withName("diseases" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
+
+        builder.newExperiment().withName("diseasesptb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym();
+
+        builder.newExperiment().withName("genesnodesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym();
+
+        builder.newExperiment().withName("genes" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genesplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline_plus_genefield, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genesonly" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline_only_genefield, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genedis" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_boosters, templateProperties).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genespb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_boosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription();
+
+        builder.newExperiment().withName("genedispbnb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_neg_boosters, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+        builder.newExperiment().withName("posnegbstadd" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_neg_boosters_additional_signals, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+        builder.newExperiment().withName("posnegbstaddextra" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
 
         builder.newExperiment().withName("addextranonmel" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+        builder.newExperiment().withName("addextranonmelshould" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel_should, templateProperties).withWordRemoval().withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
     }
 
     private static class TemplateSet {
