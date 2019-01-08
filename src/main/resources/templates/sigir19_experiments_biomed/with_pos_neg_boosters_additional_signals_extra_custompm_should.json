@@ -1,0 +1,17 @@
+{
+	"bool": {
+		"must": [
+			{{sigir19_experiments_biomed/disease.json}},
+			{{sigir19_experiments_biomed/gene.json}}
+		],
+		"should": [
+			{{sigir19_experiments_biomed/positive_boosters_boosts.json}},
+			{{sigir19_experiments_biomed/negative_boosters_boosts.json}},
+			{{sigir19_experiments_biomed/chemotherapy_boosts.json}},
+			{{sigir19_experiments_biomed/cancer_boosts.json}},
+			{{sigir19_experiments_biomed/dna_boosts.json}},
+			{{sigir19_experiments_biomed/extra_boosts.json}},
+			{{sigir19_experiments_biomed/pm.json}}
+		]
+	}
+}

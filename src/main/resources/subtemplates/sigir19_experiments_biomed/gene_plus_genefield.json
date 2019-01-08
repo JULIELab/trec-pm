@@ -1,6 +1,6 @@
 {
   "dis_max": {
-    "boost": 1.0,
+    "boost": {{gene_boost}},
     "queries": [
       {
         "multi_match": {
@@ -8,7 +8,7 @@
           "fields": {{sigir19_experiments_biomed/gene_fields_boosts.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": {{gene_boost}}
+          "boost": {{gene_topic_boost}}
         }
       },
       {{geneSynonyms:sigir19_experiments_biomed/gene_synonym_boost_plus_genefield.json}},

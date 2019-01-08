@@ -18,8 +18,8 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("disease_topic_boost", "1");
         templateProperties.put("disease_prefterm_boost", "0.1");
         templateProperties.put("disease_syn_boost", "0.1");
-        templateProperties.put("gene_boost", "1.3");
-        templateProperties.put("gene_topic_boost", "1.5");
+        templateProperties.put("gene_boost", "1.5");
+        templateProperties.put("gene_topic_boost", "1");
         templateProperties.put("gene_syn_boost", "0.7");
         templateProperties.put("gene_desc_boost", "0.1");
         templateProperties.put("title_boost", "^2");
@@ -34,6 +34,8 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         templateProperties.put("dna_boost", "1");
         templateProperties.put("extra_boost", "1");
         templateProperties.put("pm_gs_boost", "1");
+        templateProperties.put("pm_boost", "1");
+        templateProperties.put("non_mel_boost", "-1");
 
         runExperiments(templateProperties, goldStandard, target, year, "", "");
     }

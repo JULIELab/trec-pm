@@ -1,0 +1,8 @@
+{
+  "term": {
+    "documentClasses.keyword": {
+      "value": "PM",
+      "boost": {{pm_boost}}
+    }
+  }
+}
