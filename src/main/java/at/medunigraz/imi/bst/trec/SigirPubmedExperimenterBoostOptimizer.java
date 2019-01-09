@@ -53,9 +53,9 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
 
         DecimalFormat df = new DecimalFormat("0.0");
         if (what.equals("disease")) {
-            for (double disb = .4; disb < 2; disb += .4) {
-                for (double ptb = .4; ptb < 2; ptb += .4) {
-                    for (double synb = .4; synb < 2; synb += .4) {
+            for (double disb = .4; disb < 2.4; disb += .4) {
+                for (double ptb = .2; ptb < 1.2; ptb += .4) {
+                    for (double synb = .2; synb < 2; synb += .4) {
                         templateProperties.put("disease_boost", String.valueOf(disb));
                         templateProperties.put("disease_prefterm_boost", String.valueOf(ptb));
                         templateProperties.put("disease_syn_boost", String.valueOf(synb));
@@ -65,9 +65,9 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 }
             }
         } else if (what.equals("gene")) {
-            for (double genb = .4; genb < 2; genb += .4) {
-                for (double descb = .4; descb < 2; descb += .4) {
-                    for (double synb = .4; synb < 2; synb += .4) {
+            for (double genb = .4; genb < 2.4; genb += .4) {
+                for (double descb = .2; descb < 1.8; descb += .4) {
+                    for (double synb = .2; synb < 1.8; synb += .4) {
                         templateProperties.put("gene_boost", String.valueOf(genb));
                         templateProperties.put("gene_desc_boost", String.valueOf(descb));
                         templateProperties.put("gene_syn_boost", String.valueOf(synb));
@@ -77,11 +77,11 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 }
             }
         } else if (what.equals("fields")) {
-            for (double titb = .4; titb < 2; titb += .4) {
-                for (double abstrb = .4; abstrb < 2; abstrb += .4) {
-                    for (double kwb = .4; kwb < 2; kwb += .4) {
-                        for (double meshb = .4; meshb < 2; meshb += .4) {
-                            for (double genesb = .4; genesb < 2; genesb += .4) {
+            for (double titb = 1; titb < 1.6; titb += .2) {
+                for (double abstrb = 1; abstrb < 1.6; abstrb += .2) {
+                    for (double kwb = 1; kwb < 1.6; kwb += .2) {
+                        for (double meshb = 1; meshb < 1.6; meshb += .2) {
+                            for (double genesb = 1; genesb < 1.1; genesb += .4) {
                                 templateProperties.put("title_boost", "^" + titb);
                                 templateProperties.put("abstract_boost", "^" + abstrb);
                                 templateProperties.put("keyword_boost", "^" + kwb);

@@ -15,7 +15,7 @@ public class ClinicalTrialsExperimenter {
 
 		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
 		final Experiment.Task target = Experiment.Task.CLINICAL_TRIALS;
-		final int year = 2017;
+		final int year = 2018;
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();
 
