@@ -1,9 +1,5 @@
-# Erik Faessler, 01 Jan 2019: Got this from a GitHub repository
-# because the NIST server is down and I cannot download
-# it from the original source. But this script seems to work
-# just fine. We will use it in the pom.xml's ant plugin
-# as a fallback.
-#
+#!/usr/bin/perl -w
+
 # This code implements measures discussed in the SIGIR 2008 paper
 # "A Simple and Efficient Sampling Method for Estimating AP and NDCG"
 # by Emine Yilmaz, Evangelos Kanoulas, and Javed A. Aslam. See the ACM
@@ -513,3 +509,6 @@ for ($i=0;$i<=$#precisionranks;$i++){
 printf "inum_rel_ret\tall\t%14.4f\n", $sum_rel_ret;
 printf "inum_rel\tall\t%14.4f\n", $sum_num_rel;
 printf "num_ret\t\tall\t%9d\n", $sum_num_ret;
+ 
+
+ 

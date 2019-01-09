@@ -46,7 +46,7 @@ public class ElasticSearch implements SearchEngine {
 	
 	private List<Result> query(QueryBuilder qb) {
 		SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(types).setQuery(qb)
-				.setSize(10000).addStoredField("_id");
+				.setSize(1000).addStoredField("_id");
 
 		SearchResponse response = searchRequestBuilder.get();
 		//LOG.trace(JsonUtils.prettify(response.toString()));
