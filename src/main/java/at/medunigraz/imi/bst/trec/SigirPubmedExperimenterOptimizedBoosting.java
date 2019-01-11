@@ -14,21 +14,21 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
 
 
         Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("disease_boost", "1.5");
+        templateProperties.put("disease_boost", "1.6");
         templateProperties.put("disease_topic_boost", "1");
-        templateProperties.put("disease_prefterm_boost", "0.1");
-        templateProperties.put("disease_syn_boost", "0.1");
-        templateProperties.put("gene_boost", "1.5");
+        templateProperties.put("disease_prefterm_boost", "0.6");
+        templateProperties.put("disease_syn_boost", "1.4");
+        templateProperties.put("gene_boost", "1.6");
         templateProperties.put("gene_topic_boost", "1");
-        templateProperties.put("gene_syn_boost", "0.7");
-        templateProperties.put("gene_desc_boost", "0.1");
-        templateProperties.put("title_boost", "");
+        templateProperties.put("gene_syn_boost", "0.6");
+        templateProperties.put("gene_desc_boost", "0.2");
+        templateProperties.put("title_boost", "^1.6");
         templateProperties.put("abstract_boost", "");
         templateProperties.put("keyword_boost", "");
         templateProperties.put("meshTags_boost", "");
         templateProperties.put("genes_field_boost", "");
-        templateProperties.put("pos_words_boost", "1");
-        templateProperties.put("neg_words_boost", "-1");
+        templateProperties.put("pos_words_boost", "1.1");
+        templateProperties.put("neg_words_boost", "-0.2");
         templateProperties.put("cancer_boost", "1");
         templateProperties.put("chemo_boost", "1");
         templateProperties.put("dna_boost", "1");

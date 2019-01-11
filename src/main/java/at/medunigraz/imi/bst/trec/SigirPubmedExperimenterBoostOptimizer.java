@@ -31,10 +31,12 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
 
 
         Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("disease_boost", "1");
+        templateProperties.put("disease_boost", "1.5");
+        templateProperties.put("disease_topic_boost", "1");
         templateProperties.put("disease_prefterm_boost", "1");
         templateProperties.put("disease_syn_boost", "1");
-        templateProperties.put("gene_boost", "1");
+        templateProperties.put("gene_boost", "1.5");
+        templateProperties.put("gene_topic_boost", "1");
         templateProperties.put("gene_syn_boost", "1");
         templateProperties.put("gene_desc_boost", "1");
         templateProperties.put("title_boost", "");
@@ -49,6 +51,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         templateProperties.put("dna_boost", "1");
         templateProperties.put("extra_boost", "1");
         templateProperties.put("pm_gs_boost", "1");
+        templateProperties.put("pm_boost", "1");
         templateProperties.put("non_mel_boost", "1");
 
         DecimalFormat df = new DecimalFormat("0.0");
@@ -96,8 +99,8 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 }
             }
         } else if (what.equals("posneg")) {
-            for (double posb = .4; posb < 2; posb += .4) {
-                for (double negb = -1; negb < .8; negb += .4) {
+            for (double posb = .7; posb < 1.2; posb += .1) {
+                for (double negb = -3; negb < .2; negb += .4) {
                     templateProperties.put("pos_words_boost", String.valueOf(posb));
                     templateProperties.put("neg_words_boost", String.valueOf(negb));
                     String suffix = "XXpos" + df.format(posb) + "neg" + df.format(negb);

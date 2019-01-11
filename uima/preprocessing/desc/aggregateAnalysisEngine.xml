@@ -1,67 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
     <primitive>false</primitive>
+        
     <delegateAnalysisEngineSpecifiers>
-        <delegateAnalysisEngine key="JCoRe Sentence Annotator">
-            <import location="JCoRe Sentence Annotator.xml"/>
+                
+        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
+                        
+            <import location="JCoRe Mutation Annotator.xml"/>
+                    
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe Token Annotator">
-            <import location="JCoRe Token Annotator.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
-            <import location="JCoRe OpenNLP POS Tagger.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe Stanford Lemmatizer">
-            <import location="JCoRe Stanford Lemmatizer.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe AcronymAnnotator">
-            <import location="JCoRe AcronymAnnotator.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
-            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
-            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe BioSEM Event Annotator">
-            <import location="JCoRe BioSEM Event Annotator.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe Likelihood Detection AE">
-            <import location="JCoRe Likelihood Detection AE.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe Likelihood Assignment AE">
-            <import location="JCoRe Likelihood Assignment AE.xml"/>
-        </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator">
-            <import location="de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator.xml"/>
-        </delegateAnalysisEngine>
+            
     </delegateAnalysisEngineSpecifiers>
+        
     <analysisEngineMetaData>
+                
         <name>JCoRe Pipeline AAE</name>
+                
         <description>This AAE descriptor directly contains the analysis engines added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
+                
         <configurationParameters/>
+                
         <configurationParameterSettings/>
+                
         <flowConstraints>
+                        
             <fixedFlow>
-                <node>JCoRe Sentence Annotator</node>
-                <node>JCoRe Token Annotator</node>
-                <node>JCoRe OpenNLP POS Tagger</node>
-                <node>JCoRe Stanford Lemmatizer</node>
-                <node>JCoRe AcronymAnnotator</node>
-                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
-                <node>JCoRe BANNER AE for Biomedical English</node>
-                <node>JCoRe BioSEM Event Annotator</node>
-                <node>JCoRe Likelihood Detection AE</node>
-                <node>JCoRe Likelihood Assignment AE</node>
-                <node>de.julielab.jcore.ae.pmclassifier.PMClassificationAnnotator</node>
+                                
+                <node>JCoRe Mutation Annotator</node>
+                            
             </fixedFlow>
+                    
         </flowConstraints>
+                
         <capabilities/>
+                
         <operationalProperties>
+                        
             <modifiesCas>true</modifiesCas>
+                        
             <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
             <outputsNewCASes>false</outputsNewCASes>
+                    
         </operationalProperties>
+            
     </analysisEngineMetaData>
+    
 </analysisEngineDescription>

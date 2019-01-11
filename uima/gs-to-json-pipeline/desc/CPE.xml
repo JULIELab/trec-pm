@@ -3,14 +3,14 @@
     <collectionReader>
         <collectionIterator>
             <descriptor>
-                <include href="JCoRe XMI Database Reader.xml"/>
+                <import location="JCoRe XMI Database Reader.xml"/>
             </descriptor>
         </collectionIterator>
     </collectionReader>
-    <casProcessors casPoolSize="1" processingUnitThreadCount="1">
+    <casProcessors casPoolSize="24" processingUnitThreadCount="1">
     <casProcessor deployment="integrated" name="CPE AAE">
         <descriptor>
-            <include href="cpeAAE.xml"/>
+            <import location="cpeAAE.xml"/>
         </descriptor>
             <deploymentParameters/>
         <errorHandling>
@@ -18,7 +18,7 @@
             <maxConsecutiveRestarts action="terminate" value="30"/>
             <timeout max="100000" default="-1"/>
         </errorHandling>
-        <checkpoint batch="1" time="1000ms"/>
+        <checkpoint batch="500" time="1000ms"/>
     </casProcessor>
     </casProcessors>
     <cpeConfig>

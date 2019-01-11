@@ -3,7 +3,7 @@
 <runners>
 <runner>
 <name>CPERunner</name>
-<pipelinepath>/home/faessler/Coding/git/trec2018/uima/gs-to-json-pipeline/</pipelinepath>
+<pipelinepath>/home/faessler/Coding/git/ourtrecpm/uima/gs-to-json-pipeline</pipelinepath>
 <numthreads>1</numthreads>
 </runner>
 </runners>

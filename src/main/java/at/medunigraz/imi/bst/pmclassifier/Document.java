@@ -3,7 +3,9 @@ package at.medunigraz.imi.bst.pmclassifier;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class Document {
     @JsonProperty("pubmedId")
@@ -11,6 +13,7 @@ public class Document {
     private String title;
     @JsonProperty("abstract")
     private String abstractText;
+    private String alltextreplacedentities;
     private List<String> genes;
     private List<String> organisms;
     private List<String> meshTags;
@@ -21,6 +24,14 @@ public class Document {
     private List<String> publicationTypes;
     @JsonIgnore
     private double[] topicWeight;
+
+    public String getAlltextreplacedentities() {
+        return alltextreplacedentities;
+    }
+
+    public void setAlltextreplacedentities(String alltextreplacedentities) {
+        this.alltextreplacedentities = alltextreplacedentities;
+    }
 
     public double[] getTopicWeight() {
         return topicWeight;
@@ -117,5 +128,20 @@ public class Document {
 
     public void setPMLabel(String pmLabel) {
         this.pmLabel = pmLabel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Document document = (Document) o;
+        return Objects.equals(id, document.id) &&
+                Arrays.equals(topicWeight, document.topicWeight);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
     }
 }

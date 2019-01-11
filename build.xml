@@ -34,7 +34,7 @@
              verbose="false" usetimestamp="true"/>
     </target>
     <target name="get.trec.sample.fallback" unless="nist.available">
-        <get src="file:resources/sample_eval.pl"
+        <get src="file:${basedir}/resources/sample_eval.pl"
              dest="${project.build.directory}/lib/sample_eval.pl"
              verbose="false" usetimestamp="false"/>
     </target>

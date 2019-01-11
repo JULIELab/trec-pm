@@ -17,6 +17,7 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.DoubleArray;
+import org.elasticsearch.common.util.set.Sets;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +58,7 @@ public class CrossVal {
         List<List<Document>> partitions = makeStratifiedPartitions(pmList, notPmList, numFolds);
 
         int corrAllover = 0;
+        Set<Document> onceRight = new HashSet<>();
         for (int fold = 0; fold < numFolds; fold++) {
             int currentFold = fold;
             Map<String, Document> train = IntStream.range(0, numFolds).filter(i -> i != currentFold).mapToObj(partitions::get).flatMap(Collection::stream).collect(toMap(Document::getId, d -> d));
@@ -70,8 +72,10 @@ public class CrossVal {
             int corr = 0;
             for (Document document : test.values()) {
                 String predict = classifier.predict(document);
-                if (predict.equalsIgnoreCase(document.getPmLabel()))
+                if (predict.equalsIgnoreCase(document.getPmLabel())) {
                     ++corr;
+                    onceRight.add(document);
+                }
             }
             LOG.info("Evaluation for fold " + fold + ":");
             LOG.info("Total: " + test.size());
@@ -86,6 +90,10 @@ public class CrossVal {
         LOG.info("Total: " + documents.size());
         LOG.info("Correct: " + corrAllover);
         LOG.info("That is " + (corrAllover / (double) documents.size()) * 100 + "%");
+
+        final HashSet<Document> alldocs = new HashSet<>(documents.values());
+        final Set<Document> alwaysWrong = Sets.difference(alldocs, onceRight);
+        alwaysWrong.forEach(System.out::println);
 
     }
 

@@ -15,7 +15,10 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class PmClassifierInputFieldGenerator extends FieldGenerator {
 
@@ -27,6 +30,7 @@ public class PmClassifierInputFieldGenerator extends FieldGenerator {
     public Document addFields(JCas jCas, Document document) throws CASException, FieldGenerationException {
         addPmid(jCas, document);
         addTitle(jCas, document);
+        addAllTextReplaceEntities(jCas, document);
         addFullAbstract(jCas, document);
         addMeshTags(jCas, document);
         addGenes(jCas, document);
@@ -34,6 +38,20 @@ public class PmClassifierInputFieldGenerator extends FieldGenerator {
         addPublicationType(jCas, document);
         addKeywords(jCas, document);
         return document;
+    }
+
+    private void addAllTextReplaceEntities(JCas jCas, Document document) {
+        StringBuilder sb = new StringBuilder(jCas.getDocumentText());
+        List<Gene> genes = new ArrayList<>(JCasUtil.select(jCas, Gene.class));
+        Collections.sort(genes, (g1, g2) -> Integer.compare(g2.getBegin(), g1.getBegin()));
+        for (Gene gene : genes) {
+            try {
+                sb.replace(gene.getBegin(), gene.getEnd(), "XXGENEXX");
+            } catch (java.lang.StringIndexOutOfBoundsException e) {
+                System.err.println("Gene is out of bounds of the text that has length " + jCas.getDocumentText().length());
+            }
+        }
+        document.addField("alltextreplacedentities", sb.toString());
     }
 
     private void addKeywords(JCas jCas, Document document) {

@@ -2,7 +2,6 @@ package at.medunigraz.imi.bst.pmclassifier;
 
 import cc.mallet.classify.Classification;
 import cc.mallet.classify.Classifier;
-import cc.mallet.classify.MaxEnt;
 import cc.mallet.classify.MaxEntTrainer;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
@@ -12,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.rmi.server.UID;
 
 public class MalletClassifier implements Serializable{
 
@@ -47,6 +45,13 @@ public class MalletClassifier implements Serializable{
         Label bestLabel = classification.getLabeling().getBestLabel();
         //classification.getLabeling().value(classifier.getInstancePipe().getTargetAlphabet().lookupIndex(""))
         return (String) bestLabel.getEntry();
+    }
+
+    public double predictProbabiltyForPM(Document document) {
+        Instance instance = classifier.getInstancePipe().instanceFrom(new Instance(document, "unknown", document.getId(), ""));
+        Classification classification = classifier.classify(instance);
+        final Label pmlabel = classification.getLabeling().getLabelAlphabet().lookupLabel("PM");
+        return classification.getLabelVector().value(pmlabel);
     }
 
     public Classifier getClassifier() {
