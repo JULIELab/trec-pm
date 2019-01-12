@@ -30,7 +30,8 @@ public class PmClassifierInputFieldGenerator extends FieldGenerator {
     public Document addFields(JCas jCas, Document document) throws CASException, FieldGenerationException {
         addPmid(jCas, document);
         addTitle(jCas, document);
-        addAllTextReplaceEntities(jCas, document);
+        // I tried this for the PM classifier but it didn't do any good
+        //addAllTextReplaceEntities(jCas, document);
         addFullAbstract(jCas, document);
         addMeshTags(jCas, document);
         addGenes(jCas, document);

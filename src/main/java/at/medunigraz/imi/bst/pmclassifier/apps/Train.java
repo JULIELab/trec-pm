@@ -16,12 +16,12 @@ import java.util.Map;
 public class Train {
     private static final Logger LOG = LogManager.getLogger();
 
-    public static void main(String args[]) throws DataReadingException, IOException, ClassNotFoundException {
+    public static void doTrain(String jsongsdocs, String annotatedGs, String modeloutputfile) throws DataReadingException, IOException, ClassNotFoundException {
         MalletClassifier classifier = new MalletClassifier();
 
         LOG.info("Reading documents");
-        Map<String, Document> documents = DataReader.readDocuments(new File("resources/gs2017DocsJson.zip"));
-        DataReader.addPMLabels(new File("resources/20180622processedGoldStandardTopics.tsv.gz"), documents);
+        Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
+        DataReader.addPMLabels(new File(annotatedGs), documents);
         InstancePreparator ip = InstancePreparator.getInstance();
         ip.trainTfIdf(documents.values());
         classifier.setInstancePreparator(ip);
@@ -29,22 +29,12 @@ public class Train {
         LOG.info("Training the model");
         writeFeaturestoSVMLight(instances);
         classifier.train(instances);
-        String filename = "src/main/resources/models/malletPmClassifier.mod.gz";
+        String filename = modeloutputfile;
         LOG.info("Storing the model to " + filename);
         classifier.writeClassifier(new File(filename));
 
         LOG.info("Loading model and doing reclassification of training data to check that training was in order.");
-        classifier = new MalletClassifier();
-        classifier.readClassifier(filename);
-        int corr = 0;
-        for (Document doc : documents.values()) {
-            String label = classifier.predict(doc);
-            if (label.equalsIgnoreCase(doc.getPmLabel()))
-                ++corr;
-        }
-        LOG.info("Total: " + documents.size());
-        LOG.info("Correct: " + corr);
-        LOG.info("That is " + (corr / (double) documents.size()) * 100 + "%");
+        Eval.doEval(documents, filename);
     }
 
     private static void writeFeaturestoSVMLight(InstanceList instances) {

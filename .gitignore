@@ -42,7 +42,12 @@ models
 
 # Big resource files
 src/main/resources/genes/*.gene_info*
+
+# Resources that are not public yet
 resources/abstracts.judgments.2018.csv
 resources/clinical_trials.judgments.2018.csv
+resources/gs2018DocsJson.zip
 src/main/resources/gold-standard/qrels-treceval-abstracts.2018.txt
 src/main/resources/gold-standard/qrels-treceval-clinical_trials.2018.txt
+resources/20190111processedGoldStandardPub2018.tsv.gz
+uima/gsdocids2018.txt

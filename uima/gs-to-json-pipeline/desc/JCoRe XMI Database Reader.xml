@@ -148,7 +148,7 @@
             <nameValuePair>
                 <name>Table</name>
                 <value>
-                    <string>trec2017gsdocs</string>
+			<string>gsdocs2018</string>
                 </value>
             </nameValuePair>
         </configurationParameterSettings>

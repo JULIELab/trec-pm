@@ -30,11 +30,12 @@ public class CrossVal {
     private static final Logger LOG = LogManager.getLogger();
     private final static int randomSeed = 1;
 
-    public static void main(String args[]) throws DataReadingException, IOException, ClassNotFoundException {
+
+    public static void performCrossVal(String jsongsdocs, String annotatedGs) throws DataReadingException {
         MalletClassifier classifier = new MalletClassifier();
         int numFolds = 10;
 
-        Map<String, Document> documents = DataReader.readDocuments(new File("resources/gs2017DocsJson.zip"));
+        Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
         LOG.info("Got {} documents for training", documents.size());
         //inferTopics(documents.values());
         InstancePreparator ip = InstancePreparator.getInstance();
@@ -42,7 +43,7 @@ public class CrossVal {
 
         ip.trainTfIdf(documents.values());
 
-        DataReader.addPMLabels(new File("resources/20180622processedGoldStandardTopics.tsv.gz"), documents);
+        DataReader.addPMLabels(new File(annotatedGs), documents);
         if (LOG.isInfoEnabled()) {
             long pm = documents.values().stream().filter(d -> d.getPmLabel().equalsIgnoreCase("PM")).count();
             long notpm = documents.values().stream().filter(d -> d.getPmLabel().equalsIgnoreCase("Not PM")).count();
@@ -93,8 +94,7 @@ public class CrossVal {
 
         final HashSet<Document> alldocs = new HashSet<>(documents.values());
         final Set<Document> alwaysWrong = Sets.difference(alldocs, onceRight);
-        alwaysWrong.forEach(System.out::println);
-
+        //alwaysWrong.forEach(System.out::println);
     }
 
     private static void inferTopics(Collection<Document> values) {
