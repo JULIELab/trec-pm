@@ -165,14 +165,22 @@ public class Experiment extends Thread {
 
     private File getSampleGoldStandard() {
         if (hasSampleGoldStandard()) {
-            return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.txt").getPath());
+            if (year == 2017)
+                return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.txt").getPath());
+            else if (year == 2018 && task == Task.PUBMED)
+                return new File("resources/qrels-sample-abstracts.txt");
+            else if (year == 2018 && task == Task.CLINICAL_TRIALS)
+                return new File("resources/qrels-sample-trials.txt");
+            else throw new IllegalStateException("There should be a sample gold standard but no condition did meet for year, task, gstype: " + year + ", " + task + ", " + goldStandard);
         } else {
             throw new UnsupportedOperationException("No available sample gold standard.");
         }
     }
 
     private boolean hasSampleGoldStandard() {
-        return goldStandard == GoldStandard.OFFICIAL && task == Task.PUBMED && year == YEAR_PUBLISHED_GS;
+        boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
+        hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
+        return hasgs;
     }
 
     public String getIndexName() {

@@ -1,52 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
-        
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
-        
     <primitive>false</primitive>
-        
     <delegateAnalysisEngineSpecifiers>
-                
         <delegateAnalysisEngine key="JCoRe Mutation Annotator">
-                        
             <import location="JCoRe Mutation Annotator.xml"/>
-                    
         </delegateAnalysisEngine>
-            
     </delegateAnalysisEngineSpecifiers>
-        
     <analysisEngineMetaData>
-                
         <name>JCoRe Pipeline AAE</name>
-                
         <description>This AAE descriptor directly contains the analysis engines added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
-                
         <configurationParameters/>
-                
         <configurationParameterSettings/>
-                
         <flowConstraints>
-                        
             <fixedFlow>
-                                
                 <node>JCoRe Mutation Annotator</node>
-                            
             </fixedFlow>
-                    
         </flowConstraints>
-                
         <capabilities/>
-                
         <operationalProperties>
-                        
             <modifiesCas>true</modifiesCas>
-                        
             <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
-                        
             <outputsNewCASes>false</outputsNewCASes>
-                    
         </operationalProperties>
-            
     </analysisEngineMetaData>
-    
 </analysisEngineDescription>

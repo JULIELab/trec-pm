@@ -51,3 +51,5 @@ src/main/resources/gold-standard/qrels-treceval-abstracts.2018.txt
 src/main/resources/gold-standard/qrels-treceval-clinical_trials.2018.txt
 resources/20190111processedGoldStandardPub2018.tsv.gz
 uima/gsdocids2018.txt
+resources/qrels-sample-abstracts.txt
+resources/qrels-sample-trials.txt
