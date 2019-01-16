@@ -17,7 +17,7 @@ public class PubmedExperimenter {
 
 		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
 		final Experiment.Task target = Experiment.Task.PUBMED;
-		final int year = 2018;
+		final int year = 2017;
 
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();

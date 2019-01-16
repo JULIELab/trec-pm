@@ -1,6 +1,6 @@
 #!/bin/bash
 
-whats="disease gene fields posneg additional extra pmgs"
+whats="disease gene fields posneg additional extra"
 
 mvn clean compile
 

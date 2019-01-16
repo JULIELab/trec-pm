@@ -1,6 +1,8 @@
 package at.medunigraz.imi.bst.pmclassifier.apps;
 
 import at.medunigraz.imi.bst.pmclassifier.*;
+import cc.mallet.types.FeatureSelection;
+import cc.mallet.types.InfoGain;
 import cc.mallet.types.InstanceList;
 import de.julielab.jcore.ae.topicindexing.TopicIndexer;
 import de.julielab.jcore.ae.topicindexing.TopicModelProvider;
@@ -72,7 +74,8 @@ public class CrossVal {
             LOG.info("Testing on " + test.size() + " documents");
             int corr = 0;
             for (Document document : test.values()) {
-                String predict = classifier.predict(document);
+                String predict = classifier.predictProbabiltyForPM(document) > .5 ? "PM" : "Not PM";
+                //String predict = classifier.predict(document);
                 if (predict.equalsIgnoreCase(document.getPmLabel())) {
                     ++corr;
                     onceRight.add(document);

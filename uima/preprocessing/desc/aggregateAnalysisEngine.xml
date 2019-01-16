@@ -6,6 +6,9 @@
         <delegateAnalysisEngine key="JCoRe Mutation Annotator">
             <import location="JCoRe Mutation Annotator.xml"/>
         </delegateAnalysisEngine>
+        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
+            <import location="JCoRe Lingscope Negation AE.xml"/>
+        </delegateAnalysisEngine>
     </delegateAnalysisEngineSpecifiers>
     <analysisEngineMetaData>
         <name>JCoRe Pipeline AAE</name>
@@ -15,6 +18,7 @@
         <flowConstraints>
             <fixedFlow>
                 <node>JCoRe Mutation Annotator</node>
+                <node>JCoRe Lingscope Negation AE</node>
             </fixedFlow>
         </flowConstraints>
         <capabilities/>

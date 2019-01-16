@@ -43,9 +43,9 @@ public class TfIdfPipe extends Pipe {
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {
             if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
                 token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));
-           //     if (lasttoken != null)
-             //       token.setFeatureValue(lasttoken.getValue()+tfidfToken.getValue(), (tfidf.getWeight(lasttoken) + tfidf.getWeight(tfidfToken))/2);
-               // lasttoken = tfidfToken;
+//                if (lasttoken != null)
+//                    token.setFeatureValue(lasttoken.getValue()+tfidfToken.getValue(), (tfidf.getWeight(lasttoken) + tfidf.getWeight(tfidfToken))/2);
+//                lasttoken = tfidfToken;
             }
         }
         return inst;

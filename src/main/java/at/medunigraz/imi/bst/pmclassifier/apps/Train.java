@@ -22,6 +22,7 @@ public class Train {
         LOG.info("Reading documents");
         Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
         DataReader.addPMLabels(new File(annotatedGs), documents);
+        writeLabelDistribution(documents);
         InstancePreparator ip = InstancePreparator.getInstance();
         ip.trainTfIdf(documents.values());
         classifier.setInstancePreparator(ip);
@@ -35,6 +36,13 @@ public class Train {
 
         LOG.info("Loading model and doing reclassification of training data to check that training was in order.");
         Eval.doEval(documents, filename);
+    }
+
+    private static void writeLabelDistribution(Map<String,Document> documents) {
+        final long pm = documents.values().stream().filter(d -> d.getPmLabel().equals("PM")).count();
+        final long notpm = documents.values().stream().filter(d -> d.getPmLabel().equals("Not PM")).count();
+        long all = pm + notpm;
+        LOG.info("Of all {} documents, {} ({}%) are PM and {} ({}%) are Not PM", all, pm, (double)pm/all*100, notpm, (double)notpm/all*100);
     }
 
     private static void writeFeaturestoSVMLight(InstanceList instances) {

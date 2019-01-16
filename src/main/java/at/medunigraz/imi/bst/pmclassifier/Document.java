@@ -144,4 +144,12 @@ public class Document {
 
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "Document{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }

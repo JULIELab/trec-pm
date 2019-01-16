@@ -117,7 +117,8 @@
                 <name>AnnotationsToStore</name>
                 <value>
                     <array>
-                        <string>de.julielab.jcore.types.PointMutation</string>
+                        <string>de.julielab.jcore.types.LikelihoodIndicator</string>
+                        <string>de.julielab.jcore.types.Scope</string>
                     </array>
                 </value>
             </nameValuePair>

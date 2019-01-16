@@ -36,7 +36,7 @@ public class PmClassifierInputFieldGenerator extends FieldGenerator {
         addMeshTags(jCas, document);
         addGenes(jCas, document);
         addOrganisms(jCas, document);
-        addPublicationType(jCas, document);
+        //addPublicationType(jCas, document);
         addKeywords(jCas, document);
         return document;
     }

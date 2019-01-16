@@ -2,10 +2,9 @@ package at.medunigraz.imi.bst.pmclassifier;
 
 import cc.mallet.classify.Classification;
 import cc.mallet.classify.Classifier;
+import cc.mallet.classify.FeatureSelectingClassifierTrainer;
 import cc.mallet.classify.MaxEntTrainer;
-import cc.mallet.types.Instance;
-import cc.mallet.types.InstanceList;
-import cc.mallet.types.Label;
+import cc.mallet.types.*;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +34,10 @@ public class MalletClassifier implements Serializable{
 
     public void train(InstanceList instances) {
         MaxEntTrainer maxEntTrainer = new MaxEntTrainer();
+//        final FeatureSelector selector = new FeatureSelector(new InfoGain.Factory(), 40000);
+//        final FeatureSelectingClassifierTrainer trainer = new FeatureSelectingClassifierTrainer(maxEntTrainer, selector);
         classifier = maxEntTrainer.train(instances);
+        //classifier = trainer.train(instances);
     }
 
 
