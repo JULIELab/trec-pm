@@ -40,7 +40,7 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addGenes(jCas, document);
         addOrganisms(jCas, document);
         addDocumentClasses(jCas, document);
-        addGsInfo(jCas, document);
+        //addGsInfo(jCas, document);
         addPublicationType(jCas, document);
         return document;
     }
@@ -80,13 +80,16 @@ public class Trec2018FieldGenerator extends FieldGenerator {
     private void addDocumentClasses(JCas jCas, Document document) {
         Optional<AutoDescriptor> any = JCasUtil.select(jCas, AutoDescriptor.class).stream().findAny();
         if (any.isPresent() && any.get().getDocumentClasses() != null) {
-            ArrayFieldValue arrayFieldValue = new ArrayFieldValue();
             AutoDescriptor ad = any.get();
-            for (int i = 0; i < ad.getDocumentClasses().size(); i++) {
-                DocumentClass documentClass = ad.getDocumentClasses(i);
-                arrayFieldValue.add(new RawToken(documentClass.getClassname()));
-            }
-            document.addField("documentClasses", arrayFieldValue);
+            if (ad.getDocumentClasses().size() != 2)
+                throw new IllegalStateException("This field generator expects two document classes given from PM classifiers. The first should be from the classifier trained on the TREC PM 2017, the second trained on 2018.");
+            DocumentClass dc2017 = ad.getDocumentClasses(0);
+            DocumentClass dc2018 = ad.getDocumentClasses(1);
+            document.addField("pmclass2017", dc2017.getClassname());
+            document.addField("pmclass2017confidence", dc2017.getConfidence());
+
+            document.addField("pmclass2018", dc2018.getClassname());
+            document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
     }
 

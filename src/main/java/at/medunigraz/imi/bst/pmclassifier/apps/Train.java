@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Train {
@@ -24,7 +26,11 @@ public class Train {
         DataReader.addPMLabels(new File(annotatedGs), documents);
         writeLabelDistribution(documents);
         InstancePreparator ip = InstancePreparator.getInstance();
-        ip.trainTfIdf(documents.values());
+        final Map<String, Document> stringDocumentMap = DataReader.readDocuments(new File("resources/gs2018DocsJson.zip"));
+        List<Document> all = new ArrayList<>();
+        all.addAll(documents.values());
+        all.addAll(stringDocumentMap.values());
+        ip.trainTfIdf(all);
         classifier.setInstancePreparator(ip);
         InstanceList instances = ip.createClassificationInstances(documents);
         LOG.info("Training the model");

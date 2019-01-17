@@ -23,9 +23,9 @@
 		</parameters>
 		<corpus>
 			<subset>
-				<table>goldstandard2</table>
+				<table>gsdocs</table>
 				<reset>true</reset>
-				<annotationpgschema>_data_xmi</annotationpgschema>
+				<annotationpgschema>_data</annotationpgschema>
 			</subset>
 			<costosys>
 				<configurationFile>../costosys.xml</configurationFile>

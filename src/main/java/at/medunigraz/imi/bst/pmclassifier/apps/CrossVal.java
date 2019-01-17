@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.pmclassifier.apps;
 
 import at.medunigraz.imi.bst.pmclassifier.*;
+import at.medunigraz.imi.bst.pmclassifier.lucene.LuceneClassifier;
 import cc.mallet.types.FeatureSelection;
 import cc.mallet.types.InfoGain;
 import cc.mallet.types.InstanceList;
@@ -34,7 +35,7 @@ public class CrossVal {
 
 
     public static void performCrossVal(String jsongsdocs, String annotatedGs) throws DataReadingException {
-        MalletClassifier classifier = new MalletClassifier();
+        PMClassifier classifier = new LuceneClassifier();
         int numFolds = 10;
 
         Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
@@ -67,15 +68,15 @@ public class CrossVal {
             Map<String, Document> train = IntStream.range(0, numFolds).filter(i -> i != currentFold).mapToObj(partitions::get).flatMap(Collection::stream).collect(toMap(Document::getId, d -> d));
             Map<String, Document> test = partitions.get(fold).stream().collect(toMap(Document::getId, d -> d));
 
-            InstanceList ilist = ip.createClassificationInstances(train);
+            //InstanceList ilist = ip.createClassificationInstances(train);
             LOG.info("Training on " + train.size() + " documents");
-            classifier.train(ilist);
+            classifier.train(train);
 
             LOG.info("Testing on " + test.size() + " documents");
             int corr = 0;
             for (Document document : test.values()) {
-                String predict = classifier.predictProbabiltyForPM(document) > .5 ? "PM" : "Not PM";
-                //String predict = classifier.predict(document);
+               // String predict = classifier.predictProbabiltyForPM(document) > .5 ? "PM" : "Not PM";
+                String predict = classifier.predict(document);
                 if (predict.equalsIgnoreCase(document.getPmLabel())) {
                     ++corr;
                     onceRight.add(document);
@@ -112,18 +113,17 @@ public class CrossVal {
             AnalysisEngine bioLemmatizer = AnalysisEngineFactory.createEngine(
                     "de.julielab.jcore.ae.biolemmatizer.desc.jcore-biolemmatizer-ae");
             AnalysisEngineDescription desc = AnalysisEngineFactory.createEngineDescription("de.julielab.jcore.ae.topicindexing.desc.jcore-topic-indexing-ae",
-                    TopicIndexer.PARAM_TOPIC_MODEL_CONFIG, "uima/topicmodels/nt100-a1.0-b0.1-genedocs1m.xml",
+                    TopicIndexer.PARAM_TOPIC_MODEL_CONFIG, "uima/topicmodels/nt100-a1.0-b0.1-gs.xml",
                     TopicIndexer.PARAM_NUM_DISPLAYED_TOPIC_WORDS, 0,
                     TopicIndexer.PARAM_STORE_IN_MODEL_INDEX, false);
-            ExternalResourceFactory.createDependencyAndBind(desc, TopicIndexer.RESOURCE_KEY_MODEL_FILE_NAME, TopicModelProvider.class, new File("uima/topicmodels/nt100-a1.0-b0.1-genedocs1m.mod.gz").toURI().toURL().toString());
+            ExternalResourceFactory.createDependencyAndBind(desc, TopicIndexer.RESOURCE_KEY_MODEL_FILE_NAME, TopicModelProvider.class, new File("uima/topicmodels/nt100-a1.0-b0.1-gs.mod.gz").toURI().toURL().toString());
             AnalysisEngine topicIndexer = AnalysisEngineFactory.createEngine(desc);
             JCas jCas = JCasFactory.createJCas("de.julielab.jcore.types.jcore-document-meta-pubmed-types",
-                    "de.julielab.jcore.types.jcore-xmi-splitter-types",
                     "de.julielab.jcore.types.extensions.jcore-document-meta-extension-types",
                     "de.julielab.jcore.types.jcore-document-structure-pubmed-types",
                     "de.julielab.jcore.types.jcore-morpho-syntax-types");
 
-            values.parallelStream().forEach(d -> {
+            values.stream().forEach(d -> {
                 jCas.setDocumentText(d.getTitle() + " " + d.getAbstractText());
                 try {
                     sentenceDetector.process(jCas);
@@ -137,7 +137,7 @@ public class CrossVal {
                     d.setTopicWeight(doubles);
                     jCas.reset();
                 } catch (AnalysisEngineProcessException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
 
 

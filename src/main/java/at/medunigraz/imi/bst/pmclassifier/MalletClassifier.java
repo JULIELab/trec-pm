@@ -10,8 +10,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.util.Map;
 
-public class MalletClassifier implements Serializable{
+public class MalletClassifier implements Serializable, PMClassifier {
 
     private static final long serialVersionUID = 2018_08_02L;
 
@@ -29,6 +30,11 @@ public class MalletClassifier implements Serializable{
 
     public void train(File documentJsonZip, File gsTable) throws DataReadingException {
         InstanceList instances = instancePreparator.getInstancesForGoldData(documentJsonZip, gsTable);
+        train(instances);
+    }
+
+    public void train( Map<String, Document> train) {
+        final InstanceList instances = instancePreparator.createClassificationInstances(train);
         train(instances);
     }
 

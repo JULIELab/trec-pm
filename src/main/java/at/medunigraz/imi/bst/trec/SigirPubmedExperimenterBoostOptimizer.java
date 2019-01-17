@@ -74,7 +74,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                         templateProperties.put("gene_boost", String.valueOf(genb));
                         templateProperties.put("gene_desc_boost", String.valueOf(descb));
                         templateProperties.put("gene_syn_boost", String.valueOf(synb));
-                        String suffix = "-gen" + df.format(genb) + "-desc" + df.format(descb) + "-syn" + df.format(synb);
+                        String suffix = "--gen" + df.format(genb) + "-desc" + df.format(descb) + "-syn" + df.format(synb);
                         runExperiments(templateProperties, goldStandard, target, year, what, suffix);
                     }
                 }

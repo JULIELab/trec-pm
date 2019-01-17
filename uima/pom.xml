@@ -16,8 +16,12 @@
         <relativePath></relativePath>
     </parent>
     <modules>
+        <!-- These modules will be installed when calling mvn install on this POM as scripts/installJCoreComponents.sh
+        does which in turn is called by the gradle install-uima-components target -->
         <module>jcore-pmclassifier-ae</module>
         <module>jcore-trecpm-extraabstracts-reader</module>
-        <module>corpus-to-onefile-writer</module>
+        <module>gs-to-json-pipeline</module>
+        <module>jcore-clinicaltrials-reader</module>
+        <module>jcore-ct-reader</module>
     </modules>
 </project>

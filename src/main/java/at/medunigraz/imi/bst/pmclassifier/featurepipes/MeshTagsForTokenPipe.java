@@ -14,7 +14,7 @@ public class MeshTagsForTokenPipe extends Pipe {
         if (document.getMeshTagsMajor() != null) {
             Token token = (Token) inst.getData();
             for (String tag : document.getMeshTagsMajor())
-                token.setFeatureValue("hasMesh="+tag, 1);
+                token.setFeatureValue("hasMajorMesh=" + tag, 1);
         }
         return inst;
     }

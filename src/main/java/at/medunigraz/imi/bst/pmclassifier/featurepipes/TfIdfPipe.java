@@ -1,5 +1,8 @@
 package at.medunigraz.imi.bst.pmclassifier.featurepipes;
 
+import at.medunigraz.imi.bst.pmclassifier.DataReader;
+import at.medunigraz.imi.bst.pmclassifier.DataReadingException;
+import at.medunigraz.imi.bst.pmclassifier.Document;
 import at.medunigraz.imi.bst.pmclassifier.InstancePreparator;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
@@ -9,6 +12,7 @@ import de.julielab.java.utilities.FileUtilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,8 @@ public class TfIdfPipe extends Pipe {
         com.wcohen.ss.api.Token lasttoken = null;
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {
             if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
+                if (tfidf.getDocumentFrequency(tfidfToken) == 0)
+                    System.out.println(tfidfToken.getValue());
                 token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));
 //                if (lasttoken != null)
 //                    token.setFeatureValue(lasttoken.getValue()+tfidfToken.getValue(), (tfidf.getWeight(lasttoken) + tfidf.getWeight(tfidfToken))/2);
