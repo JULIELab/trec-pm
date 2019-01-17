@@ -46,10 +46,8 @@ public class LuceneClassifier implements PMClassifier {
             List<org.apache.lucene.document.Document> ldocs = new ArrayList<>();
             for (Document doc : labeledDocuments.values()) {
                 final org.apache.lucene.document.Document ldoc = new org.apache.lucene.document.Document();
-                final TextField field = new TextField(doc.getPmLabel(), doc.getTitle() + " " + doc.getAbstractText(), Field.Store.NO);
                 final TextField allfield = new TextField("all", doc.getTitle() + " " + doc.getAbstractText(), Field.Store.NO);
                 final StringField labelField = new StringField("label", doc.getPmLabel(), Field.Store.YES);
-                ldoc.add(field);
                 ldoc.add(allfield);
                 ldoc.add(labelField);
                 ldocs.add(ldoc);
@@ -95,7 +93,7 @@ public class LuceneClassifier implements PMClassifier {
             final StandardAnalyzer a = new StandardAnalyzer();
             final TokenStream ts = a.tokenStream("", text);
             final BooleanQuery query = getQuery(ts, "all");
-            final TopDocs search = indexSearcher.search(query, 50);
+            final TopDocs search = indexSearcher.search(query, 28 );
             for (ScoreDoc hit : search.scoreDocs) {
                 final org.apache.lucene.document.Document doc = reader.document(hit.doc);
                 final String label = doc.get("label");
@@ -106,24 +104,6 @@ public class LuceneClassifier implements PMClassifier {
                     notPmScore += 1;
                 }
             }
-
-            final StandardAnalyzer a2 = new StandardAnalyzer();
-            final TokenStream ts2 = a2.tokenStream("", text);
-            final BooleanQuery notPmQuery = getQuery(ts2, "Not PM");
-
-            final TopDocs pmSearch = indexSearcher.search(query, 20);
-            final TopDocs notPmSearch = indexSearcher.search(notPmQuery, 20);
-
-            int pmScore2 = 0;
-            for (ScoreDoc hit : pmSearch.scoreDocs)
-                pmScore2 += hit.score;
-            pmScore += pmScore2;
-
-
-            int notPmScore2 = 0;
-            for (ScoreDoc hit : notPmSearch.scoreDocs)
-                notPmScore2 += hit.score;
-            notPmScore += notPmScore2;
 
             return pmScore - notPmScore;
         } catch (IOException e) {

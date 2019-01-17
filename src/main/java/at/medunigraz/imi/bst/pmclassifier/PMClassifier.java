@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.pmclassifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public interface PMClassifier {
@@ -13,4 +14,6 @@ public interface PMClassifier {
     double predictProbabiltyForPM(Document document);
 
     void setInstancePreparator(InstancePreparator instancePreparator);
+
+    void writeClassifier(File file) throws IOException;
 }

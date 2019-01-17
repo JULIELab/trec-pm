@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.pmclassifier.apps;
 
 import at.medunigraz.imi.bst.pmclassifier.*;
+import cc.mallet.classify.Classifier;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
@@ -19,23 +20,19 @@ public class Train {
     private static final Logger LOG = LogManager.getLogger();
 
     public static void doTrain(String jsongsdocs, String annotatedGs, String modeloutputfile) throws DataReadingException, IOException, ClassNotFoundException {
-        MalletClassifier classifier = new MalletClassifier();
+        PMClassifier classifier = new MalletClassifier();
 
         LOG.info("Reading documents");
         Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
         DataReader.addPMLabels(new File(annotatedGs), documents);
         writeLabelDistribution(documents);
         InstancePreparator ip = InstancePreparator.getInstance();
-        final Map<String, Document> stringDocumentMap = DataReader.readDocuments(new File("resources/gs2018DocsJson.zip"));
-        List<Document> all = new ArrayList<>();
-        all.addAll(documents.values());
-        all.addAll(stringDocumentMap.values());
-        ip.trainTfIdf(all);
+        ip.trainTfIdf(documents.values());
         classifier.setInstancePreparator(ip);
-        InstanceList instances = ip.createClassificationInstances(documents);
+       // InstanceList instances = ip.createClassificationInstances(documents);
         LOG.info("Training the model");
-        writeFeaturestoSVMLight(instances);
-        classifier.train(instances);
+        //writeFeaturestoSVMLight(instances);
+        classifier.train(documents);
         String filename = modeloutputfile;
         LOG.info("Storing the model to " + filename);
         classifier.writeClassifier(new File(filename));

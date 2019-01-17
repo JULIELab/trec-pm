@@ -46,8 +46,6 @@ public class TfIdfPipe extends Pipe {
         com.wcohen.ss.api.Token lasttoken = null;
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {
             if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
-                if (tfidf.getDocumentFrequency(tfidfToken) == 0)
-                    System.out.println(tfidfToken.getValue());
                 token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));
 //                if (lasttoken != null)
 //                    token.setFeatureValue(lasttoken.getValue()+tfidfToken.getValue(), (tfidf.getWeight(lasttoken) + tfidf.getWeight(tfidfToken))/2);
