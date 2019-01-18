@@ -93,14 +93,13 @@ public class LuceneClassifier implements PMClassifier {
             final StandardAnalyzer a = new StandardAnalyzer();
             final TokenStream ts = a.tokenStream("", text);
             final BooleanQuery query = getQuery(ts, "all");
-            final TopDocs search = indexSearcher.search(query, 28 );
+            final TopDocs search = indexSearcher.search(query, 28);
             for (ScoreDoc hit : search.scoreDocs) {
                 final org.apache.lucene.document.Document doc = reader.document(hit.doc);
                 final String label = doc.get("label");
                 if (label.equals("PM")) {
                     pmScore += 1;
-                }
-                else {
+                } else {
                     notPmScore += 1;
                 }
             }
@@ -119,14 +118,19 @@ public class LuceneClassifier implements PMClassifier {
 
     public void writeClassifier(File destination) throws IOException {
         LOG.info("Writing classifier to " + destination.getAbsolutePath());
-        dir.copyFrom(dir, "ram", destination.getAbsolutePath(), IOContext.DEFAULT);
+        final FSDirectory fsDir = FSDirectory.open(destination.toPath());
+        for (String file : dir.listAll()) {
+            fsDir.copyFrom(dir, file, file, IOContext.DEFAULT);
+        }
+    }
+
+    @Override
+    public void readClassifier(String modelfile) throws IOException, ClassNotFoundException {
+        LOG.info("Reading classifier from " + modelfile);
+        dir = FSDirectory.open(Paths.get(modelfile));
+
     }
 
 
-
-    public void readClassifier(File source) throws IOException, ClassNotFoundException {
-        LOG.info("Reading classifier from " + source.getAbsolutePath());
-        dir =  FSDirectory.open(source.toPath());
-    }
 
 }

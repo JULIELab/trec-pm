@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.pmclassifier.apps;
 
 import at.medunigraz.imi.bst.pmclassifier.*;
+import at.medunigraz.imi.bst.pmclassifier.lucene.LuceneClassifier;
 import cc.mallet.classify.Classifier;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
@@ -19,9 +20,7 @@ import java.util.Map;
 public class Train {
     private static final Logger LOG = LogManager.getLogger();
 
-    public static void doTrain(String jsongsdocs, String annotatedGs, String modeloutputfile) throws DataReadingException, IOException, ClassNotFoundException {
-        PMClassifier classifier = new MalletClassifier();
-
+    public static void doTrain(PMClassifier classifier, String jsongsdocs, String annotatedGs, String modeloutputfile) throws DataReadingException, IOException, ClassNotFoundException {
         LOG.info("Reading documents");
         Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));
         DataReader.addPMLabels(new File(annotatedGs), documents);
@@ -38,7 +37,7 @@ public class Train {
         classifier.writeClassifier(new File(filename));
 
         LOG.info("Loading model and doing reclassification of training data to check that training was in order.");
-        Eval.doEval(documents, filename);
+        Eval.doEval(classifier, documents, filename);
     }
 
     private static void writeLabelDistribution(Map<String,Document> documents) {

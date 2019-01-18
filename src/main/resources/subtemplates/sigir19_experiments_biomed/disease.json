@@ -22,7 +22,6 @@
       },
       {{diseaseSynonyms:sigir19_experiments_biomed/disease_synonym_boost.json}},
       {{diseaseHypernyms:biomedical_articles/disease_hypernym.json}},
-      {{match_all.json}}
     ]
   }
 }

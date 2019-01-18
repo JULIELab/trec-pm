@@ -34,8 +34,7 @@ public class CrossVal {
     private final static int randomSeed = 1;
 
 
-    public static void performCrossVal(String jsongsdocs, String annotatedGs) throws DataReadingException {
-        PMClassifier classifier = new LuceneClassifier();
+    public static void performCrossVal(PMClassifier classifier, String jsongsdocs, String annotatedGs) throws DataReadingException {
         int numFolds = 10;
 
         Map<String, Document> documents = DataReader.readDocuments(new File(jsongsdocs));

@@ -16,4 +16,6 @@ public interface PMClassifier {
     void setInstancePreparator(InstancePreparator instancePreparator);
 
     void writeClassifier(File file) throws IOException;
+
+    void readClassifier(String modelfile) throws IOException, ClassNotFoundException;
 }
