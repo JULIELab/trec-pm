@@ -29,7 +29,7 @@ public class ClinicalTrialXmlHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName,
-                             Attributes attributes) throws SAXException {
+                             Attributes attributes) {
         pushTag(qName);
         tempVal.setLength(0);
         if (TAG_START.equalsIgnoreCase(qName)) {
@@ -39,7 +39,7 @@ public class ClinicalTrialXmlHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName,
-                           String qName) throws SAXException {
+                           String qName) {
 
         String tag = peekTag();
         if (!qName.equals(tag)) {
@@ -141,7 +141,7 @@ public class ClinicalTrialXmlHandler extends DefaultHandler {
     }
 
     @Override
-    public void characters(char ch[], int start, int length) throws SAXException {
+    public void characters(char ch[], int start, int length) {
         tempVal.append(ch, start, length);
     }
 
@@ -243,7 +243,7 @@ public class ClinicalTrialXmlHandler extends DefaultHandler {
     private static String cleanup(String text) {
         text = text.replace("\n", "").replace("\r", "");
         text = text.replace("\t", "");
-        text = text.replace("-", "");
+        //text = text.replace("-", "");
         text = text.trim().replaceAll(" +", " ");
         return text;
     }
