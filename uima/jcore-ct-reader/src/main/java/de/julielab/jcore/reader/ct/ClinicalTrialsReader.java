@@ -66,38 +66,62 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
      * is where the actual work happens.
      */
     @Override
-    public void getNext(JCas jCas) throws CollectionException {
+    public void getNext(JCas jCas) {
         if (files.hasNext()) {
-            StringBuilder sb = new StringBuilder();
             final File file = files.next();
-            final ClinicalTrial ct = ClinicalTrial.fromXml(file.getAbsolutePath());
-            addHeader(jCas, ct);
-            addMesh(jCas, ct);
-            addAnnotatedText(sb, ct.brief_title, new BriefTitle(jCas));
-            addAnnotatedText(sb, ct.official_title, new OfficialTitle(jCas));
-            addAnnotatedText(sb, ct.summary, new Summary(jCas));
-            addAnnotatedText(sb, ct.description, new Description(jCas));
-            for (int i = 0; i < ct.outcomeMeasures.size(); i++) {
-                String outcomeMeasure = ct.outcomeMeasures.get(i);
-                String outcomeDescription = ct.outcomeDescriptions.get(i);
-                addAnnotatedText(sb, outcomeMeasure, new OutcomeMeasure(jCas));
-                addAnnotatedText(sb, outcomeDescription, new OutcomeDescription(jCas));
-            }
-            for (String condition : ct.conditions)
-                addAnnotatedText(sb, condition, new Condition(jCas));
-            for (int i = 0; i < ct.interventionTypes.size(); i++) {
-                String interventionType = ct.interventionTypes.get(i);
-                String interventionName = ct.interventionNames.get(i);
-                addAnnotatedText(sb, interventionType, new InterventionType(jCas));
-                addAnnotatedText(sb, interventionName, new InterventionName(jCas));
-            }
-            for (String armGroupDesc : ct.armGroupDescriptions)
-                addAnnotatedText(sb, armGroupDesc, new ArmGroupDescription(jCas));
-            addAnnotatedText(sb, ct.inclusion, new Inclusion(jCas));
-            addAnnotatedText(sb, ct.exclusion, new Exclusion(jCas));
+            try {
+                StringBuilder sb = new StringBuilder();
+                final ClinicalTrial ct = ClinicalTrial.fromXml(file.getAbsolutePath());
+                addHeader(jCas, ct);
+                addManualDescriptor(jCas, ct);
+                addAnnotatedText(sb, ct.brief_title, new BriefTitle(jCas));
+                addAnnotatedText(sb, ct.official_title, new OfficialTitle(jCas));
+                addAnnotatedText(sb, ct.summary, new Summary(jCas));
+                addAnnotatedText(sb, ct.description, new Description(jCas));
+                for (int i = 0; i < ct.outcomeMeasures.size(); i++) {
+                    String outcomeMeasure = ct.outcomeMeasures.get(i);
+                    addAnnotatedText(sb, outcomeMeasure, new OutcomeMeasure(jCas));
+                    if (i < ct.outcomeDescriptions.size()) {
+                        String outcomeDescription = ct.outcomeDescriptions.get(i);
+                        addAnnotatedText(sb, outcomeDescription, new OutcomeDescription(jCas));
+                    }
+                }
+                for (String condition : ct.conditions)
+                    addAnnotatedText(sb, condition, new Condition(jCas));
+                for (int i = 0; i < ct.interventionTypes.size(); i++) {
+                    String interventionType = ct.interventionTypes.get(i);
+                    String interventionName = ct.interventionNames.get(i);
+                    addAnnotatedText(sb, interventionType, new InterventionType(jCas));
+                    addAnnotatedText(sb, interventionName, new InterventionName(jCas));
+                }
+                for (String armGroupDesc : ct.armGroupDescriptions)
+                    addAnnotatedText(sb, armGroupDesc, new ArmGroupDescription(jCas));
+                addAnnotatedText(sb, ct.inclusion, new Inclusion(jCas));
+                addAnnotatedText(sb, ct.exclusion, new Exclusion(jCas));
 
-            jCas.setDocumentText(sb.toString());
+                jCas.setDocumentText(sb.toString());
+            } catch (Throwable t) {
+                log.error("Exception occurred when reading file {}", file, t);
+            }
         }
+    }
+
+    private void addManualDescriptor(JCas jCas, ClinicalTrial ct) {
+        ManualDescriptor md = null;
+        if (!ct.meshTags.isEmpty() || !ct.keywords.isEmpty())
+            md = new ManualDescriptor(jCas);
+        for (String meshTag : ct.meshTags) {
+            final MeshHeading mh = new MeshHeading(jCas);
+            mh.setDescriptorName(meshTag);
+            md.setMeSHList(JCoReTools.addToFSArray(md.getMeSHList(), mh, 1));
+        }
+        for (String keyword : ct.keywords) {
+            final Keyword kw = new Keyword(jCas);
+            kw.setName(keyword);
+            md.setKeywordList(JCoReTools.addToFSArray(md.getKeywordList(), kw, 1));
+        }
+        if (md != null)
+            md.addToIndexes();
     }
 
     private Annotation addAnnotatedText(StringBuilder sb, String text, Annotation annotation) {
@@ -109,13 +133,7 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
         return annotation;
     }
 
-    private void addMesh(JCas jCas, ClinicalTrial ct) {
-        for (String mesh : ct.meshTags) {
-            final MeshHeading heading = new MeshHeading(jCas);
-            heading.setDescriptorName(mesh);
-            heading.addToIndexes();
-        }
-    }
+
 
     private void addHeader(JCas jCas, ClinicalTrial ct) {
         final Header header = new Header(jCas);
@@ -127,28 +145,17 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
         sdi.setInterventionModel(ct.interventionModel);
         sdi.setPrimaryPurpose(ct.primaryPurpose);
         header.setStudyDesignInfo(sdi);
-        ManualDescriptor md = null;
-        if (!ct.meshTags.isEmpty() || !ct.keywords.isEmpty())
-            md = new ManualDescriptor(jCas);
-        for (String meshTag : ct.meshTags) {
-            final MeshHeading mh = new MeshHeading(jCas);
-            mh.setDescriptorName(meshTag);
-            md.setMeSHList(JCoReTools.addToFSArray(md.getMeSHList(), mh));
+        if (ct.sex != null) {
+            StringArray sex = new StringArray(jCas, 0);
+            for (String s : ct.sex)
+                sex = JCoReTools.addToStringArray(sex, s);
+            header.setGender(sex);
         }
-        for (String keyword : ct.keywords) {
-            final Keyword kw = new Keyword(jCas);
-            kw.setName(keyword);
-            md.setKeywordList(JCoReTools.addToFSArray(md.getKeywordList(), kw));
-        }
-         StringArray sex = new StringArray(jCas, 0);
-        for (String s : ct.sex)
-            sex = JCoReTools.addToStringArray(sex, s);
-        header.setGender(sex);
         header.addToIndexes();
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         // TODO
     }
 
@@ -158,7 +165,7 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
     }
 
     @Override
-    public boolean hasNext() throws IOException, CollectionException {
+    public boolean hasNext() {
         return files.hasNext();
     }
 

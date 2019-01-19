@@ -1,4 +1,3 @@
-
 package de.julielab.jcore.reader.ct;
 
 import static org.junit.Assert.assertEquals;
@@ -7,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 
 import de.julielab.jcore.types.Annotation;
+import de.julielab.jcore.types.Keyword;
+import de.julielab.jcore.types.MeshHeading;
+import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import de.julielab.jcore.types.ct.*;
 import org.apache.uima.UIMAException;
 import org.apache.uima.collection.CollectionReader;
@@ -20,23 +22,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.*;
+
 /**
  * Unit tests for jcore-ct-reader.
- * @author 
  *
+ * @author
  */
-public class ClinicalTrialsReaderTest{
+public class ClinicalTrialsReaderTest {
     @Test
     public void testReader() throws UIMAException, IOException {
         final JCas jCas = JCasFactory.createJCas("de.julielab.jcore.types.jcore-document-meta-clinicaltrial-types", "de.julielab.jcore.types.jcore-document-structure-clinicaltrial-types");
         final CollectionReader reader = CollectionReaderFactory.createReader("de.julielab.jcore.reader.ct.desc.jcore-clinicaltrials-reader", ClinicalTrialsReader.PARAM_INPUT_DIR, "src/test/resources/testdocs");
         assertTrue(reader.hasNext());
         reader.getNext(jCas.getCas());
+        Header header = JCasUtil.selectSingle(jCas, Header.class);
+        final String idForThisTest = "NCT02206334";
+        boolean found = header.getDocId().equals(idForThisTest);
+        while (!header.getDocId().equals(idForThisTest) && reader.hasNext()) {
+            jCas.reset();
+            reader.getNext(jCas.getCas());
+            header = JCasUtil.selectSingle(jCas, Header.class);
+            found = header.getDocId().equals(idForThisTest);
+        }
+        assertThat(found).withFailMessage("The document used for this test was not found: %s", idForThisTest).isTrue();
 
-        final Header header = JCasUtil.selectSingle(jCas, Header.class);
+
         assertEquals("NCT02206334", header.getDocId());
         assertThat(header.getGender()).containsExactlyInAnyOrder("female", "male");
         assertEquals("Interventional", header.getStudyType());
@@ -87,7 +101,48 @@ public class ClinicalTrialsReaderTest{
         final Collection<ArmGroupDescription> armGroupDescriptions = JCasUtil.select(jCas, ArmGroupDescription.class);
         assertEquals(1, armGroupDescriptions.size());
         // Again, the cleanup method removes dashes. Here, there are so many of them, we just use the replace method
-        assertThat(armGroupDescriptions).extracting(Annotation::getCoveredText).containsExactly("Patients undergo 3-5 fractions of image-guided stereotactic body radiation therapy to all existing metastases over 1-3 weeks with at least 40 hours between treatments for an individual metastasis.".replace("-","" ));
+        assertThat(armGroupDescriptions).extracting(Annotation::getCoveredText).containsExactly("Patients undergo 3-5 fractions of image-guided stereotactic body radiation therapy to all existing metastases over 1-3 weeks with at least 40 hours between treatments for an individual metastasis.".replace("-", ""));
+
+        final ManualDescriptor md = JCasUtil.selectSingle(jCas, ManualDescriptor.class);
+        assertThat(md).isNotNull();
+        assertThat(md.getMeSHList()).hasSize(7);
+        assertThat(md.getMeSHList()).extracting(mh -> ((MeshHeading) mh).getDescriptorName()).containsExactly("Breast Neoplasms",
+                "Carcinoma",
+                "Lung Neoplasms",
+                "Prostatic Neoplasms",
+                "Carcinoma, Non-Small-Cell Lung",
+                "Adenocarcinoma",
+                "Breast Neoplasms, Male");
+
+    }
+
+    @Test
+    public void testKeywordReading() throws UIMAException, IOException {
+        final JCas jCas = JCasFactory.createJCas("de.julielab.jcore.types.jcore-document-meta-clinicaltrial-types", "de.julielab.jcore.types.jcore-document-structure-clinicaltrial-types");
+        final CollectionReader reader = CollectionReaderFactory.createReader("de.julielab.jcore.reader.ct.desc.jcore-clinicaltrials-reader", ClinicalTrialsReader.PARAM_INPUT_DIR, "src/test/resources/testdocs");
+        assertTrue(reader.hasNext());
+        reader.getNext(jCas.getCas());
+        Header header = JCasUtil.selectSingle(jCas, Header.class);
+        final String idForThisTest = "NCT01855776";
+        boolean found = header.getDocId().equals(idForThisTest);
+        while (!header.getDocId().equals(idForThisTest) && reader.hasNext()) {
+            jCas.reset();
+            reader.getNext(jCas.getCas());
+            header = JCasUtil.selectSingle(jCas, Header.class);
+            found = header.getDocId().equals(idForThisTest);
+        }
+        assertThat(found).withFailMessage("The document used for this test was not found: %s", idForThisTest).isTrue();
+
+
+
+        final ManualDescriptor md = JCasUtil.selectSingle(jCas, ManualDescriptor.class);
+        assertThat(md).isNotNull();
+        assertThat(md.getKeywordList()).hasSize(5);
+        assertThat(md.getKeywordList()).extracting(mh -> ((Keyword) mh).getName()).containsExactly("Physical Activity/Walking",
+                "Full-time employees",
+                "RCT",
+                "Incentives",
+                "Wireless pedometer");
 
     }
 }
