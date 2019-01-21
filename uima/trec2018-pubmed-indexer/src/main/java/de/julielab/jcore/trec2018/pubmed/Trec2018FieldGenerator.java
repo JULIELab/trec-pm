@@ -91,6 +91,12 @@ public class Trec2018FieldGenerator extends FieldGenerator {
             document.addField("pmclass2018", dc2018.getClassname());
             document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
+        Trec2018FilterBoard fb = filterRegistry.getFilterBoard(Trec2018FilterBoard.class);
+        if (fb.lstmpm != null && fb.lstmpm.get(document.getId()) != null) {
+            final Double lstmpmVal = fb.lstmpm.get(document.getId());
+            document.addField("pmclass2017lstm", lstmpmVal > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2017lstmconfidence", lstmpmVal);
+        }
     }
 
     private void addGenes(JCas jCas, Document document) {

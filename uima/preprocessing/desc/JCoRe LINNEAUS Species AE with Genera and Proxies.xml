@@ -2,14 +2,29 @@
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
     <primitive>true</primitive>
-    <annotatorImplementationName>de.julielab.jcore.ae.mutationfinder.MutationAnnotator</annotatorImplementationName>
+    <annotatorImplementationName>de.julielab.jcore.ae.linnaeus.LinnaeusSpeciesAnnotator</annotatorImplementationName>
     <analysisEngineMetaData>
-        <name>JCoRe Mutation Annotator</name>
-        <description>An analysis engine to recognize mentions of gene point mutations in document text. This is a wrapper around the original MutationFinder (http://mutationfinder.sourceforge.net/), published in the following paper: MutationFinder: A high-performance system for extracting point mutation mentions from text
-J. Gregory Caporaso, William A. Baumgartner Jr., David A. Randolph, K. Bretonnel Cohen, and Lawrence Hunter; Bioinformatics, 2007 23(14):1862-1865; doi:10.1093/bioinformatics/btm235;</description>
-        <vendor>JULIE Lab, Germany</vendor>
-        <configurationParameters/>
-        <configurationParameterSettings/>
+        <name>JCoRe LINNEAUS Species AE with Genera and Proxies</name>
+        <description/>
+        <version>1.0</version>
+        <vendor/>
+        <configurationParameters>
+            <configurationParameter>
+                <name>ConfigFile</name>
+                <description>Path to Linnaeus configuration file. See Linnaeus documentation for details.</description>
+                <type>String</type>
+                <multiValued>false</multiValued>
+                <mandatory>true</mandatory>
+            </configurationParameter>
+        </configurationParameters>
+        <configurationParameterSettings>
+            <nameValuePair>
+                <name>ConfigFile</name>
+                <value>
+                    <string>internal:/de/julielab/jcore/ae/linnaeus/resources-genera-proxies/properties.conf</string>
+                </value>
+            </nameValuePair>
+        </configurationParameterSettings>
         <typeSystemDescription>
             <types>
                 <typeDescription>
@@ -469,12 +484,14 @@ Trimmed Dependency Graphs" (http://www.db-thueringen.de/servlets/DerivateServlet
                 </typeDescription>
             </types>
         </typeSystemDescription>
+        <typePriorities/>
         <fsIndexCollection/>
         <capabilities>
             <capability>
                 <inputs/>
                 <outputs>
-                    <type>de.julielab.jcore.types.PointMutation</type>
+                    <type allAnnotatorFeatures="true">de.julielab.jcore.types.Organism</type>
+                    <type allAnnotatorFeatures="true">de.julielab.jcore.types.ResourceEntry</type>
                 </outputs>
                 <languagesSupported/>
             </capability>
@@ -485,4 +502,5 @@ Trimmed Dependency Graphs" (http://www.db-thueringen.de/servlets/DerivateServlet
             <outputsNewCASes>false</outputsNewCASes>
         </operationalProperties>
     </analysisEngineMetaData>
+    <resourceManagerConfiguration/>
 </analysisEngineDescription>

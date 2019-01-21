@@ -122,6 +122,18 @@
             <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
             <optional>false</optional>
         </externalResourceDependency>
+        <externalResourceDependency>
+            <key>lstmpm</key>
+            <description>List of results from the LSTM PM classifier</description>
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+            <optional>true</optional>
+        </externalResourceDependency>
+        <externalResourceDependency>
+            <key>lstmpmatt</key>
+            <description>List of results from the LSTM PM classifier with attention</description>
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+            <optional>true</optional>
+        </externalResourceDependency>
     </externalResourceDependencies>
     <resourceManagerConfiguration>
         <externalResources>
@@ -138,11 +150,45 @@
                 </configurableDataResourceSpecifier>
                 <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
             </externalResource>
+            <externalResource>
+                <name>LSTM results on the 2017 data, without attention</name>
+                <description>LSTM results without attention</description>
+                <configurableDataResourceSpecifier>
+                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2017_lstm_out</url>
+                    <resourceMetaData>
+                        <name/>
+                        <configurationParameters/>
+                        <configurationParameterSettings/>
+                    </resourceMetaData>
+                </configurableDataResourceSpecifier>
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+            </externalResource>
+            <externalResource>
+                <name>LSTM Attention</name>
+                <description>LSTM results with attention</description>
+                <configurableDataResourceSpecifier>
+                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2017_lstm_attention_out</url>
+                    <resourceMetaData>
+                        <name/>
+                        <configurationParameters/>
+                        <configurationParameterSettings/>
+                    </resourceMetaData>
+                </configurableDataResourceSpecifier>
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+            </externalResource>
         </externalResources>
         <externalResourceBindings>
             <externalResourceBinding>
                 <key>goldstandard</key>
                 <resourceName>GoldStandard</resourceName>
+            </externalResourceBinding>
+            <externalResourceBinding>
+                <key>lstmpm</key>
+                <resourceName>LSTM results on the 2017 data, without attention</resourceName>
+            </externalResourceBinding>
+            <externalResourceBinding>
+                <key>lstmpmatt</key>
+                <resourceName>LSTM Attention</resourceName>
             </externalResourceBinding>
         </externalResourceBindings>
     </resourceManagerConfiguration>
