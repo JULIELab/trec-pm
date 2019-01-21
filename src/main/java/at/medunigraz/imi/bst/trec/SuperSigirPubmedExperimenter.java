@@ -14,7 +14,7 @@ public class SuperSigirPubmedExperimenter {
 
 
     protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 22)
+        if (templateProperties.size() > 45)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();

@@ -7,7 +7,7 @@
           "query": "{{disease}}",
           "fields": {{sigir19_experiments_biomed/fields.json}},
           "tie_breaker": 0.3,
-          "operator": "{{dis_operator}}"
+          "operator": "{{dis_operator}}",
           "type": "{{dis_multi_match_type}}",
           "boost": {{disease_topic_boost}}
         }
@@ -17,7 +17,7 @@
           "query": "{{diseasePreferredTerm}}",
           "fields": {{sigir19_experiments_biomed/fields.json}},
           "tie_breaker": 0.3,
-          "operator": "{{dis_prefterm_operator}}"
+          "operator": "{{dis_prefterm_operator}}",
           "type": "{{dis_prefterm_multi_matchtype}}",
           "boost": {{disease_prefterm_boost}}
         }

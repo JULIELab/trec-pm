@@ -3,7 +3,7 @@
     "query": "{{[geneDescriptions]}}",
     "fields": {{sigir19_experiments_biomed/fields.json}},
     "tie_breaker": 0.3,
-    "operator":"{{gene_desc_operator}}"
+    "operator":"{{gene_desc_operator}}",
     "type": "{{gene_desc_multi_match_type}}",
     "boost": {{gene_desc_boost}},
     "slop": 10
