@@ -8,7 +8,7 @@
           "abstract{{abstract_boost}}"
         ],
         "tie_breaker": 0.3,
-        "type": "best_fields",
+        "type": "{{neg_boost_multi_match_type}}",
         "boost": {{neg_words_boost}}
       }
     }

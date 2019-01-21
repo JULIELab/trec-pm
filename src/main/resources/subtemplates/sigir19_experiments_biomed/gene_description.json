@@ -1,9 +1,9 @@
 {
   "multi_match": {
     "query": "{{[geneDescriptions]}}",
-    "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
+    "fields": {{sigir19_experiments_biomed/fields.json}},
     "tie_breaker": 0.3,
-    "type": "phrase",
+    "type": "{{gene_desc_multi_match_type}}",
     "boost": {{gene_desc_boost}},
     "slop": 10
   }

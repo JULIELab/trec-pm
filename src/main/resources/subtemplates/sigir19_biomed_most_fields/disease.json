@@ -5,18 +5,18 @@
       {
         "multi_match": {
           "query": "{{disease}}",
-          "fields": {{sigir19_experiments_biomed/fields.json}},
+          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
-            "type": "{{dis_multi_match_type}}",
+          "type": "most_fields",
           "boost": {{disease_topic_boost}}
         }
       },
       {
         "multi_match": {
           "query": "{{diseasePreferredTerm}}",
-          "fields": {{sigir19_experiments_biomed/fields.json}},
+          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
-          "type": "best_fields",
+          "type": "most_fields",
           "boost": {{disease_prefterm_boost}}
         }
       },

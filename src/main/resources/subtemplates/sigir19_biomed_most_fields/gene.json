@@ -1,17 +1,17 @@
 {
   "dis_max": {
-    "boost": 1.0,
+    "boost": {{gene_boost}},
     "queries": [
       {
         "multi_match": {
           "query": "{{gene}}",
-          "fields": "genes",
+          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
           "tie_breaker": 0.3,
           "type": "best_fields",
-          "boost": {{gene_boost}}
+          "boost": {{gene_topic_boost}}
         }
       },
-      {{geneSynonyms:sigir19_experiments_biomed/gene_synonym_boost_only_genefield.json}},
+      {{geneSynonyms:sigir19_experiments_biomed/gene_synonym_boost.json}},
       {{geneHypernyms:biomedical_articles/gene_hypernym.json}},
       {{geneDescriptions:sigir19_experiments_biomed/gene_description_boost.json}}
     ]

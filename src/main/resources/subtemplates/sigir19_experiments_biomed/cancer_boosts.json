@@ -3,9 +3,9 @@
     "should": {
       "multi_match": {
         "query": "cancer carcinoma tumor",
-        "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
+        "fields": {{sigir19_experiments_biomed/fields.json}},
         "tie_breaker": 0.3,
-        "type": "best_fields",
+        "type": "{{cancer_multi_match_type}}",
         "boost": {{cancer_boost}}
       }
     }

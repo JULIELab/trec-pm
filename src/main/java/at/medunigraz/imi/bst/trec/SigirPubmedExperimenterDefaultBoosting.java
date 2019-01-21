@@ -22,6 +22,7 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
         templateProperties.put("gene_topic_boost", "1");
         templateProperties.put("gene_syn_boost", "1");
         templateProperties.put("gene_desc_boost", "1");
+        templateProperties.put("gene_hyper_boost", "1");
         templateProperties.put("title_boost", "");
         templateProperties.put("abstract_boost", "");
         templateProperties.put("keyword_boost", "");
@@ -36,6 +37,21 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
         templateProperties.put("pm_gs_boost", "1");
         templateProperties.put("pm_boost", "1");
         templateProperties.put("non_mel_boost", "-1");
+
+        String defaultMultiMatch = "most_fields";
+        templateProperties.put("dis_syn_multi_match_type", defaultMultiMatch);
+        templateProperties.put("dis_multi_match_type", defaultMultiMatch);
+        templateProperties.put("dis_hyper_multi_match_type", defaultMultiMatch);
+        templateProperties.put("gene_multi_match_type", defaultMultiMatch);
+        templateProperties.put("gene_syn_multi_match_type", defaultMultiMatch);
+        templateProperties.put("gene_desc_multi_match_type", defaultMultiMatch);
+        templateProperties.put("gene_hyper_multi_match_type", defaultMultiMatch);
+        templateProperties.put("cancer_multi_match_type", defaultMultiMatch);
+        templateProperties.put("dna_multi_match_type", defaultMultiMatch);
+        templateProperties.put("neg_boost_multi_match_type", defaultMultiMatch);
+        templateProperties.put("pos_boost_multi_match_type", defaultMultiMatch);
+
+
 
         runExperiments(templateProperties, goldStandard, target, year, "", "");
     }

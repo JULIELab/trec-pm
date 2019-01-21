@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[diseaseHypernyms]}}",
+    "fields": {{sigir19_experiments_biomed/fields.json}},
+    "tie_breaker": 0.3,
+    "type": "{{dis_hyper_multi_match_type}}",
+    "boost": 0
+  }
+}

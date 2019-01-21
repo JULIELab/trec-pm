@@ -5,15 +5,15 @@
       {
         "multi_match": {
           "query": "{{gene}}",
-          "fields": {{sigir19_experiments_biomed/fields_boosts.json}},
+          "fields": {{sigir19_experiments_biomed/fields.json}},
           "tie_breaker": 0.3,
-          "type": "best_fields",
+          "type": "{{gene_multi_match_type}}",
           "boost": {{gene_topic_boost}}
         }
       },
-      {{geneSynonyms:sigir19_experiments_biomed/gene_synonym_boost.json}},
-      {{geneHypernyms:biomedical_articles/gene_hypernym.json}},
-      {{geneDescriptions:sigir19_experiments_biomed/gene_description_boost.json}}
+      {{geneSynonyms:sigir19_experiments_biomed/gene_synonym.json}},
+      {{geneHypernyms:sigir19_experiments_biomed/gene_hypernym.json}},
+      {{geneDescriptions:sigir19_experiments_biomed/gene_description.json}}
     ]
   }
 }
