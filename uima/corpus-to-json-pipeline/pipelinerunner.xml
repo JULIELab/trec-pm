@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+<runners>
+<runner>
+<name>CPERunner</name>
+<pipelinepath>.</pipelinepath>
+<numthreads>5</numthreads>
+</runner>
+</runners>
+</configuration>
