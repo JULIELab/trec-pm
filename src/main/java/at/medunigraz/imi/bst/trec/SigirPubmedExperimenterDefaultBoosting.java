@@ -50,6 +50,19 @@ public class SigirPubmedExperimenterDefaultBoosting extends SuperSigirPubmedExpe
         templateProperties.put("dna_multi_match_type", defaultMultiMatch);
         templateProperties.put("neg_boost_multi_match_type", defaultMultiMatch);
         templateProperties.put("pos_boost_multi_match_type", defaultMultiMatch);
+        templateProperties.put("dis_prefterm_multi_matchtype", defaultMultiMatch);
+
+        String defaultOperator = "OR";
+        templateProperties.put("dis_operator", defaultOperator);
+        templateProperties.put("dis_prefterm_operator", defaultOperator);
+        templateProperties.put("dis_syn_operator", defaultOperator);
+        templateProperties.put("dis_hyper_operator", defaultOperator);
+        templateProperties.put("gene_operator", defaultOperator);
+        templateProperties.put("gene_syn_operator", defaultOperator);
+        templateProperties.put("gene_hyper_operator", defaultOperator);
+        templateProperties.put("gene_desc_operator", defaultOperator);
+        templateProperties.put("cancer_operator", defaultOperator);
+        templateProperties.put("dna_operator", defaultOperator);
 
 
 

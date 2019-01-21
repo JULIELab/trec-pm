@@ -3,6 +3,7 @@
     "query": "{{[geneSynonyms]}}",
     "fields": {{sigir19_experiments_biomed/gene_fields.json}},
     "tie_breaker": 0.3,
+    "operator": "{{gene_syn_operator}}"
     "type": "{{gene_syn_multi_match_type}}",
     "boost": {{gene_syn_boost}}
   }

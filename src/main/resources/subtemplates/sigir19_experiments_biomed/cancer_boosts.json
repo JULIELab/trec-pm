@@ -5,6 +5,7 @@
         "query": "cancer carcinoma tumor",
         "fields": {{sigir19_experiments_biomed/fields.json}},
         "tie_breaker": 0.3,
+        "operator": "{{cancer_operator}}"
         "type": "{{cancer_multi_match_type}}",
         "boost": {{cancer_boost}}
       }
