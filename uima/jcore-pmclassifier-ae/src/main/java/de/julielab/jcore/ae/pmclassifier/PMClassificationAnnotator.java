@@ -102,7 +102,8 @@ public class PMClassificationAnnotator extends JCasAnnotator_ImplBase {
         }
         DocumentClass documentClass = new DocumentClass(aJCas);
         documentClass.setClassname(probabiltyForPM > .5 ? "PM" : "Not PM");
-        FSArray newArray = JCoReTools.addToFSArray(ad.getDocumentClasses(), documentClass);
+        documentClass.setConfidence(probabiltyForPM);
+        FSArray newArray = JCoReTools.addToFSArray(ad.getDocumentClasses(), documentClass, 1);
         ad.setDocumentClasses(newArray);
     }
 

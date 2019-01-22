@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --mem 40g
 #SBATCH --cpus-per-task 20 
-#SBATCH -J trecprocessing
+#SBATCH -J trecpreproc 
 
 # This library causes a conflict
 if [ -f lib/commons-cli-1.2.jar ]; then

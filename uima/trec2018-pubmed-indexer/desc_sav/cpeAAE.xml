@@ -3,22 +3,21 @@
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
     <primitive>false</primitive>
     <delegateAnalysisEngineSpecifiers>
-        <delegateAnalysisEngine key="PM Classifier 2017">
-            <import location="PM Classifier 2017.xml"/>
+        <delegateAnalysisEngine key="JCoRe Abstract Database Multiplier">
+            <import location="JCoRe Abstract Database Multiplier.xml"/>
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="PM Classifier 2018">
-            <import location="PM Classifier 2018.xml"/>
+        <delegateAnalysisEngine key="JCoRe ElasticSearch Consumer">
+            <import location="JCoRe ElasticSearch Consumer.xml"/>
         </delegateAnalysisEngine>
     </delegateAnalysisEngineSpecifiers>
     <analysisEngineMetaData>
-        <name>JCoRe Pipeline AAE</name>
-        <description>This AAE descriptor directly contains the analysis engines added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
+        <name/>
         <configurationParameters/>
         <configurationParameterSettings/>
         <flowConstraints>
             <fixedFlow>
-                <node>PM Classifier 2017</node>
-                <node>PM Classifier 2018</node>
+                <node>JCoRe Abstract Database Multiplier</node>
+                <node>JCoRe ElasticSearch Consumer</node>
             </fixedFlow>
         </flowConstraints>
         <capabilities/>

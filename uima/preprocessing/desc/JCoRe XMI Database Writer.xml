@@ -117,8 +117,7 @@
                 <name>AnnotationsToStore</name>
                 <value>
                     <array>
-                        <string>de.julielab.jcore.types.LikelihoodIndicator</string>
-                        <string>de.julielab.jcore.types.Scope</string>
+                        <string>de.julielab.jcore.types.AutoDescriptor</string>
                     </array>
                 </value>
             </nameValuePair>

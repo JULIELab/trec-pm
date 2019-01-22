@@ -92,10 +92,35 @@ public class Trec2018FieldGenerator extends FieldGenerator {
             document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
         Trec2018FilterBoard fb = filterRegistry.getFilterBoard(Trec2018FilterBoard.class);
-        if (fb.lstmpm != null && fb.lstmpm.get(document.getId()) != null) {
-            final Double lstmpmVal = fb.lstmpm.get(document.getId());
-            document.addField("pmclass2017lstm", lstmpmVal > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2017lstmconfidence", lstmpmVal);
+        if (fb.lstm2017 != null && fb.lstm2017.get(document.getId()) != null) {
+            final Double prob = fb.lstm2017.get(document.getId());
+            document.addField("pmclass2017lstm", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2017lstmconfidence", prob);
+        }
+        if (fb.lstmatt2017 != null && fb.lstmatt2017.get(document.getId()) != null) {
+            final Double prob = fb.lstmatt2017.get(document.getId());
+            document.addField("pmclass2017lstmatt", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2017lstmattconfidence", prob);
+        }
+        if (fb.lstmgru2017 != null && fb.lstmgru2017.get(document.getId()) != null) {
+            final Double prob = fb.lstmgru2017.get(document.getId());
+            document.addField("pmclass2017lstmgru", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2017lstmgruconfidence", prob);
+        }
+        if (fb.lstm2018 != null && fb.lstm2018.get(document.getId()) != null) {
+            final Double prob = fb.lstm2018.get(document.getId());
+            document.addField("pmclass2018lstm", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2018lstmconfidence", prob);
+        }
+        if (fb.lstmatt2018 != null && fb.lstmatt2018.get(document.getId()) != null) {
+            final Double prob = fb.lstmatt2018.get(document.getId());
+            document.addField("pmclass2018lstmatt", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2018lstmattconfidence", prob);
+        }
+        if (fb.lstmgru2018 != null && fb.lstmgru2018.get(document.getId()) != null) {
+            final Double prob = fb.lstmgru2018.get(document.getId());
+            document.addField("pmclass2018lstmgru", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2018lstmgruconfidence", prob);
         }
     }
 

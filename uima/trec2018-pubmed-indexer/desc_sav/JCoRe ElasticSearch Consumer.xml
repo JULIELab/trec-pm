@@ -123,39 +123,15 @@
             <optional>false</optional>
         </externalResourceDependency>
         <externalResourceDependency>
-            <key>lstm2017</key>
-            <description>List of results from the LSTM PM classifier trained on the 2017 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
+            <key>lstmpm</key>
+            <description>List of results from the LSTM PM classifier</description>
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
             <optional>true</optional>
         </externalResourceDependency>
         <externalResourceDependency>
-            <key>lstmatt2017</key>
-            <description>List of results from the LSTM PM classifier with attention trained on the 2017 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-            <optional>true</optional>
-        </externalResourceDependency>
-        <externalResourceDependency>
-            <key>lstmgru2017</key>
-            <description>List of results from the LSTM PM classifier with GRU trained on the 2017 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-            <optional>true</optional>
-        </externalResourceDependency>
-        <externalResourceDependency>
-            <key>lstm2018</key>
-            <description>List of results from the LSTM PM classifier trained on the 2018 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-            <optional>true</optional>
-        </externalResourceDependency>
-        <externalResourceDependency>
-            <key>lstmatt2018</key>
-            <description>List of results from the LSTM PM classifier with attention trained on the 2018 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-            <optional>true</optional>
-        </externalResourceDependency>
-        <externalResourceDependency>
-            <key>lstmgru2018</key>
-            <description>List of results from the LSTM PM classifier with GRU trained on the 2018 GS</description>
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
+            <key>lstmpmatt</key>
+            <description>List of results from the LSTM PM classifier with attention</description>
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
             <optional>true</optional>
         </externalResourceDependency>
     </externalResourceDependencies>
@@ -175,7 +151,7 @@
                 <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
             </externalResource>
             <externalResource>
-                <name>lstm2017</name>
+                <name>LSTM results on the 2017 data, without attention</name>
                 <description>LSTM results without attention</description>
                 <configurableDataResourceSpecifier>
                     <url>file:/var/data/data_corpora/SIGIR2019_classified/model2017_lstm_out</url>
@@ -185,10 +161,10 @@
                         <configurationParameterSettings/>
                     </resourceMetaData>
                 </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
             </externalResource>
             <externalResource>
-                <name>lstmatt2017</name>
+                <name>LSTM Attention</name>
                 <description>LSTM results with attention</description>
                 <configurableDataResourceSpecifier>
                     <url>file:/var/data/data_corpora/SIGIR2019_classified/model2017_lstm_attention_out</url>
@@ -198,59 +174,7 @@
                         <configurationParameterSettings/>
                     </resourceMetaData>
                 </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
-            </externalResource>
-            <externalResource>
-                <name>lstmgru2017</name>
-                <description>LSTM results with GRU</description>
-                <configurableDataResourceSpecifier>
-                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2017_gru_out</url>
-                    <resourceMetaData>
-                        <name/>
-                        <configurationParameters/>
-                        <configurationParameterSettings/>
-                    </resourceMetaData>
-                </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
-            </externalResource>
-            <externalResource>
-                <name>lstm2018</name>
-                <description>LSTM results without attention</description>
-                <configurableDataResourceSpecifier>
-                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2018_out</url>
-                    <resourceMetaData>
-                        <name/>
-                        <configurationParameters/>
-                        <configurationParameterSettings/>
-                    </resourceMetaData>
-                </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
-            </externalResource>
-            <externalResource>
-                <name>lstmatt2018</name>
-                <description>LSTM results with attention</description>
-                <configurableDataResourceSpecifier>
-                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2018_attention_out</url>
-                    <resourceMetaData>
-                        <name/>
-                        <configurationParameters/>
-                        <configurationParameterSettings/>
-                    </resourceMetaData>
-                </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
-            </externalResource>
-            <externalResource>
-                <name>lstmgru2018</name>
-                <description>LSTM results with GRU</description>
-                <configurableDataResourceSpecifier>
-                    <url>file:/var/data/data_corpora/SIGIR2019_classified/model2018_gru_out</url>
-                    <resourceMetaData>
-                        <name/>
-                        <configurationParameters/>
-                        <configurationParameterSettings/>
-                    </resourceMetaData>
-                </configurableDataResourceSpecifier>
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
             </externalResource>
         </externalResources>
         <externalResourceBindings>
@@ -259,28 +183,12 @@
                 <resourceName>GoldStandard</resourceName>
             </externalResourceBinding>
             <externalResourceBinding>
-                <key>lstm2017</key>
-                <resourceName>lstm2017</resourceName>
+                <key>lstmpm</key>
+                <resourceName>LSTM results on the 2017 data, without attention</resourceName>
             </externalResourceBinding>
             <externalResourceBinding>
-                <key>lstmatt2017</key>
-                <resourceName>lstmatt2017</resourceName>
-            </externalResourceBinding>
-            <externalResourceBinding>
-                <key>lstmgru2017</key>
-                <resourceName>lstmgru2017</resourceName>
-            </externalResourceBinding>
-            <externalResourceBinding>
-                <key>lstm2018</key>
-                <resourceName>lstm2018</resourceName>
-            </externalResourceBinding>
-            <externalResourceBinding>
-                <key>lstmatt2018</key>
-                <resourceName>lstmatt2018</resourceName>
-            </externalResourceBinding>
-            <externalResourceBinding>
-                <key>lstmgru2018</key>
-                <resourceName>lstmgru2018</resourceName>
+                <key>lstmpmatt</key>
+                <resourceName>LSTM Attention</resourceName>
             </externalResourceBinding>
         </externalResourceBindings>
     </resourceManagerConfiguration>

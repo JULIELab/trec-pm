@@ -6,7 +6,7 @@
         <tableSchemas>
             <tableSchema forEach="." name="xmi_anno_view">
                 <field name="pmid" primaryKey="true" retrieve="true" type="text" xpath="PMID"/>
-                <field gzip="true" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
+                <field gzip="false" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
             </tableSchema>
         </tableSchemas>
     </DBSchemaInformation>
