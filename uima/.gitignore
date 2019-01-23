@@ -6,3 +6,7 @@ build
 
 # Ignore SLURM logs
 slurm-*.out
+gsdocids2017.txt
+gsdocids2017ct.txt
+gsdocids2018.txt
+gsdocids2018ct.txt

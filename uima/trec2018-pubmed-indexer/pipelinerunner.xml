@@ -4,7 +4,8 @@
 <runner>
 <name>CPERunner</name>
 <pipelinepath>/home/faessler/Coding/git/ourtrecpm/uima/trec2018-pubmed-indexer/</pipelinepath>
-<numthreads>1</numthreads>
+<numthreads>20</numthreads>
+<heapsize>30G</heapsize>
 </runner>
 </runners>
 </configuration>
