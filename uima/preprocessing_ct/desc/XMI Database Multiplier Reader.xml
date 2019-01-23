@@ -148,7 +148,7 @@
             <nameValuePair>
                 <name>BatchSize</name>
                 <value>
-                    <integer>500</integer>
+                    <integer>50</integer>
                 </value>
             </nameValuePair>
             <nameValuePair>
@@ -158,9 +158,9 @@
                 </value>
             </nameValuePair>
             <nameValuePair>
-                <name>ReadsBaseDocument</name>
+                <name>Table</name>
                 <value>
-                    <boolean>true</boolean>
+                    <string>preprocessing_all_ct</string>
                 </value>
             </nameValuePair>
             <nameValuePair>
@@ -170,24 +170,9 @@
                 </value>
             </nameValuePair>
             <nameValuePair>
-                <name>Table</name>
+                <name>ReadsBaseDocument</name>
                 <value>
-                    <string>indexing_all</string>
-                </value>
-            </nameValuePair>
-            <nameValuePair>
-                <name>AdditionalTableSchemas</name>
-                <value>
-                    <array/>
-                </value>
-            </nameValuePair>
-            <nameValuePair>
-                <name>AdditionalTables</name>
-                <value>
-                    <array>
-                        <string>de.julielab.jcore.types.Gene</string>
-                        <string>de.julielab.jcore.types.Organism</string>
-                    </array>
+                    <boolean>true</boolean>
                 </value>
             </nameValuePair>
         </configurationParameterSettings>

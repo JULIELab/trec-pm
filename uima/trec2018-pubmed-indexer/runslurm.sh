@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --mem 20g
+#SBATCH --mem 40g
 #SBATCH --cpus-per-task 1
 #SBATCH -J trecpubindex 
 
-java -jar -Xmx15g ~/bin/jcore-pipeline-runner-base*.jar pipelinerunner.xml
+java -jar -Xmx35g ~/bin/jcore-pipeline-runner-base*.jar pipelinerunner.xml
