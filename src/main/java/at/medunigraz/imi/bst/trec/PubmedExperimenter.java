@@ -24,28 +24,28 @@ public class PubmedExperimenter {
 
 
 		// Judging order: 1
-		builder.newExperiment().withName("hpipubclass").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(extraBoostTemplate).withWordRemoval().withGeneSynonym()
-				.withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
+//		builder.newExperiment().withName("hpipubclass").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//				.withSubTemplate(extraBoostTemplate).withWordRemoval().withGeneSynonym()
+//				.withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
 
 		// Judging order: 2
 		builder.newExperiment().withName("hpipubnone").withYear(year).withGoldStandard(goldStandard).withTarget(target)
 				.withSubTemplate(noClassifierTemplate).withWordRemoval().withGeneSynonym()
                 		.withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
 
-		// Judging order: 3
-		builder.newExperiment().withName("hpipubboost").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(improvedTemplate).withWordRemoval().withGeneSynonym()
-                		.withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
-
-		// Judging order: 4
-		builder.newExperiment().withName("hpipubcommon").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(noClassifierTemplate).withWordRemoval().withGeneSynonym()
-				.withDiseasePreferredTerm().withDiseaseSynonym();
-
-		// Judging order: 5
-		builder.newExperiment().withName("hpipubbase").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(noClassifierTemplate);
+//		// Judging order: 3
+//		builder.newExperiment().withName("hpipubboost").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//				.withSubTemplate(improvedTemplate).withWordRemoval().withGeneSynonym()
+//                		.withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
+//
+//		// Judging order: 4
+//		builder.newExperiment().withName("hpipubcommon").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//				.withSubTemplate(noClassifierTemplate).withWordRemoval().withGeneSynonym()
+//				.withDiseasePreferredTerm().withDiseaseSynonym();
+//
+//		// Judging order: 5
+//		builder.newExperiment().withName("hpipubbase").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//				.withSubTemplate(noClassifierTemplate);
 
 		Set<Experiment> experiments = builder.build();
 

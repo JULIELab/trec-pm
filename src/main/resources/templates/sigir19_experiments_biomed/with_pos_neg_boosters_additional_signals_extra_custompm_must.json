@@ -6,12 +6,12 @@
 			{{sigir19_experiments_biomed/pm.json}}
 		],
 		"should": [
-			{{sigir19_experiments_biomed/positive_boosters_boosts.json}},
-			{{sigir19_experiments_biomed/negative_boosters_boosts.json}},
-			{{sigir19_experiments_biomed/chemotherapy_boosts.json}},
-			{{sigir19_experiments_biomed/cancer_boosts.json}},
-			{{sigir19_experiments_biomed/dna_boosts.json}},
-			{{sigir19_experiments_biomed/extra_boosts.json}}
+			{{sigir19_experiments_biomed/positive_boosters.json}},
+			{{sigir19_experiments_biomed/negative_boosters.json}},
+			{{sigir19_experiments_biomed/chemotherapy.json}},
+			{{sigir19_experiments_biomed/cancer.json}},
+			{{sigir19_experiments_biomed/dna.json}},
+			{{sigir19_experiments_biomed/extra.json}}
 		]
 	}
 }

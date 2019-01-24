@@ -14,7 +14,7 @@ public class SuperSigirPubmedExperimenter {
 
 
     protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 45)
+        if (templateProperties.size() > 46)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
@@ -90,7 +90,6 @@ public class SuperSigirPubmedExperimenter {
 
     private static void addExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, Function<String, File> getTemplate, String suffix) {
         File baseline = getTemplate.apply("baseline");
-        File baseline_only_genefield = getTemplate.apply("baseline_only_genefield");
         File baseline_plus_genefield = getTemplate.apply("baseline_plus_genefield");
         File with_pos_boosters = getTemplate.apply("with_pos_boosters");
         File with_pos_neg_boosters = getTemplate.apply("with_pos_neg_boosters");
@@ -101,43 +100,50 @@ public class SuperSigirPubmedExperimenter {
 
         boolean wordRemoval = false;
 
-        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties);
+//        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties);
+//
+//        builder.newExperiment().withName("baselinewr" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withWordRemoval();
+//
+//        builder.newExperiment().withName("dissyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withDiseaseSynonym();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("dishyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withDiseaseHypernym();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("dissynpt" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("dissynpthyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("gensyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withGeneSynonym();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("gensyndesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withGeneSynonym().withGeneDescription();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("gensyndescplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline_plus_genefield, templateProperties).withGeneSynonym().withGeneDescription();
+//        if (wordRemoval) builder.withWordRemoval();
+//
+//        builder.newExperiment().withName("gendisall" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription();
+//        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("baselinewr" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withWordRemoval();
 
-        builder.newExperiment().withName("dissyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseaseSynonym();
-        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("dishyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseaseHypernym();
-        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("dissynpt" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym();
-        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("dissynpthyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym();
-        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("gensyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withGeneSynonym();
-        if (wordRemoval) builder.withWordRemoval();
 
-        builder.newExperiment().withName("gensyndesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withGeneSynonym().withGeneDescription();
-        if (wordRemoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gensyndescplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline_plus_genefield, templateProperties).withGeneSynonym().withGeneDescription();
-        if (wordRemoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gendisall" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription();
-        if (wordRemoval) builder.withWordRemoval();
 
 //        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
 //                .withSubTemplate(with_pos_boosters, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
@@ -159,6 +165,11 @@ public class SuperSigirPubmedExperimenter {
 //
 //        builder.newExperiment().withName("addextranonmelshould" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
 //                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel_should, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
+
+
+        builder.newExperiment().withName("hpipubnone_replique").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     private static class TemplateSet {

@@ -6,8 +6,8 @@
 			{{sigir19_experiments_biomed/pm.json}}
 		],
 		"should": [
-			{{sigir19_experiments_biomed/positive_boosters_boosts.json}},
-			{{sigir19_experiments_biomed/negative_boosters_boosts.json}}
+			{{sigir19_experiments_biomed/positive_boosters.json}},
+			{{sigir19_experiments_biomed/negative_boosters.json}}
 		]
 	}
 }

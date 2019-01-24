@@ -22,9 +22,10 @@
           "boost": {{disease_prefterm_boost}}
         }
       },
-      {{diseaseSynonyms:sigir19_experiments_biomed/disease_synonym_boost.json}},
+      {{diseaseSynonyms:sigir19_experiments_biomed/disease_synonym.json}},
       {{diseaseHypernyms:biomedical_articles/disease_hypernym.json}},
 
+{{match_all.json}}
     ]
   }
 }

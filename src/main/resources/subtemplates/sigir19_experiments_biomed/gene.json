@@ -5,7 +5,7 @@
       {
         "multi_match": {
           "query": "{{gene}}",
-          "fields": {{sigir19_experiments_biomed/fields.json}},
+          "fields": {{sigir19_experiments_biomed/gene_fields.json}},
           "tie_breaker": 0.3,
           "operator": "{{gene_operator}}",
           "type": "{{gene_multi_match_type}}",
