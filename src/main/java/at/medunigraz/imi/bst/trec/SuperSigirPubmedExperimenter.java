@@ -14,7 +14,7 @@ public class SuperSigirPubmedExperimenter {
 
 
     protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 46)
+        if (templateProperties.size() > 47)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
@@ -22,11 +22,11 @@ public class SuperSigirPubmedExperimenter {
             builder.setDefaultStatsDir("stats_" + what);
         final Map<String, TemplateSet> sigirTemplates = getSigirTemplates();
 
-        addExperimentsWithoutPmClassifier(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
+        //addExperimentsWithoutPmClassifier(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
 //        addExperimentsWithGoldStandardPmClassifierShould(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
 //        addExperimentsWithGoldStandardPmClassifierMust(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-//        addExperimentsWithCustomPmClassifierShould(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-//        addExperimentsWithCustomPmClassifierMust(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
+        addExperimentsWithCustomPmClassifierShould(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
+        addExperimentsWithCustomPmClassifierMust(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
 
         Set<Experiment> experiments = builder.build();
 
@@ -96,7 +96,6 @@ public class SuperSigirPubmedExperimenter {
         File with_pos_neg_boosters_additional_signals = getTemplate.apply("with_pos_neg_boosters_additional_signals");
         File with_pos_neg_boosters_additional_signals_extra = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra");
         File with_pos_neg_boosters_additional_signals_extra_nonmel = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel");
-        File with_pos_neg_boosters_additional_signals_extra_nonmel_should = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel_should");
 
         boolean wordRemoval = false;
 
@@ -139,12 +138,6 @@ public class SuperSigirPubmedExperimenter {
 //        if (wordRemoval) builder.withWordRemoval();
 
 
-
-
-
-
-
-
 //        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
 //                .withSubTemplate(with_pos_boosters, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
 //
@@ -167,11 +160,14 @@ public class SuperSigirPubmedExperimenter {
 //                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel_should, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
 
 
-        builder.newExperiment().withName("hpipubnone_replique").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//        builder.newExperiment().withName("hpipubnone_replique").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
+//                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
+
+        builder.newExperiment().withName("hpipubnone_replique" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
                 .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
-
     private static class TemplateSet {
         private File base;
         private File gspmMust;

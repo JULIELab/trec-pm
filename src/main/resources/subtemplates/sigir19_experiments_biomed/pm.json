@@ -1,6 +1,6 @@
 {
   "term": {
-    "documentClasses.keyword": {
+    "{{pm_class_field}}": {
       "value": "PM",
       "boost": {{pm_boost}}
     }

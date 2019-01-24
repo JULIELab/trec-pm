@@ -1,34 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
     <primitive>false</primitive>
+        
     <delegateAnalysisEngineSpecifiers>
+                
         <delegateAnalysisEngine key="JCoRe Abstract Database Multiplier">
+                        
             <import location="JCoRe Abstract Database Multiplier.xml"/>
+                    
         </delegateAnalysisEngine>
+                
         <delegateAnalysisEngine key="JCoRe Pipeline AAE">
+                        
             <import location="AggregateAnalysisEngine.xml"/>
+                    
         </delegateAnalysisEngine>
-        <delegateAnalysisEngine key="JCoRe XMI Database Writer">
-            <import location="JCoRe XMI Database Writer.xml"/>
+                
+        <delegateAnalysisEngine key="JCoRe Consumer AAE">
+                        
+            <import location="AggregateConsumer.xml"/>
+                    
         </delegateAnalysisEngine>
+            
     </delegateAnalysisEngineSpecifiers>
+        
     <analysisEngineMetaData>
+                
         <name/>
+                
         <configurationParameters/>
+                
         <configurationParameterSettings/>
+                
         <flowConstraints>
+                        
             <fixedFlow>
+                                
                 <node>JCoRe Abstract Database Multiplier</node>
+                                
                 <node>JCoRe Pipeline AAE</node>
-                <node>JCoRe XMI Database Writer</node>
+                                
+                <node>JCoRe Consumer AAE</node>
+                            
             </fixedFlow>
+                    
         </flowConstraints>
+                
         <capabilities/>
+                
         <operationalProperties>
+                        
             <modifiesCas>true</modifiesCas>
+                        
             <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
             <outputsNewCASes>false</outputsNewCASes>
+                    
         </operationalProperties>
+            
     </analysisEngineMetaData>
+    
 </analysisEngineDescription>

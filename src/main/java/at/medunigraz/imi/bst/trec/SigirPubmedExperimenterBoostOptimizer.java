@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.trec.experiment.Experiment;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExperimenter {
     public static void main(String[] args) {
@@ -16,6 +17,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         validParams.add("additional");
         validParams.add("extra");
         validParams.add("pmgs");
+        validParams.add("pmclass");
 
         if (args.length != 1 || !validParams.contains(args[0])) {
             System.err.println("Usage: " + SigirPubmedExperimenterBoostOptimizer.class.getSimpleName() + " <what>");
@@ -30,29 +32,8 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         final int year = 2017;
 
 
-        Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("disease_boost", "1");
-        templateProperties.put("disease_topic_boost", "1");
-        templateProperties.put("disease_prefterm_boost", "1");
-        templateProperties.put("disease_syn_boost", "1");
-        templateProperties.put("gene_boost", "1");
-        templateProperties.put("gene_topic_boost", "1");
-        templateProperties.put("gene_syn_boost", "1");
-        templateProperties.put("gene_desc_boost", "1");
-        templateProperties.put("title_boost", "");
-        templateProperties.put("abstract_boost", "");
-        templateProperties.put("keyword_boost", "");
-        templateProperties.put("meshTags_boost", "");
-        templateProperties.put("genes_field_boost", "");
-        templateProperties.put("pos_words_boost", "1");
-        templateProperties.put("neg_words_boost", "1");
-        templateProperties.put("cancer_boost", "1");
-        templateProperties.put("chemo_boost", "1");
-        templateProperties.put("dna_boost", "1");
-        templateProperties.put("extra_boost", "1");
-        templateProperties.put("pm_gs_boost", "1");
-        templateProperties.put("pm_boost", "1");
-        templateProperties.put("non_mel_boost", "1");
+        Map<String, String> templateProperties = SigirParameters.TREC_2018_HPIPUBNONE;
+
 
         DecimalFormat df = new DecimalFormat("0.0");
         if (what.equals("disease")) {
@@ -108,20 +89,32 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 }
             }
         } else if (what.equals("additional")) {
+            List<Map<String, String>> parameters = new ArrayList<>();
+            List<String> suffixes = new ArrayList<>();
             for (double cancerb = .4; cancerb < 2; cancerb += .4) {
                 for (double chemob = .4; chemob < 2; chemob += .4) {
                     for (double dnab = .4; dnab < 2; dnab += .4) {
                         for (double nonmelb = -1; nonmelb < .8; nonmelb += .4) {
-                            templateProperties.put("cancer_boost", String.valueOf(cancerb));
-                            templateProperties.put("chemo_boost", String.valueOf(chemob));
-                            templateProperties.put("dna_boost", String.valueOf(dnab));
-                            templateProperties.put("non_mel_boost", String.valueOf(dnab));
+                            Map<String, String> paramcombination = templateProperties;
+                            paramcombination.put("cancer_boost", String.valueOf(cancerb));
+                            paramcombination.put("chemo_boost", String.valueOf(chemob));
+                            paramcombination.put("dna_boost", String.valueOf(dnab));
+                            paramcombination.put("non_mel_boost", String.valueOf(dnab));
                             String suffix = "--canc" + df.format(cancerb) + "-chem" + df.format(chemob) + "-dna" + df.format(dnab) + "-nonmel" + df.format(nonmelb);
-                            runExperiments(templateProperties, goldStandard, target, year, what, suffix);
+                            parameters.add(paramcombination);
+                            suffixes.add(suffix);
                         }
                     }
                 }
             }
+            IntStream.range(0, parameters.size()).parallel().forEach(i -> {
+                Map<String, String> parameterset = parameters.get(i);
+                String suffix = suffixes.get(i);
+                Map<String, String> runparameters = templateProperties;
+                runparameters.putAll(parameterset);
+                runExperiments(parameterset, goldStandard, target, year, what, suffix);
+            });
+
         } else if (what.equals("extra")) {
             for (double extrab = .4; extrab < 2; extrab += .4) {
                 templateProperties.put("extra_boost", String.valueOf(extrab));
@@ -134,6 +127,20 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 String suffix = "--pmgs" + df.format(pmgsb);
                 runExperiments(templateProperties, goldStandard, target, year, what, suffix);
             }
+        }
+        if (what.equals("pmclass")) {
+            final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
+                    "pmclass2017lstmatt.keyword",
+                    "pmclass2017lstmgru.keyword",
+                    "pmclass2018lstm.keyword",
+                    "pmclass2018lstmat.keyword",
+                    "pmclass2018lstmgru.keyword", "pmclass2017.keyword", "pmclass2018.keyword");
+            //final List<String> pmfields = Arrays.asList( "pmclass2017.keyword");
+            pmfields.parallelStream().forEach(pmfield -> {
+                Map<String, String> parameters = templateProperties;
+                parameters.put("pm_class_field", pmfield);
+                runExperiments(parameters, goldStandard, target, year, what, "-" + pmfield);
+            });
         } else throw new IllegalStateException("Unknown mode " + what);
 
 

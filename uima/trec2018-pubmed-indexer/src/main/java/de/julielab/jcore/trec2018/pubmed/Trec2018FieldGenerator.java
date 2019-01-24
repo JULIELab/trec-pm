@@ -40,7 +40,7 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addGenes(jCas, document);
         addOrganisms(jCas, document);
         addDocumentClasses(jCas, document);
-        //addGsInfo(jCas, document);
+        addGsInfo(jCas, document);
         addPublicationType(jCas, document);
         return document;
     }

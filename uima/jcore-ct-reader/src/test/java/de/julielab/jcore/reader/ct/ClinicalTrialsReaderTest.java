@@ -36,7 +36,7 @@ public class ClinicalTrialsReaderTest {
     @Test
     public void testReader() throws UIMAException, IOException {
         final JCas jCas = JCasFactory.createJCas("de.julielab.jcore.types.jcore-document-meta-clinicaltrial-types", "de.julielab.jcore.types.jcore-document-structure-clinicaltrial-types");
-        final CollectionReader reader = CollectionReaderFactory.createReader("de.julielab.jcore.reader.ct.desc.jcore-clinicaltrials-reader", ClinicalTrialsReader.PARAM_INPUT_DIR, "src/test/resources/testdocs");
+        final CollectionReader reader = CollectionReaderFactory.createReader("de.julielab.jcore.reader.ct.desc.jcore-clinicaltrials-reader", ClinicalTrialsReader.PARAM_INPUT_DIR, "src/test/resources/testdocs", ClinicalTrialsReader.PARAM_FILES, new String[]{"NCT02206334.xml"});
         assertTrue(reader.hasNext());
         reader.getNext(jCas.getCas());
         Header header = JCasUtil.selectSingle(jCas, Header.class);

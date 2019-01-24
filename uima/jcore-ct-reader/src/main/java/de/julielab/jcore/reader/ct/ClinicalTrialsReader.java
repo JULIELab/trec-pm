@@ -7,10 +7,8 @@ import de.julielab.jcore.types.ct.Header;
 import de.julielab.jcore.types.MeshHeading;
 import de.julielab.jcore.types.ct.*;
 import de.julielab.jcore.utility.JCoReTools;
-import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.UimaContext;
 import org.apache.uima.jcas.cas.StringArray;
@@ -24,16 +22,19 @@ import org.apache.uima.util.ProgressImpl;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
 
     public static final String PARAM_INPUT_DIR = "InputDirectory";
+    public static final String PARAM_FILES = "FileNames";
     private final static Logger log = LoggerFactory.getLogger(ClinicalTrialsReader.class);
     @ConfigurationParameter(name = PARAM_INPUT_DIR)
     private File inputDirectory;
+    @ConfigurationParameter(name = PARAM_FILES, mandatory = false, description = "For debugging: Restrict the documents read to the given document file names.")
+    private String[] fileNames;
 
     private Iterator<File> files;
 
@@ -45,19 +46,28 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
         inputDirectory = new File((String) context.getConfigParameterValue(PARAM_INPUT_DIR));
+        fileNames = (String[]) context.getConfigParameterValue(PARAM_FILES);
         try {
             files = readFiles(inputDirectory);
         } catch (IOException e) {
             log.error("Could not read clinical trials files", e);
             throw new ResourceInitializationException(e);
         }
+        log.info("{}: {}", PARAM_INPUT_DIR, inputDirectory);
+        log.info("{}: {}", PARAM_FILES, fileNames);
     }
 
     private Iterator<File> readFiles(File inputDirectory) throws IOException {
         List<File> files = new ArrayList<>(250000);
-        Files.walk(inputDirectory.toPath())
-                .filter(Files::isRegularFile)
-                .forEach(f -> files.add(f.toFile()));
+        Stream<Path> pathStream = Files.walk(inputDirectory.toPath())
+                .filter(Files::isRegularFile);
+        if (fileNames != null && fileNames.length > 0) {
+            final Set<String> idset = new HashSet<>(Arrays.asList(fileNames));
+            pathStream = pathStream.filter(f -> idset.contains(f.toFile().getName()));
+        }
+        pathStream.forEach(f ->
+                files.add(f.toFile())
+        );
         return files.iterator();
     }
 
@@ -132,7 +142,6 @@ public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {
         sb.append(System.getProperty("line.separator"));
         return annotation;
     }
-
 
 
     private void addHeader(JCas jCas, ClinicalTrial ct) {

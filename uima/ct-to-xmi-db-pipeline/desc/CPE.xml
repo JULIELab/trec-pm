@@ -7,7 +7,7 @@
                         
             <descriptor>
                                 
-                <import location="JCoRe ClinicalTrials Reader.xml"/>
+                <import location="de.julielab.jcore.reader.ct.ClinicalTrialsReader.xml"/>
                             
             </descriptor>
                     
