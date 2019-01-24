@@ -22,7 +22,7 @@ import java.util.List;
 public class Trec2018FieldGenerator extends FieldGenerator {
 
 
-    private static final Set<String> unwantedGsFields = new HashSet<>(Arrays.asList("unified_id", "title", "abstract", "major_mesh", "minor_mesh", "trec_doc_id",  "trec_topic_number", "trec_topic_other2", "trec_topic_other2", "trec_topic_other3"));
+    private static final Set<String> unwantedGsFields = new HashSet<>(Arrays.asList("unified_id", "title", "abstract", "major_mesh", "minor_mesh", "trec_doc_id", "trec_topic_number", "trec_topic_other2", "trec_topic_other2", "trec_topic_other3"));
 
     public Trec2018FieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
@@ -96,31 +96,43 @@ public class Trec2018FieldGenerator extends FieldGenerator {
             final Double prob = fb.lstm2017.get(document.getId());
             document.addField("pmclass2017lstm", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2017lstmconfidence", prob);
+        } else if (fb.lstm2017 != null) {
+            log.warn("No value for document {} in LSTM2017 data", document.getId());
         }
         if (fb.lstmatt2017 != null && fb.lstmatt2017.get(document.getId()) != null) {
             final Double prob = fb.lstmatt2017.get(document.getId());
             document.addField("pmclass2017lstmatt", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2017lstmattconfidence", prob);
+        } else if (fb.lstmatt2017 != null) {
+            log.warn("No value for document {} in LSTMATT2017 data", document.getId());
         }
-        if (fb.lstmgru2017 != null && fb.lstmgru2017.get(document.getId()) != null) {
-            final Double prob = fb.lstmgru2017.get(document.getId());
+        if (fb.gru2017 != null && fb.gru2017.get(document.getId()) != null) {
+            final Double prob = fb.gru2017.get(document.getId());
             document.addField("pmclass2017lstmgru", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2017lstmgruconfidence", prob);
+        } else if (fb.gru2017 != null) {
+            log.warn("No value for document {} in GRU2017 data", document.getId());
         }
         if (fb.lstm2018 != null && fb.lstm2018.get(document.getId()) != null) {
             final Double prob = fb.lstm2018.get(document.getId());
             document.addField("pmclass2018lstm", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2018lstmconfidence", prob);
+        } else if (fb.lstm2018 != null) {
+            log.warn("No value for document {} in LSTM2018 data", document.getId());
         }
         if (fb.lstmatt2018 != null && fb.lstmatt2018.get(document.getId()) != null) {
             final Double prob = fb.lstmatt2018.get(document.getId());
             document.addField("pmclass2018lstmatt", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2018lstmattconfidence", prob);
+        } else if (fb.lstmatt2018 != null) {
+            log.warn("No value for document {} in LSTMATT2018 data", document.getId());
         }
-        if (fb.lstmgru2018 != null && fb.lstmgru2018.get(document.getId()) != null) {
-            final Double prob = fb.lstmgru2018.get(document.getId());
+        if (fb.gru2018 != null && fb.gru2018.get(document.getId()) != null) {
+            final Double prob = fb.gru2018.get(document.getId());
             document.addField("pmclass2018lstmgru", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2018lstmgruconfidence", prob);
+        } else if (fb.gru2018 != null) {
+            log.warn("No value for document {} in GRU2018 data", document.getId());
         }
     }
 

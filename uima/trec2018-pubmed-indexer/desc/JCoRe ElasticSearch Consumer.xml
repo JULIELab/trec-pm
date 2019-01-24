@@ -271,7 +271,7 @@
                 
         <externalResourceDependency>
                         
-            <key>lstmgru2017</key>
+            <key>gru2017</key>
                         
             <description>List of results from the LSTM PM classifier with GRU trained on the 2017 GS</description>
                         
@@ -307,7 +307,7 @@
                 
         <externalResourceDependency>
                         
-            <key>lstmgru2018</key>
+            <key>gru2018</key>
                         
             <description>List of results from the LSTM PM classifier with GRU trained on the 2018 GS</description>
                         
@@ -403,7 +403,7 @@
                         
             <externalResource>
                                 
-                <name>lstmgru2017</name>
+                <name>gru2017</name>
                                 
                 <description>LSTM results with GRU</description>
                                 
@@ -481,7 +481,7 @@
                         
             <externalResource>
                                 
-                <name>lstmgru2018</name>
+                <name>gru2018</name>
                                 
                 <description>LSTM results with GRU</description>
                                 
@@ -535,9 +535,9 @@
                         
             <externalResourceBinding>
                                 
-                <key>lstmgru2017</key>
+                <key>gru2017</key>
                                 
-                <resourceName>lstmgru2017</resourceName>
+                <resourceName>gru2017</resourceName>
                             
             </externalResourceBinding>
                         
@@ -559,9 +559,9 @@
                         
             <externalResourceBinding>
                                 
-                <key>lstmgru2018</key>
+                <key>gru2018</key>
                                 
-                <resourceName>lstmgru2018</resourceName>
+                <resourceName>gru2018</resourceName>
                             
             </externalResourceBinding>
                     
