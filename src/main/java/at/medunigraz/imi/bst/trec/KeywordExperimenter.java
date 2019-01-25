@@ -69,7 +69,7 @@ public class KeywordExperimenter {
 					.withWordRemoval();
 		}
 
-		TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
+		//TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
 	}
 
 	private static TreeMap<Double, String> runExperiments(Set<Experiment> experiments) {

@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.lexigram;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.trec.expansion.CachedWebRequester;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
@@ -28,6 +29,8 @@ public class Lexigram {
 
     private static final String ENDPOINT = "https://api.lexigram.io/v1/lexigraph/";
 
+    private static final CachedWebRequester REQUESTER = new CachedWebRequester("cache/lexigramV2.ser");
+
     private static final List<String> NOISE = new ArrayList<>();
     static {
         NOISE.add("classification");
@@ -37,37 +40,6 @@ public class Lexigram {
         NOISE.add("morphology");
         NOISE.add(" - category");
         NOISE.add("ca - ");
-    }
-
-    private static class Cache {
-        private static final String FILENAME = "cache/lexigram.ser";
-        private static HashMap<String, String> CALLS = new HashMap<>();
-        static {
-            if (Files.exists(Paths.get(FILENAME))) {
-                load();
-            }
-        }
-
-        private static void load() {
-            try {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILENAME));
-                CALLS = (HashMap) ois.readObject();
-                ois.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        private static void save() {
-            try
-            {
-                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILENAME));
-                oos.writeObject(CALLS);
-                oos.close();
-            } catch(IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public static boolean isAPIKeyLoaded() {
@@ -231,39 +203,7 @@ public class Lexigram {
     }
 
     private static JSONObject get(String url) {
-        if (!Cache.CALLS.containsKey(url)) {
-            HttpResponse<JsonNode> response = null;
-            try {
-                response = Unirest.get(url)
-                        .header("authorization", "Bearer " + TrecConfig.LEXIGRAM_APIKEY)
-                        .asJson();
-            } catch (UnirestException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (response.getStatus() == 401) {
-                throw new RuntimeException("Unauthorized access to Lexigram API. Place your key in the file trec-pm.properties.");
-            }
-
-            if (response.getStatus() != 200) {
-                throw new RuntimeException("Got status code " + response.getStatus() + " from Lexigram API with body " + response.getBody());
-            }
-
-            JSONObject body = new JSONObject(response.getBody());
-
-            String firstArrayObject = "";
-            try {
-                firstArrayObject = body.getJSONObject("object").toString();
-            } catch (JSONException e) {
-                LOG.error("Unexpected response from Lexigram API: " + body);
-                throw e;
-            }
-
-            Cache.CALLS.put(url, firstArrayObject);
-            Cache.save();
-        }
-
-        return new JSONObject(Cache.CALLS.get(url));
+        return new JSONObject(REQUESTER.get(url, TrecConfig.LEXIGRAM_APIKEY));
     }
 
     /**

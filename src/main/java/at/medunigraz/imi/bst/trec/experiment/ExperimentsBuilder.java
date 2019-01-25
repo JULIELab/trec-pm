@@ -142,7 +142,13 @@ public class ExperimentsBuilder {
         return this;
     }
 
-    public ExperimentsBuilder withGoldStandard(Experiment.GoldStandard gold) {
+    public ExperimentsBuilder withDrugInteraction() {
+		Query previousDecorator = buildingExp.getDecorator();
+		buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
+		return this;
+	}
+
+	public ExperimentsBuilder withGoldStandard(Experiment.GoldStandard gold) {
         buildingExp.setGoldStandard(gold);
         return this;
     }

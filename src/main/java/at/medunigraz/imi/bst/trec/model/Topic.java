@@ -35,6 +35,8 @@ public class Topic {
 	// MUST be public to be accessed via Reflection on SubTemplateQueryDecorator
 	public List<String> geneHypernyms = new ArrayList<>();
 
+	public List<String> drugInteractions = new ArrayList<>();
+
 	public Topic() {
 
 	}
@@ -153,6 +155,11 @@ public class Topic {
 		this.geneHypernyms.add(hypernym);
 		return this;
 	}
+
+	public Topic withDrugInteraction(String interaction) {
+		this.drugInteractions.add(interaction);
+		return this;
+	}
 	
 	private static boolean hasElement(Element element, String name) {
 		return element.getElementsByTagName(name).getLength() > 0 ? true : false;
@@ -239,6 +246,10 @@ public class Topic {
 
 		for (int i = 0; i < geneHypernyms.size(); i++) {
 			ret.put("geneHypernyms" + i, geneHypernyms.get(i));
+		}
+
+		for (int i = 0; i < drugInteractions.size(); i++) {
+			ret.put("drugInteractions" + i, drugInteractions.get(i));
 		}
 		
 		return ret;
