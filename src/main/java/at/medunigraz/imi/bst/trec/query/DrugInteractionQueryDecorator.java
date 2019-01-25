@@ -18,7 +18,7 @@ public class DrugInteractionQueryDecorator extends DynamicQueryDecorator {
         String[] geneTokens = topic.getGeneTokens();
 
         for (String token : geneTokens) {
-            Set<String> interactions = dgidb.getDrugInteractions(token);
+            Set<String> interactions = dgidb.getDrugInteractions(token, true, 150);
             for (String interaction : interactions) {
                 topic.withDrugInteraction(interaction);
             }
