@@ -1,0 +1,11 @@
+{
+  "dis_max": {
+    "boost": 1,
+    "queries": [
+      {
+        "match_none": {}
+      },
+      {{drugInteractions:biomedical_articles/drug_interaction.json}}
+    ]
+  }
+}
