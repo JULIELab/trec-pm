@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.IntStream;
 
-public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExperimenter {
+public class SigirPubmedRecallExperimenterBoostOptimizer extends SuperSigirPubmedRecallExperimenter {
     public static void main(String[] args) {
 
         Set<String> validParams = new LinkedHashSet<>();
@@ -20,7 +20,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         validParams.add("pmclass");
 
         if (args.length != 1 || !validParams.contains(args[0])) {
-            System.err.println("Usage: " + SigirPubmedExperimenterBoostOptimizer.class.getSimpleName() + " <what>");
+            System.err.println("Usage: " + SigirPubmedRecallExperimenterBoostOptimizer.class.getSimpleName() + " <what>");
             System.err.println("Where <what> is one of " + validParams);
             System.exit(1);
         }
@@ -32,7 +32,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         final int year = 2017;
 
 
-        Map<String, String> templateProperties = SigirParameters.TREC_2018_HPIPUBNONE;
+        Map<String, String> templateProperties = Collections.unmodifiableMap(SigirParameters.LITERATURE_ES_DEFAULTS);
 
 
         DecimalFormat df = new DecimalFormat("0.0");
@@ -43,9 +43,9 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                 for (double ptb = .2; ptb < 1.2; ptb += .4) {
                     for (double synb = .2; synb < 2; synb += .4) {
                         Map<String, String> paramcombination = new HashMap<>(templateProperties);
-                        paramcombination.put("disease_boost", String.valueOf(disb));
-                        paramcombination.put("disease_prefterm_boost", String.valueOf(ptb));
-                        paramcombination.put("disease_syn_boost", String.valueOf(synb));
+                        paramcombination.put("dis_boost", String.valueOf(disb));
+                        paramcombination.put("dis_prefterm_boost", String.valueOf(ptb));
+                        paramcombination.put("dis_syn_boost", String.valueOf(synb));
                         String suffix = "--dis" + df.format(disb) + "-pt" + df.format(ptb) + "-syn" + df.format(synb);
                         parameters.add(paramcombination);
                         suffixes.add(suffix);
@@ -155,15 +155,15 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
                     "pmclass2017lstmatt.keyword",
                     "pmclass2017lstmgru.keyword",
                     "pmclass2018lstm.keyword",
-                    "pmclass2018lstmat.keyword",
+                    "pmclass2018lstmatt.keyword",
                     "pmclass2018lstmgru.keyword",
                     "pmclass2017.keyword",
                     "pmclass2018.keyword");
             //final List<String> pmfields = Arrays.asList( "pmclass2017.keyword");
             pmfields.parallelStream().forEach(pmfield -> {
-                Map<String, String> parameters = templateProperties;
+                Map<String, String> parameters = new HashMap<>(templateProperties);
                 parameters.put("pm_class_field", pmfield);
-                runExperiments(parameters, goldStandard, target, year, what, "-" + pmfield);
+                runExperiments(parameters, false, goldStandard, target, year, what, "-" + pmfield);
             });
         } else throw new IllegalStateException("Unknown mode " + what);
 
@@ -174,7 +174,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedExper
         IntStream.range(0, parameters.size()).parallel().forEach(i -> {
             Map<String, String> parameterset = parameters.get(i);
             String suffix = suffixes.get(i);
-            runExperiments(parameterset, goldStandard, target, year, what, suffix);
+            runExperiments(parameterset, false, goldStandard, target, year, what, suffix);
         });
     }
 }

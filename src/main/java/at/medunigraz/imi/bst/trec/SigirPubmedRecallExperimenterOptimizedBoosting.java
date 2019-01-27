@@ -5,7 +5,7 @@ import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedExperimenter {
+public class SigirPubmedRecallExperimenterOptimizedBoosting extends SuperSigirPubmedRecallExperimenter {
     public static void main(String[] args) {
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
@@ -38,6 +38,6 @@ public class SigirPubmedExperimenterOptimizedBoosting extends SuperSigirPubmedEx
         // Doesn't seem to do anything, the whole non-melanoma query part doesn't show much influence (none?)
         templateProperties.put("non_mel_boost", "-10");
 
-        runExperiments(templateProperties, goldStandard, target, year, "", "");
+        runExperiments(templateProperties, false, goldStandard, target, year, "", "");
     }
 }

@@ -10,23 +10,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-public class SuperSigirPubmedExperimenter {
+public class SuperSigirPubmedRecallExperimenter {
 
 
-    protected static void runExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 47)
+    protected static void runExperiments(Map<String, String> templateProperties, boolean wordremoval, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+        if (templateProperties.size() > 50)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
-        if (!StringUtils.isBlank(what))
-            builder.setDefaultStatsDir("stats_" + what);
+        if (!StringUtils.isBlank(what)) {
+            builder.setDefaultStatsDir("stats_" + what+"_"+year);
+            builder.setDefaultResultsDir("results_" + what+"_"+year);
+        }
         final Map<String, TemplateSet> sigirTemplates = getSigirTemplates();
 
-        //addExperimentsWithoutPmClassifier(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-//        addExperimentsWithGoldStandardPmClassifierShould(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-//        addExperimentsWithGoldStandardPmClassifierMust(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-        addExperimentsWithCustomPmClassifierShould(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
-        addExperimentsWithCustomPmClassifierMust(sigirTemplates, templateProperties, goldStandard, target, year, builder, suffix);
+        //addExperimentsWithoutPmClassifier(sigirTemplates, templateProperties, goldStandard, wordremoval, target, year, builder, suffix);
+        addExperimentsWithCustomPmClassifierShould(sigirTemplates, templateProperties, goldStandard, wordremoval,  target, year, builder, suffix);
+        addExperimentsWithCustomPmClassifierMust(sigirTemplates, templateProperties, goldStandard, wordremoval,  target, year, builder, suffix);
 
         Set<Experiment> experiments = builder.build();
 
@@ -63,32 +63,22 @@ public class SuperSigirPubmedExperimenter {
         return templateMap;
     }
 
-    private static void addExperimentsWithoutPmClassifier(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
+    private static void addExperimentsWithoutPmClassifier(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
         Function<String, File> getTemplate = name -> templates.get(name).getBase();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, suffix);
+        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, suffix);
     }
 
-    private static void addExperimentsWithGoldStandardPmClassifierShould(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
-        Function<String, File> getTemplate = name -> templates.get(name).getGspmShould();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_should" + suffix);
-    }
-
-    private static void addExperimentsWithGoldStandardPmClassifierMust(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
-        Function<String, File> getTemplate = name -> templates.get(name).getGspmMust();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_gspm_must" + suffix);
-    }
-
-    private static void addExperimentsWithCustomPmClassifierShould(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
+    private static void addExperimentsWithCustomPmClassifierShould(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
         Function<String, File> getTemplate = name -> templates.get(name).getCustompmShould();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_custompm_should" + suffix);
+        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, "_custompm_should" + suffix);
     }
 
-    private static void addExperimentsWithCustomPmClassifierMust(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
+    private static void addExperimentsWithCustomPmClassifierMust(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
         Function<String, File> getTemplate = name -> templates.get(name).getCustompmMust();
-        addExperiments(templateProperties, goldStandard, target, year, builder, getTemplate, "_custompm_must" + suffix);
+        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, "_custompm_must" + suffix);
     }
 
-    private static void addExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, Function<String, File> getTemplate, String suffix) {
+    private static void addExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, Function<String, File> getTemplate, String suffix) {
         File baseline = getTemplate.apply("baseline");
         File baseline_plus_genefield = getTemplate.apply("baseline_plus_genefield");
         File with_pos_boosters = getTemplate.apply("with_pos_boosters");
@@ -97,45 +87,58 @@ public class SuperSigirPubmedExperimenter {
         File with_pos_neg_boosters_additional_signals_extra = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra");
         File with_pos_neg_boosters_additional_signals_extra_nonmel = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel");
 
-        boolean wordRemoval = false;
+        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties);
+        if (wordremoval) builder.withWordRemoval();
 
-//        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties);
-//
-//        builder.newExperiment().withName("baselinewr" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withWordRemoval();
-//
-//        builder.newExperiment().withName("dissyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withDiseaseSynonym();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("dishyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withDiseaseHypernym();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("dissynpt" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("dissynpthyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("gensyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withGeneSynonym();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("gensyndesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withGeneSynonym().withGeneDescription();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("gensyndescplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline_plus_genefield, templateProperties).withGeneSynonym().withGeneDescription();
-//        if (wordRemoval) builder.withWordRemoval();
-//
-//        builder.newExperiment().withName("gendisall" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription();
-//        if (wordRemoval) builder.withWordRemoval();
+        builder.newExperiment().withName("dissyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseaseSynonym();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("dishyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseaseHypernym();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("dissynpt" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("dissynpthyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("gensyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withGeneSynonym();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("gendis" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription();
+        if (wordremoval) builder.withWordRemoval();
+
+
+
+
+
+
+        builder.newExperiment().withName("gensyndesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withGeneSynonym().withGeneDescription();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("gensyndescplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline_plus_genefield, templateProperties).withGeneSynonym().withGeneDescription();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("dgint" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDrugInteraction();
+        if (wordremoval) builder.withWordRemoval();
+
+        builder.newExperiment().withName("gendisdgint" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription().withDrugInteraction();
+        if (wordremoval) builder.withWordRemoval();
+
+
+
+
 
 
 //        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
@@ -164,9 +167,9 @@ public class SuperSigirPubmedExperimenter {
 //                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
 //                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
 
-        builder.newExperiment().withName("hpipubnone_replique" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
-                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
+//        builder.newExperiment().withName("hpipubnone_replique" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
+//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
+//                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
     private static class TemplateSet {
         private File base;

@@ -85,7 +85,8 @@ public class DGIdb {
         // TODO EML4-ALK must split
         // TODO check any unwanted gene (e.g. coming from prepositions)
 
-        String url = String.format(ENDPOINT + "?genes=%s", gene);
+        String escapedGene = gene.replace(">", "%3E").replace("%","%25" );
+        String url = String.format(ENDPOINT + "?genes=%s", escapedGene);
         url = expertCuratedOnly ? url + "&source_trust_levels=Expert%20curated" : url;
 
         JSONObject data = new JSONObject(REQUESTER.get(url));
