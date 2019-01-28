@@ -1,12 +1,11 @@
 #!/bin/bash
 
-whats="disease gene fields posneg additional extra"
+whats="genedis fields posneg additional extra pmclass mutation drug"
 
-mvn clean compile
-
-#srun scripts/runBoostOptimizer.sh extra
+mvn compile
 
 for i in $whats; do
     echo "Starting boost optimization of $i"
-    sbatch scripts/runBoostOptimizer.sh $i
+    sbatch scripts/runBoostOptimizer.sh $i 2017
+    sbatch scripts/runBoostOptimizer.sh $i 2018
 done

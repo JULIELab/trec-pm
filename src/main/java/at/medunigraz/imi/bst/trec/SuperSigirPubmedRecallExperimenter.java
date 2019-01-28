@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import bsh.commands.dir;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -48,6 +49,7 @@ public class SuperSigirPubmedRecallExperimenter {
                 throw new RuntimeException(e);
             }
         }
+        executorService.shutdown();
     }
 
     /**
@@ -61,7 +63,7 @@ public class SuperSigirPubmedRecallExperimenter {
      * @param what
      * @param suffix
      */
-    protected static void runBoostExperiments(File template, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+    protected static void runBoostExperiments(String template, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
         if (templateProperties.size() > numProperties)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
@@ -70,12 +72,22 @@ public class SuperSigirPubmedRecallExperimenter {
             builder.setDefaultStatsDir("stats_" + what + "_" + year);
             builder.setDefaultResultsDir("results_" + what + "_" + year);
         }
-        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_experiments_biomed");
+        final File file = new File(PubmedExperimenter.class.getResource(template).getFile());
+        Map<String, TemplateSet> sigirTemplates;
+        if (file.isDirectory()) {
+            sigirTemplates = getSigirTemplates(template);
+        } else {
+            final TemplateSet templateSet = new TemplateSet();
+            templateSet.setBase(file);
+            sigirTemplates = new HashMap<>();
+            sigirTemplates.put(file.getName(), templateSet);
+        }
+
 
         // Switch everything on - except word removal - so that the boosters actually have a point.
         final Set<Set<Expansion>> expansionSets = new HashSet<>(Arrays.asList(EnumSet.complementOf(EnumSet.of(Expansion.WR))));
 
-        addExperiments(template, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
+        addExperiments(null, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
 
         Set<Experiment> experiments = builder.build();
         final ExecutorService executorService = Executors.newFixedThreadPool(5);
@@ -91,6 +103,7 @@ public class SuperSigirPubmedRecallExperimenter {
                 throw new RuntimeException(e);
             }
         }
+        executorService.shutdown();
     }
 
     /**
@@ -138,6 +151,7 @@ public class SuperSigirPubmedRecallExperimenter {
                 throw new RuntimeException(e);
             }
         }
+        executorService.shutdown();
     }
 
     /**

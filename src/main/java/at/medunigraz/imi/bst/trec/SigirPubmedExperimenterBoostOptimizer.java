@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -19,8 +20,8 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
         validParams.add("mutation");
         validParams.add("drug");
 
-        if (args.length != 1 || !validParams.contains(args[0])) {
-            System.err.println("Usage: " + SigirPubmedExperimenterBoostOptimizer.class.getSimpleName() + " <what>");
+        if (args.length != 2 || !validParams.contains(args[0])) {
+            System.err.println("Usage: " + SigirPubmedExperimenterBoostOptimizer.class.getSimpleName() + " <what> <year>");
             System.err.println("Where <what> is one of " + validParams);
             System.exit(1);
         }
@@ -29,7 +30,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
         final Experiment.Task target = Experiment.Task.PUBMED;
-        final int year = 2017;
+        final int year = Integer.parseInt(args[1]);
 
 
         Map<String, String> templateProperties = Collections.unmodifiableMap(SigirParameters.LITERATURE_ES_DEFAULTS);
@@ -58,7 +59,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     }
                 }
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_experiments_biomed/baseline.json", parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("fields")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
@@ -81,7 +82,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     }
                 }
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_field_boost_optimization", parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("posneg")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
@@ -95,7 +96,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     suffixes.add(suffix);
                 }
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_boost_optimization/posneg.json",parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("additional")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
@@ -112,7 +113,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     }
                 }
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_boost_optimization/additional.json", parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("extra")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
@@ -123,7 +124,7 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                 parameters.add(paramcombination);
                 suffixes.add(suffix);
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_experiments_biomed/extra.json",parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("mutation")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
@@ -134,8 +135,10 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                 parameters.add(paramcombination);
                 suffixes.add(suffix);
             }
-            runExperimentsWithParameters(parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_experiments_biomed/mutations.json", parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("pmclass")) {
+            List<Map<String, String>> parameters = new ArrayList<>();
+            List<String> suffixes = new ArrayList<>();
             final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
                     "pmclass2017lstmatt.keyword",
                     "pmclass2017lstmgru.keyword",
@@ -144,22 +147,28 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     "pmclass2018lstmgru.keyword",
                     "pmclass2017.keyword",
                     "pmclass2018.keyword");
-            //final List<String> pmfields = Arrays.asList( "pmclass2017.keyword");
-            pmfields.parallelStream().forEach(pmfield -> {
-                Map<String, String> parameters = new HashMap<>(templateProperties);
-                parameters.put("pm_class_field", pmfield);
-                //  runExperiments(parameters, false, goldStandard, target, year, what, "-" + pmfield);
-            });
+            for (String pmfield : pmfields) {
+                for (double extrab = .5; extrab <= 3; extrab += .5) {
+                    Map<String, String> paramcombination = new HashMap<>(templateProperties);
+                    paramcombination.put("pm_boost", String.valueOf(extrab));
+                    paramcombination.put("pm_class_field", pmfield);
+                    String suffix = "--pm" + df.format(extrab) + "-pmf:";
+                    parameters.add(paramcombination);
+                    suffixes.add(suffix);
+                }
+            }
+            runExperimentsWithParameters("/templates/sigir19_pmclass_biomed", parameters, suffixes, year, what, goldStandard, target);
+
         } else throw new IllegalStateException("Unknown mode " + what);
 
 
     }
 
-    private static void runExperimentsWithParameters(List<Map<String, String>> parameters, List<String> suffixes, int year, String what, Experiment.GoldStandard goldStandard, Experiment.Task target) {
+    private static void runExperimentsWithParameters(String template, List<Map<String, String>> parameters, List<String> suffixes, int year, String what, Experiment.GoldStandard goldStandard, Experiment.Task target) {
         IntStream.range(0, parameters.size()).parallel().forEach(i -> {
             Map<String, String> parameterset = parameters.get(i);
             String suffix = suffixes.get(i);
-            // runExperiments(parameterset, false, goldStandard, target, year, what, suffix);
+             runBoostExperiments(template, parameterset, goldStandard, target, year, what, suffix);
         });
     }
 }

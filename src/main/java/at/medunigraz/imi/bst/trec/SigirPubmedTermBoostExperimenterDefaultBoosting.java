@@ -10,13 +10,13 @@ import static at.medunigraz.imi.bst.trec.SigirParameters.BEST_FIELDS;
 public class SigirPubmedTermBoostExperimenterDefaultBoosting extends SuperSigirPubmedRecallExperimenter {
     public static void main(String[] args) {
 
-        if (args.length != 2) {
-            System.err.println("Parameters: <multi match mode> <match default operator>");
+        if (args.length != 3) {
+            System.err.println("Parameters: <multi match mode> <match default operator> <year>");
         }
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
         final Experiment.Task target = Experiment.Task.PUBMED;
-        final int year = 2018;
+        final int year = Integer.parseInt(args[2]);
 
 
         Map<String, String> templateProperties = new HashMap<>(SigirParameters.LITERATURE_ES_DEFAULTS);

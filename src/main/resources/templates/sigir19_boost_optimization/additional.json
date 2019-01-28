@@ -5,7 +5,9 @@
 			{{sigir19_experiments_biomed/gene.json}}
 		],
 		"should": [
-			{{sigir19_experiments_biomed/pm.json}}
+			{{sigir19_experiments_biomed/chemotherapy.json}},
+			{{sigir19_experiments_biomed/cancer.json}},
+			{{sigir19_experiments_biomed/dna.json}}
 		]
 	}
 }
