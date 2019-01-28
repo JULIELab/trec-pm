@@ -42,7 +42,27 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addDocumentClasses(jCas, document);
         addGsInfo(jCas, document);
         addPublicationType(jCas, document);
+        addNegationScopes(jCas, document);
+        addMutations(jCas, document);
         return document;
+    }
+
+    private void addNegationScopes(JCas jCas, Document document) {
+        Collection<Scope> negationScopes = JCasUtil.select(jCas, Scope.class);
+        ArrayFieldValue fieldValue = new ArrayFieldValue();
+        for (Scope scope : negationScopes) {
+            fieldValue.add(new RawToken(scope.getCoveredText()));
+        }
+        document.addField("negationPhrases", fieldValue);
+    }
+
+    private void addMutations(JCas jCas, Document document) {
+        Collection<PointMutation> mutations = JCasUtil.select(jCas, PointMutation.class);
+        ArrayFieldValue fieldValue = new ArrayFieldValue();
+        for (PointMutation mutation : mutations) {
+            fieldValue.add(new RawToken(mutation.getSpecificType()));
+        }
+        document.addField("mutations", fieldValue);
     }
 
     private void addPublicationType(JCas jCas, Document document) {

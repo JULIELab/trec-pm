@@ -2,21 +2,26 @@ package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.IntStream;
 
 import static at.medunigraz.imi.bst.trec.SigirParameters.BEST_FIELDS;
 
-public class SigirPubmedRecallExperimenterDefaultBoosting extends SuperSigirPubmedRecallExperimenter {
+public class SigirPubmedExperimenterPmClass extends SuperSigirPubmedRecallExperimenter {
     public static void main(String[] args) {
 
-        if (args.length != 3) {
-            System.err.println("Parameters: <multi match mode> <match default operator> <phrase slop>");
+        if (args.length != 2) {
+            System.err.println("Parameters: <multi match mode> <match default operator>");
         }
+
+        String what = "pmclass";
 
         final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
         final Experiment.Task target = Experiment.Task.PUBMED;
         final int year = 2017;
+
+
 
 
         Map<String, String> templateProperties = new HashMap<>(SigirParameters.LITERATURE_ES_DEFAULTS);
@@ -48,10 +53,25 @@ public class SigirPubmedRecallExperimenterDefaultBoosting extends SuperSigirPubm
         templateProperties.put("cancer_operator", "OR");
         templateProperties.put("dna_operator", "OR");
 
-        final String slop = args[2];
-        templateProperties.put("phrase_slop", slop);
+        templateProperties.put("phrase_slop", "10");
 
 
-        runRecallExperiments(templateProperties, goldStandard, target, year, "recall", "--mmm:" + defaultMultiMatch + "-op:" + defaultOperator + "-sl:" + slop);
+        final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
+                "pmclass2017lstmatt.keyword",
+                "pmclass2017lstmgru.keyword",
+                "pmclass2018lstm.keyword",
+                "pmclass2018lstmatt.keyword",
+                "pmclass2018lstmgru.keyword",
+                "pmclass2017.keyword",
+                "pmclass2018.keyword");
+        pmfields.parallelStream().forEach(pmfield -> {
+            Map<String, String> parameters = new HashMap<>(templateProperties);
+            parameters.put("pm_class_field", pmfield);
+            runPmClassifierExperiments(null, parameters, goldStandard, target, year, what, "--mmm:" + defaultMultiMatch + "-op:" + defaultOperator + "-pmf:" + pmfield);
+        });
+
+
     }
+
+
 }

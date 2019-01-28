@@ -36,6 +36,7 @@ public class SigirParameters {
         TREC_2018_HPIPUBNONE.put("non_mel_boost", "1");
         TREC_2018_HPIPUBNONE.put("pm_gs_boost", "1");
         TREC_2018_HPIPUBNONE.put("dgi_boost", "0");
+        TREC_2018_HPIPUBNONE.put("mut_boost", "1");
 
         TREC_2018_HPIPUBNONE.put("dis_multi_match_type", BEST_FIELDS);
         TREC_2018_HPIPUBNONE.put("dis_prefterm_multi_match_type", BEST_FIELDS);
@@ -92,6 +93,7 @@ public class SigirParameters {
         LITERATURE_ES_DEFAULTS.put("non_mel_boost", "1");
         LITERATURE_ES_DEFAULTS.put("pm_gs_boost", "1");
         LITERATURE_ES_DEFAULTS.put("dgi_boost", "1");
+        LITERATURE_ES_DEFAULTS.put("mut_boost", "1");
 
         LITERATURE_ES_DEFAULTS.put("dis_multi_match_type", BEST_FIELDS);
         LITERATURE_ES_DEFAULTS.put("dis_prefterm_multi_match_type", BEST_FIELDS);

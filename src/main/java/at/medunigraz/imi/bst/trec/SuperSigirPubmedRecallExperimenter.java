@@ -2,31 +2,169 @@ package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 public class SuperSigirPubmedRecallExperimenter {
+    private static final Logger LOG = LogManager.getLogger();
+    private static int numProperties = 51;
 
-
-    protected static void runExperiments(Map<String, String> templateProperties, boolean wordremoval, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
-        if (templateProperties.size() > 50)
+    protected static void runPmClassifierExperiments(File template, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+        if (templateProperties.size() > numProperties)
             throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
 
         ExperimentsBuilder builder = new ExperimentsBuilder();
         if (!StringUtils.isBlank(what)) {
-            builder.setDefaultStatsDir("stats_" + what+"_"+year);
-            builder.setDefaultResultsDir("results_" + what+"_"+year);
+            builder.setDefaultStatsDir("stats_" + what + "_" + year);
+            builder.setDefaultResultsDir("results_" + what + "_" + year);
         }
-        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates();
+        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_pmclass_biomed");
 
-        //addExperimentsWithoutPmClassifier(sigirTemplates, templateProperties, goldStandard, wordremoval, target, year, builder, suffix);
-        addExperimentsWithCustomPmClassifierShould(sigirTemplates, templateProperties, goldStandard, wordremoval,  target, year, builder, suffix);
-        addExperimentsWithCustomPmClassifierMust(sigirTemplates, templateProperties, goldStandard, wordremoval,  target, year, builder, suffix);
+        final Set<Set<Expansion>> expansionSets = new HashSet<>(Sets.powerSet(EnumSet.of(Expansion.DGI, Expansion.GDE, Expansion.GSY, Expansion.DSY, Expansion.WR)));
+
+        addExperiments(template, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
+
+        Set<Experiment> experiments = builder.build();
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+        List<Future<?>> futures = new ArrayList<>();
+        for (Experiment exp : experiments) {
+            futures.add(executorService.submit(exp));
+        }
+
+        for (Future<?> f : futures) {
+            try {
+                f.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * For experiments that try different query boosts.
+     *
+     * @param template
+     * @param templateProperties
+     * @param goldStandard
+     * @param target
+     * @param year
+     * @param what
+     * @param suffix
+     */
+    protected static void runBoostExperiments(File template, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+        if (templateProperties.size() > numProperties)
+            throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
+
+        ExperimentsBuilder builder = new ExperimentsBuilder();
+        if (!StringUtils.isBlank(what)) {
+            builder.setDefaultStatsDir("stats_" + what + "_" + year);
+            builder.setDefaultResultsDir("results_" + what + "_" + year);
+        }
+        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_experiments_biomed");
+
+        // Switch everything on - except word removal - so that the boosters actually have a point.
+        final Set<Set<Expansion>> expansionSets = new HashSet<>(Arrays.asList(EnumSet.complementOf(EnumSet.of(Expansion.WR))));
+
+        addExperiments(template, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
+
+        Set<Experiment> experiments = builder.build();
+        final ExecutorService executorService = Executors.newFixedThreadPool(5);
+        List<Future<?>> futures = new ArrayList<>();
+        for (Experiment exp : experiments) {
+            futures.add(executorService.submit(exp));
+        }
+
+        for (Future<?> f : futures) {
+            try {
+                f.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * For experiments with different boosting signals in the form of additional SHOULD queries.
+     *
+     * @param templateProperties
+     * @param goldStandard
+     * @param target
+     * @param year
+     * @param what
+     * @param suffix
+     */
+    protected static void runTermBoostExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+        if (templateProperties.size() > numProperties)
+            throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
+
+        ExperimentsBuilder builder = new ExperimentsBuilder();
+        if (!StringUtils.isBlank(what)) {
+            builder.setDefaultStatsDir("stats_" + what + "_" + year);
+            builder.setDefaultResultsDir("results_" + what + "_" + year);
+        }
+        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_experiments_biomed");
+
+        final Set<Set<Expansion>> expansionSets = new HashSet<>(Sets.powerSet(EnumSet.of(Expansion.DGI, Expansion.GDE, Expansion.GSY, Expansion.DSY, Expansion.WR)));
+        // Only make those sets that actually contain a positive boost, namely the drug interactions and the gene descriptions
+        for (Iterator<Set<Expansion>> it = expansionSets.iterator(); it.hasNext(); ) {
+            final Set<Expansion> set = it.next();
+            if (!set.contains(Expansion.DGI) && !set.contains(Expansion.GDE))
+                it.remove();
+        }
+
+        addExperiments(null, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
+
+        Set<Experiment> experiments = builder.build();
+        final ExecutorService executorService = Executors.newFixedThreadPool(5);
+        List<Future<?>> futures = new ArrayList<>();
+        for (Experiment exp : experiments) {
+            futures.add(executorService.submit(exp));
+        }
+
+        for (Future<?> f : futures) {
+            try {
+                f.get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Experiments with the base template and different settings for topic expansions
+     *
+     * @param templateProperties
+     * @param goldStandard
+     * @param target
+     * @param year
+     * @param what
+     * @param suffix
+     */
+    protected static void runRecallExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, String what, String suffix) {
+        if (templateProperties.size() > numProperties)
+            throw new IllegalArgumentException("There are more key in the properties map as there are known properties: " + templateProperties.keySet());
+
+        ExperimentsBuilder builder = new ExperimentsBuilder();
+        if (!StringUtils.isBlank(what)) {
+            builder.setDefaultStatsDir("stats_" + what + "_" + year);
+            builder.setDefaultResultsDir("results_" + what + "_" + year);
+        }
+        final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_experiments_biomed");
+
+        final Set<Set<Expansion>> expansionSets = Sets.powerSet(EnumSet.complementOf(EnumSet.of(Expansion.DGI, Expansion.GDE)));
+
+        File baselineTemplate = new File(PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed/baseline.json").getFile());
+        addExperiments(baselineTemplate, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
 
         Set<Experiment> experiments = builder.build();
 
@@ -40,8 +178,8 @@ public class SuperSigirPubmedRecallExperimenter {
         }
     }
 
-    private static Map<String, TemplateSet> getSigirTemplates() {
-        final File file = new File(PubmedExperimenter.class.getResource("/templates/sigir19_experiments_biomed").getFile());
+    private static Map<String, TemplateSet> getSigirTemplates(String dir) {
+        final File file = new File(PubmedExperimenter.class.getResource(dir).getFile());
         final File[] templateFiles = file.listFiles(f -> !f.getName().equals(".DS_Store"));
         Map<String, TemplateSet> templateMap = new HashMap<>();
         for (File template : templateFiles) {
@@ -63,114 +201,61 @@ public class SuperSigirPubmedRecallExperimenter {
         return templateMap;
     }
 
-    private static void addExperimentsWithoutPmClassifier(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
-        Function<String, File> getTemplate = name -> templates.get(name).getBase();
-        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, suffix);
+
+    private static void addExperiments(File singleTemplate, Map<String, TemplateSet> templates, Map<String, String> templateProperties, Set<Set<Expansion>> expansionSets, Experiment.GoldStandard goldStandard, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
+        Map<String, TemplateSet> effectiveTemplates = templates;
+        if (singleTemplate != null) {
+            effectiveTemplates = new HashMap<>();
+            final TemplateSet templateSet = new TemplateSet();
+            templateSet.setBase(singleTemplate);
+        }
+        for (TemplateSet templateSet : effectiveTemplates.values()) {
+            final File template = templateSet.getBase();
+            if (template == null) {
+                LOG.debug("Skipping template set {} because it does not have the required template derivative", templateSet);
+                continue;
+            }
+
+            LOG.debug("Creating experiments with template {}", template);
+            for (Set<Expansion> expansions : expansionSets) {
+                builder.newExperiment().withYear(year).withGoldStandard(goldStandard).withTarget(target)
+                        .withSubTemplate(template, templateProperties);
+                // This is the default name to indicate that no expansion is enabled
+                builder.withName(template.getName() + "-NONE" + suffix);
+
+                for (Expansion expansion : expansions) {
+                    switch (expansion) {
+                        case DSY:
+                            builder.withDiseaseSynonym();
+                            break;
+                        case DHY:
+                            builder.withDiseaseHypernym();
+                            break;
+                        case DP:
+                            builder.withDiseasePreferredTerm();
+                            break;
+                        case GSY:
+                            builder.withGeneSynonym();
+                            break;
+                        case GDE:
+                            builder.withGeneDescription();
+                            break;
+                        case WR:
+                            builder.withWordRemoval();
+                            break;
+                        case DGI:
+                            builder.withDrugInteraction();
+                            break;
+                    }
+                    String name = expansions.stream().sorted().map(Expansion::name).collect(Collectors.joining("_"));
+                    builder.withName(template.getName() + "-" + name + suffix);
+                }
+            }
+        }
     }
 
-    private static void addExperimentsWithCustomPmClassifierShould(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
-        Function<String, File> getTemplate = name -> templates.get(name).getCustompmShould();
-        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, "_custompm_should" + suffix);
-    }
+    public enum Expansion {DSY, DHY, DP, GSY, GDE, WR, DGI}
 
-    private static void addExperimentsWithCustomPmClassifierMust(Map<String, TemplateSet> templates, Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, String suffix) {
-        Function<String, File> getTemplate = name -> templates.get(name).getCustompmMust();
-        addExperiments(templateProperties, goldStandard, wordremoval,  target, year, builder, getTemplate, "_custompm_must" + suffix);
-    }
-
-    private static void addExperiments(Map<String, String> templateProperties, Experiment.GoldStandard goldStandard, boolean wordremoval, Experiment.Task target, int year, ExperimentsBuilder builder, Function<String, File> getTemplate, String suffix) {
-        File baseline = getTemplate.apply("baseline");
-        File baseline_plus_genefield = getTemplate.apply("baseline_plus_genefield");
-        File with_pos_boosters = getTemplate.apply("with_pos_boosters");
-        File with_pos_neg_boosters = getTemplate.apply("with_pos_neg_boosters");
-        File with_pos_neg_boosters_additional_signals = getTemplate.apply("with_pos_neg_boosters_additional_signals");
-        File with_pos_neg_boosters_additional_signals_extra = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra");
-        File with_pos_neg_boosters_additional_signals_extra_nonmel = getTemplate.apply("with_pos_neg_boosters_additional_signals_extra_nonmel");
-
-        builder.newExperiment().withName("baseline" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties);
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("dissyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseaseSynonym();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("dishyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseaseHypernym();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("dissynpt" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("dissynpthyper" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gensyn" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withGeneSynonym();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gendis" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription();
-        if (wordremoval) builder.withWordRemoval();
-
-
-
-
-
-
-        builder.newExperiment().withName("gensyndesc" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withGeneSynonym().withGeneDescription();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gensyndescplus" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline_plus_genefield, templateProperties).withGeneSynonym().withGeneDescription();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("dgint" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDrugInteraction();
-        if (wordremoval) builder.withWordRemoval();
-
-        builder.newExperiment().withName("gendisdgint" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(baseline, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withDiseaseHypernym().withGeneSynonym().withGeneDescription().withDrugInteraction();
-        if (wordremoval) builder.withWordRemoval();
-
-
-
-
-
-
-//        builder.newExperiment().withName("genedispb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_boosters, templateProperties).withDiseasePreferredTerm().withDiseaseSynonym().withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genespb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_boosters, templateProperties).withGeneSynonym().withGeneDescription();
-//
-//        builder.newExperiment().withName("genedispbnb" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("posnegbstadd" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("posnegbstaddextra" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("addextranonmel" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-//
-//        builder.newExperiment().withName("addextranonmelshould" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel_should, templateProperties).withGeneSynonym().withGeneDescription().withDiseaseSynonym().withDiseasePreferredTerm();
-
-
-//        builder.newExperiment().withName("hpipubnone_replique").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
-//                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
-
-//        builder.newExperiment().withName("hpipubnone_replique" + suffix).withYear(year).withGoldStandard(goldStandard).withTarget(target)
-//                .withSubTemplate(with_pos_neg_boosters_additional_signals_extra_nonmel, templateProperties).withWordRemoval().withGeneSynonym()
-//                .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
-    }
     private static class TemplateSet {
         private File base;
         private File gspmMust;
@@ -214,6 +299,17 @@ public class SuperSigirPubmedRecallExperimenter {
         public void setCustompmShould(File custompmShould) {
 
             this.custompmShould = custompmShould;
+        }
+
+        @Override
+        public String toString() {
+            return "TemplateSet{" +
+                    "base=" + base +
+                    ", gspmMust=" + gspmMust +
+                    ", gspmShould=" + gspmShould +
+                    ", custompmShould=" + custompmShould +
+                    ", custompmMust=" + custompmMust +
+                    '}';
         }
 
         public File getCustompmMust() {

@@ -5,9 +5,7 @@
 			{{sigir19_experiments_biomed/gene_plus_genefield.json}}
 		],
 		"should": [
-			{{sigir19_experiments_biomed/positive_boosters.json}},
-			{{sigir19_experiments_biomed/negative_boosters.json}},
-			{{sigir19_experiments_biomed/pm.json}}
+			{{sigir19_experiments_biomed/mutations.json}}
 		]
 	}
 }

@@ -5,11 +5,7 @@
 			{{sigir19_experiments_biomed/gene_plus_genefield.json}}
 		],
 		"should": [
-			{{sigir19_experiments_biomed/positive_boosters.json}},
 			{{sigir19_experiments_biomed/negative_boosters.json}},
-			{{sigir19_experiments_biomed/chemotherapy.json}},
-			{{sigir19_experiments_biomed/cancer.json}},
-			{{sigir19_experiments_biomed/dna.json}}
 		]
 	}
 }

@@ -18,6 +18,6 @@ public class SigirPubmedRecallExperimenterParameterized extends SuperSigirPubmed
 
         // Change here the predefined parameter set you want to use
         Map<String, String> templateProperties = SigirParameters.TREC_2018_HPIPUBNONE;
-        runExperiments(templateProperties, false, goldStandard, target, year, "", "");
+       // runExperiments(templateProperties, false, goldStandard, target, year, "", "");
     }
 }

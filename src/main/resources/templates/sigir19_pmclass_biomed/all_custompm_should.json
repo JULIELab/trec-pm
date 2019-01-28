@@ -10,6 +10,8 @@
 			{{sigir19_experiments_biomed/chemotherapy.json}},
 			{{sigir19_experiments_biomed/cancer.json}},
 			{{sigir19_experiments_biomed/dna.json}},
+			{{sigir19_experiments_biomed/mutations.json}},
+			{{sigir19_experiments_biomed/interactions.json}},
 			{{sigir19_experiments_biomed/pm.json}}
 		]
 	}

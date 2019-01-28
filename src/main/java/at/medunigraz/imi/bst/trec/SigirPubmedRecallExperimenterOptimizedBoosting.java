@@ -38,6 +38,6 @@ public class SigirPubmedRecallExperimenterOptimizedBoosting extends SuperSigirPu
         // Doesn't seem to do anything, the whole non-melanoma query part doesn't show much influence (none?)
         templateProperties.put("non_mel_boost", "-10");
 
-        runExperiments(templateProperties, false, goldStandard, target, year, "", "");
+     //   runExperiments(templateProperties, false, goldStandard, target, year, "", "");
     }
 }
