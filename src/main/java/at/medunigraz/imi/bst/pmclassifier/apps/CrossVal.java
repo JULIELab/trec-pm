@@ -62,6 +62,7 @@ public class CrossVal {
 
         int corrAllover = 0;
         Set<Document> onceRight = new HashSet<>();
+        List<Double> foldResults = new ArrayList<>();
         for (int fold = 0; fold < numFolds; fold++) {
             int currentFold = fold;
             Map<String, Document> train = IntStream.range(0, numFolds).filter(i -> i != currentFold).mapToObj(partitions::get).flatMap(Collection::stream).collect(toMap(Document::getId, d -> d));
@@ -84,12 +85,15 @@ public class CrossVal {
             LOG.info("Evaluation for fold " + fold + ":");
             LOG.info("Total: " + test.size());
             LOG.info("Correct: " + corr);
-            LOG.info("That is " + (corr / (double) test.size()) * 100 + "%");
+            final double acc = (corr / (double) test.size()) * 100;
+            LOG.info("That is " + acc + "%");
+            foldResults.add(acc);
 
 
             corrAllover += corr;
         }
 
+        LOG.info("All fold results: {}", foldResults);
         LOG.info("Allover eval:");
         LOG.info("Total: " + documents.size());
         LOG.info("Correct: " + corrAllover);

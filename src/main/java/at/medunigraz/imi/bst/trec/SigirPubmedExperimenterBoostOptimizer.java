@@ -40,11 +40,13 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
         if (what.equals("genedis")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
-            for (double genb = 1; genb < 3; genb += .5) {
-                for (double descb = 1; descb < 3; descb += .5) {
-                    for (double gsynb = 1; gsynb < 3; gsynb += .5) {
-                        for (double disb = 1; disb < 3; disb += .5) {
-                            for (double dsynb = 1; dsynb < 3; gsynb += .5) {
+            int num = 0;
+            for (double genb = 1; genb < 2.5; genb += .5) {
+                for (double descb = 1; descb < 2.5; descb += .5) {
+                    for (double gsynb = 1; gsynb < 2.5; gsynb += .5) {
+                        for (double disb = 1; disb < 2.5; disb += .5) {
+                            for (double dsynb = 1; dsynb < 2.5; dsynb += .5) {
+                                System.out.println(num++);
                                 Map<String, String> paramcombination = new HashMap<>(templateProperties);
                                 paramcombination.put("gene_boost", String.valueOf(genb));
                                 paramcombination.put("gene_desc_boost", String.valueOf(descb));
@@ -64,10 +66,10 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
             for (double titb = 1; titb < 3; titb += .5) {
-                for (double abstrb = 1; abstrb < 3; abstrb += .5) {
-                    for (double kwb = 1; kwb < 3; kwb += .5) {
-                        for (double meshb = 1; meshb < 3; meshb += .5) {
-                            for (double genesb = 1; genesb < 3; genesb += .5) {
+                for (double abstrb = 1; abstrb < 2.5; abstrb += .5) {
+                    for (double kwb = 1; kwb < 2.5; kwb += .5) {
+                        for (double meshb = 1; meshb < 2.5; meshb += .5) {
+                            for (double genesb = 1; genesb < 2.5; genesb += .5) {
                                 Map<String, String> paramcombination = new HashMap<>(templateProperties);
                                 paramcombination.put("title_boost", "^" + titb);
                                 paramcombination.put("abstract_boost", "^" + abstrb);
@@ -136,14 +138,31 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                 suffixes.add(suffix);
             }
             runExperimentsWithParameters("/templates/sigir19_experiments_biomed/mutations.json", parameters, suffixes, year, what, goldStandard, target);
+        }else if (what.equals("drug")) {
+            List<Map<String, String>> parameters = new ArrayList<>();
+            List<String> suffixes = new ArrayList<>();
+            for (double extrab = .5; extrab <= 3; extrab += .5) {
+                Map<String, String> paramcombination = new HashMap<>(templateProperties);
+                paramcombination.put("dgi_boost", String.valueOf(extrab));
+                String suffix = "--dgi" + df.format(extrab);
+                parameters.add(paramcombination);
+                suffixes.add(suffix);
+            }
+            runExperimentsWithParameters("/templates/sigir19_experiments_biomed/dgi.json", parameters, suffixes, year, what, goldStandard, target);
         } else if (what.equals("pmclass")) {
             List<Map<String, String>> parameters = new ArrayList<>();
             List<String> suffixes = new ArrayList<>();
-            final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
-                    "pmclass2017lstmatt.keyword",
+//            final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
+//                    "pmclass2017lstmatt.keyword",
+//                    "pmclass2017lstmgru.keyword",
+//                    "pmclass2018lstm.keyword",
+//                    "pmclass2018lstmatt.keyword",
+//                    "pmclass2018lstmgru.keyword",
+//                    "pmclass2017.keyword",
+//                    "pmclass2018.keyword");
+            // We decided for the paper to only use the LogReg and GRU approaches, thus we don't need to optimize the others
+            final List<String> pmfields = Arrays.asList(
                     "pmclass2017lstmgru.keyword",
-                    "pmclass2018lstm.keyword",
-                    "pmclass2018lstmatt.keyword",
                     "pmclass2018lstmgru.keyword",
                     "pmclass2017.keyword",
                     "pmclass2018.keyword");
@@ -152,12 +171,12 @@ public class SigirPubmedExperimenterBoostOptimizer extends SuperSigirPubmedRecal
                     Map<String, String> paramcombination = new HashMap<>(templateProperties);
                     paramcombination.put("pm_boost", String.valueOf(extrab));
                     paramcombination.put("pm_class_field", pmfield);
-                    String suffix = "--pm" + df.format(extrab) + "-pmf:";
+                    String suffix = "--pm" + df.format(extrab) + "-pmf:"+pmfield;
                     parameters.add(paramcombination);
                     suffixes.add(suffix);
                 }
             }
-            runExperimentsWithParameters("/templates/sigir19_pmclass_biomed", parameters, suffixes, year, what, goldStandard, target);
+            runExperimentsWithParameters("/templates/sigir19_pmclass_biomed", parameters, suffixes, year, what+"boostopt", goldStandard, target);
 
         } else throw new IllegalStateException("Unknown mode " + what);
 

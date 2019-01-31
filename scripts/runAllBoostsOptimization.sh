@@ -1,6 +1,6 @@
 #!/bin/bash
-
-whats="genedis fields posneg additional extra pmclass mutation drug"
+#whats="genedis fields posneg additional extra pmclass mutation drug"
+whats="pmclass"
 
 mvn compile
 

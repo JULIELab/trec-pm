@@ -31,12 +31,12 @@ public class SuperSigirPubmedRecallExperimenter {
         }
         final Map<String, TemplateSet> sigirTemplates = getSigirTemplates("/templates/sigir19_pmclass_biomed");
 
-        final Set<Set<Expansion>> expansionSets = new HashSet<>(Sets.powerSet(EnumSet.of(Expansion.DGI, Expansion.GDE, Expansion.GSY, Expansion.DSY, Expansion.WR)));
+        final Set<Set<Expansion>> expansionSets = new HashSet<>(Arrays.asList(EnumSet.of( Expansion.GSY, Expansion.DSY)));
 
         addExperiments(template, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
 
         Set<Experiment> experiments = builder.build();
-        final ExecutorService executorService = Executors.newFixedThreadPool(2);
+        final ExecutorService executorService = Executors.newFixedThreadPool(5);
         List<Future<?>> futures = new ArrayList<>();
         for (Experiment exp : experiments) {
             futures.add(executorService.submit(exp));
@@ -84,8 +84,8 @@ public class SuperSigirPubmedRecallExperimenter {
         }
 
 
-        // Switch everything on - except word removal - so that the boosters actually have a point.
-        final Set<Set<Expansion>> expansionSets = new HashSet<>(Arrays.asList(EnumSet.complementOf(EnumSet.of(Expansion.WR))));
+        // Switch on the gene and disease synonyms as those have high coverage.
+        final Set<Set<Expansion>> expansionSets = new HashSet<>(Arrays.asList(EnumSet.of( Expansion.GSY, Expansion.DSY)));
 
         addExperiments(null, sigirTemplates, templateProperties, expansionSets, goldStandard, target, year, builder, suffix);
 

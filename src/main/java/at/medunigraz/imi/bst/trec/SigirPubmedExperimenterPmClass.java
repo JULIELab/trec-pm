@@ -56,11 +56,9 @@ public class SigirPubmedExperimenterPmClass extends SuperSigirPubmedRecallExperi
         templateProperties.put("phrase_slop", "10");
 
 
-        final List<String> pmfields = Arrays.asList("pmclass2017lstm.keyword",
-                "pmclass2017lstmatt.keyword",
+        // We decided for the paper to only use the LogReg and GRU approaches, thus we don't need to optimize the others
+        final List<String> pmfields = Arrays.asList(
                 "pmclass2017lstmgru.keyword",
-                "pmclass2018lstm.keyword",
-                "pmclass2018lstmatt.keyword",
                 "pmclass2018lstmgru.keyword",
                 "pmclass2017.keyword",
                 "pmclass2018.keyword");
