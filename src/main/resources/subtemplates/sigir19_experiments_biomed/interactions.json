@@ -1,0 +1,11 @@
+{
+  "dis_max": {
+    "boost": 1,
+    "queries": [
+      {
+        "match_none": {}
+      },
+      {{drugInteractions:sigir19_experiments_biomed/drug_interaction.json}}
+    ]
+  }
+}

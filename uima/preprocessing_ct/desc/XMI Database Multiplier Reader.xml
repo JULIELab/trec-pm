@@ -321,7 +321,7 @@
                                 
                 <value>
                                         
-                    <string>errordoc</string>
+                    <string>preprocessing_all_ct</string>
                                     
                 </value>
                             
@@ -342,6 +342,18 @@
             <nameValuePair>
                                 
                 <name>ReadsBaseDocument</name>
+                                
+                <value>
+                                        
+                    <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>StoreMaxXmiId</name>
                                 
                 <value>
                                         

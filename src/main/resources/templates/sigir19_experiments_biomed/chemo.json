@@ -1,0 +1,11 @@
+{
+	"bool": {
+		"must": [
+			{{sigir19_experiments_biomed/disease.json}},
+			{{sigir19_experiments_biomed/gene.json}}
+		],
+		"should": [
+			{{sigir19_experiments_biomed/chemotherapy.json}},
+		]
+	}
+}

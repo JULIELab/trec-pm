@@ -5,6 +5,7 @@
     "tie_breaker": 0.3,
     "operator": "{{dis_syn_operator}}",
     "type": "{{dis_syn_multi_match_type}}",
-    "boost": {{disease_syn_boost}}
+    "boost": {{dis_syn_boost}},
+    "slop": {{phrase_slop}}
   }
 }

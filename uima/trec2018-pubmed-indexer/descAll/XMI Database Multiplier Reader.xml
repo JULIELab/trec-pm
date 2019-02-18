@@ -345,7 +345,7 @@
                                 
                 <value>
                                         
-                    <string>indexing_all</string>
+                    <string>indexing_all2</string>
                                     
                 </value>
                             
@@ -376,6 +376,10 @@
                         <string>de.julielab.jcore.types.Organism</string>
                                                 
                         <string>de.julielab.jcore.types.AutoDescriptor</string>
+                                                
+                        <string>de.julielab.jcore.types.Scope</string>
+                                                
+                        <string>de.julielab.jcore.types.PointMutation</string>
                                             
                     </array>
                                     

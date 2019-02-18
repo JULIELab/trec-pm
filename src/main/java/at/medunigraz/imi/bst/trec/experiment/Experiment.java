@@ -26,6 +26,7 @@ public class Experiment extends Thread {
     private int year;
     private String experimentName = null;
     private String statsDir = "stats/";
+    private String resultsDir = "results/";
 
     public String getStatsDir() {
         return statsDir;
@@ -33,6 +34,10 @@ public class Experiment extends Thread {
 
     public void setStatsDir(String statsDir) {
         this.statsDir = statsDir.endsWith(File.separator) ? statsDir : statsDir + File.separator;
+    }
+
+    public void setResultsDir(String resultsDir) {
+        this.resultsDir = resultsDir.endsWith(File.separator) ? resultsDir : resultsDir + File.separator;
     }
 
     @Override
@@ -44,10 +49,10 @@ public class Experiment extends Thread {
         File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
         TopicSet topicSet = new TopicSet(example);
 
-        File resultsDir = new File("results");
+        File resultsDir = new File(this.resultsDir);
         if (!resultsDir.exists())
             resultsDir.mkdir();
-        File output = new File("results/" + getExperimentId() + ".trec_results");
+        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
         final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
         TrecWriter tw = new TrecWriter(output, runName);
 

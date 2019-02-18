@@ -5,6 +5,7 @@
     "tie_breaker": 0.3,
     "operator": "{{dis_hyper_operator}}",
     "type": "{{dis_hyper_multi_match_type}}",
-    "boost": 0
+    "boost": {{dis_hyper_boost}},
+    "slop": {{phrase_slop}}
   }
 }

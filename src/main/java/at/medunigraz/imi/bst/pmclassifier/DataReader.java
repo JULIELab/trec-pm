@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class DataReader {
     }
 
     public static void addPMLabels(File gsTable, Map<String, Document> docsById) throws DataReadingException {
+        int pmAndNotPMCounter = 0;
         try (CSVParser csvRecords = CSVFormat.TDF.withFirstRecordAsHeader().parse(FileUtilities.getReaderFromFile(gsTable))) {
             Iterator<CSVRecord> it = csvRecords.iterator();
             while (it.hasNext()) {
@@ -65,12 +67,16 @@ public class DataReader {
                     LOG.warn("Null document for doc ID " + trecDocId + ". Record: " + record);
                     continue;
                 }
+                if (doc.getPmLabel() != null && doc.getPmLabel().equals("Not PM") && pmRelDesc.equalsIgnoreCase("PM"))
+                    ++pmAndNotPMCounter;
+                if (doc.getPmLabel() != null && doc.getPmLabel().equals("PM") && pmRelDesc.equalsIgnoreCase("Not PM"))
+                    ++pmAndNotPMCounter;
                 // "Once PM, always PM"
                 if (doc.getPmLabel() == null || doc.getPmLabel().equalsIgnoreCase("Not PM")) {
                     doc.setPMLabel(pmRelDesc);
                 }
             }
-
+            LOG.info("Encountered {} documents labeled as PM and also as Not PM for different queries", pmAndNotPMCounter);
         } catch (IOException e1) {
             throw new DataReadingException(e1);
         }

@@ -15,6 +15,7 @@ public class ExperimentsBuilder {
 
     private Experiment buildingExp = null;
     private String statsDir;
+    private String resultsDir;
 
     public ExperimentsBuilder() {
     }
@@ -24,6 +25,8 @@ public class ExperimentsBuilder {
         buildingExp = new Experiment();
         if (statsDir != null)
             withStatsDir(statsDir);
+        if (resultsDir != null)
+            withResultsDir(resultsDir);
         return this;
     }
 
@@ -172,6 +175,11 @@ public class ExperimentsBuilder {
         return this;
     }
 
+    public ExperimentsBuilder withResultsDir(String dir) {
+        buildingExp.setResultsDir(dir);
+        return this;
+    }
+
     public Set<Experiment> build() {
         validate();
         return experiments;
@@ -202,5 +210,9 @@ public class ExperimentsBuilder {
 
     public void setDefaultStatsDir(String statsDir) {
         this.statsDir = statsDir;
+    }
+
+    public void setDefaultResultsDir(String resultsDir) {
+        this.resultsDir = resultsDir;
     }
 }
