@@ -17,15 +17,14 @@
     </target>
 
     <target name="build.trec.eval.patch" unless="trec.eval.available">
-        <!-- We're affected by https://github.com/usnistgov/trec_eval/issues/14 on GCC-7 -->
-        <get src="https://github.com/bgamari/trec_eval/archive/8c56e931127d53cff52945ca7d07c5270c190da1.zip"
-             dest="${project.build.directory}/lib/trec_eval_patched.zip"
+        <get src="https://github.com/usnistgov/trec_eval/archive/v9.0.6.zip"
+             dest="${project.build.directory}/lib/trec_eval-9.0.6.zip"
              verbose="false" usetimestamp="true"/>
-        <unzip src="${project.build.directory}/lib/trec_eval_patched.zip"
+        <unzip src="${project.build.directory}/lib/trec_eval-9.0.6.zip"
                dest="${project.build.directory}/lib/"/>
         <exec executable="make" failonerror="true"
-              dir="${project.build.directory}/lib/trec_eval-8c56e931127d53cff52945ca7d07c5270c190da1/"/>
-        <move file="${project.build.directory}/lib/trec_eval-8c56e931127d53cff52945ca7d07c5270c190da1/trec_eval"
+              dir="${project.build.directory}/lib/trec_eval-9.0.6/"/>
+        <move file="${project.build.directory}/lib/trec_eval-9.0.6/trec_eval"
               tofile="${project.build.directory}/lib/trec_eval"/>
     </target>
     <target name="get.trec.sample.eval" if="script.available">
