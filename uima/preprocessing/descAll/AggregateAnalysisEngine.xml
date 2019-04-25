@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
+    <primitive>false</primitive>
+        
+    <delegateAnalysisEngineSpecifiers>
+                
+        <delegateAnalysisEngine key="JCoRe Sentence Annotator">
+                        
+            <import location="JCoRe Sentence Annotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Token Annotator">
+                        
+            <import location="JCoRe Token Annotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe AcronymAnnotator">
+                        
+            <import location="JCoRe AcronymAnnotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
+                        
+            <import location="JCoRe OpenNLP POS Tagger.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="BioLemmatizer">
+                        
+            <import location="BioLemmatizer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
+                        
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
+                        
+            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
+                        
+            <import location="JCoRe Mutation Annotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
+                        
+            <import location="JCoRe Lingscope Negation AE.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="PM Classifier 2017">
+                        
+            <import location="PM Classifier 2017.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="PM Classifier 2018">
+                        
+            <import location="PM Classifier 2018.xml"/>
+                    
+        </delegateAnalysisEngine>
+            
+    </delegateAnalysisEngineSpecifiers>
+        
+    <analysisEngineMetaData>
+                
+        <name>AggregateAnalysisEngine</name>
+                
+        <configurationParameters/>
+                
+        <configurationParameterSettings/>
+                
+        <flowConstraints>
+                        
+            <fixedFlow>
+                                
+                <node>JCoRe Sentence Annotator</node>
+                                
+                <node>JCoRe Token Annotator</node>
+                                
+                <node>JCoRe AcronymAnnotator</node>
+                                
+                <node>JCoRe OpenNLP POS Tagger</node>
+                                
+                <node>BioLemmatizer</node>
+                                
+                <node>JCoRe BANNER AE for Biomedical English</node>
+                                
+                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
+                                
+                <node>JCoRe Mutation Annotator</node>
+                                
+                <node>JCoRe Lingscope Negation AE</node>
+                                
+                <node>PM Classifier 2017</node>
+                                
+                <node>PM Classifier 2018</node>
+                            
+            </fixedFlow>
+                    
+        </flowConstraints>
+                
+        <capabilities/>
+                
+        <operationalProperties>
+                        
+            <modifiesCas>true</modifiesCas>
+                        
+            <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
+            <outputsNewCASes>false</outputsNewCASes>
+                    
+        </operationalProperties>
+            
+    </analysisEngineMetaData>
+    
+</analysisEngineDescription>
