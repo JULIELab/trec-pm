@@ -1,9 +1,0 @@
-{
-  "multi_match": {
-    "query": "{{[drugInteractions]}}",
-    "fields": {{sigir19_experiments_biomed/fields.json}},
-    "tie_breaker": 0.3,
-    "type": "{{dgi_multi_match_type}}",
-    "boost": {{dgi_boost}}
-  }
-}

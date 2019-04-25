@@ -1,7 +1,0 @@
-{
-  "query_string": {
-    "query": "*mab *nib *cin *one *ate *mus *lin",
-    "fields": {{sigir19_experiments_biomed/fields.json}},
-    "boost": {{chemo_boost}}
-  }
-}

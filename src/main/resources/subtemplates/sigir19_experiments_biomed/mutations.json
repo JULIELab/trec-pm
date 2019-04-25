@@ -1,8 +1,0 @@
-{
-  "match": {
-    "mutations": {
-      "query": "{{gene}}",
-      "boost": {{mut_boost}}
-    }
-  }
-}
