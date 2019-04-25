@@ -33,11 +33,7 @@ public class SubTemplateQueryDecorator extends TemplateQueryDecorator {
     private static final String FIELD_SEPARATOR = ", ";
 
     public SubTemplateQueryDecorator(File template, Query decoratedQuery) {
-        this(template, decoratedQuery, Collections.emptyMap());
-    }
-
-    public SubTemplateQueryDecorator(File template, Query decoratedQuery, Map<String, String> properties) {
-        super(template, decoratedQuery, properties);
+        super(template, decoratedQuery);
     }
 
     @Override

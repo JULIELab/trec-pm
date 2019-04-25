@@ -47,11 +47,6 @@ public class ExperimentsBuilder {
         return this;
     }
 
-    public ExperimentsBuilder withTemplate(File template, String... properties) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new TemplateQueryDecorator(template, previousDecorator, array2Map(properties)));
-        return this;
-    }
 
     public ExperimentsBuilder withSubTemplate(File template) {
         Query previousDecorator = buildingExp.getDecorator();
@@ -59,22 +54,33 @@ public class ExperimentsBuilder {
         return this;
     }
 
-    public ExperimentsBuilder withSubTemplate(File template, Map<String, String> properties) {
+    /**
+     * <p>
+     * The given map will be used to fill variables/properties in the used template by the mapped values.
+     * </p>
+     *
+     * @param templateProperties A map holding the poperties from the template and the values they should be replaced with.
+     * @return This ExperimentsBuilder.
+     */
+    public ExperimentsBuilder withProperties(Map<String, String> templateProperties) {
         Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator, properties));
+        buildingExp.setDecorator(new StaticMapQueryDecorator(templateProperties, previousDecorator));
+
         return this;
     }
 
-    public ExperimentsBuilder withSubTemplate(File template, String... properties) {
-        return withSubTemplate(template, array2Map(properties));
-    }
-
-    public ExperimentsBuilder withKeyword(String value) {
+    /**
+     * <p>
+     * The given map will be used to fill variables/properties in the used template by the mapped values.
+     * </p>
+     * <p>The parameters of the method are property-value pairs were the property always comes first and then the associated value.</p>
+     *
+     * @param templatePropertiesAndValues An array holding the poperties from the template and the values they should be replaced with.
+     * @return This ExperimentsBuilder.
+     */
+    public ExperimentsBuilder withProperties(String... templatePropertiesAndValues) {
         Query previousDecorator = buildingExp.getDecorator();
-
-        Map<String, String> keymap = new HashMap<>();
-        keymap.put("keyword", value);
-        buildingExp.setDecorator(new StaticMapQueryDecorator(keymap, previousDecorator));
+        buildingExp.setDecorator(new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), previousDecorator));
 
         return this;
     }
@@ -146,12 +152,12 @@ public class ExperimentsBuilder {
     }
 
     public ExperimentsBuilder withDrugInteraction() {
-		Query previousDecorator = buildingExp.getDecorator();
-		buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
-		return this;
-	}
+        Query previousDecorator = buildingExp.getDecorator();
+        buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
+        return this;
+    }
 
-	public ExperimentsBuilder withGoldStandard(Experiment.GoldStandard gold) {
+    public ExperimentsBuilder withGoldStandard(Experiment.GoldStandard gold) {
         buildingExp.setGoldStandard(gold);
         return this;
     }

@@ -14,7 +14,7 @@ public class BoostExperimenter {
 
 		for (float i = 1; i <= 5; i += 0.5) {
 			builder.newExperiment().withYear(2017).withGoldStandard(Experiment.GoldStandard.OFFICIAL)
-					.withTarget(Experiment.Task.PUBMED).withKeyword(String.valueOf(i)).withTemplate(relaxedTemplate)
+					.withTarget(Experiment.Task.PUBMED).withProperties("keyword", String.valueOf(i)).withTemplate(relaxedTemplate)
 					.withWordRemoval();
 		}
 
