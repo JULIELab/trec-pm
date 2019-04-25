@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
+    <primitive>false</primitive>
+        
+    <delegateAnalysisEngineSpecifiers>
+                
+        <delegateAnalysisEngine key="JCoRe XMI DB Consumer">
+                        
+            <import location="JCoRe XMI DB Consumer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Database Checkpoint Consumer">
+                        
+            <import location="JCoRe Database Checkpoint Consumer.xml"/>
+                    
+        </delegateAnalysisEngine>
+            
+    </delegateAnalysisEngineSpecifiers>
+        
+    <analysisEngineMetaData>
+                
+        <name>JCoRe Consumer AAE</name>
+                
+        <description>This consumer AAE descriptor directly contains the CAS consumers added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
+                
+        <configurationParameters/>
+                
+        <configurationParameterSettings/>
+                
+        <flowConstraints>
+                        
+            <fixedFlow>
+                                
+                <node>JCoRe XMI DB Consumer</node>
+                                
+                <node>JCoRe Database Checkpoint Consumer</node>
+                            
+            </fixedFlow>
+                    
+        </flowConstraints>
+                
+        <capabilities/>
+                
+        <operationalProperties>
+                        
+            <modifiesCas>true</modifiesCas>
+                        
+            <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
+            <outputsNewCASes>false</outputsNewCASes>
+                    
+        </operationalProperties>
+            
+    </analysisEngineMetaData>
+    
+</analysisEngineDescription>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
+    <primitive>true</primitive>
+        
+    <annotatorImplementationName>de.julielab.jcore.consumer.es.JsonWriter</annotatorImplementationName>
+        
+    <analysisEngineMetaData>
+                
+        <name>JCoRe JSON Writer</name>
+                
+        <configurationParameters>
+                        
+            <configurationParameter>
+                                
+                <name>OutputDestination</name>
+                                
+                <description>The path to which the JSON data will be stored. This parameter can denote a file or a directory. See the FileOutput parameter which specifies whether the output should be written into one large file - one document per line - or into a directory - one document per file. The file or directory will be created if it does not exist, including all parent directories. In the directory case, the files in the directory will be overwritten. In the single file case, new documents will be appended, requiring the file to be deleted manually if desired.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>true</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>GZIP</name>
+                                
+                <description/>
+                                
+                <type>Boolean</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>FileOutput</name>
+                                
+                <description>This boolean parameter determines whether a single file (parameter set to 'true') or a directory of files (parameter set to 'false') will be output to the location given with OutputDestination. File output supports multithreading on the same machine through</description>
+                                
+                <type>Boolean</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>true</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>FieldGenerators</name>
+                                
+                <description>An array of qualified Java class names. Each enumerated class must implement the FieldGenerator interface and is delivered by the user. These classes will be applied to the consumed CAS and populate Document instances with fields and thus determine the structure and content of the output documents. The field values are derived from CAS data. FieldGenerators always populate a single Document instance with fields. If multiple documents must be created for each CAS, refer to the DocumentGenerators parameter.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>true</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>DocumentGenerators</name>
+                                
+                <description>An array of qualified Java class names. Each enumerated class must extend the abstract DocumentGenerator class and is delivered by the user. Unlike FieldGenerator classes, DocumentGenerators put out whole Document instances instead of only populating a single Document with fields. This is required when multiple ElasticSearch documents should be created from a single CAS. When only the creation of a single document with a range of fields is required, leave this parameter empty and refer to the FieldGenerators parameter.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>true</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>FilterBoards</name>
+                                
+                <description>An array of qualified Java names. Each enumerated class must extend the FilterBoard class and is delivered by the user. FieldGenerators and DocumentGenerators may make use of several filters that a applied to tokens derived from UIMA annotations. Often, the same kind of filter is required across differnet fields (e.g. all full text fields will undergo a very similar text transformation process to create index tokens). To centralize the creation and management of the filters, one or multiple filter boards may be created. The filter boards are passed to each field and document generator. Also, the filter boards feature an annotation-driven access to the external resource mechanism used by UIMA for shared resources. Using shared resources helps to reduce memory consumption and the annotation-driven approach facilitates configuration.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>true</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>IdField</name>
+                                
+                <description>The name of the field that contains the document ID. If not set, the document ID will be read from the Header annotation of the CAS. If both methods to obtain a document ID fail, an exception will be raised.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>IdPrefix</name>
+                                
+                <description>A string that will be prepended to each document ID.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                    
+        </configurationParameters>
+                
+        <configurationParameterSettings>
+                        
+            <nameValuePair>
+                                
+                <name>OutputDestination</name>
+                                
+                <value>
+                                        
+                    <string>/home/faessler/tmp/baseline2018files/baseline2018resultss</string>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>FileOutput</name>
+                                
+                <value>
+                                        
+                    <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>GZIP</name>
+                                
+                <value>
+                                        
+                    <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>FilterBoards</name>
+                                
+                <value>
+                                        
+                    <array/>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>FieldGenerators</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>de.julielab.pmclassifier.jsonoutput.PmClassifierInputFieldGenerator</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                    
+        </configurationParameterSettings>
+                
+        <typeSystemDescription/>
+                
+        <fsIndexCollection/>
+                
+        <capabilities/>
+                
+        <operationalProperties>
+                        
+            <modifiesCas>true</modifiesCas>
+                        
+            <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
+            <outputsNewCASes>false</outputsNewCASes>
+                    
+        </operationalProperties>
+            
+    </analysisEngineMetaData>
+    
+</analysisEngineDescription>

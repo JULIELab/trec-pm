@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpeDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <collectionReader>
+                
+        <collectionIterator>
+                        
+            <descriptor>
+                                
+                <import location="XmiCollectionReader 1.xml"/>
+                            
+            </descriptor>
+                    
+        </collectionIterator>
+            
+    </collectionReader>
+    <casProcessors casPoolSize="1" processingUnitThreadCount="1">
+            
+        <casProcessor deployment="integrated" name="CPE AAE">
+                    
+            <descriptor>
+                            
+                <import location="cpeAAE.xml"/>
+                        
+            </descriptor>
+            <deploymentParameters/>
+                    
+            <errorHandling>
+                            
+                <errorRateThreshold action="terminate" value="100/1000"/>
+                            
+                <maxConsecutiveRestarts action="terminate" value="30"/>
+                            
+                <timeout max="100000" default="-1"/>
+                        
+            </errorHandling>
+                    
+            <checkpoint batch="500" time="1000ms"/>
+                
+        </casProcessor>
+    </casProcessors>
+    
+</cpeDescription>

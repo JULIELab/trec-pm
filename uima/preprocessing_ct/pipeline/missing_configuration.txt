@@ -1,0 +1,2 @@
+The pipeline has no collection reader.
+
