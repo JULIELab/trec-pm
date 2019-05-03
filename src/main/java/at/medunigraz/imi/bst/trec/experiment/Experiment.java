@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecEval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.query.Query;
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
 

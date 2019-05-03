@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.query;
 
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.expansion.DGIdb;
 import at.medunigraz.imi.bst.trec.model.Topic;
 

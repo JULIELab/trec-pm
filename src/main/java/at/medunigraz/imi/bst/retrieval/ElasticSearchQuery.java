@@ -1,11 +1,9 @@
-package at.medunigraz.imi.bst.trec.query;
+package at.medunigraz.imi.bst.retrieval;
 
 import java.util.List;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
-import at.medunigraz.imi.bst.trec.model.Task;
-import org.apache.commons.math3.analysis.function.Exp;
 import org.json.JSONObject;
 
 import at.medunigraz.imi.bst.trec.model.Result;

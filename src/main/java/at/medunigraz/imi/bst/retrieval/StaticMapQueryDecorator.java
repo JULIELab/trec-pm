@@ -1,4 +1,4 @@
-package at.medunigraz.imi.bst.trec.query;
+package at.medunigraz.imi.bst.retrieval;
 
 import java.util.List;
 import java.util.Map;

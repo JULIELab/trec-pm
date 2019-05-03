@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import at.medunigraz.imi.bst.retrieval.*;
 import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
@@ -18,6 +19,7 @@ public class ExperimentsBuilder {
     private Experiment buildingExp = null;
     private String statsDir;
     private String resultsDir;
+    private TrecPmRetrieval retrieval;
 
     public ExperimentsBuilder() {
     }
@@ -25,6 +27,7 @@ public class ExperimentsBuilder {
     public ExperimentsBuilder newExperiment() {
         validate();
         buildingExp = new Experiment();
+        retrieval = new TrecPmRetrieval();
         if (statsDir != null)
             withStatsDir(statsDir);
         if (resultsDir != null)
@@ -40,12 +43,16 @@ public class ExperimentsBuilder {
     @Deprecated
     public ExperimentsBuilder withDecorator(Query decorator) {
         buildingExp.setDecorator(decorator);
+
+        retrieval.setQuery(decorator);
         return this;
     }
 
     public ExperimentsBuilder withTemplate(File template) {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new TemplateQueryDecorator(template, previousDecorator));
+
+        retrieval.withTemplate(template);
         return this;
     }
 
@@ -53,6 +60,8 @@ public class ExperimentsBuilder {
     public ExperimentsBuilder withSubTemplate(File template) {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator));
+
+        retrieval.withSubTemplate(template);
         return this;
     }
 
@@ -68,6 +77,7 @@ public class ExperimentsBuilder {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new StaticMapQueryDecorator(templateProperties, previousDecorator));
 
+        retrieval.withProperties(templateProperties);
         return this;
     }
 
@@ -84,21 +94,25 @@ public class ExperimentsBuilder {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), previousDecorator));
 
+        retrieval.withProperties(templatePropertiesAndValues);
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withWordRemoval() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new WordRemovalQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withGeneExpansion(Gene.Field[] expandTo) {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new GeneExpanderQueryDecorator(expandTo, previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDiseaseReplacer() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DiseaseReplacerQueryDecorator(previousDecorator));

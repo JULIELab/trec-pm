@@ -1,4 +1,4 @@
-package at.medunigraz.imi.bst.trec.query;
+package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;

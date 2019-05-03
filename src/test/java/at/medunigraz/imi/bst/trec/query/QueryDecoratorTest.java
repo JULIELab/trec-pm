@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import at.medunigraz.imi.bst.retrieval.Query;
 import org.junit.Assume;
 import org.junit.Test;
 

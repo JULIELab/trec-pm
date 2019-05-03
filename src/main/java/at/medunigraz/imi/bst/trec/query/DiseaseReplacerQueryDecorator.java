@@ -3,10 +3,10 @@ package at.medunigraz.imi.bst.trec.query;
 import java.util.List;
 
 import at.medunigraz.imi.bst.lexigram.Lexigram;
+import at.medunigraz.imi.bst.retrieval.Query;
+import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
