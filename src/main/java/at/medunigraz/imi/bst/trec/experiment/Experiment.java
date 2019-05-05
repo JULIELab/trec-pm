@@ -3,6 +3,7 @@ package at.medunigraz.imi.bst.trec.experiment;
 import java.io.File;
 import java.util.*;
 
+import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.SampleEval;
 import at.medunigraz.imi.bst.trec.model.*;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +21,7 @@ public class Experiment extends Thread {
     private static final Logger LOG = LogManager.getLogger();
     private static final int YEAR_PUBLISHED_GS = 2017;
     public Metrics allMetrics = null;
-    private Query decorator;
+    private Retrieval retrieval;
     private Challenge challenge;
     private Task task;
     private GoldStandard goldStandard;
@@ -54,6 +55,14 @@ public class Experiment extends Thread {
         return ret;
     }
 
+    public Retrieval getRetrieval() {
+        return retrieval;
+    }
+
+    public void setRetrieval(Retrieval retrieval) {
+        this.retrieval = retrieval;
+    }
+
     public void setChallenge(Challenge challenge) {
         this.challenge = challenge;
     }
@@ -72,7 +81,7 @@ public class Experiment extends Thread {
 
     @Override
     public void run() {
-        final String name = getExperimentId() + " with decorators " + decorator.getName();
+        final String name = getExperimentId() + " with decorators " + retrieval.getQuery().getName();
 
         LOG.info("Running collection " + name + "...");
 
@@ -90,7 +99,7 @@ public class Experiment extends Thread {
         Collection<Topic> topics = topicSet.getTopics();
         List<ResultList> resultListSet = new ArrayList<>();
         for (Topic topic : topics) {
-            List<Result> results = decorator.query(topic);
+            List<Result> results = retrieval.getQuery().query(topic);
 
 
             if (results.isEmpty())
@@ -147,7 +156,7 @@ public class Experiment extends Thread {
         if (experimentName != null) {
             return experimentName.replace(" ", "_");
         }
-        return String.format("%s_%d_%s", getShortTaskName(), year, decorator.getName().replace(" ", "_"));
+        return String.format("%s_%d_%s", getShortTaskName(), year, retrieval.getQuery().getName().replace(" ", "_"));
     }
 
     public String getExperimentName() {
@@ -236,11 +245,7 @@ public class Experiment extends Thread {
     }
 
     public Query getDecorator() {
-        return decorator;
-    }
-
-    public void setDecorator(Query decorator) {
-        this.decorator = decorator;
+        return retrieval.getQuery();
     }
 
 

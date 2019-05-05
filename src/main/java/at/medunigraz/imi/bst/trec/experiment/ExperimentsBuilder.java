@@ -28,6 +28,7 @@ public class ExperimentsBuilder {
         validate();
         buildingExp = new Experiment();
         retrieval = new TrecPmRetrieval();
+        buildingExp.setRetrieval(retrieval);
         if (statsDir != null)
             withStatsDir(statsDir);
         if (resultsDir != null)
@@ -40,27 +41,18 @@ public class ExperimentsBuilder {
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDecorator(Query decorator) {
-        buildingExp.setDecorator(decorator);
-
         retrieval.setQuery(decorator);
         return this;
     }
 
     public ExperimentsBuilder withTemplate(File template) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new TemplateQueryDecorator(template, previousDecorator));
-
         retrieval.withTemplate(template);
         return this;
     }
 
 
     public ExperimentsBuilder withSubTemplate(File template) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator));
-
         retrieval.withSubTemplate(template);
         return this;
     }
@@ -74,9 +66,6 @@ public class ExperimentsBuilder {
      * @return This ExperimentsBuilder.
      */
     public ExperimentsBuilder withProperties(Map<String, String> templateProperties) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new StaticMapQueryDecorator(templateProperties, previousDecorator));
-
         retrieval.withProperties(templateProperties);
         return this;
     }
@@ -91,94 +80,67 @@ public class ExperimentsBuilder {
      * @return This ExperimentsBuilder.
      */
     public ExperimentsBuilder withProperties(String... templatePropertiesAndValues) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), previousDecorator));
-
         retrieval.withProperties(templatePropertiesAndValues);
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withWordRemoval() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new WordRemovalQueryDecorator(previousDecorator));
+        retrieval.withWordRemoval();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withGeneExpansion(Gene.Field[] expandTo) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneExpanderQueryDecorator(expandTo, previousDecorator));
+        retrieval.withGeneExpansion(expandTo);
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDiseaseReplacer() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseReplacerQueryDecorator(previousDecorator));
+        retrieval.withDiseaseReplacer();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDiseaseExpander() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseExpanderQueryDecorator(previousDecorator));
+        retrieval.withDiseaseExpander();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDiseasePreferredTerm() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseasePreferredTermQueryDecorator(previousDecorator));
+        retrieval.withDiseasePreferredTerm();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDiseaseSynonym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseSynonymQueryDecorator(previousDecorator));
+        retrieval.withDiseaseSynonym();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withGeneSynonym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneSynonymQueryDecorator(previousDecorator));
+        retrieval.withGeneSynonym();
         return this;
     }
 
-@Deprecated
     public ExperimentsBuilder withGeneDescription() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneDescriptionQueryDecorator(previousDecorator));
+        retrieval.withGeneDescription();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDiseaseHypernym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseHypernymQueryDecorator(previousDecorator));
+        retrieval.withDiseaseHypernym();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withSolidTumor() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SolidTumorQueryDecorator(previousDecorator));
+        retrieval.withSolidTumor();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withGeneFamily() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneFamilyQueryDecorator(previousDecorator));
+        retrieval.withGeneFamily();
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDrugInteraction() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
+        retrieval.withDrugInteraction();
         return this;
     }
 
@@ -190,9 +152,9 @@ public class ExperimentsBuilder {
     public ExperimentsBuilder withTarget(Task task) {
         buildingExp.setTask(task);
         if (task != Task.PUBMED_ONLINE)
-            buildingExp.setDecorator(new ElasticSearchQuery(buildingExp.getGoldStandard()));
+            retrieval.setQuery(new ElasticSearchQuery(buildingExp.getGoldStandard()));
         else
-            buildingExp.setDecorator(new PubMedOnlineQuery());
+            retrieval.setQuery(new PubMedOnlineQuery());
         return this;
     }
 

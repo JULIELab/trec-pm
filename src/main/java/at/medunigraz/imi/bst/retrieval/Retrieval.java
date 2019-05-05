@@ -1,10 +1,14 @@
 package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Retrieval<T extends Retrieval> {
@@ -15,6 +19,10 @@ public class Retrieval<T extends Retrieval> {
     private int year;
     private String resultsDir;
 
+
+    public List<Result> retrieve(QueryDescription queryDescription) {
+        return this.query.query((Topic) queryDescription);
+    }
     public void setQuery(Query query) {
         this.query = query;
     }
@@ -70,6 +78,10 @@ public class Retrieval<T extends Retrieval> {
         return (T) this;
     }
 
+    public Query getQuery() {
+        return query;
+    }
+
     public T withTarget(Task task) {
         this.task = task;
         if (task != Task.PUBMED_ONLINE)
@@ -101,4 +113,5 @@ public class Retrieval<T extends Retrieval> {
         }
         return map;
     }
+
 }
