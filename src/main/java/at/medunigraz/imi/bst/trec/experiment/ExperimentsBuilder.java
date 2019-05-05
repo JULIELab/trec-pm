@@ -119,54 +119,63 @@ public class ExperimentsBuilder {
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDiseaseExpander() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DiseaseExpanderQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDiseasePreferredTerm() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DiseasePreferredTermQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDiseaseSynonym() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DiseaseSynonymQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withGeneSynonym() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new GeneSynonymQueryDecorator(previousDecorator));
         return this;
     }
 
+@Deprecated
     public ExperimentsBuilder withGeneDescription() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new GeneDescriptionQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDiseaseHypernym() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DiseaseHypernymQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withSolidTumor() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new SolidTumorQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withGeneFamily() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new GeneFamilyQueryDecorator(previousDecorator));
         return this;
     }
 
+    @Deprecated
     public ExperimentsBuilder withDrugInteraction() {
         Query previousDecorator = buildingExp.getDecorator();
         buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
