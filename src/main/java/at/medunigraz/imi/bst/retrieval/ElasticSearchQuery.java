@@ -4,13 +4,14 @@ import java.util.List;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import de.julielab.ir.model.QueryDescription;
 import org.json.JSONObject;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.search.ElasticSearch;
 
-public class ElasticSearchQuery implements Query {
+public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> {
 
     private  GoldStandard goldStandard;
     private String jsonQuery;
@@ -29,7 +30,7 @@ public class ElasticSearchQuery implements Query {
     }
 
     @Override
-	public List<Result> query(Topic topic) {
+	public List<Result> query(T topic) {
 		ElasticSearch es;
 		final String index = this.index != null ? this.index : Experiment.getIndexName(topic.getTask());
         final String[] types = this.types != null ? this.types : Experiment.getTypes(topic.getTask(), goldStandard);

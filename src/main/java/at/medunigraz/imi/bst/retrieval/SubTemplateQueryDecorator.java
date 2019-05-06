@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.model.QueryDescription;
 import joptsimple.internal.Strings;
 
 import java.io.File;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SubTemplateQueryDecorator extends TemplateQueryDecorator {
+public class SubTemplateQueryDecorator<T extends QueryDescription> extends TemplateQueryDecorator<T> {
 
     /**
      * Matches and captures regular filenames enclosed in double curly braces, e.g.
@@ -35,11 +36,11 @@ public class SubTemplateQueryDecorator extends TemplateQueryDecorator {
     }
 
     @Override
-    protected void loadTemplate(Topic topic) {
+    protected void loadTemplate(T topic) {
         setJSONQuery(recursiveLoadTemplate(topic, template));
     }
 
-    private String recursiveLoadTemplate(Topic topic, File file) {
+    private String recursiveLoadTemplate(T topic, File file) {
         String templateString = readTemplate(file);
 
         StringBuffer sb = new StringBuffer();
@@ -65,7 +66,7 @@ public class SubTemplateQueryDecorator extends TemplateQueryDecorator {
         return sb.toString();
     }
 
-    private String handleDynamicExpansion(Topic topic, String fieldName, String subtemplate) {
+    private String handleDynamicExpansion(T topic, String fieldName, String subtemplate) {
         Matcher matcher = DYNAMIC_TEMPLATE_PATTERN.matcher(subtemplate);
 
         // TODO obtain fieldName here and do not receive via parameter

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PubMedOnlineQuery implements Query {
+public class PubMedOnlineQuery implements Query<Topic> {
     private PubMedOnline pmo = new PubMedOnline();
     @Override
     public List<Result> query(Topic topic) {

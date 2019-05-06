@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
-public class DiseaseReplacerQueryDecorator extends QueryDecorator {
+public class DiseaseReplacerQueryDecorator extends QueryDecorator<Topic> {
 
 	private static final Logger LOG = LogManager.getLogger();
 

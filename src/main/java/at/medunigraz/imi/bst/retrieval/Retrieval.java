@@ -1,15 +1,11 @@
 package at.medunigraz.imi.bst.retrieval;
 
-import at.medunigraz.imi.bst.trec.model.GoldStandard;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Task;
-import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Retrieval<T extends Retrieval> {
 
@@ -18,7 +14,7 @@ public class Retrieval<T extends Retrieval> {
     private GoldStandard goldStandard;
     private int year;
     private String resultsDir;
-
+    private String experimentName;
 
 
 
@@ -116,4 +112,55 @@ public class Retrieval<T extends Retrieval> {
         return map;
     }
 
+    public void retrieve(Collection<QueryDescription> queryDescriptions) {
+        File resultsDir = new File(this.resultsDir);
+        if (!resultsDir.exists())
+            resultsDir.mkdir();
+        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
+        final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
+        TrecWriter tw = new TrecWriter(output, runName);
+
+        // TODO DRY Issue #53
+        List<ResultList<?>> resultListSet = new ArrayList<>();
+        for (QueryDescription topic : queryDescriptions) {
+            List<Result> results = query.query(topic);
+
+
+            if (results.isEmpty())
+                throw new IllegalStateException("RESULT EMPTY for " + experimentName);
+
+            ResultList<?> resultList = new ResultList<>(topic);
+            resultList.addAll(results);
+            resultListSet.add(resultList);
+        }
+
+        tw.write(resultListSet);
+        tw.close();
+
+    }
+    public String getExperimentId() {
+        if (experimentName != null) {
+            return experimentName.replace(" ", "_");
+        }
+        return String.format("%s_%d_%s", getShortTaskName(), year, query.getName().replace(" ", "_"));
+    }
+
+    public String getShortTaskName() {
+        switch (task) {
+            case CLINICAL_TRIALS:
+                return "ct";
+            case PUBMED:
+                return "pmid";
+            default:
+                return "";
+        }
+    }
+
+    public String getExperimentName() {
+        if (experimentName == null) {
+            return "experiment";
+        }
+
+        return experimentName;
+    }
 }

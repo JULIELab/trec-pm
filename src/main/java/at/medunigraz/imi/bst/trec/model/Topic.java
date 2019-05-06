@@ -223,6 +223,7 @@ public class Topic extends QueryDescription {
         return other;
     }
 
+    @Override
     public Map<String, String> getAttributes() {
         Map<String, String> ret = new HashMap<>();
 

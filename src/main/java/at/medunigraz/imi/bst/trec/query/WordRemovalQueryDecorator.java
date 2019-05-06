@@ -10,7 +10,7 @@ import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
-public class WordRemovalQueryDecorator extends QueryDecorator {
+public class WordRemovalQueryDecorator extends QueryDecorator<Topic> {
 
 	private static final Set<String> DOMAIN_STOPWORDS = new HashSet<>();
 	static {

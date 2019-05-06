@@ -5,8 +5,9 @@ import java.util.Map;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.model.QueryDescription;
 
-public class StaticMapQueryDecorator extends MapQueryDecorator {
+public class StaticMapQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
 	
 	private Map<String, String> keymap;
 
@@ -16,7 +17,7 @@ public class StaticMapQueryDecorator extends MapQueryDecorator {
 	}
 	
 	@Override
-	public List<Result> query(Topic topic) {
+	public List<Result> query(T topic) {
 		map(keymap);
 		return decoratedQuery.query(topic);
 	}

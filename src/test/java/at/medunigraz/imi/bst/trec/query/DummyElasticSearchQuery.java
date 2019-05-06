@@ -5,24 +5,25 @@ import java.util.List;
 import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.model.QueryDescription;
 
-public class DummyElasticSearchQuery extends ElasticSearchQuery {
+public class DummyElasticSearchQuery<T extends QueryDescription> extends ElasticSearchQuery<T> {
 	
 	public DummyElasticSearchQuery() {
 		super("NOOP");
 	}
 
-	private Topic topic;
+	private T topic;
 
 	@Override
-	public List<Result> query(Topic topic) {
+	public List<Result> query(T topic) {
 		this.topic = topic;
 		
 		// NOOP
 		return null;
 	}
 	
-	public Topic getTopic() {
+	public T getTopic() {
 		return this.topic;
 	}
 

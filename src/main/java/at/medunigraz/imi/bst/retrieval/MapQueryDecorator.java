@@ -1,8 +1,10 @@
 package at.medunigraz.imi.bst.retrieval;
 
+import de.julielab.ir.model.QueryDescription;
+
 import java.util.Map;
 
-public abstract class MapQueryDecorator extends QueryDecorator {
+public abstract class MapQueryDecorator<T extends QueryDescription> extends QueryDecorator<T> {
 
 	public MapQueryDecorator(Query decoratedQuery) {
 		super(decoratedQuery);

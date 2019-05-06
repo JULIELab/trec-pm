@@ -11,7 +11,7 @@ import at.medunigraz.imi.bst.lexigram.Lexigram;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
-public class DiseaseExpanderQueryDecorator extends QueryDecorator {
+public class DiseaseExpanderQueryDecorator extends QueryDecorator<Topic> {
 
 	private static final Logger LOG = LogManager.getLogger();
 

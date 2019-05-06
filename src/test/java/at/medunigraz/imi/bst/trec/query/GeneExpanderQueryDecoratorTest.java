@@ -28,7 +28,7 @@ public class GeneExpanderQueryDecoratorTest extends QueryDecoratorTest {
 
 	@Test
 	public void testGetTopic() {
-		DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
+		DummyElasticSearchQuery<Topic> dummyQuery = new DummyElasticSearchQuery<>();
 		Query decorator = new GeneExpanderQueryDecorator(EXPAND_TO, dummyQuery);
 
 		decorator.query(new Topic().withGene(GENE));

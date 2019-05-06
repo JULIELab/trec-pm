@@ -9,7 +9,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.List;
 
-public class GeneExpanderQueryDecorator extends QueryDecorator {
+public class GeneExpanderQueryDecorator extends QueryDecorator<Topic> {
 
 	private static final String TOKEN_SEPARATOR = " ";
 

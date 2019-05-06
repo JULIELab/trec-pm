@@ -4,8 +4,9 @@ import java.util.List;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.model.QueryDescription;
 
-public class QueryDecorator implements Query {
+public class QueryDecorator<T extends QueryDescription> implements Query<T> {
 
 	protected Query decoratedQuery;
 
@@ -14,7 +15,7 @@ public class QueryDecorator implements Query {
 	}
 
 	@Override
-	public List<Result> query(Topic topic) {
+	public List<Result> query(T topic) {
 		return decoratedQuery.query(topic);
 	}
 
