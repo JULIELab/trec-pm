@@ -3,6 +3,7 @@ package de.julielab.ir.ltr.features.featuregroups;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import com.wcohen.ss.TFIDF;
+import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.ir.pm.pmclassifier.InstancePreparator;
 import de.julielab.java.utilities.FileUtilities;
@@ -21,9 +22,11 @@ import java.util.stream.Collectors;
 public class TfidfFeatureGroup extends FeatureGroup {
 
     private Set<String> stopwords;
+    private TFIDF tfidf;
 
-    public TfidfFeatureGroup() {
+    public TfidfFeatureGroup(TFIDF tfidf) {
         super("TFIDF");
+        this.tfidf = tfidf;
         try {
             stopwords = FileUtilities.getReaderFromFile(new File("resources/stopwords.txt")).lines().collect(Collectors.toSet());
         } catch (IOException e) {
@@ -33,21 +36,14 @@ public class TfidfFeatureGroup extends FeatureGroup {
 
     @Override
     public Instance pipe(Instance inst) {
-        final InstancePreparator instancePreparator = InstancePreparator.getInstance();
-        TFIDF tfidf;
-        synchronized (instancePreparator) {
-            tfidf = instancePreparator.getTfidf();
-        }
-        assert tfidf != null : "The TFIDF model has not been trained.";
         Token token = (Token) inst.getData();
         com.wcohen.ss.api.Token[] tokens;
-        // Synchronization is required because the InstancePreparator is static and thus, the TFIDF object
-        // is the same for all threads and it is not thread safe (found out the hard way)
+        // Synchronization is required because we might use the same TFIDF in multiple threads
+        // and it is not thread safe (found out the hard way)
         synchronized (tfidf) {
             tfidf.prepare(token.getText());
             tokens = tfidf.getTokens();
         }
-        com.wcohen.ss.api.Token lasttoken = null;
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {
             if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
                 token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));

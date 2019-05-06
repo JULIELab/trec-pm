@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -15,7 +16,8 @@ import java.util.stream.Stream;
  */
 public class AggregatedGoldStandard<Q extends QueryDescription> implements GoldStandard<Q> {
 
-    Map<Integer, Q> queriesByNumber;
+    private Map<Integer, Q> queriesByNumber;
+    private Map<String, Q> queriesByCrossDatasetId;
     private Map<String, AtomicGoldStandard<Q>> goldstandards;
     private List<Q> queryList;
     private Map<Q, DocumentList> documentsByQuery;
@@ -56,13 +58,14 @@ public class AggregatedGoldStandard<Q extends QueryDescription> implements GoldS
 
     @Override
     public DocumentList<Q> getDocumentsForQuery(QueryDescription query) {
-        return null;
+        return getDocumentsPerQuery().get(query);
     }
 
     @Override
     public Map<Q, DocumentList> getDocumentsPerQuery() {
-        if (documentsByQuery == null)
-            documentsByQuery = getQueries().collect(Collectors.toMap(Function.identity(), this::getDocumentsForQuery));
+        if (documentsByQuery == null) {
+            documentsByQuery = goldstandards.values().stream().map(GoldStandard::getDocumentsPerQuery).collect(HashMap::new, (m1, m2) -> m1.putAll(m2), (m1, m2) -> m1.putAll(m2));
+        }
         return documentsByQuery;
     }
 
@@ -71,6 +74,12 @@ public class AggregatedGoldStandard<Q extends QueryDescription> implements GoldS
         if (queriesByNumber == null)
             queriesByNumber = getQueries().collect(Collectors.toMap(Q::getNumber, Function.identity()));
         return queriesByNumber;
+    }
+
+    public Map<String, Q> getQueriesByCrossDatasetId(){
+        if (queriesByCrossDatasetId == null)
+            queriesByCrossDatasetId = getQueries().collect(Collectors.toMap(Q::getCrossDatasetId, Function.identity()));
+        return queriesByCrossDatasetId;
     }
 
     @Override

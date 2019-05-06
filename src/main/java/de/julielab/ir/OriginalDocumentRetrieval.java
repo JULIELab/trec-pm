@@ -10,15 +10,18 @@ import de.julielab.xmlData.dataBase.CoStoSysConnection;
 import de.julielab.xmlData.dataBase.DataBaseConnector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
-import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.impl.ResourceManager_impl;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.resource.metadata.impl.ProcessingResourceMetaData_impl;
 import org.apache.uima.util.CasPool;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -27,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,6 +54,9 @@ public class OriginalDocumentRetrieval {
      * retrieved data for the keys, the document and the annotation data.
      */
     private final int primaryKeyLength;
+    private HTreeMap<String, String> documentTextCache;
+    private HTreeMap<String, byte[]> xmiCache;
+
     /**
      * CAS objects are expensive to create, especially in terms of memory, but also in CPU time. Reusing them
      * is much more appropriate which is why we use a CasPool.
@@ -76,6 +83,7 @@ public class OriginalDocumentRetrieval {
      * to be used when retrieving data from the respective tables.
      */
     private String[] schemaNames;
+    private final DB filedb;
 
     private OriginalDocumentRetrieval() {
 
@@ -134,6 +142,18 @@ public class OriginalDocumentRetrieval {
         } catch (IOException e) {
             log.error("The CAS pool could not be created because the file with the UIMA types to load could not be read", e);
         }
+
+
+        filedb = DBMaker
+                .fileDB("cache/uimaDocText.db")
+                .fileMmapEnable()
+                .transactionEnable()
+                .closeOnJvmShutdown()
+                .make();
+        documentTextCache = filedb.hashMap("UIMACasDocumentTextCache").
+                keySerializer(Serializer.STRING).valueSerializer(Serializer.STRING).
+                createOrOpen();
+        xmiCache = filedb.hashMap("UIMACasXMICache").keySerializer(Serializer.STRING).valueSerializer(Serializer.BYTE_ARRAY).createOrOpen();
     }
 
 
@@ -144,16 +164,42 @@ public class OriginalDocumentRetrieval {
         return instance;
     }
 
+    public Stream<String> getDocumentText(DocumentList<?> documents) {
+        try {
+            setXmiCasDataToDocuments(documents);
+            return documents.stream().map(d -> {
+                String text;
+                if (!documentTextCache.containsKey(d.getId())) {
+                    final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
+                    text = cas.getDocumentText();
+                    documentTextCache.put(d.getId(), text);
+                    releaseCas(cas);
+                } else {
+                    text = documentTextCache.get(d.getId());
+                }
+                return text;
+            });
+        } finally {
+            filedb.commit();
+        }
+    }
+
     /**
-     * Retrieves CAS data from the Postgres database for the given document IDs. Note that the returned CAS
-     * is actually the same for each call of {@link Iterator#next()} and that each such call will reset the CAS.
-     * Thus, before advancing the iterator, all required processing should have finished with the current
-     * CAS contents.
+     * Releases the given CAS back into the CAS pool.
+     *
+     * @param cas The CAS to be released for reuse.
+     */
+    public void releaseCas(CAS cas) {
+        casPool.releaseCas(cas);
+    }
+
+    /**
+     * Retrieves CAS data from the Postgres database for the given document IDs.
      *
      * @param ids The IDs of the documents to retrieve from the database.
-     * @return An iterator for the retrieved documents.
+     * @return An iterator for the retrieved document data.
      */
-    public Iterator<byte[][]> getDocuments(List<Object[]> ids) {
+    Iterator<byte[][]> getDocuments(List<Object[]> ids) {
         return dbc.retrieveColumnsByTableSchema(ids, tablesToJoin, schemaNames);
     }
 
@@ -183,23 +229,13 @@ public class OriginalDocumentRetrieval {
         return map;
     }
 
-    public JCas parseXmiDataIntoJCas(byte[][] xmiData) {
-        LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
-        for (int i = 0; i < tablesToJoin.length; i++) {
-            // Here we need to calculate with the offset of the primary key elements that is contained
-            // in the xmiData byte[][] structure: The first positions of the array are just the primary
-            // key elements.
-            dataMap.put(tablesToJoin[i], new ByteArrayInputStream(xmiData[i + primaryKeyLength]));
-        }
+    public CAS parseXmiDataIntoJCas(byte[] xmiData) {
         try {
-            final JCas cas = casPool.getCas().getJCas();
-            final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
-            XmiCasDeserializer.deserialize(new ByteArrayInputStream(xmiBaos.toByteArray()), cas.getCas());
+            final CAS cas = casPool.getCas(300000);
+            XmiCasDeserializer.deserialize(new ByteArrayInputStream(xmiData), cas);
             return cas;
         } catch (SAXException | IOException e) {
             log.error("Could not deserialize XMI data into a CAS", e);
-        } catch (CASException e) {
-            log.error("Could not retrieve JCas from CAS", e);
         }
         return null;
     }
@@ -211,21 +247,44 @@ public class OriginalDocumentRetrieval {
      * @param documents The documents to populate with the UIMA XMI CAS data.
      */
     public void setXmiCasDataToDocuments(DocumentList<?> documents) {
-        final Iterator<byte[][]> xmiData = getDocuments(documents.stream().filter(d -> d.getFullDocumentData() == null).map(d -> new String[]{d.getId()}).collect(Collectors.toList()));
+        final List<Object[]> documentIDs = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> !xmiCache.containsKey(d.getId())).map(d -> new String[]{d.getId()}).collect(Collectors.toList());
+
+
         Map<String, byte[][]> dataByDocId = new HashMap<>();
-        while (xmiData.hasNext()) {
-            byte[][] data = xmiData.next();
-            String id = new String(data[0], StandardCharsets.UTF_8);
-            dataByDocId.put(id, data);
+        if (!documentIDs.isEmpty()) {
+            final Iterator<byte[][]> xmiData = getDocuments(documentIDs);
+            while (xmiData.hasNext()) {
+                byte[][] data = xmiData.next();
+                String id = new String(data[0], StandardCharsets.UTF_8);
+                dataByDocId.put(id, data);
+            }
         }
 
-        final Iterator<? extends Document<?>> docsIt = documents.iterator();
+        final CAS cas = casPool.getCas(300000);
+        final Iterator<? extends Document<?>> docsIt = documents.stream().filter(d -> d.getFullDocumentData() == null).iterator();
         while (docsIt.hasNext()) {
             final Document doc = docsIt.next();
-            final byte[][] documentData = xmiData.next();
-            if (!dataByDocId.containsKey(doc.getId()))
-                throw new IllegalStateException("The document with ID " + doc.getId() + " was not returned from the database. Another cause for this error would be that the database response");
-            doc.setFullDocumentData(documentData);
+            byte[] docXmiData;
+            if (xmiCache.containsKey(doc.getId())) {
+                docXmiData = xmiCache.get(doc.getId());
+            } else {
+                if (!dataByDocId.containsKey(doc.getId()))
+                    throw new IllegalStateException("The document with ID " + doc.getId() + " was not returned from the database.");
+                final byte[][] documentData = dataByDocId.get(doc.getId());
+                LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
+                for (int i = 0; i < tablesToJoin.length; i++) {
+                    // Here we need to calculate with the offset of the primary key elements that is contained
+                    // in the xmiData byte[][] structure: The first positions of the array are just the primary
+                    // key elements.
+                    dataMap.put(tablesToJoin[i], new ByteArrayInputStream(documentData[i + primaryKeyLength]));
+                }
+                final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
+                docXmiData = xmiBaos.toByteArray();
+                xmiCache.put(doc.getId(), docXmiData);
+            }
+            doc.setFullDocumentData(docXmiData);
         }
+        filedb.commit();
+        releaseCas(cas);
     }
 }

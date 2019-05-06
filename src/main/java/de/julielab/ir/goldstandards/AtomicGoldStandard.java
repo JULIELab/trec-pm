@@ -2,6 +2,7 @@ package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Task;
+import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
@@ -70,7 +71,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     @Override
     public Map<Q, DocumentList> getDocumentsPerQuery() {
         if (documentsByQuery == null)
-            documentsByQuery = getQueries().collect(Collectors.toMap(Function.identity(), this::getDocumentsForQuery));
+            documentsByQuery = getDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new)));
         return documentsByQuery;
     }
 
@@ -79,7 +80,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         return getDocumentsForQuery(getQueriesByNumber().get(queryId));
     }
 
-    public DocumentList getDocuments() {
+    public DocumentList<Q> getDocuments() {
         return documents;
     }
 

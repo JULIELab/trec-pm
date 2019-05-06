@@ -6,6 +6,7 @@ import cc.mallet.pipe.Token2FeatureVector;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -52,11 +53,11 @@ public class FeatureControlCenter {
         return isActive;
     }
 
-    public void createFeatures(DocumentList<? extends QueryDescription> documents) {
+    public void createFeatures(DocumentList<? extends QueryDescription> documents, TFIDF tfidf) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
-        featurePipes.add(new TfidfFeatureGroup());
+        featurePipes.add(new TfidfFeatureGroup(tfidf));
         featurePipes.add(new TopicMatchFeatureGroup());
         featurePipes.add(new Token2FeatureVector(false, false));
         featurePipes.add(new SetFeatureVectorPipe());

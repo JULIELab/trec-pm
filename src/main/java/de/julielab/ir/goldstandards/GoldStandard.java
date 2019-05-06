@@ -54,4 +54,8 @@ public interface GoldStandard<Q extends QueryDescription> {
     default DocumentList<Q> getDocumentsForQuery(Q query) {
         return getDocumentsForQuery(query.getNumber());
     }
+
+    default DocumentList<Q> getDocumentsForQueries(Collection<Q> queries) {
+        return queries.stream().map(this::getDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
+    }
 }

@@ -1,9 +1,11 @@
 package de.julielab.ir.ltr;
 
 import cc.mallet.types.FeatureVector;
+import ciir.umass.edu.features.FeatureManager;
 import ciir.umass.edu.learning.*;
 import ciir.umass.edu.metric.METRIC;
 import ciir.umass.edu.metric.MetricScorerFactory;
+import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 
@@ -43,7 +45,8 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     @Override
     public void train(DocumentList<Q> documents) {
         final Map<String, RankList> rankLists = convertToRankList(documents);
-        ranker = new RankerFactory().createRanker(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));
+        this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
+        ranker = new RankerTrainer().train(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));
     }
 
     /**
@@ -55,6 +58,8 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     private Map<String, RankList> convertToRankList(DocumentList<Q> documents) {
         final LinkedHashMap<String, List<DataPoint>> dataPointsByQueryId = documents.stream().map(d -> {
             final FeatureVector fv = d.getFeatureVector();
+            if (fv == null)
+                throw new IllegalArgumentException("Cannot train a ranker because the input documents have no feature vector.");
             final double[] values = fv.getValues();
             final int[] indices = fv.getIndices();
 
@@ -65,7 +70,8 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
                 // binary vector
                 Arrays.fill(ranklibValues, 1f);
             } else {
-                System.arraycopy(values, 0, ranklibValues, 1, values.length);
+                for (int i = 0; i < values.length; i++)
+                    ranklibValues[i + 1] = (float) values[i];
             }
             System.arraycopy(indices, 0, ranklibIndices, 1, indices.length);
             DataPoint dp = new SparseDataPoint(ranklibValues, ranklibIndices, d.getQueryDescription().getCrossDatasetId(), d.getRelevance());
@@ -94,7 +100,7 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     public DocumentList rank(DocumentList<Q> documents) {
         final DocumentList<QueryDescription> ret = new DocumentList<>();
 
-        Map<String, Document> docsById = documents.stream().collect(Collectors.toMap(Document::getId, Function.identity()));
+        Map<String, Document> docsById = documents.stream().collect(Collectors.toMap(d -> d.getQueryDescription().getCrossDatasetId() + d.getId(), Function.identity()));
 
         if (docsById.size() != documents.size())
             throw new IllegalArgumentException("The passed document do not have unique IDs. The input document list has size " + documents + ", its ID map form only " + docsById.size());
@@ -105,10 +111,14 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
             for (int i = 0; i < rl.size(); i++) {
                 DataPoint dp = rl.get(i);
                 final String docId = dp.getDescription();
-                ret.add(docsById.get(docId));
+                ret.add(docsById.get(dp.getID() + docId));
             }
         }
         return ret;
+    }
+
+    public ciir.umass.edu.learning.Ranker getRankLibRanker() {
+        return ranker;
     }
 
 

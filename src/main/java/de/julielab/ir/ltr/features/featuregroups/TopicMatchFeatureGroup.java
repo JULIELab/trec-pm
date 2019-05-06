@@ -14,6 +14,6 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     public Instance pipe(Instance instance) {
         final Token token = (Token) instance.getData();
         final Document document = (Document) instance.getSource();
-        return null;
+        return instance;
     }
 }

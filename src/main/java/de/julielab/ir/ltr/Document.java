@@ -29,13 +29,13 @@ public class Document<Q extends QueryDescription> {
      * The serialized CAS data of this document as retrieved from the database. To be set through
      * {@link de.julielab.ir.OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList)}.
      */
-    private byte[][] fullDocumentData;
+    private byte[] fullDocumentData;
     /**
      * The feature vector that is created for this document for the LtR algorithms.
      */
     private FeatureVector fv;
     /**
-     * The deserialized version of fullDocumentData. To be created by {@link de.julielab.ir.OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[][])}.
+     * The deserialized version of fullDocumentData. To be created by {@link de.julielab.ir.OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[])}.
      * This field will mostly be null because it is very expansive to keep a lot of CAS instances around.
      * Thus, this field will be populated on request.
      */
@@ -50,7 +50,7 @@ public class Document<Q extends QueryDescription> {
     }
 
     /**
-     * Returns the UIMA CAS of the document. This can only be done if {@link #setFullDocumentData(byte[][])} has
+     * Returns the UIMA CAS of the document. This can only be done if {@link #setFullDocumentData(byte[])} has
      * been used before to set the serialized CAS data. If this method hasn't been called before or the CAS
      * had been released, the XMI CAS data will be parsed into a CAS from the CasPool managed by
      * {@link OriginalDocumentRetrieval#casPool}
@@ -110,11 +110,11 @@ public class Document<Q extends QueryDescription> {
         this.type = type;
     }
 
-    public byte[][] getFullDocumentData() {
+    public byte[] getFullDocumentData() {
         return fullDocumentData;
     }
 
-    public void setFullDocumentData(byte[][] fullDocumentData) {
+    public void setFullDocumentData(byte[] fullDocumentData) {
         this.fullDocumentData = fullDocumentData;
     }
 
