@@ -97,7 +97,7 @@ public class Experiment extends Thread {
 
         // TODO DRY Issue #53
         Collection<Topic> topics = topicSet.getTopics();
-        List<ResultList> resultListSet = new ArrayList<>();
+        List<ResultList<?>> resultListSet = new ArrayList<>();
         for (Topic topic : topics) {
             List<Result> results = retrieval.getQuery().query(topic);
 
@@ -105,8 +105,8 @@ public class Experiment extends Thread {
             if (results.isEmpty())
                 throw new IllegalStateException("RESULT EMPTY for " + experimentName);
 
-            ResultList resultList = new ResultList(topic);
-            resultList.setResults(results);
+            ResultList<?> resultList = new ResultList<>(topic);
+            resultList.addAll(results);
             resultListSet.add(resultList);
         }
 

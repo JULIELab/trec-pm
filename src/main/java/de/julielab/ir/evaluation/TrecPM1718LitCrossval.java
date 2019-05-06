@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.trec.PubmedExperimenter;
 import at.medunigraz.imi.bst.trec.evaluator.TrecEval;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import de.julielab.ir.goldstandards.AggregatedGoldStandard;
@@ -28,17 +29,14 @@ public class TrecPM1718LitCrossval {
 
         final File noClassifierTemplate = new File(
                 PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final ExperimentsBuilder builder = new ExperimentsBuilder();
-        final Experiment experiment = builder.newExperiment().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withSubTemplate(noClassifierTemplate).withGeneSynonym().build().iterator().next();
-experiment.run();
-        //
-//        final at.medunigraz.imi.bst.trec.query.Query decorator = experiment.getDecorator();
-//        final List<Result> query = decorator.query(topics2017.getTopics().get(0));
-//        for (Result r : query) {
-//            System.out.println(r.getId() + " " + r.getScore());
-//        }
-//        final TrecEval trecEval = new TrecEval(trecPmLit2017.getQrelFile(), new File("myresult.txt"));
-//        System.out.println(trecEval.getNDCG());
-        // train and eval
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withSubTemplate(noClassifierTemplate).withGeneSynonym();;
+
+        final List<Result> query = retrieval.retrieve(topics2017.getTopics().get(0));
+        for (Result r : query) {
+            System.out.println(r.getId() + " " + r.getScore());
+        }
+        final TrecEval trecEval = new TrecEval(trecPmLit2017.getQrelFile(), new File("myresult.txt"));
+        System.out.println(trecEval.getNDCG());
+         //train and eval
     }
 }

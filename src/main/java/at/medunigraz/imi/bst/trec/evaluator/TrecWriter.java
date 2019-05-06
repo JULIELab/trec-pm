@@ -40,13 +40,13 @@ public class TrecWriter implements Closeable {
 		return true;
 	}
 	
-	public void write(List<ResultList> resultListSet) {
+	public void write(List<ResultList<?>> resultListSet) {
 		for (ResultList resultList : resultListSet) {
 			write(resultList);
 		}
 	}
 
-	public void write(ResultList resultList) {		
+	public void write(ResultList<?> resultList) {
 		String[] entries = new String[NUM_FIELDS];
 		
 		// Sets fixed fields

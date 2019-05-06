@@ -20,6 +20,8 @@ public class Retrieval<T extends Retrieval> {
     private String resultsDir;
 
 
+
+
     public List<Result> retrieve(QueryDescription queryDescription) {
         return this.query.query((Topic) queryDescription);
     }
