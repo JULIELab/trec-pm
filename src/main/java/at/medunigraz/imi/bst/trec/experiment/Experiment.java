@@ -26,34 +26,8 @@ public class Experiment extends Thread {
     private Task task;
     private GoldStandard goldStandard;
     private int year;
-    private String experimentName = null;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
-
-    public static String getIndexName(Task task) {
-        switch (task) {
-            case CLINICAL_TRIALS:
-                return TrecConfig.ELASTIC_CT_INDEX;
-            case PUBMED:
-                return TrecConfig.ELASTIC_BA_INDEX;
-            default:
-                return "";
-        }
-    }
-
-    public static String[] getTypes(Task task, GoldStandard goldStandard) {
-        String[] ret = new String[0];    // Everything
-
-        if (task == Task.CLINICAL_TRIALS) {
-            return new String[]{TrecConfig.ELASTIC_CT_TYPE};
-        }
-
-        if (task == Task.PUBMED && goldStandard == GoldStandard.INTERNAL) {
-            return new String[]{TrecConfig.ELASTIC_BA_EXTRA_TYPE, TrecConfig.ELASTIC_BA_MEDLINE_TYPE};
-        }
-
-        return ret;
-    }
 
     public Retrieval getRetrieval() {
         return retrieval;
@@ -79,9 +53,13 @@ public class Experiment extends Thread {
         this.resultsDir = resultsDir.endsWith(File.separator) ? resultsDir : resultsDir + File.separator;
     }
 
+    public String getExperimentId() {
+        return retrieval.getExperimentId();
+    }
+
     @Override
     public void run() {
-        final String name = getExperimentId() + " with decorators " + retrieval.getQuery().getName();
+        final String name = retrieval.getExperimentId() + " with decorators " + retrieval.getQuery().getName();
 
         LOG.info("Running collection " + name + "...");
 
@@ -90,31 +68,6 @@ public class Experiment extends Thread {
 
         retrieval.withResultsDir(this.resultsDir);
         retrieval.retrieve(topicSet.getTopics());
-//
-//        File resultsDir = new File(this.resultsDir);
-//        if (!resultsDir.exists())
-//            resultsDir.mkdir();
-//        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
-//        final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
-//        TrecWriter tw = new TrecWriter(output, runName);
-//
-//        // TODO DRY Issue #53
-//        Collection<Topic> topics = topicSet.getTopics();
-//        List<ResultList<?>> resultListSet = new ArrayList<>();
-//        for (Topic topic : topics) {
-//            List<Result> results = retrieval.getQuery().query(topic);
-//
-//
-//            if (results.isEmpty())
-//                throw new IllegalStateException("RESULT EMPTY for " + experimentName);
-//
-//            ResultList<?> resultList = new ResultList<>(topic);
-//            resultList.addAll(results);
-//            resultListSet.add(resultList);
-//        }
-//
-//        tw.write(resultListSet);
-//        tw.close();
 
         File output = retrieval.getOutput();
         File goldStandard = new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
@@ -138,11 +91,11 @@ public class Experiment extends Thread {
         if (!statsDirFile.exists())
             statsDirFile.mkdir();
 
-        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + this.goldStandard + "_" + getExperimentId() + ".xml"));
+        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".xml"));
         xsw.write(metrics);
         xsw.close();
 
-        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + this.goldStandard + "_" + getExperimentId() + ".csv"));
+        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".csv"));
         csw.write(metrics);
         csw.close();
 
@@ -154,25 +107,6 @@ public class Experiment extends Thread {
 
         // TODO Experiment API #53
         System.out.println(allMetrics.getInfNDCG() + ";" + name);
-    }
-
-    public String getExperimentId() {
-        if (experimentName != null) {
-            return experimentName.replace(" ", "_");
-        }
-        return String.format("%s_%d_%s", getShortTaskName(), year, retrieval.getQuery().getName().replace(" ", "_"));
-    }
-
-    public String getExperimentName() {
-        if (experimentName == null) {
-            return "experiment";
-        }
-
-        return experimentName;
-    }
-
-    public void setExperimentName(String name) {
-        this.experimentName = name;
     }
 
     public void setYear(int year) {
@@ -235,17 +169,6 @@ public class Experiment extends Thread {
 
     public void setGoldStandard(GoldStandard goldStandard) {
         this.goldStandard = goldStandard;
-    }
-
-    public String getShortTaskName() {
-        switch (task) {
-            case CLINICAL_TRIALS:
-                return "ct";
-            case PUBMED:
-                return "pmid";
-            default:
-                return "";
-        }
     }
 
     public Query getDecorator() {

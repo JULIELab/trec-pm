@@ -189,18 +189,6 @@ public class ExperimentsBuilder {
         }
     }
 
-    private Map<String, String> array2Map(String[] mapItems) {
-        Map<String, String> map = new HashMap<>();
-        for (int i = 0; i < mapItems.length; i++) {
-            if (i % 2 == 1) {
-                String key = mapItems[i - 1];
-                String value = mapItems[i];
-                map.put(key, value);
-            }
-        }
-        return map;
-    }
-
     public void setDefaultStatsDir(String statsDir) {
         this.statsDir = statsDir;
     }

@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.retrieval;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.model.QueryDescription;
@@ -16,6 +17,30 @@ public class Retrieval<T extends Retrieval> {
     private String resultsDir;
     private String experimentName;
 
+    public static String[] getTypes(Task task, GoldStandard goldStandard) {
+        String[] ret = new String[0];    // Everything
+
+        if (task == Task.CLINICAL_TRIALS) {
+            return new String[]{TrecConfig.ELASTIC_CT_TYPE};
+        }
+
+        if (task == Task.PUBMED && goldStandard == GoldStandard.INTERNAL) {
+            return new String[]{TrecConfig.ELASTIC_BA_EXTRA_TYPE, TrecConfig.ELASTIC_BA_MEDLINE_TYPE};
+        }
+
+        return ret;
+    }
+
+    public static String getIndexName(Task task) {
+        switch (task) {
+            case CLINICAL_TRIALS:
+                return TrecConfig.ELASTIC_CT_INDEX;
+            case PUBMED:
+                return TrecConfig.ELASTIC_BA_INDEX;
+            default:
+                return "";
+        }
+    }
 
     public List<Result> retrieve(QueryDescription queryDescription) {
         return retrieve(Collections.singleton(queryDescription)).get(0).getResults();
@@ -97,7 +122,6 @@ public class Retrieval<T extends Retrieval> {
         return (T) this;
     }
 
-
     public T withResultsDir(String dir) {
         resultsDir = dir;
         return (T) this;
@@ -123,12 +147,24 @@ public class Retrieval<T extends Retrieval> {
      * @return The query results.
      */
     public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions) {
+        return retrieve(queryDescriptions, resultsDir);
+    }
+
+    /**
+     * <p>Issues to the given queries for retrieval and returns the retrieved results. Writes the results to file
+     * if <tt>resultsDirPath</tt> is not null.</p>
+     *
+     * @param queryDescriptions The queries to issue.
+     * @param resultsDirPath    The path to the directory where results should be written to.
+     * @return The query results.
+     */
+    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, String resultsDirPath) {
         TrecWriter tw = null;
-        if (resultsDir != null) {
-            File resultsDir = new File(this.resultsDir);
+        if (resultsDirPath != null) {
+            File resultsDir = new File(resultsDirPath);
             if (!resultsDir.exists())
                 resultsDir.mkdir();
-            File output = getOutput();
+            File output = getOutput(resultsDirPath);
             final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
             tw = new TrecWriter(output, runName);
         }
@@ -153,7 +189,11 @@ public class Retrieval<T extends Retrieval> {
     }
 
     public File getOutput() {
-        return new File(this.resultsDir + getExperimentId() + ".trec_results");
+        return getOutput(this.resultsDir);
+    }
+
+    public File getOutput(String resultsDir) {
+        return new File(resultsDir + getExperimentId() + ".trec_results");
     }
 
     public String getExperimentId() {

@@ -32,8 +32,7 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     @Override
 	public List<Result> query(T topic) {
 		ElasticSearch es;
-		final String index = this.index != null ? this.index : Experiment.getIndexName(topic.getTask());
-        final String[] types = this.types != null ? this.types : Experiment.getTypes(topic.getTask(), goldStandard);
+		final String index = this.index != null ? this.index : Retrieval.getIndexName(topic.getTask());
         if (this.types != null) {
 			es = new ElasticSearch(index, this.types);
 		} else {

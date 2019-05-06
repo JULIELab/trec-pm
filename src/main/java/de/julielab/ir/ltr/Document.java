@@ -93,7 +93,7 @@ public class Document<Q extends QueryDescription> {
         this.id = id;
     }
 
-    public Q getTopic() {
+    public Q getQueryDescription() {
         return topic;
     }
 
