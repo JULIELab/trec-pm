@@ -37,7 +37,7 @@ public class ExperimentsBuilder {
     }
 
     public ExperimentsBuilder withName(String name) {
-        buildingExp.setExperimentName(name);
+        retrieval.withExperimentName(name);
         return this;
     }
 

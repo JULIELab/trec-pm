@@ -17,15 +17,15 @@ public class Retrieval<T extends Retrieval> {
     private String experimentName;
 
 
-
     public List<Result> retrieve(QueryDescription queryDescription) {
-        return this.query.query((Topic) queryDescription);
-    }
-    public void setQuery(Query query) {
-        this.query = query;
+        return retrieve(Collections.singleton(queryDescription)).get(0).getResults();
     }
 
-    @Deprecated
+    public T withExperimentName(String name) {
+        this.experimentName = name;
+        return (T) this;
+    }
+
     public T withDecorator(Query decorator) {
         query = decorator;
         return (T) this;
@@ -35,7 +35,6 @@ public class Retrieval<T extends Retrieval> {
         query = new TemplateQueryDecorator(template, query);
         return (T) this;
     }
-
 
     public T withSubTemplate(File template) {
         query = new SubTemplateQueryDecorator(template, query);
@@ -80,6 +79,10 @@ public class Retrieval<T extends Retrieval> {
         return query;
     }
 
+    public void setQuery(Query query) {
+        this.query = query;
+    }
+
     public T withTarget(Task task) {
         this.task = task;
         if (task != Task.PUBMED_ONLINE)
@@ -112,32 +115,47 @@ public class Retrieval<T extends Retrieval> {
         return map;
     }
 
-    public void retrieve(Collection<QueryDescription> queryDescriptions) {
-        File resultsDir = new File(this.resultsDir);
-        if (!resultsDir.exists())
-            resultsDir.mkdir();
-        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
-        final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
-        TrecWriter tw = new TrecWriter(output, runName);
-
-        // TODO DRY Issue #53
-        List<ResultList<?>> resultListSet = new ArrayList<>();
-        for (QueryDescription topic : queryDescriptions) {
+    /**
+     * <p>Issues to the given queries for retrieval and returns the retrieved results. Writes the results to file
+     * if {@link #withResultsDir(String)} was called for this retrieval.</p>
+     *
+     * @param queryDescriptions The queries to issue.
+     * @return The query results.
+     */
+    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions) {
+        TrecWriter tw = null;
+        if (resultsDir != null) {
+            File resultsDir = new File(this.resultsDir);
+            if (!resultsDir.exists())
+                resultsDir.mkdir();
+            File output = getOutput();
+            final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
+            tw = new TrecWriter(output, runName);
+        }
+        List<ResultList<T>> resultListSet = new ArrayList<>();
+        for (T topic : queryDescriptions) {
             List<Result> results = query.query(topic);
 
 
             if (results.isEmpty())
                 throw new IllegalStateException("RESULT EMPTY for " + experimentName);
 
-            ResultList<?> resultList = new ResultList<>(topic);
+            ResultList<T> resultList = new ResultList<>(topic);
             resultList.addAll(results);
             resultListSet.add(resultList);
         }
 
-        tw.write(resultListSet);
-        tw.close();
-
+        if (tw != null) {
+            tw.write(resultListSet);
+            tw.close();
+        }
+        return resultListSet;
     }
+
+    public File getOutput() {
+        return new File(this.resultsDir + getExperimentId() + ".trec_results");
+    }
+
     public String getExperimentId() {
         if (experimentName != null) {
             return experimentName.replace(" ", "_");

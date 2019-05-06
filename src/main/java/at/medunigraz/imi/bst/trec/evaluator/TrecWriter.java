@@ -13,6 +13,7 @@ import com.opencsv.CSVWriter;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
+import de.julielab.ir.model.QueryDescription;
 
 public class TrecWriter implements Closeable {
 	private static final String VALID_RUN_NAME_REGEX = "[a-zA-Z0-9]{1,12}";
@@ -40,7 +41,7 @@ public class TrecWriter implements Closeable {
 		return true;
 	}
 	
-	public void write(List<ResultList<?>> resultListSet) {
+	public <T extends QueryDescription> void write(List<ResultList<T>> resultListSet) {
 		for (ResultList resultList : resultListSet) {
 			write(resultList);
 		}

@@ -29,7 +29,7 @@ public class TrecPM1718LitCrossval {
 
         final File noClassifierTemplate = new File(
                 PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withSubTemplate(noClassifierTemplate).withGeneSynonym();;
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir").withSubTemplate(noClassifierTemplate).withGeneSynonym();;
 
         final List<Result> query = retrieval.retrieve(topics2017.getTopics().get(0));
         for (Result r : query) {

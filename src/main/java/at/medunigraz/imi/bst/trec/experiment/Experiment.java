@@ -88,31 +88,35 @@ public class Experiment extends Thread {
         File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
         TopicSet topicSet = new TopicSet(example, challenge, task, year);
 
-        File resultsDir = new File(this.resultsDir);
-        if (!resultsDir.exists())
-            resultsDir.mkdir();
-        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
-        final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
-        TrecWriter tw = new TrecWriter(output, runName);
+        retrieval.withResultsDir(this.resultsDir);
+        retrieval.retrieve(topicSet.getTopics());
+//
+//        File resultsDir = new File(this.resultsDir);
+//        if (!resultsDir.exists())
+//            resultsDir.mkdir();
+//        File output = new File(this.resultsDir + getExperimentId() + ".trec_results");
+//        final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
+//        TrecWriter tw = new TrecWriter(output, runName);
+//
+//        // TODO DRY Issue #53
+//        Collection<Topic> topics = topicSet.getTopics();
+//        List<ResultList<?>> resultListSet = new ArrayList<>();
+//        for (Topic topic : topics) {
+//            List<Result> results = retrieval.getQuery().query(topic);
+//
+//
+//            if (results.isEmpty())
+//                throw new IllegalStateException("RESULT EMPTY for " + experimentName);
+//
+//            ResultList<?> resultList = new ResultList<>(topic);
+//            resultList.addAll(results);
+//            resultListSet.add(resultList);
+//        }
+//
+//        tw.write(resultListSet);
+//        tw.close();
 
-        // TODO DRY Issue #53
-        Collection<Topic> topics = topicSet.getTopics();
-        List<ResultList<?>> resultListSet = new ArrayList<>();
-        for (Topic topic : topics) {
-            List<Result> results = retrieval.getQuery().query(topic);
-
-
-            if (results.isEmpty())
-                throw new IllegalStateException("RESULT EMPTY for " + experimentName);
-
-            ResultList<?> resultList = new ResultList<>(topic);
-            resultList.addAll(results);
-            resultListSet.add(resultList);
-        }
-
-        tw.write(resultListSet);
-        tw.close();
-
+        File output = retrieval.getOutput();
         File goldStandard = new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
         TrecEval te = new TrecEval(goldStandard, output);
         Map<String, Metrics> metrics = te.getMetrics();
