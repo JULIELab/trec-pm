@@ -18,6 +18,8 @@ import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -28,6 +30,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class TrecPM1718LitCrossval {
+
+    private static Logger log = LogManager.getLogger();
 
     public static final int CROSSVAL_SIZE = 5;
 
@@ -55,6 +59,7 @@ public class TrecPM1718LitCrossval {
         final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir").withSubTemplate(noClassifierTemplate).withGeneSynonym();
 
         for (int i = 0; i < CROSSVAL_SIZE; i++) {
+            log.info("Crossval round {}", i);
             int thisround = i;
             List<Topic> test = topicPartitioning.get(i);
             final List<Topic> train = IntStream.range(0, CROSSVAL_SIZE).filter(round -> round != thisround).mapToObj(topicPartitioning::get).flatMap(Collection::stream).collect(Collectors.toList());
@@ -70,11 +75,11 @@ public class TrecPM1718LitCrossval {
             FeatureControlCenter.getInstance().createFeatures(testDocs, testTfIdf);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k);
-            //ranker.train(trainDocs);
+            ranker.train(trainDocs);
             //final DocumentList result = ranker.rank(testDocs);
             break;
         }
-
+        System.out.println("Finished training, the program should stop now");
         //train and eval
     }
 }

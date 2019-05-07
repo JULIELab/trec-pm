@@ -40,6 +40,10 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         this.trainMetric = trainMetric;
         this.k = k;
         metricScorerFactory = new MetricScorerFactory();
+        // This causes the RankLib datapoints to return 0f for feature values they don't have. We need this because
+        // in the original RankLib, there was a static field enumerating all known features loaded within the current JVM.
+        // I removed that because it is not thread safe.
+        DataPoint.missingZero = true;
     }
 
     @Override
@@ -73,7 +77,8 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
                 for (int i = 0; i < values.length; i++)
                     ranklibValues[i + 1] = (float) values[i];
             }
-            System.arraycopy(indices, 0, ranklibIndices, 1, indices.length);
+            for (int i = 0; i < indices.length; i++)
+                ranklibIndices[i + 1] = indices[i] + 1;
             DataPoint dp = new SparseDataPoint(ranklibValues, ranklibIndices, d.getQueryDescription().getCrossDatasetId(), d.getRelevance());
             // The description field of the DataPoint is used to store the document ID
             dp.setDescription(d.getId());
