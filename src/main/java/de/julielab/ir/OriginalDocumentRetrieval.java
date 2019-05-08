@@ -54,9 +54,9 @@ public class OriginalDocumentRetrieval {
      * retrieved data for the keys, the document and the annotation data.
      */
     private final int primaryKeyLength;
+    private final DB filedb;
     private HTreeMap<String, String> documentTextCache;
     private HTreeMap<String, byte[]> xmiCache;
-
     /**
      * CAS objects are expensive to create, especially in terms of memory, but also in CPU time. Reusing them
      * is much more appropriate which is why we use a CasPool.
@@ -83,7 +83,6 @@ public class OriginalDocumentRetrieval {
      * to be used when retrieving data from the respective tables.
      */
     private String[] schemaNames;
-    private final DB filedb;
 
     private OriginalDocumentRetrieval() {
 
@@ -144,11 +143,14 @@ public class OriginalDocumentRetrieval {
         }
 
 
-        filedb = DBMaker
+        final DBMaker.Maker dbmaker = DBMaker
                 .fileDB("cache/uimaDocText.db")
                 .fileMmapEnable()
                 .transactionEnable()
-                .closeOnJvmShutdown()
+                .closeOnJvmShutdown();
+        if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+            dbmaker.readOnly();
+        filedb = dbmaker
                 .make();
         documentTextCache = filedb.hashMap("UIMACasDocumentTextCache").
                 keySerializer(Serializer.STRING).valueSerializer(Serializer.STRING).
@@ -172,7 +174,8 @@ public class OriginalDocumentRetrieval {
                 if (!documentTextCache.containsKey(d.getId())) {
                     final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
                     text = cas.getDocumentText();
-                    documentTextCache.put(d.getId(), text);
+                    if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+                        documentTextCache.put(d.getId(), text);
                     releaseCas(cas);
                 } else {
                     text = documentTextCache.get(d.getId());
@@ -180,7 +183,8 @@ public class OriginalDocumentRetrieval {
                 return text;
             });
         } finally {
-            filedb.commit();
+            if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+                filedb.commit();
         }
     }
 
@@ -280,11 +284,13 @@ public class OriginalDocumentRetrieval {
                 }
                 final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
                 docXmiData = xmiBaos.toByteArray();
-                xmiCache.put(doc.getId(), docXmiData);
+                if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+                    xmiCache.put(doc.getId(), docXmiData);
             }
             doc.setFullDocumentData(docXmiData);
         }
-        filedb.commit();
+        if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+            filedb.commit();
         releaseCas(cas);
     }
 }

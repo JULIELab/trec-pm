@@ -1,6 +1,9 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.model.QueryDescription;
 import de.julielab.jcore.types.AutoDescriptor;
 import de.julielab.jcore.types.pubmed.Header;
 import org.apache.uima.UIMAException;
@@ -30,10 +33,12 @@ public class OriginalDocumentRetrievalTest {
     @Test
     public void getSingleDocument() throws CASException {
         final OriginalDocumentRetrieval retrieval = OriginalDocumentRetrieval.getInstance();
-        Object[] id = {"10065107"};
-        final Iterator<byte[][]> documents = retrieval.getDocuments(Arrays.<Object[]>asList(id));
-        assertTrue(documents.hasNext());
-        final JCas cas = retrieval.parseXmiDataIntoJCas(documents.next()).getJCas();
+        final Document<QueryDescription> document = new Document<>();
+        document.setId("10065107");
+        final DocumentList<QueryDescription> dl = new DocumentList<>();
+        dl.add(document);
+        retrieval.setXmiCasDataToDocuments(dl);
+        final JCas cas = retrieval.parseXmiDataIntoJCas(document.getFullDocumentData()).getJCas();
         final Header header = JCasUtil.selectSingle(cas, Header.class);
         assertNotNull(header);
         assertEquals("10065107", header.getDocId());
