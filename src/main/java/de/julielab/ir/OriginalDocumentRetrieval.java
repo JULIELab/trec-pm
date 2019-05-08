@@ -143,12 +143,13 @@ public class OriginalDocumentRetrieval {
         }
 
 
+        File cacheDir = new File("cache/uimaDocText.db");
         final DBMaker.Maker dbmaker = DBMaker
-                .fileDB("cache/uimaDocText.db")
+                .fileDB(cacheDir.getAbsolutePath())
                 .fileMmapEnable()
                 .transactionEnable()
                 .closeOnJvmShutdown();
-        if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+        if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY && cacheDir.exists())
             dbmaker.readOnly();
         filedb = dbmaker
                 .make();
