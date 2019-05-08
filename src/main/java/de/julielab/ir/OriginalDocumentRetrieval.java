@@ -171,15 +171,13 @@ public class OriginalDocumentRetrieval {
         try {
             setXmiCasDataToDocuments(documents);
             return documents.stream().map(d -> {
-                String text;
-                if (!documentTextCache.containsKey(d.getId())) {
+                String text = documentTextCache.get(d.getId());
+                if (text == null) {
                     final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
                     text = cas.getDocumentText();
                     if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
                         documentTextCache.put(d.getId(), text);
                     releaseCas(cas);
-                } else {
-                    text = documentTextCache.get(d.getId());
                 }
                 return text;
             });
@@ -269,10 +267,8 @@ public class OriginalDocumentRetrieval {
         final Iterator<? extends Document<?>> docsIt = documents.stream().filter(d -> d.getFullDocumentData() == null).iterator();
         while (docsIt.hasNext()) {
             final Document doc = docsIt.next();
-            byte[] docXmiData;
-            if (xmiCache.containsKey(doc.getId())) {
-                docXmiData = xmiCache.get(doc.getId());
-            } else {
+            byte[] docXmiData = xmiCache.get(doc.getId());
+            if (docXmiData == null) {
                 if (!dataByDocId.containsKey(doc.getId()))
                     throw new IllegalStateException("The document with ID " + doc.getId() + " was not returned from the database.");
                 final byte[][] documentData = dataByDocId.get(doc.getId());
