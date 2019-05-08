@@ -1,6 +1,7 @@
 package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.trec.PubmedExperimenter;
+import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +60,12 @@ public class TrecPM1718LitCrossval {
                 PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
         final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir").withSubTemplate(noClassifierTemplate).withGeneSynonym();
 
+        List<Double> rankLibScores = new ArrayList<>();
+        int[] features = null;
+        final int numfeatures = 50;
+        features = new int[numfeatures];
+        for (int i = 0; i < numfeatures; i++)
+            features[i] = i;
         for (int i = 0; i < CROSSVAL_SIZE; i++) {
             log.info("Crossval round {}", i);
             int thisround = i;
@@ -74,12 +82,20 @@ public class TrecPM1718LitCrossval {
             FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);
             FeatureControlCenter.getInstance().createFeatures(testDocs, testTfIdf);
 
-            final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k);
+            final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
             ranker.train(trainDocs);
-            //final DocumentList result = ranker.rank(testDocs);
-            break;
+            final DocumentList<Topic> result = ranker.rank(testDocs);
+            final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
+            rankLibScores.add(rankLibScore);
+
+            retrieval.withExperimentName("round"+i);
+            final Experiment experiment = new Experiment();
+            experiment.setGoldStandard(GoldStandard.OFFICIAL);
+            experiment.setTask(Task.PUBMED);
+            experiment.setYear(2017);
+            experiment.setTopicSet(new TopicSet(test));
+            experiment.setRetrieval(retrieval);
+            experiment.run();
         }
-        System.out.println("Finished training, the program should stop now");
-        //train and eval
     }
 }

@@ -20,24 +20,22 @@ public interface GoldStandard<Q extends QueryDescription> {
         // This way, the different property values are as well distributed over the partitions as possible.
         final Map<String, Deque<Q>> topicsByProperty = getQueries().collect(Collectors.groupingBy(topicProperty, HashMap::new, Collectors.toCollection(ArrayDeque::new)));
 
+        List<Map.Entry<String, Deque<Q>>> propertiesSortedByFrequency = new ArrayList<>(topicsByProperty.entrySet());
+        propertiesSortedByFrequency.sort((e1,e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()));
+        final ArrayDeque<Map.Entry<String, Deque<Q>>> deque = new ArrayDeque<>(propertiesSortedByFrequency);
+
         List<List<Q>> partitioning = new ArrayList<>();
         for (int i = 0; i < nPartitions; i++)
             partitioning.add(new ArrayList<>());
 
-        while (!topicsByProperty.isEmpty()) {
+        while (!deque.isEmpty()) {
             for (List<Q> partition : partitioning) {
-                // When one property value has no topics left (because we will remove the topics when assigning them
-                // to a partition), we remove the whole property from the map. This will eventually leave the
-                // map empty, triggering the termination criterium of the while loop.
-                List<String> emptyProperties = new ArrayList<>();
-                for (Map.Entry<String, Deque<Q>> topicsForProperty : topicsByProperty.entrySet()) {
-                    final Q topic = topicsForProperty.getValue().pop();
-                    if (topicsForProperty.getValue().isEmpty())
-                        emptyProperties.add(topicsForProperty.getKey());
-                    partition.add(topic);
-                }
-                for (String property : emptyProperties)
-                    topicsByProperty.remove(property);
+                if (deque.isEmpty())
+                    break;
+                final Q pop = deque.peekFirst().getValue().pop();
+                partition.add(pop);
+                if (deque.peekFirst().getValue().isEmpty())
+                    deque.removeFirst();
             }
         }
         return partitioning;

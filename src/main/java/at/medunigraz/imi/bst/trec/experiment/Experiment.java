@@ -15,6 +15,7 @@ import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
+import org.jetbrains.annotations.NotNull;
 
 public class Experiment extends Thread {
 
@@ -28,6 +29,7 @@ public class Experiment extends Thread {
     private int year;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
+    private TopicSet topicSet;
 
     public Retrieval getRetrieval() {
         return retrieval;
@@ -57,16 +59,26 @@ public class Experiment extends Thread {
         return retrieval.getExperimentId();
     }
 
+    public TopicSet getTopicSet() {
+        return topicSet;
+    }
+
+    public void setTopicSet(TopicSet topicSet) {
+        this.topicSet = topicSet;
+    }
+
     @Override
     public void run() {
         final String name = retrieval.getExperimentId() + " with decorators " + retrieval.getQuery().getName();
 
         LOG.info("Running collection " + name + "...");
 
-        File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
-        TopicSet topicSet = new TopicSet(example, challenge, task, year);
+        // Load the default TopicSet which is all topics for the given year
+        if (topicSet == null)
+            topicSet = loadTopics();
 
         retrieval.withResultsDir(this.resultsDir);
+
         retrieval.retrieve(topicSet.getTopics());
 
         File output = retrieval.getOutput();
@@ -107,6 +119,12 @@ public class Experiment extends Thread {
 
         // TODO Experiment API #53
         System.out.println(allMetrics.getInfNDCG() + ";" + name);
+    }
+
+    @NotNull
+    private TopicSet loadTopics() {
+        File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
+        return new TopicSet(example, challenge, task, year);
     }
 
     public void setYear(int year) {

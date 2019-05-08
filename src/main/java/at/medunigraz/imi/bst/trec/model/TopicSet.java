@@ -16,6 +16,10 @@ public class TopicSet {
 
     private List<Topic> topics = new ArrayList<>();
 
+	public TopicSet(Collection<Topic> topics) {
+		this.topics = new ArrayList<>(topics);
+	}
+
 	public TopicSet(File xmlFile, Challenge challenge, Task task, int year) {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 

@@ -1,9 +1,10 @@
 package de.julielab.ir.ltr;
 
 import cc.mallet.types.FeatureVector;
-import ciir.umass.edu.features.FeatureManager;
+import ciir.umass.edu.features.*;
 import ciir.umass.edu.learning.*;
 import ciir.umass.edu.metric.METRIC;
+import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.metric.MetricScorerFactory;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.model.QueryDescription;
@@ -24,6 +25,7 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     private int[] features;
     private METRIC trainMetric;
     private int k;
+    private Normalizer featureNormalizer;
 
     /**
      * <p>Creates an object that has all information to create a RankLib ranker but does not immediately do it.</p>
@@ -33,8 +35,9 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
      * @param features    The feature indices the ranker should be trained with and which should be used for ranking.
      * @param trainMetric The metric to be optimized for during training.
      * @param k           The top-number of documents to be used for the training metric.
+     * @param normalizer  The feature normalizer to use, may be null. Possible values are <tt>sum</tt>, <tt>zscore</tt> and <tt>linear</tt>.
      */
-    public RankLibRanker(RANKER_TYPE rType, int[] features, METRIC trainMetric, int k) {
+    public RankLibRanker(RANKER_TYPE rType, int[] features, METRIC trainMetric, int k, String normalizer) {
         this.rType = rType;
         this.features = features;
         this.trainMetric = trainMetric;
@@ -44,6 +47,23 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         // in the original RankLib, there was a static field enumerating all known features loaded within the current JVM.
         // I removed that because it is not thread safe.
         DataPoint.missingZero = true;
+        if (normalizer != null) {
+            if (normalizer.equalsIgnoreCase("sum"))
+                featureNormalizer = new SumNormalizor();
+            else if (normalizer.equalsIgnoreCase("zscore"))
+                featureNormalizer = new ZScoreNormalizor();
+            else if (normalizer.equalsIgnoreCase("linear"))
+                featureNormalizer = new LinearNormalizer();
+            else {
+                throw new IllegalArgumentException("Unknown normalizer: " + normalizer);
+            }
+        }
+    }
+
+    public double score(DocumentList<Q> documentList, METRIC scoringMetric, int k) {
+        final MetricScorer scorer = metricScorerFactory.createScorer(scoringMetric, k);
+        final Map<String, RankList> rankLists = convertToRankList(documentList);
+        return scorer.score(rankLists.values().stream().collect(Collectors.toList()));
     }
 
     @Override
