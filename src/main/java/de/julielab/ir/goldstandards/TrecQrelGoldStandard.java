@@ -33,7 +33,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         setDocuments(readQrels(qrels));
     }
 
-    public DocumentList readQrels(File qrels) {
+    private DocumentList readQrels(File qrels) {
         final Map<Integer, Q> queriesByNumber = getQueriesByNumber();
         final DocumentList<Q> documents = new DocumentList();
         try {
