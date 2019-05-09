@@ -33,4 +33,8 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     }
 
 
+    @Override
+    public Function<QueryDescription, String> getQueryIdFunction() {
+        return q -> q.getYear() + "" + q.getNumber();
+    }
 }

@@ -26,12 +26,11 @@ public class Experiment extends Thread {
     private Challenge challenge;
     private Task task;
     private GoldStandard goldStandard;
+    private de.julielab.ir.goldstandards.GoldStandard goldDataset;
     private int year;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
     private TopicSet topicSet;
-    private File qrelFile;
-    private File sampleQrelFile;
     private boolean calculateTrecEvalWithMissingResults = true;
     private int k = 1000;
 
@@ -112,10 +111,10 @@ public class Experiment extends Thread {
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
-        retrieval.retrieve(topicSet.getTopics());
+        retrieval.retrieve(topicSet.getTopics(), goldDataset.getQueryIdFunction());
 
         File output = retrieval.getOutput();
-        File goldStandard = qrelFile != null ? qrelFile : new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
+        File goldStandard = goldDataset != null && goldDataset.getQrelFile() != null ? goldDataset.getQrelFile() : new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
         TrecEval te = new TrecEval(goldStandard, output, k, calculateTrecEvalWithMissingResults);
         Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
@@ -197,13 +196,9 @@ public class Experiment extends Thread {
         }
     }
 
-    public void setGoldStandardFileName(File qrelFile) {
-        this.qrelFile = qrelFile;
-    }
-
     private File getSampleGoldStandard() {
-        if (sampleQrelFile != null)
-            return sampleQrelFile;
+        if (goldDataset !=  null && goldDataset.getSampleQrelFile() != null)
+            return goldDataset.getSampleQrelFile();
         if (hasSampleGoldStandard()) {
             if (year == 2017)
                 return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
@@ -219,7 +214,7 @@ public class Experiment extends Thread {
     }
 
     private boolean hasSampleGoldStandard() {
-        if (sampleQrelFile != null)
+        if (goldDataset !=  null && goldDataset.getSampleQrelFile() != null)
             return true;
         boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
         hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
@@ -238,7 +233,7 @@ public class Experiment extends Thread {
         return retrieval.getQuery();
     }
 
-    public void setSampleGoldStandardFileName(File sampleQrelFile) {
-        this.sampleQrelFile = sampleQrelFile;
+    public void setGoldDataset(de.julielab.ir.goldstandards.GoldStandard goldDataset) {
+        this.goldDataset = goldDataset;
     }
 }

@@ -3,6 +3,7 @@ package at.medunigraz.imi.bst.trec.search;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
+import de.julielab.ir.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -16,8 +17,10 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
+import org.springframework.cache.Cache;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,24 +38,11 @@ public class ElasticSearch implements SearchEngine {
     private boolean cacheReadOnly = true;
 
     public ElasticSearch() {
-
-        if (filedb == null) {
-            File cacheDir = new File("cache/elasticsearc.db");
-            final DBMaker.Maker dbmaker = DBMaker
-                    .fileDB(cacheDir.getAbsolutePath())
-                    .fileMmapEnable()
-                    .transactionEnable()
-                    .closeOnJvmShutdown();
-            if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY && cacheDir.exists())
-                dbmaker.readOnly();
-            else
-                cacheReadOnly = false;
-            filedb = dbmaker
-                    .make();
-            resultListCache = filedb.hashMap("ElasticSearchResultListCache").
-                    keySerializer(Serializer.STRING).valueSerializer(Serializer.JAVA).
-                    createOrOpen();
-        }
+        final CacheService cacheService = CacheService.getInstance();
+        final File cacheDbFile = Path.of("cache", "elasticsearch.db").toFile();
+        filedb = cacheService.getFiledb(cacheDbFile);
+        resultListCache = cacheService.getCache(cacheDbFile, "ElasticSearchResultListCache", Serializer.STRING, Serializer.JAVA);
+        cacheReadOnly = cacheService.isDbReadOnly(cacheDbFile);
 	}
 
 	public ElasticSearch(String index) {

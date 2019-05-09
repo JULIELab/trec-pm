@@ -65,4 +65,6 @@ public interface GoldStandard<Q extends QueryDescription> {
     default DocumentList<Q> getQrelDocumentsForQueries(Collection<Q> queries) {
         return queries.stream().map(this::getQrelDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
     }
+
+    Function<QueryDescription, String> getQueryIdFunction();
 }

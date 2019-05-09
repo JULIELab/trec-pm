@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
@@ -65,5 +66,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     @Override
     public File getSampleQrelFile() {
         return sampleQrels;
+    }
+
+    @Override
+    public Function<QueryDescription, String> getQueryIdFunction() {
+        return q -> String.valueOf(q.getNumber());
     }
 }

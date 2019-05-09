@@ -6,9 +6,13 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.model.QueryDescription;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
+
+    private Set<Topic> expandedTopics = new HashSet<>();
 
     public DynamicQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
@@ -16,7 +20,10 @@ public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
     @Override
     public List<Result> query(Topic topic) {
-        expandTopic(topic);
+        if (!expandedTopics.contains(topic)) {
+            expandTopic(topic);
+            expandedTopics.add(topic);
+        }
         return decoratedQuery.query(topic);
     }
 

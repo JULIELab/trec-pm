@@ -2,7 +2,10 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.*;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
@@ -16,10 +19,6 @@ public class Retrieval<T extends Retrieval> {
     private GoldStandard goldStandard;
     private int year;
     private String resultsDir;
-    /**
-     * Used when writing the results to file. Determines the query ID. Default to the query number.
-     */
-    private Function<QueryDescription, String> queryIdFunction;
     private String experimentName;
 
     public static String[] getTypes(Task task, GoldStandard goldStandard) {
@@ -45,10 +44,6 @@ public class Retrieval<T extends Retrieval> {
             default:
                 return "";
         }
-    }
-
-    public List<Result> retrieve(QueryDescription queryDescription) {
-        return retrieve(Collections.singleton(queryDescription)).get(0).getResults();
     }
 
     public T withExperimentName(String name) {
@@ -136,10 +131,6 @@ public class Retrieval<T extends Retrieval> {
         return (T) this;
     }
 
-    public T withResultQueryIdFunction(Function<QueryDescription, String> queryIdFunction) {
-        this.queryIdFunction = queryIdFunction;
-        return (T) this;
-    }
     private Map<String, String> array2Map(String[] mapItems) {
         Map<String, String> map = new HashMap<>();
         for (int i = 0; i < mapItems.length; i++) {
@@ -157,10 +148,11 @@ public class Retrieval<T extends Retrieval> {
      * if {@link #withResultsDir(String)} was called for this retrieval.</p>
      *
      * @param queryDescriptions The queries to issue.
+     * @param queryIdFunction   The function that generates the query IDs in the result file.
      * @return The query results.
      */
-    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions) {
-        return retrieve(queryDescriptions, resultsDir);
+    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, Function<QueryDescription, String> queryIdFunction) {
+        return retrieve(queryDescriptions, resultsDir, queryIdFunction);
     }
 
     /**
@@ -169,9 +161,10 @@ public class Retrieval<T extends Retrieval> {
      *
      * @param queryDescriptions The queries to issue.
      * @param resultsDirPath    The path to the directory where results should be written to.
+     * @param queryIdFunction   The function that generates the query IDs in the result file.
      * @return The query results.
      */
-    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, String resultsDirPath) {
+    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, String resultsDirPath, Function<QueryDescription, String> queryIdFunction) {
         TrecWriter tw = null;
         if (resultsDirPath != null) {
             File resultsDir = new File(resultsDirPath);

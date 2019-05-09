@@ -126,4 +126,5 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 //        return Stream.of(challenge, task, year).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
         return String.valueOf(year);
     }
+
 }

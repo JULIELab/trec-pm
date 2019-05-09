@@ -32,9 +32,8 @@ import java.util.stream.Stream;
 
 public class TrecPM1718LitCrossval {
 
-    private static Logger log = LogManager.getLogger();
-
     public static final int CROSSVAL_SIZE = 5;
+    private static Logger log = LogManager.getLogger();
 
     public static void main(String args[]) throws ConfigurationException {
 
@@ -51,13 +50,13 @@ public class TrecPM1718LitCrossval {
 
         final TrecQrelGoldStandard<Topic> trecPmLit2017 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, topics2017.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2017.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "sample-qrels-final-abstracts.2017.txt").toFile());
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, topics2018.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2018.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "qrels-sample-abstracts.2018.txt").toFile());
-        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(Path.of("aggregatedQrels","trecPmLit2017-2018.qrel").toFile(), Path.of("aggregatedQrels","sampleTrecPmLit2017-2018.qrel").toFile(), trecPmLit2017, trecPmLit2018);
+        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile(), Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile(), trecPmLit2017, trecPmLit2018);
 
         final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
         final File noClassifierTemplate = new File(
                 PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withResultQueryIdFunction(AggregatedTrecQrelGoldStandard.CROSS_DATASET_QUERY_ID_FUNCTION).withSubTemplate(noClassifierTemplate).withGeneSynonym();
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();
         List<Metrics> allMetrics = new ArrayList<>();
@@ -71,27 +70,26 @@ public class TrecPM1718LitCrossval {
             int thisround = i;
             List<Topic> test = topicPartitioning.get(i);
             final List<Topic> train = IntStream.range(0, CROSSVAL_SIZE).filter(round -> round != thisround).mapToObj(topicPartitioning::get).flatMap(Collection::stream).collect(Collectors.toList());
-//            final DocumentList<Topic> testDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(test);
-//            final DocumentList<Topic> trainDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(train);
+            final DocumentList<Topic> testDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(test);
+            final DocumentList<Topic> trainDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(train);
 
-//            final Stream<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs);
-//            final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf("train" + i, trainDocumentText);
-//            final Stream<String> testDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(testDocs);
-//            final TFIDF testTfIdf = TfIdfManager.getInstance().trainTfIdf("test" + i, testDocumentText);
-//
-//            FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);
-//            FeatureControlCenter.getInstance().createFeatures(testDocs, testTfIdf);
+            final Stream<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs);
+            final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf("train" + i, trainDocumentText);
+            final Stream<String> testDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(testDocs);
+            final TFIDF testTfIdf = TfIdfManager.getInstance().trainTfIdf("test" + i, testDocumentText);
+
+            FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);
+            FeatureControlCenter.getInstance().createFeatures(testDocs, testTfIdf);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
-//            ranker.train(trainDocs);
-//            final DocumentList<Topic> result = ranker.rank(testDocs);
-//            final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
-//            rankLibScores.add(rankLibScore);
+            ranker.train(trainDocs);
+            final DocumentList<Topic> result = ranker.rank(testDocs);
+            final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
+            rankLibScores.add(rankLibScore);
 
-            retrieval.withExperimentName("pmround"+i);
+            retrieval.withExperimentName("pmround" + i);
             final Experiment experiment = new Experiment();
-            experiment.setGoldStandardFileName(aggregatedGoldStandard.getQrelFile());
-            experiment.setSampleGoldStandardFileName(aggregatedGoldStandard.getSampleQrelFile());
+            experiment.setGoldDataset(aggregatedGoldStandard);
             experiment.setTopicSet(new TopicSet(test));
             experiment.setRetrieval(retrieval);
             experiment.setGoldStandard(GoldStandard.OFFICIAL);
@@ -100,8 +98,10 @@ public class TrecPM1718LitCrossval {
 
             allMetrics.add(experiment.getAllMetrics());
         }
+
         for (Metrics m : allMetrics) {
             System.out.println(m.getInfNDCG());
         }
+        System.out.println("Mean: " + allMetrics.stream().mapToDouble(Metrics::getInfNDCG).average());
     }
 }

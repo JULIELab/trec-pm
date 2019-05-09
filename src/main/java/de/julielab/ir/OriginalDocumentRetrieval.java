@@ -1,6 +1,7 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.ir.cache.CacheService;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.java.utilities.FileUtilities;
@@ -143,21 +144,12 @@ public class OriginalDocumentRetrieval {
         }
 
 
-        File cacheDir = new File("cache/uimaDocText.db");
-        final DBMaker.Maker dbmaker = DBMaker
-                .fileDB(cacheDir.getAbsolutePath())
-                .fileMmapEnable()
-                .transactionEnable()
-                .closeOnJvmShutdown();
-        if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY && cacheDir.exists())
-            dbmaker.readOnly();
-        else cacheReadOnly = false;
-        filedb = dbmaker
-                .make();
-        documentTextCache = filedb.hashMap("UIMACasDocumentTextCache").
-                keySerializer(Serializer.STRING).valueSerializer(Serializer.STRING).
-                createOrOpen();
-        xmiCache = filedb.hashMap("UIMACasXMICache").keySerializer(Serializer.STRING).valueSerializer(Serializer.BYTE_ARRAY).createOrOpen();
+        final CacheService cacheService = CacheService.getInstance();
+        File cacheDir = new File("cache"+File.separator+"uimaDocText.db");
+        filedb = cacheService.getFiledb(cacheDir);
+        documentTextCache = cacheService.getCache(cacheDir, "UIMACasDocumentTextCache", Serializer.STRING, Serializer.STRING);
+        xmiCache =  cacheService.getCache(cacheDir, "UIMACasXMICache", Serializer.STRING, Serializer.BYTE_ARRAY);
+        cacheReadOnly = cacheService.isDbReadOnly(cacheDir);
     }
 
 

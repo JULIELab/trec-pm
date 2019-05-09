@@ -7,6 +7,5 @@ import org.json.JSONObject;
 import at.medunigraz.imi.bst.trec.model.Result;
 
 public interface SearchEngine {
-	public List<Result> query(JSONObject jsonQuery);
-
+    List<Result> query(JSONObject jsonQuery);
 }
