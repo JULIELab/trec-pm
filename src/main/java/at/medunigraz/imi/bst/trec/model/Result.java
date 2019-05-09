@@ -1,6 +1,8 @@
 package at.medunigraz.imi.bst.trec.model;
 
-public class Result {
+import java.io.Serializable;
+
+public class Result implements Serializable {
 	private String id;
 
 	private float score;

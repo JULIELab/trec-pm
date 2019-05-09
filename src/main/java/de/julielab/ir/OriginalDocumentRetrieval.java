@@ -30,7 +30,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -57,6 +56,7 @@ public class OriginalDocumentRetrieval {
     private final DB filedb;
     private HTreeMap<String, String> documentTextCache;
     private HTreeMap<String, byte[]> xmiCache;
+    private boolean cacheReadOnly = true;
     /**
      * CAS objects are expensive to create, especially in terms of memory, but also in CPU time. Reusing them
      * is much more appropriate which is why we use a CasPool.
@@ -151,6 +151,7 @@ public class OriginalDocumentRetrieval {
                 .closeOnJvmShutdown();
         if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY && cacheDir.exists())
             dbmaker.readOnly();
+        else cacheReadOnly = false;
         filedb = dbmaker
                 .make();
         documentTextCache = filedb.hashMap("UIMACasDocumentTextCache").
@@ -175,14 +176,14 @@ public class OriginalDocumentRetrieval {
                 if (text == null) {
                     final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
                     text = cas.getDocumentText();
-                    if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+                    if (!cacheReadOnly)
                         documentTextCache.put(d.getId(), text);
                     releaseCas(cas);
                 }
                 return text;
             });
         } finally {
-            if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+            if (!cacheReadOnly)
                 filedb.commit();
         }
     }
@@ -281,12 +282,12 @@ public class OriginalDocumentRetrieval {
                 }
                 final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
                 docXmiData = xmiBaos.toByteArray();
-                if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+                if (!cacheReadOnly)
                     xmiCache.put(doc.getId(), docXmiData);
             }
             doc.setFullDocumentData(docXmiData);
         }
-        if (!TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY)
+        if (!cacheReadOnly)
             filedb.commit();
         releaseCas(cas);
     }
