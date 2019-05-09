@@ -6,9 +6,11 @@ import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,9 +22,13 @@ import java.util.stream.Stream;
  */
 public abstract class AtomicGoldStandard<Q extends QueryDescription> implements GoldStandard<Q> {
     /**
-     * All documents, across all queries.
+     * All documents from the qrel file, across all queries.
      */
-    protected DocumentList<Q> documents;
+    protected DocumentList<Q> qrelDocuments;
+    /**
+     * All documents from the sample qrel file, across all queries
+     */
+    protected DocumentList<Q> sampleQrelDocuments;
     /**
      * All queries.
      */
@@ -30,25 +36,28 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     protected Challenge challenge;
     protected Task task;
     protected int year;
+
+    protected File qrels;
+    protected File sampleQrels;
+
     /**
-     * The documents in {@link #documents} grouped by query.
+     * The documents in {@link #qrelDocuments} grouped by query.
      */
-    private Map<Q, DocumentList> documentsByQuery;
+    protected Map<Q, DocumentList> documentsByQuery;
     /**
      * The queries in {@link #queries} grouped by number.
      */
-    private Map<Integer, Q> queriesByNumber;
+    protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, DocumentList documents) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, File sampleQrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> sampleQrelsReader) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;
         this.queries = queries;
-        this.documents = documents;
-    }
-
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries) {
-        this(challenge, task, year, queries, null);
+        this.qrels = qrelsFile;
+        this.sampleQrels = sampleQrelsFile;
+        qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
+        sampleQrelDocuments = sampleQrelsReader.apply(sampleQrelsFile, getQueriesByNumber());
     }
 
     @Override
@@ -64,28 +73,44 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     }
 
     @Override
-    public DocumentList getDocumentsForQuery(Q query) {
-        return getDocumentsPerQuery().get(query);
+    public DocumentList getQrelDocumentsForQuery(Q query) {
+        return getQrelDocumentsPerQuery().get(query);
     }
 
     @Override
-    public Map<Q, DocumentList> getDocumentsPerQuery() {
+    public Map<Q, DocumentList> getQrelDocumentsPerQuery() {
         if (documentsByQuery == null)
-            documentsByQuery = getDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new)));
+            documentsByQuery = getQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new)));
         return documentsByQuery;
     }
 
     @Override
-    public DocumentList<Q> getDocumentsForQuery(int queryId) {
-        return getDocumentsForQuery(getQueriesByNumber().get(queryId));
+    public File getQrelFile() {
+        return null;
     }
 
-    public DocumentList<Q> getDocuments() {
-        return documents;
+    @Override
+    public File getSampleQrelFile() {
+        return getSampleQrelFile();
     }
 
-    public void setDocuments(DocumentList documents) {
-        this.documents = documents;
+    @Override
+    public DocumentList<Q> getSampleQrelDocuments() {
+        return sampleQrelDocuments;
+    }
+
+    @Override
+    public DocumentList<Q> getQrelDocumentsForQuery(int queryId) {
+        return getQrelDocumentsForQuery(getQueriesByNumber().get(queryId));
+    }
+
+    @Override
+    public DocumentList<Q> getQrelDocuments() {
+        return qrelDocuments;
+    }
+
+    public void setQrelDocuments(DocumentList qrelDocuments) {
+        this.qrelDocuments = qrelDocuments;
     }
 
     public Stream<Q> getQueries() {
@@ -98,6 +123,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 
     @Override
     public String getDatasetId() {
-        return Stream.of(challenge, task, year).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
+//        return Stream.of(challenge, task, year).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
+        return String.valueOf(year);
     }
 }

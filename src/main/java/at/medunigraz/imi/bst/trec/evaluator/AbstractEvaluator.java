@@ -93,7 +93,7 @@ public abstract class AbstractEvaluator implements Evaluator {
             for (String e : error) {
                 LOG.error(e);
             }
-            return;
+            throw new IllegalStateException("Could not run the evaluation.");
         }
 
         parseOutput(output);

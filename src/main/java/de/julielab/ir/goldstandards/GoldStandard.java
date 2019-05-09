@@ -3,6 +3,7 @@ package de.julielab.ir.goldstandards;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -43,17 +44,25 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     List<Q> getQueriesAsList();
 
-    Map<Q, DocumentList> getDocumentsPerQuery();
+    Map<Q, DocumentList> getQrelDocumentsPerQuery();
+
+    File getQrelFile();
+
+    File getSampleQrelFile();
+
+    DocumentList<Q> getSampleQrelDocuments();
+
+    DocumentList<Q> getQrelDocuments();
 
     Map<Integer, Q> getQueriesByNumber();
 
-    DocumentList<Q> getDocumentsForQuery(int queryId);
+    DocumentList<Q> getQrelDocumentsForQuery(int queryId);
 
-    default DocumentList<Q> getDocumentsForQuery(Q query) {
-        return getDocumentsForQuery(query.getNumber());
+    default DocumentList<Q> getQrelDocumentsForQuery(Q query) {
+        return getQrelDocumentsForQuery(query.getNumber());
     }
 
-    default DocumentList<Q> getDocumentsForQueries(Collection<Q> queries) {
-        return queries.stream().map(this::getDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
+    default DocumentList<Q> getQrelDocumentsForQueries(Collection<Q> queries) {
+        return queries.stream().map(this::getQrelDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
     }
 }

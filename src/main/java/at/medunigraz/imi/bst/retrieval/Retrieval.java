@@ -7,6 +7,7 @@ import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 
 public class Retrieval<T extends Retrieval> {
 
@@ -15,6 +16,10 @@ public class Retrieval<T extends Retrieval> {
     private GoldStandard goldStandard;
     private int year;
     private String resultsDir;
+    /**
+     * Used when writing the results to file. Determines the query ID. Default to the query number.
+     */
+    private Function<QueryDescription, String> queryIdFunction;
     private String experimentName;
 
     public static String[] getTypes(Task task, GoldStandard goldStandard) {
@@ -122,11 +127,19 @@ public class Retrieval<T extends Retrieval> {
         return (T) this;
     }
 
+    public String getResultsDir() {
+        return resultsDir;
+    }
+
     public T withResultsDir(String dir) {
-        resultsDir = dir;
+        this.resultsDir = dir;
         return (T) this;
     }
 
+    public T withResultQueryIdFunction(Function<QueryDescription, String> queryIdFunction) {
+        this.queryIdFunction = queryIdFunction;
+        return (T) this;
+    }
     private Map<String, String> array2Map(String[] mapItems) {
         Map<String, String> map = new HashMap<>();
         for (int i = 0; i < mapItems.length; i++) {
@@ -182,7 +195,7 @@ public class Retrieval<T extends Retrieval> {
         }
 
         if (tw != null) {
-            tw.write(resultListSet);
+            tw.write(resultListSet, queryIdFunction);
             tw.close();
         }
         return resultListSet;

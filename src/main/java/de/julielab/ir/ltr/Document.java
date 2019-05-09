@@ -22,6 +22,20 @@ public class Document<Q extends QueryDescription> {
      */
     private int relevance;
     /**
+     * For infNDCG or infAP evaluation after
+     * Yilmaz, E., Kanoulas, E., & Aslam, J. a. (2008). A simple and efficient sampling method for estimating AP and NDCG.
+     * Proceedings of the 31st Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, 603–610.
+     * https://doi.org/papers2://publication/uuid/FABB7DFB-E56B-45F9-855F-77F256E1CB1D
+     * and also
+     * https://groups.google.com/forum/#!msg/trec-cds/o6Y7_tSaGdE/Rmwo-4WcCwAJ
+     * and
+     * https://groups.google.com/forum/#!msg/trec-cds/nk5vx1FDacQ/S2BaqQh6tskJ
+     * <p>
+     * documents are partitioned into strata, e.g. 2, from which independent samples are taken. This field reveals
+     * the stratum the document-query pair is from.
+     */
+    private int stratum;
+    /**
      * Scores that this document has for the given query.
      */
     private Map<IRScore, Double> irScores;
@@ -40,6 +54,14 @@ public class Document<Q extends QueryDescription> {
      * Thus, this field will be populated on request.
      */
     private JCas cas;
+
+    public int getStratum() {
+        return stratum;
+    }
+
+    public void setStratum(int stratum) {
+        this.stratum = stratum;
+    }
 
     public FeatureVector getFeatureVector() {
         return fv;

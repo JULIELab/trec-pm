@@ -21,30 +21,23 @@ import java.util.stream.Collectors;
 public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
 
     private static final Logger log = LogManager.getLogger();
-    private File qrels;
 
-    public File getQrelFile() {
-        return qrels;
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, File sampleQrels) {
+        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, sampleQrels, TrecQrelGoldStandard::readQrels, TrecQrelGoldStandard::readQrels);
     }
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels) {
-        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()));
-        this.qrels = qrels;
-        setDocuments(readQrels(qrels));
-    }
-
-    private DocumentList readQrels(File qrels) {
-        final Map<Integer, Q> queriesByNumber = getQueriesByNumber();
+    private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
         final DocumentList<Q> documents = new DocumentList();
         try {
             final List<String> lines = IOStreamUtilities.getLinesFromInputStream(FileUtilities.getInputStreamFromFile(qrels));
             for (String line : lines) {
                 final String[] record = line.split("\\s+");
-                if (record.length != 4)
-                    throw new IllegalArgumentException("Qrel file format error in line '" + line + "': Expected 4 columns but got " + record.length);
+                if (record.length < 4 || record.length > 5)
+                    throw new IllegalArgumentException("Qrel file format error in line '" + line + "': Expected 4 or 5 columns but got " + record.length);
                 Integer topicNumber = Integer.valueOf(record[0]);
                 String documentId = record[2];
-                Integer relevance = Integer.valueOf(record[3]);
+                Integer relevance = Integer.valueOf(record.length > 4 ? record[4] : record[3]);
+                Integer stratum = record.length > 4 ? Integer.valueOf(record[3]) : null;
 
                 Q topic = queriesByNumber.get(topicNumber);
                 if (topic == null)
@@ -53,6 +46,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
                 document.setTopic(topic);
                 document.setId(documentId);
                 document.setRelevance(relevance);
+                if (stratum != null)
+                    document.setStratum(stratum);
 
                 documents.add(document);
             }
@@ -60,5 +55,15 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
             log.error("Could not read the qrels file", e);
         }
         return documents;
+    }
+
+    @Override
+    public File getQrelFile() {
+        return qrels;
+    }
+
+    @Override
+    public File getSampleQrelFile() {
+        return sampleQrels;
     }
 }

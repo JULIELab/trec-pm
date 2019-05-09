@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import com.opencsv.CSVWriter;
@@ -20,6 +21,7 @@ public class TrecWriter implements Closeable {
 	private static final int NUM_FIELDS = 6;
 	private CSVWriter writer;
 	private String runName;
+    private static final Function<QueryDescription, String> defaultQueryIdFunction = q -> String.valueOf(q.getNumber());
 
 	public TrecWriter(File output, String runName) {
 		if (!checkRunName(runName)) {
@@ -40,18 +42,28 @@ public class TrecWriter implements Closeable {
 		//return valid.matcher(runName).matches();
 		return true;
 	}
-	
-	public <T extends QueryDescription> void write(List<ResultList<T>> resultListSet) {
+
+    public <T extends QueryDescription> void write(List<ResultList<T>> resultListSet) {
+        write(resultListSet, null);
+    }
+
+	public <T extends QueryDescription> void write(List<ResultList<T>> resultListSet, Function<QueryDescription, String> queryIdFunction) {
 		for (ResultList resultList : resultListSet) {
-			write(resultList);
+			write(resultList, queryIdFunction);
 		}
 	}
 
 	public void write(ResultList<?> resultList) {
+		write(resultList, null);
+	}
+
+	public void write(ResultList<?> resultList, Function<QueryDescription, String> queryIdFunction) {
 		String[] entries = new String[NUM_FIELDS];
-		
+
+		if (queryIdFunction == null)
+            queryIdFunction = defaultQueryIdFunction;
 		// Sets fixed fields
-		entries[0] = String.valueOf(resultList.getTopic().getNumber());
+		entries[0] = queryIdFunction.apply(resultList.getTopic());
 		entries[1] = "Q0";
 		entries[5] = runName; // XXX must be 1-12 alphanumeric characters
 		

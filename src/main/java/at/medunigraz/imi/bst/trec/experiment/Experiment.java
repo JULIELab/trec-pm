@@ -30,6 +30,11 @@ public class Experiment extends Thread {
     private String statsDir = "stats/";
     private String resultsDir = "results/";
     private TopicSet topicSet;
+    private File qrelFile;
+    private File sampleQrelFile;
+    private boolean calculateTrecEvalWithMissingResults = true;
+    private int k = 1000;
+
 
     public Retrieval getRetrieval() {
         return retrieval;
@@ -67,6 +72,33 @@ public class Experiment extends Thread {
         this.topicSet = topicSet;
     }
 
+    public boolean isCalculateTrecEvalWithMissingResults() {
+        return calculateTrecEvalWithMissingResults;
+    }
+
+    /**
+     * <p>For the trec_eval script, specify if non-existing result entries should count as 0 in the 'all' performance values.</p>
+     * <p>The sample_eval.pl script does not allow a setting here and always works as if this setting would be set to <tt>false</tt>.</p>
+     *
+     * @param calculateTrecEvalWithMissingResults Whether or not to calculate the evaluation scores including or excluding missing result documents.
+     */
+    public void setCalculateTrecEvalWithMissingResults(boolean calculateTrecEvalWithMissingResults) {
+        this.calculateTrecEvalWithMissingResults = calculateTrecEvalWithMissingResults;
+    }
+
+    public int getK() {
+        return k;
+    }
+
+    /**
+     * <p>The number of top documents to calculate scores for with trec_eval. Defaults to 1000.</p>
+     *
+     * @param k The number of the top documents.
+     */
+    public void setK(int k) {
+        this.k = k;
+    }
+
     @Override
     public void run() {
         final String name = retrieval.getExperimentId() + " with decorators " + retrieval.getQuery().getName();
@@ -77,21 +109,22 @@ public class Experiment extends Thread {
         if (topicSet == null)
             topicSet = loadTopics();
 
-        retrieval.withResultsDir(this.resultsDir);
+        if (retrieval.getResultsDir() == null)
+            retrieval.withResultsDir(this.resultsDir);
 
         retrieval.retrieve(topicSet.getTopics());
 
         File output = retrieval.getOutput();
-        File goldStandard = new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
-        TrecEval te = new TrecEval(goldStandard, output);
-        Map<String, Metrics> metrics = te.getMetrics();
+        File goldStandard = qrelFile != null ? qrelFile : new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
+        TrecEval te = new TrecEval(goldStandard, output, k, calculateTrecEvalWithMissingResults);
+        Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
         if (hasSampleGoldStandard()) {
             SampleEval se = new SampleEval(getSampleGoldStandard(), output);
 
             // TODO Refactor into MetricSet
             Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
-            for (Map.Entry<String, Metrics> entry : metrics.entrySet()) {
+            for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
                 String topic = entry.getKey();
                 if (topic == null)
                     throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + output.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
@@ -104,21 +137,25 @@ public class Experiment extends Thread {
             statsDirFile.mkdir();
 
         XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".xml"));
-        xsw.write(metrics);
+        xsw.write(metricsPerTopic);
         xsw.close();
 
         CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".csv"));
-        csw.write(metrics);
+        csw.write(metricsPerTopic);
         csw.close();
 
-        allMetrics = metrics.get("all");
+        allMetrics = metricsPerTopic.get("all");
         LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
                 allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
                 name);
         LOG.trace(allMetrics);
 
         // TODO Experiment API #53
-        System.out.println(allMetrics.getInfNDCG() + ";" + name);
+//        System.out.println(allMetrics.getInfNDCG() + ";" + name);
+    }
+
+    public Metrics getAllMetrics() {
+        return allMetrics;
     }
 
     @NotNull
@@ -160,7 +197,13 @@ public class Experiment extends Thread {
         }
     }
 
+    public void setGoldStandardFileName(File qrelFile) {
+        this.qrelFile = qrelFile;
+    }
+
     private File getSampleGoldStandard() {
+        if (sampleQrelFile != null)
+            return sampleQrelFile;
         if (hasSampleGoldStandard()) {
             if (year == 2017)
                 return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
@@ -176,6 +219,8 @@ public class Experiment extends Thread {
     }
 
     private boolean hasSampleGoldStandard() {
+        if (sampleQrelFile != null)
+            return true;
         boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
         hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
         return hasgs;
@@ -193,5 +238,7 @@ public class Experiment extends Thread {
         return retrieval.getQuery();
     }
 
-
+    public void setSampleGoldStandardFileName(File sampleQrelFile) {
+        this.sampleQrelFile = sampleQrelFile;
+    }
 }
