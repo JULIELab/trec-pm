@@ -15,7 +15,6 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
-import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;

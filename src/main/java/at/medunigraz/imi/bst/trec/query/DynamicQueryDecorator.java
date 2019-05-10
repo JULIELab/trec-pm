@@ -12,7 +12,7 @@ import java.util.Set;
 
 public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
-    private Set<Topic> expandedTopics = new HashSet<>();
+    private Set<Integer> expandedTopics = new HashSet<>();
 
     public DynamicQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
@@ -22,7 +22,7 @@ public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
     public List<Result> query(Topic topic) {
         if (!expandedTopics.contains(topic)) {
             expandTopic(topic);
-            expandedTopics.add(topic);
+            expandedTopics.add(System.identityHashCode(topic));
         }
         return decoratedQuery.query(topic);
     }
