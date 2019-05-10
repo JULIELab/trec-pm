@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class Document<Q extends QueryDescription> {
     private String id;
-    private Q topic;
+    private Q queryDescription;
     private String type;
     /**
      * The gold standard given relevance level, e.g. 0, 1, 2 for not relevant, partially relevant and definitively relevant.
@@ -116,12 +116,12 @@ public class Document<Q extends QueryDescription> {
     }
 
     public Q getQueryDescription() {
-        return topic;
+        return queryDescription;
     }
 
 
-    public void setTopic(Q topic) {
-        this.topic = topic;
+    public void setQueryDescription(Q queryDescription) {
+        this.queryDescription = queryDescription;
     }
 
     public String getType() {

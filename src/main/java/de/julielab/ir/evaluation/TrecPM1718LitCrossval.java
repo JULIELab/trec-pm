@@ -2,6 +2,7 @@ package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.trec.PubmedExperimenter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
+import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
@@ -12,15 +13,18 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
+import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +38,7 @@ public class TrecPM1718LitCrossval {
     public static final int CROSSVAL_SIZE = 5;
     private static Logger log = LogManager.getLogger();
 
-    public static void main(String args[]) throws ConfigurationException {
+    public static void main(String args[]) throws ConfigurationException, IOException {
 
         RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
         METRIC trainMetric = METRIC.NDCG;
@@ -65,6 +69,7 @@ public class TrecPM1718LitCrossval {
         for (int i = 0; i < numfeatures; i++)
             features[i] = i;
         for (int i = 0; i < CROSSVAL_SIZE; i++) {
+            File modelFile = Path.of("rankLibModels", aggregatedGoldStandard.getDatasetId() + "-xval" + CROSSVAL_SIZE + "-" + rType + "-" + trainMetric + "-" + k + "-round" + i).toFile();
             log.info("Crossval round {}", i);
             int thisround = i;
             List<Topic> test = topicPartitioning.get(i);
@@ -79,21 +84,48 @@ public class TrecPM1718LitCrossval {
             FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
-            ranker.train(trainDocs);
+            if (!modelFile.exists()) {
+                ranker.train(trainDocs);
+                ranker.save(modelFile);
+            } else {
+                ranker.load(modelFile);
+            }
             final DocumentList<Topic> result = ranker.rank(testDocs);
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);
 
             retrieval.withExperimentName("pmround" + i);
-            final Experiment experiment = new Experiment();
+
+            final Experiment<Topic> experiment = new Experiment();
             experiment.setGoldDataset(aggregatedGoldStandard);
             experiment.setTopicSet(new TopicSet(test));
             experiment.setRetrieval(retrieval);
             experiment.setGoldStandard(GoldStandard.OFFICIAL);
             experiment.setCalculateTrecEvalWithMissingResults(false);
             experiment.run();
-
             allMetrics.add(experiment.getAllMetrics());
+
+            final List<ResultList<Topic>> lastResultListSet = experiment.getLastResultListSet();
+            List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
+            for (ResultList<Topic> list : lastResultListSet) {
+                final DocumentList<Topic> documents = new DocumentList<>();
+                for (Result r : list.getResults()) {
+                    final Document<Topic> doc = new Document<>();
+                    doc.setId(r.getId());
+                    doc.setScore(IRScore.BM25, r.getScore());
+                    doc.setQueryDescription(list.getTopic());
+                    documents.add(doc);
+                }
+                lastDocumentLists.add(documents);
+            }
+
+            for (DocumentList<Topic> list : lastDocumentLists) {
+                FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf);
+                ranker.rank(list);
+
+            }
+
+
         }
 
         for (Metrics m : allMetrics) {

@@ -270,6 +270,8 @@ public class OriginalDocumentRetrieval {
                     // Here we need to calculate with the offset of the primary key elements that is contained
                     // in the xmiData byte[][] structure: The first positions of the array are just the primary
                     // key elements.
+                    if (documentData[i+primaryKeyLength] == null)
+                        throw new IllegalStateException("There is no data in table " + tablesToJoin[i] + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
                     dataMap.put(tablesToJoin[i], new ByteArrayInputStream(documentData[i + primaryKeyLength]));
                 }
                 final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());

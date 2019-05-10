@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -14,6 +15,8 @@ import com.opencsv.CSVWriter;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
 public class TrecWriter implements Closeable {
@@ -52,6 +55,17 @@ public class TrecWriter implements Closeable {
 			write(resultList, queryIdFunction);
 		}
 	}
+
+	public <T extends QueryDescription> void writeDocuments(List<DocumentList<T>> documents, Function<QueryDescription, String> queryIdFunction) {
+        List<ResultList<T>> resultLists = new ArrayList<>();
+        for (DocumentList<T> documentList : documents) {
+            final ResultList<T> resultList = new ResultList<>(documentList.get(0).getQueryDescription());
+            for (Document<T> doc : documentList) {
+//                new Result(doc.getId(), doc.get)
+            }
+        }
+    }
+
 
 	public void write(ResultList<?> resultList) {
 		write(resultList, null);

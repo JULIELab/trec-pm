@@ -12,7 +12,7 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Function;
 
-public class Retrieval<T extends Retrieval> {
+public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     protected Query query;
     private Task task;
@@ -151,7 +151,7 @@ public class Retrieval<T extends Retrieval> {
      * @param queryIdFunction   The function that generates the query IDs in the result file.
      * @return The query results.
      */
-    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, Function<QueryDescription, String> queryIdFunction) {
+    public List<ResultList<Q>> retrieve(Collection<Q> queryDescriptions, Function<QueryDescription, String> queryIdFunction) {
         return retrieve(queryDescriptions, resultsDir, queryIdFunction);
     }
 
@@ -164,7 +164,7 @@ public class Retrieval<T extends Retrieval> {
      * @param queryIdFunction   The function that generates the query IDs in the result file.
      * @return The query results.
      */
-    public <T extends QueryDescription> List<ResultList<T>> retrieve(Collection<T> queryDescriptions, String resultsDirPath, Function<QueryDescription, String> queryIdFunction) {
+    public List<ResultList<Q>> retrieve(Collection<Q> queryDescriptions, String resultsDirPath, Function<QueryDescription, String> queryIdFunction) {
         TrecWriter tw = null;
         if (resultsDirPath != null) {
             File resultsDir = new File(resultsDirPath);
@@ -174,15 +174,15 @@ public class Retrieval<T extends Retrieval> {
             final String runName = getExperimentName();  // TODO generate from experimentID, but respecting TREC syntax
             tw = new TrecWriter(output, runName);
         }
-        List<ResultList<T>> resultListSet = new ArrayList<>();
-        for (T topic : queryDescriptions) {
+        List<ResultList<Q>> resultListSet = new ArrayList<>();
+        for (Q topic : queryDescriptions) {
             List<Result> results = query.query(topic);
 
 
             if (results.isEmpty())
                 throw new IllegalStateException("RESULT EMPTY for " + experimentName);
 
-            ResultList<T> resultList = new ResultList<>(topic);
+            ResultList<Q> resultList = new ResultList<>(topic);
             resultList.addAll(results);
             resultListSet.add(resultList);
         }

@@ -112,12 +112,14 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     @Override
     public void load(File modelFile) throws IOException {
         try (final BufferedReader br = FileUtilities.getReaderFromFile(modelFile)) {
-            ranker.loadFromString(br.lines().collect(Collectors.joining(System.getProperty("line.separator"))));
+            ranker = new RankerFactory().loadRankerFromString(br.lines().collect(Collectors.joining(System.getProperty("line.separator"))));
         }
     }
 
     @Override
     public void save(File modelFile) {
+        if (!modelFile.getParentFile().exists())
+            modelFile.getParentFile().mkdirs();
         ranker.save(modelFile.getAbsolutePath());
     }
 

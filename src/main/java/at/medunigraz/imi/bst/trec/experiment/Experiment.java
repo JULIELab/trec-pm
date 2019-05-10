@@ -22,7 +22,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private static final Logger LOG = LogManager.getLogger();
     private static final int YEAR_PUBLISHED_GS = 2017;
     public Metrics allMetrics = null;
-    private Retrieval<?> retrieval;
+    private Retrieval<?, Q> retrieval;
     private Challenge challenge;
     private Task task;
     private GoldStandard goldStandard;
@@ -33,6 +33,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private TopicSet topicSet;
     private boolean calculateTrecEvalWithMissingResults = true;
     private int k = 1000;
+    private List<ResultList<Q>> lastResultListSet;
 
 
     public Retrieval getRetrieval() {
@@ -99,6 +100,9 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     }
 
 
+    public List<ResultList<Q>> getLastResultListSet() {
+        return lastResultListSet;
+    }
 
     @Override
     public void run() {
@@ -115,19 +119,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
             retrieval.withResultsDir(this.resultsDir);
 
         final Function<QueryDescription, String> queryIdFunction = goldDataset != null ? goldDataset.getQueryIdFunction() : q -> String.valueOf(q.getNumber());
-        final List<ResultList<Topic>> resultLists = retrieval.retrieve(topicSet.getTopics(), queryIdFunction);
-
-        List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
-        for (ResultList<Topic> list : resultLists) {
-            final DocumentList<Topic> documents = new DocumentList<>();
-            for (Result r : list.getResults()) {
-                final Document<Topic> doc = new Document<>();
-                doc.setId(r.getId());
-                doc.setScore(IRScore.BM25, r.getScore());
-                documents.add(doc);
-            }
-            lastDocumentLists.add(documents);
-        }
+        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), queryIdFunction);
 
 
         File output = retrieval.getOutput();

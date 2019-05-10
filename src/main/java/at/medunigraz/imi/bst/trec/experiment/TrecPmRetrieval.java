@@ -2,9 +2,10 @@ package at.medunigraz.imi.bst.trec.experiment;
 
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.Gene;
+import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.*;
 
-public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval> {
+public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
 
     public TrecPmRetrieval withWordRemoval() {
