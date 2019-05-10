@@ -4,25 +4,24 @@ import java.io.File;
 import java.util.*;
 
 import at.medunigraz.imi.bst.retrieval.Retrieval;
-import at.medunigraz.imi.bst.trec.evaluator.SampleEval;
 import at.medunigraz.imi.bst.trec.model.*;
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.trec.evaluator.TrecEval;
-import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
-import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
 import org.jetbrains.annotations.NotNull;
 
-public class Experiment extends Thread {
+public class Experiment<Q extends QueryDescription> extends Thread {
 
     private static final Logger LOG = LogManager.getLogger();
     private static final int YEAR_PUBLISHED_GS = 2017;
     public Metrics allMetrics = null;
-    private Retrieval retrieval;
+    private Retrieval<?> retrieval;
     private Challenge challenge;
     private Task task;
     private GoldStandard goldStandard;
@@ -98,11 +97,14 @@ public class Experiment extends Thread {
         this.k = k;
     }
 
+
+
     @Override
     public void run() {
-        final String name = retrieval.getExperimentId() + " with decorators " + retrieval.getQuery().getName();
+        final String experimentId = retrieval.getExperimentId();
+        final String longExperimentId = experimentId + " with decorators " + retrieval.getQuery().getName();
 
-        LOG.info("Running collection " + name + "...");
+        LOG.info("Running collection " + longExperimentId + "...");
 
         // Load the default TopicSet which is all topics for the given year
         if (topicSet == null)
@@ -111,46 +113,35 @@ public class Experiment extends Thread {
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
-        retrieval.retrieve(topicSet.getTopics(), goldDataset.getQueryIdFunction());
+        final List<ResultList<Q>> resultLists = retrieval.retrieve(topicSet.getTopics(), goldDataset.getQueryIdFunction());
+
+        List<DocumentList<Q>> lastDocumentLists = new ArrayList<>();
+        for (ResultList<Q> list : resultLists) {
+            final DocumentList<Q> documents = new DocumentList<>();
+            for (Result r : list.getResults()) {
+                final Document<Q> doc = new Document<>();
+                doc.setId(r.getId());
+                doc.setScore(IRScore.BM25, r.getScore());
+                documents.add(doc);
+            }
+            lastDocumentLists.add(documents);
+        }
+
 
         File output = retrieval.getOutput();
         File goldStandard = goldDataset != null && goldDataset.getQrelFile() != null ? goldDataset.getQrelFile() : new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
-        TrecEval te = new TrecEval(goldStandard, output, k, calculateTrecEvalWithMissingResults);
-        Map<String, Metrics> metricsPerTopic = te.getMetrics();
+        int k = this.k;
+        boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
+        String statsDir = this.statsDir;
+        GoldStandard goldStandardType = this.goldStandard;
+        final File sampleGoldStandard = getSampleGoldStandard();
 
-        if (hasSampleGoldStandard()) {
-            SampleEval se = new SampleEval(getSampleGoldStandard(), output);
+        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
 
-            // TODO Refactor into MetricSet
-            Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
-            for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
-                String topic = entry.getKey();
-                if (topic == null)
-                    throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + output.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
-                entry.getValue().merge(sampleEvalMetrics.get(topic));
-            }
-        }
-
-        File statsDirFile = new File(statsDir);
-        if (!statsDirFile.exists())
-            statsDirFile.mkdir();
-
-        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".xml"));
-        xsw.write(metricsPerTopic);
-        xsw.close();
-
-        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + this.goldStandard + "_" + retrieval.getExperimentId() + ".csv"));
-        csw.write(metricsPerTopic);
-        csw.close();
-
-        allMetrics = metricsPerTopic.get("all");
-        LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
-                allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
-                name);
-        LOG.trace(allMetrics);
+        this.allMetrics = allMetrics;
 
         // TODO Experiment API #53
-//        System.out.println(allMetrics.getInfNDCG() + ";" + name);
+//        System.out.println(allMetrics.getInfNDCG() + ";" + longExperimentId);
     }
 
     public Metrics getAllMetrics() {
@@ -197,7 +188,7 @@ public class Experiment extends Thread {
     }
 
     private File getSampleGoldStandard() {
-        if (goldDataset !=  null && goldDataset.getSampleQrelFile() != null)
+        if (goldDataset != null && goldDataset.getSampleQrelFile() != null)
             return goldDataset.getSampleQrelFile();
         if (hasSampleGoldStandard()) {
             if (year == 2017)
@@ -214,7 +205,7 @@ public class Experiment extends Thread {
     }
 
     private boolean hasSampleGoldStandard() {
-        if (goldDataset !=  null && goldDataset.getSampleQrelFile() != null)
+        if (goldDataset != null && goldDataset.getSampleQrelFile() != null)
             return true;
         boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
         hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
@@ -236,4 +227,6 @@ public class Experiment extends Thread {
     public void setGoldDataset(de.julielab.ir.goldstandards.GoldStandard goldDataset) {
         this.goldDataset = goldDataset;
     }
+
+
 }

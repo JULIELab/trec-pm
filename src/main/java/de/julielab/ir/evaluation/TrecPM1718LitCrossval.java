@@ -75,11 +75,9 @@ public class TrecPM1718LitCrossval {
 
             final Stream<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs);
             final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf("train" + i, trainDocumentText);
-            final Stream<String> testDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(testDocs);
-            final TFIDF testTfIdf = TfIdfManager.getInstance().trainTfIdf("test" + i, testDocumentText);
 
             FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);
-            FeatureControlCenter.getInstance().createFeatures(testDocs, testTfIdf);
+            FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
             ranker.train(trainDocs);
