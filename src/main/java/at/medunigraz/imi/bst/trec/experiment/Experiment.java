@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.trec.experiment;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
 
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.*;
@@ -113,13 +114,14 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
-        final List<ResultList<Q>> resultLists = retrieval.retrieve(topicSet.getTopics(), goldDataset.getQueryIdFunction());
+        final Function<QueryDescription, String> queryIdFunction = goldDataset != null ? goldDataset.getQueryIdFunction() : q -> String.valueOf(q.getNumber());
+        final List<ResultList<Topic>> resultLists = retrieval.retrieve(topicSet.getTopics(), queryIdFunction);
 
-        List<DocumentList<Q>> lastDocumentLists = new ArrayList<>();
-        for (ResultList<Q> list : resultLists) {
-            final DocumentList<Q> documents = new DocumentList<>();
+        List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
+        for (ResultList<Topic> list : resultLists) {
+            final DocumentList<Topic> documents = new DocumentList<>();
             for (Result r : list.getResults()) {
-                final Document<Q> doc = new Document<>();
+                final Document<Topic> doc = new Document<>();
                 doc.setId(r.getId());
                 doc.setScore(IRScore.BM25, r.getScore());
                 documents.add(doc);
