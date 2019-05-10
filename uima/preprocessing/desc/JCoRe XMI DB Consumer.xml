@@ -236,6 +236,8 @@
                     <array>
                                                 
                         <string>de.julielab.jcore.types.Scope</string>
+                                                
+                        <string>de.julielab.jcore.types.AutoDescriptor</string>
                                             
                     </array>
                                     

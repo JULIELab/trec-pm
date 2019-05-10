@@ -14,7 +14,7 @@
     "maven-artifact": {
         "artifactId": "jcore-pmclassifier-ae",
         "groupId": "de.julielab",
-        "version": "2.4.0-SNAPSHOT"
+        "version": "2.5.0-SNAPSHOT"
     },
     "name": "JCoRe Precision Medicine Classifier"
 }
