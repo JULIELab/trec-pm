@@ -1,3 +1,5 @@
 <configuration>
-    <featuregroups/>
+    <featuregroups>
+        <featuregroup name="TFIDF" active="true"/>
+    </featuregroups>
 </configuration>

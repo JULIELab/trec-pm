@@ -48,8 +48,9 @@ public class FeatureControlCenter {
     }
 
     public boolean filterActive(FeatureGroup featureGroup, Feature feature) {
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqMultiPred("and", NAME_ATTR, featureGroup.getName(), ACTIVE_ATTR, "true")), true);
-        log.trace("Checking if feature group '{}' is active {}: ", featureGroup.getName(), isActive);
+        // featuregroups/featuregroup[@name='fgname']/feature[@name='fname' and @active='true']
+        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE+ attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
+        log.trace("Checking if feature '{}' is active {}: ", slash(featureGroup.getName(), feature.getName()), isActive);
         return isActive;
     }
 

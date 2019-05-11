@@ -17,6 +17,7 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 
 public class TrecWriter implements Closeable {
@@ -30,6 +31,9 @@ public class TrecWriter implements Closeable {
 		if (!checkRunName(runName)) {
 			throw new RuntimeException("Invalid run name!");
 		}
+
+		if (!output.getParentFile().exists())
+			output.getParentFile().mkdirs();
 
 		this.runName = runName;
 
@@ -56,14 +60,17 @@ public class TrecWriter implements Closeable {
 		}
 	}
 
-	public <T extends QueryDescription> void writeDocuments(List<DocumentList<T>> documents, Function<QueryDescription, String> queryIdFunction) {
+	public <T extends QueryDescription> void writeDocuments(List<DocumentList<T>> documents, IRScore scoreToWrite, Function<QueryDescription, String> queryIdFunction) {
         List<ResultList<T>> resultLists = new ArrayList<>();
         for (DocumentList<T> documentList : documents) {
             final ResultList<T> resultList = new ResultList<>(documentList.get(0).getQueryDescription());
             for (Document<T> doc : documentList) {
-//                new Result(doc.getId(), doc.get)
+                final Result result = new Result(doc.getId(), doc.getIrScore(scoreToWrite));
+                resultList.add(result);
             }
+            resultLists.add(resultList);
         }
+        write(resultLists, queryIdFunction);
     }
 
 

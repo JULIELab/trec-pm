@@ -36,7 +36,7 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
     public TrecPmRetrieval withDiseaseSynonym() {
 
-        query = new DiseaseSynonymQueryDecorator(query);
+        query = new DiseaseUmlsSynonymQueryDecorator(query);
         return this;
     }
 

@@ -104,7 +104,10 @@ public class Document<Q extends QueryDescription> {
         if (irScores == null)
             irScores = new HashMap<>();
         irScores.put(type, score);
+    }
 
+    public Double getIrScore(IRScore score) {
+        return irScores.get(score);
     }
 
     public String getId() {

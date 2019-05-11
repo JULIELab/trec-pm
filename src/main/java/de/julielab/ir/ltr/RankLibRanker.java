@@ -7,6 +7,7 @@ import ciir.umass.edu.metric.METRIC;
 import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.metric.MetricScorerFactory;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 
@@ -138,7 +139,9 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
             for (int i = 0; i < rl.size(); i++) {
                 DataPoint dp = rl.get(i);
                 final String docId = dp.getDescription();
-                ret.add(docsById.get(dp.getID() + docId));
+                final Document doc = docsById.get(dp.getID() + docId);
+                doc.setScore(IRScore.LTR, dp.getCached());
+                ret.add(doc);
             }
         }
         return ret;

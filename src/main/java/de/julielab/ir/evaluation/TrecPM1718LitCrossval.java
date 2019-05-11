@@ -1,6 +1,7 @@
 package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.trec.PubmedExperimenter;
+import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
@@ -44,7 +45,7 @@ public class TrecPM1718LitCrossval {
         METRIC trainMetric = METRIC.NDCG;
         int k = 10;
 
-        FeatureControlCenter.initialize(ConfigurationUtilities.createEmptyConfiguration());
+        FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(Path.of("config", "featureConfiguration.xml").toFile()));
 
         File topicsFile2017 = new File(CSVStatsWriter.class.getResource("/topics/topics2017.xml").getPath());
         final TopicSet topics2017 = new TopicSet(topicsFile2017, Challenge.TREC_PM, Task.PUBMED, 2017);
@@ -94,7 +95,7 @@ public class TrecPM1718LitCrossval {
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);
 
-            retrieval.withExperimentName("pmround" + i);
+            retrieval.withExperimentName("pmround" + i + "es");
 
             final Experiment<Topic> experiment = new Experiment();
             experiment.setGoldDataset(aggregatedGoldStandard);
@@ -122,8 +123,15 @@ public class TrecPM1718LitCrossval {
             for (DocumentList<Topic> list : lastDocumentLists) {
                 FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf);
                 ranker.rank(list);
-
             }
+            final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
+            try (final TrecWriter tw = new TrecWriter(output, "round" + i + "ltr")) {
+                tw.writeDocuments(lastDocumentLists, IRScore.LTR, aggregatedGoldStandard.getQueryIdFunction());
+            }
+
+
+            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, aggregatedGoldStandard.getQrelFile(), 1000, false, "stats-tr/", GoldStandard.OFFICIAL, aggregatedGoldStandard.getSampleQrelFile());
+            trecMetricsCreator.computeMetrics();
 
 
         }

@@ -19,4 +19,8 @@ public class Feature {
     public void assignFeature(Token token) {
         featureAssigner.accept(token);
     }
+
+    public String getName() {
+        return name;
+    }
 }
