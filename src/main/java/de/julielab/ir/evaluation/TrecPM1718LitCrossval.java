@@ -12,6 +12,7 @@ import ciir.umass.edu.metric.METRIC;
 import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
+import de.julielab.ir.VocabularyRestrictor;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
@@ -43,7 +44,7 @@ public class TrecPM1718LitCrossval {
 
         RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
         METRIC trainMetric = METRIC.NDCG;
-        int k = 10;
+        int k = 1000;
 
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(Path.of("config", "featureConfiguration.xml").toFile()));
 
@@ -79,6 +80,7 @@ public class TrecPM1718LitCrossval {
             final DocumentList<Topic> trainDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(train);
 
             final Stream<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs);
+            VocabularyRestrictor.getInstance().calculateVocabulary("muh", trainDocumentText, VocabularyRestrictor.Restriction.TFIDF, 2000);
             final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf("train" + i, trainDocumentText);
 
             FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);

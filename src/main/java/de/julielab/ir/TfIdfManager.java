@@ -3,18 +3,28 @@ package de.julielab.ir;
 import com.wcohen.ss.BasicStringWrapper;
 import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
+import de.julielab.ir.cache.CacheService;
 import org.apache.commons.collections.map.HashedMap;
+import org.mapdb.DB;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class TfIdfManager {
 
     private static TfIdfManager instance;
+
     private Map<String, TFIDF> tfidfModels;
+
 
     private TfIdfManager() {
         this.tfidfModels = new HashedMap();
+
     }
 
     public static TfIdfManager getInstance() {
