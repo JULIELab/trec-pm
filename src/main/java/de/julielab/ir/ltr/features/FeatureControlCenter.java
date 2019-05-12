@@ -17,10 +17,10 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.uima.cas.CAS;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.*;
@@ -55,11 +55,11 @@ public class FeatureControlCenter {
         return isActive;
     }
 
-    public void createFeatures(DocumentList<? extends QueryDescription> documents, TFIDF tfidf) {
+    public void createFeatures(DocumentList<? extends QueryDescription> documents, TFIDF tfidf, Set<String> vocabulary) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
-        featurePipes.add(new TfidfFeatureGroup(tfidf));
+        featurePipes.add(new TfidfFeatureGroup(tfidf, vocabulary));
         featurePipes.add(new TopicMatchFeatureGroup());
         featurePipes.add(new Token2FeatureVector(false, false));
         featurePipes.add(new SetFeatureVectorPipe());
@@ -83,5 +83,33 @@ public class FeatureControlCenter {
             final FeatureVector fv = (FeatureVector) instance.getData();
             // TODO continue
         }
+    }
+
+    public String getActiveFeatureDescriptionString() {
+        StringBuilder sb = new StringBuilder();
+        final List<HierarchicalConfiguration<ImmutableNode>> featureGroupConfigurations = configuration.configurationsAt(FEATUREGROUPS);
+        for (HierarchicalConfiguration<ImmutableNode> featureGroupConfiguration : featureGroupConfigurations) {
+            final String name = featureGroupConfiguration.getString(slash(FEATUREGROUP, NAME_ATTR));
+            final boolean isActive = featureGroupConfiguration.getBoolean(slash(FEATUREGROUP, ACTIVE_ATTR));
+            if (isActive) {
+                if (sb.length() != 0)
+                    sb.append("-");
+                sb.append("FG:").append(name);
+                final List<HierarchicalConfiguration<ImmutableNode>> featureConfigurations = featureGroupConfiguration.configurationsAt(FEATURE);
+                if (!featureConfigurations.isEmpty())
+                    sb.append("[");
+                for (HierarchicalConfiguration<ImmutableNode> featureConfiguration : featureConfigurations) {
+                    String featureName = featureConfiguration.getString(slash(FEATUREGROUP, NAME_ATTR));
+                    boolean featureIsActive = featureConfiguration.getBoolean(slash(FEATURE, ACTIVE_ATTR));
+                    if (featureIsActive) {
+                        sb.append("F:").append(featureName).append("-");
+                    }
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+                if (!featureConfigurations.isEmpty())
+                    sb.append("]");
+            }
+        }
+        return sb.toString();
     }
 }

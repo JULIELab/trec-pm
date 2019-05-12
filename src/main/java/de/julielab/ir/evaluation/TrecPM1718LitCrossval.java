@@ -31,9 +31,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TrecPM1718LitCrossval {
 
@@ -46,7 +46,10 @@ public class TrecPM1718LitCrossval {
         METRIC trainMetric = METRIC.NDCG;
         int k = 1000;
 
+        int vocabCutoff = 50;
+
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(Path.of("config", "featureConfiguration.xml").toFile()));
+
 
         File topicsFile2017 = new File(CSVStatsWriter.class.getResource("/topics/topics2017.xml").getPath());
         final TopicSet topics2017 = new TopicSet(topicsFile2017, Challenge.TREC_PM, Task.PUBMED, 2017);
@@ -64,38 +67,37 @@ public class TrecPM1718LitCrossval {
         final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();
-        List<Metrics> allMetrics = new ArrayList<>();
-        int[] features = null;
-//        final int numfeatures = 50;
-//        features = new int[numfeatures];
-//        for (int i = 0; i < numfeatures; i++)
-//            features[i] = i;
+        List<Metrics> allESMetrics = new ArrayList<>();
+        List<Metrics> allLtrMetrics = new ArrayList<>();
         for (int i = 0; i < CROSSVAL_SIZE; i++) {
-            File modelFile = Path.of("rankLibModels", aggregatedGoldStandard.getDatasetId() + "-xval" + CROSSVAL_SIZE + "-" + rType + "-" + trainMetric + "-" + k + "-round" + i).toFile();
-            log.info("Crossval round {}", i);
+            final String ltrFoldId = getLtrFoldId(i, aggregatedGoldStandard, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());
+            final String vocabularyId = getVocabularyId(i, "Alltext", "Pubmed", vocabCutoff);
+            final String tfidfFoldId = getTfidfFoldId(i, aggregatedGoldStandard);
+            File modelFile = Path.of("rankLibModels", ltrFoldId).toFile();
+            log.info("Crossval round {}", ltrFoldId);
             int thisround = i;
             List<Topic> test = topicPartitioning.get(i);
             final List<Topic> train = IntStream.range(0, CROSSVAL_SIZE).filter(round -> round != thisround).mapToObj(topicPartitioning::get).flatMap(Collection::stream).collect(Collectors.toList());
             final DocumentList<Topic> testDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(test);
             final DocumentList<Topic> trainDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(train);
 
-            final Stream<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs);
-            VocabularyRestrictor.getInstance().calculateVocabulary("muh", trainDocumentText, VocabularyRestrictor.Restriction.TFIDF, 2000);
-            final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf("train" + i, trainDocumentText);
+            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds()).collect(Collectors.toList());
+            final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
-            FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf);
-            FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf);
+            final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
+            FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf, vocabulary);
+            FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf, vocabulary);
 
-            final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
-           // if (!modelFile.exists()) {
-            long time = System.currentTimeMillis();
+            final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
+            if (!modelFile.exists()) {
+                long time = System.currentTimeMillis();
                 ranker.train(trainDocs);
-            time = System.currentTimeMillis() - time;
-            log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, trainDocs.size(), time, time/1000/60);
-             //   ranker.save(modelFile);
-            //} else {
-              //  ranker.load(modelFile);
-            //}
+                time = System.currentTimeMillis() - time;
+                log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, trainDocs.size(), time, time / 1000 / 60);
+                ranker.save(modelFile);
+            } else {
+                ranker.load(modelFile);
+            }
             final DocumentList<Topic> result = ranker.rank(testDocs);
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);
@@ -109,7 +111,7 @@ public class TrecPM1718LitCrossval {
             experiment.setGoldStandard(GoldStandard.OFFICIAL);
             experiment.setCalculateTrecEvalWithMissingResults(false);
             experiment.run();
-            allMetrics.add(experiment.getAllMetrics());
+            allESMetrics.add(experiment.getAllMetrics());
 
             final List<ResultList<Topic>> lastResultListSet = experiment.getLastResultListSet();
             List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
@@ -126,7 +128,7 @@ public class TrecPM1718LitCrossval {
             }
 
             for (DocumentList<Topic> list : lastDocumentLists) {
-                FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf);
+                FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf, vocabulary);
                 ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
@@ -136,14 +138,28 @@ public class TrecPM1718LitCrossval {
 
 
             final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, aggregatedGoldStandard.getQrelFile(), 1000, false, "stats-tr/", GoldStandard.OFFICIAL, aggregatedGoldStandard.getSampleQrelFile());
-            trecMetricsCreator.computeMetrics();
-
+            final Metrics metrics = trecMetricsCreator.computeMetrics();
+            allLtrMetrics.add(metrics);
 
         }
 
-        for (Metrics m : allMetrics) {
+        for (Metrics m : allESMetrics) {
             System.out.println(m.getInfNDCG());
         }
-        System.out.println("Mean: " + allMetrics.stream().mapToDouble(Metrics::getInfNDCG).average());
+        System.out.println("Mean from ES: " + allESMetrics.stream().mapToDouble(Metrics::getInfNDCG).average());
+        System.out.println("Mean from LtR: " + allLtrMetrics.stream().mapToDouble(Metrics::getInfNDCG).average());
     }
+
+    private static String getVocabularyId(int fold, String field, String corpusType, int cutoff) {
+        return "Vocab-Fold:" + fold + "-Field:" + field + "-Corpustype:" + corpusType + "-Cutoff" + cutoff;
+    }
+
+    private static String getLtrFoldId(int fold, de.julielab.ir.goldstandards.GoldStandard<?> goldStandard, RANKER_TYPE rType, METRIC trainMetric, int k, int cutoff, String featureConfig) {
+        return "Ltr-Fold:" + fold + "-Goldstandard:" + goldStandard.getDatasetId() + "-Rankertype:" + rType + "-Trainmetric:" + trainMetric + "MetricK:" + k + "-Cutoff:"+cutoff+"-Features:"+featureConfig;
+    }
+
+    private static String getTfidfFoldId(int fold, de.julielab.ir.goldstandards.GoldStandard<?> goldStandard) {
+        return "Tfidf-Fold:" + fold + "-Goldstandard:" + goldStandard.getDatasetId();
+    }
+
 }

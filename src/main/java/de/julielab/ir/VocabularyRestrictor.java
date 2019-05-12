@@ -6,7 +6,10 @@ import com.google.common.collect.TreeMultiset;
 import com.wcohen.ss.BasicStringWrapper;
 import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
+import com.wcohen.ss.api.StringWrapper;
 import com.wcohen.ss.api.Token;
+import com.wcohen.ss.tokens.BasicSourcedToken;
+import com.wcohen.ss.tokens.BasicToken;
 import com.wcohen.ss.tokens.SimpleTokenizer;
 import de.julielab.ir.cache.CacheService;
 import de.julielab.java.utilities.FileUtilities;
@@ -16,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.mapdb.DB;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
+import org.springframework.cache.CacheManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,9 +34,10 @@ public class VocabularyRestrictor {
     private final HTreeMap<String, Set<String>> fieldVocabularies;
     private final DB filedb;
     private Set<String> stopwords;
+    private final File cacheFile;
 
     private VocabularyRestrictor() {
-        final File cacheFile = Path.of("cache", "fieldVocabularies.db").toFile();
+        cacheFile = Path.of("cache", "fieldVocabularies.db").toFile();
         filedb = CacheService.getInstance().getFiledb(cacheFile);
         fieldVocabularies = CacheService.getInstance().getCache(cacheFile, "FieldVocabularies", Serializer.STRING, Serializer.JAVA);
         try {
@@ -53,19 +58,22 @@ public class VocabularyRestrictor {
         Set<String> vocabulary = fieldVocabularies.get(field);
         if (vocabulary == null) {
             switch (restriction) {
-
                 case TFIDF:
-                    vocabulary = calculateTfIdfVocabulary(field, fieldContents, cutoff);
+                    vocabulary = calculateTfIdfVocabulary(fieldContents, cutoff);
                     break;
                 case FREQUENCY:
-                    vocabulary = calculateFrequencyVocabulary(field, fieldContents, cutoff);
+                    vocabulary = calculateFrequencyVocabulary(fieldContents, cutoff);
                     break;
+            }
+            if(!CacheService.getInstance().isDbReadOnly(cacheFile)) {
+                fieldVocabularies.put(field, vocabulary);
+                filedb.commit();
             }
         }
         return vocabulary;
     }
 
-    private Set<String> calculateFrequencyVocabulary(String field, Stream<String> fieldContents, int cutoff) {
+    private Set<String> calculateFrequencyVocabulary(Stream<String> fieldContents, int cutoff) {
         // This is the tokenizer used with the default constructor of an TFIDF instance
         final SimpleTokenizer tokenizer = SimpleTokenizer.DEFAULT_TOKENIZER;
         final Map<String, List<String>> sets = fieldContents.map(tokenizer::tokenize).flatMap(Stream::of).map(Token::getValue).collect(Collectors.groupingBy(Function.identity()));
@@ -81,12 +89,13 @@ public class VocabularyRestrictor {
         return vocabulary;
     }
 
-    private Set<String> calculateTfIdfVocabulary(String field, Stream<String> fieldContents, int cutoff) {
+    private Set<String> calculateTfIdfVocabulary(Stream<String> fieldContents, int cutoff) {
         final List<String> fieldContentList = fieldContents.collect(Collectors.toList());
         final TFIDF tfidf = new TFIDF();
         final Stream<BasicStringWrapper> stringWrapperStream = fieldContentList.stream().map(BasicStringWrapper::new);
         tfidf.train(new BasicStringWrapperIterator(stringWrapperStream.iterator()));
         List<Pair<Token, Double>> weightedTokens = new ArrayList<>();
+
         for (String fieldValue : fieldContentList) {
             tfidf.prepare(fieldValue);
             for (Token t : tfidf.getTokens())

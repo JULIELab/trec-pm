@@ -24,10 +24,12 @@ public class TfidfFeatureGroup extends FeatureGroup {
 
     private Set<String> stopwords;
     private TFIDF tfidf;
+    private Set<String> vocabulary;
 
-    public TfidfFeatureGroup(TFIDF tfidf) {
+    public TfidfFeatureGroup(TFIDF tfidf, Set<String> vocabulary) {
         super("TFIDF");
         this.tfidf = tfidf;
+        this.vocabulary = vocabulary;
         try {
             stopwords = FileUtilities.getReaderFromFile(new File("resources/stopwords.txt")).lines().collect(Collectors.toSet());
         } catch (IOException e) {
@@ -47,8 +49,10 @@ public class TfidfFeatureGroup extends FeatureGroup {
             tokens = tfidf.getTokens();
         }
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {
-            if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
-                token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));
+            if (vocabulary == null || vocabulary.contains(tfidfToken.getValue())) {
+                if (!stopwords.contains(tfidfToken.getValue().toLowerCase())) {
+                    token.setFeatureValue(tfidfToken.getValue(), tfidf.getWeight(tfidfToken));
+                }
             }
         }
         return inst;
