@@ -17,6 +17,7 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.uima.cas.CAS;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -4,6 +4,7 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import com.wcohen.ss.TFIDF;
 import de.julielab.ir.TfIdfManager;
+import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.ir.pm.pmclassifier.InstancePreparator;
 import de.julielab.java.utilities.FileUtilities;
@@ -37,11 +38,12 @@ public class TfidfFeatureGroup extends FeatureGroup {
     @Override
     public Instance pipe(Instance inst) {
         Token token = (Token) inst.getData();
+        final Document document = (Document) inst.getSource();
         com.wcohen.ss.api.Token[] tokens;
         // Synchronization is required because we might use the same TFIDF in multiple threads
         // and it is not thread safe (found out the hard way)
         synchronized (tfidf) {
-            tfidf.prepare(token.getText());
+            tfidf.prepare(document.getCas().getDocumentText());
             tokens = tfidf.getTokens();
         }
         for (com.wcohen.ss.api.Token tfidfToken : tokens) {

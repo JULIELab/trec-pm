@@ -38,23 +38,23 @@ import java.util.stream.Stream;
 public class OriginalDocumentRetrieval {
 
     private static OriginalDocumentRetrieval instance;
+    private final DB filedb;
     /**
      * This map contains the XMI namespace definitions required to rebuild valid XMI documents from the
      * XMI elements we will retrieve from the database. The base document and the annotations are all stored
      * without this information which is why it has to be added when assembling the final XMI document.
      */
-    private final Map<String, String> namespaceMap;
+    private Map<String, String> namespaceMap;
     /**
      * This object takes the XMI document parts: The base document and possibly annotations retrieved additionally
      * from the database. It also makes takes the namespace map to then assembly complete XMI documents.
      */
-    private final XmiBuilder xmiBuilder;
+    private XmiBuilder xmiBuilder;
     /**
      * The length of the primary key of the original documents. Used to determine the correct locations in the
      * retrieved data for the keys, the document and the annotation data.
      */
-    private final int primaryKeyLength;
-    private final DB filedb;
+    private int primaryKeyLength;
     private HTreeMap<String, String> documentTextCache;
     private HTreeMap<String, byte[]> xmiCache;
     private boolean cacheReadOnly = true;
@@ -87,6 +87,41 @@ public class OriginalDocumentRetrieval {
 
     private OriginalDocumentRetrieval() {
 
+        try {
+            // Create a CasPool.
+            String[] typeSystemDescriptorNames;
+            try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.UIMA_TYPES_DESCRIPTORNAMES))) {
+                typeSystemDescriptorNames = br.lines().filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
+            }
+            final TypeSystemDescription tsDesc = TypeSystemDescriptionFactory.createTypeSystemDescription(typeSystemDescriptorNames);
+            final ProcessingResourceMetaData_impl metaData = new ProcessingResourceMetaData_impl();
+            metaData.setTypeSystem(tsDesc);
+            try {
+                casPool = new CasPool(10, metaData, new ResourceManager_impl());
+            } catch (ResourceInitializationException e) {
+                log.error("Could not create CAS pool", e);
+            }
+        } catch (IOException e) {
+            log.error("The CAS pool could not be created because the file with the UIMA types to load could not be read", e);
+        }
+
+
+        final CacheService cacheService = CacheService.getInstance();
+        File cacheDir = new File("cache" + File.separator + "uimaDocText.db");
+        filedb = cacheService.getFiledb(cacheDir);
+        documentTextCache = cacheService.getCache(cacheDir, "UIMACasDocumentTextCache", Serializer.STRING, Serializer.STRING);
+        xmiCache = cacheService.getCache(cacheDir, "UIMACasXMICache", Serializer.STRING, Serializer.BYTE_ARRAY);
+        cacheReadOnly = cacheService.isDbReadOnly(cacheDir);
+    }
+
+    public static OriginalDocumentRetrieval getInstance() {
+        if (instance == null) {
+            instance = new OriginalDocumentRetrieval();
+        }
+        return instance;
+    }
+
+    private void initializeDatabaseConnection() {
         try {
             dbc = new DataBaseConnector(TrecConfig.COSTOSYS_CONFIG);
             try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.COSTOSYS_ANNOTATIONS_LIST))) {
@@ -123,41 +158,6 @@ public class OriginalDocumentRetrieval {
             namespaceMap = getNamespaceMap();
         }
         xmiBuilder = new XmiBuilder(namespaceMap, annotationTypesToRetrieve);
-
-
-        try {
-            // Create a CasPool.
-            String[] typeSystemDescriptorNames;
-            try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.UIMA_TYPES_DESCRIPTORNAMES))) {
-                typeSystemDescriptorNames = br.lines().filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
-            }
-            final TypeSystemDescription tsDesc = TypeSystemDescriptionFactory.createTypeSystemDescription(typeSystemDescriptorNames);
-            final ProcessingResourceMetaData_impl metaData = new ProcessingResourceMetaData_impl();
-            metaData.setTypeSystem(tsDesc);
-            try {
-                casPool = new CasPool(10, metaData, new ResourceManager_impl());
-            } catch (ResourceInitializationException e) {
-                log.error("Could not create CAS pool", e);
-            }
-        } catch (IOException e) {
-            log.error("The CAS pool could not be created because the file with the UIMA types to load could not be read", e);
-        }
-
-
-        final CacheService cacheService = CacheService.getInstance();
-        File cacheDir = new File("cache"+File.separator+"uimaDocText.db");
-        filedb = cacheService.getFiledb(cacheDir);
-        documentTextCache = cacheService.getCache(cacheDir, "UIMACasDocumentTextCache", Serializer.STRING, Serializer.STRING);
-        xmiCache =  cacheService.getCache(cacheDir, "UIMACasXMICache", Serializer.STRING, Serializer.BYTE_ARRAY);
-        cacheReadOnly = cacheService.isDbReadOnly(cacheDir);
-    }
-
-
-    public static OriginalDocumentRetrieval getInstance() {
-        if (instance == null) {
-            instance = new OriginalDocumentRetrieval();
-        }
-        return instance;
     }
 
     public Stream<String> getDocumentText(DocumentList<?> documents) {
@@ -196,6 +196,8 @@ public class OriginalDocumentRetrieval {
      * @return An iterator for the retrieved document data.
      */
     Iterator<byte[][]> getDocuments(List<Object[]> ids) {
+        if (dbc == null)
+            initializeDatabaseConnection();
         return dbc.retrieveColumnsByTableSchema(ids, tablesToJoin, schemaNames);
     }
 
@@ -270,7 +272,7 @@ public class OriginalDocumentRetrieval {
                     // Here we need to calculate with the offset of the primary key elements that is contained
                     // in the xmiData byte[][] structure: The first positions of the array are just the primary
                     // key elements.
-                    if (documentData[i+primaryKeyLength] == null)
+                    if (documentData[i + primaryKeyLength] == null)
                         throw new IllegalStateException("There is no data in table " + tablesToJoin[i] + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
                     dataMap.put(tablesToJoin[i], new ByteArrayInputStream(documentData[i + primaryKeyLength]));
                 }

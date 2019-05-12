@@ -69,6 +69,18 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
 
     @Override
     public void train(DocumentList<Q> documents) {
+//        for(int j = 0; j < 20; j++) {
+//            System.out.println(documents.get(j).getId());
+//            final FeatureVector fv = documents.get(j).getFeatureVector();
+//            System.out.println(fv.toString(true));
+//            for (int i = 0; i < fv.numLocations(); i++) {
+//                final int index = fv.indexAtLocation(i);
+//                final double v = fv.value(index);
+//                System.out.print(index + ":" + v + " ");
+//            }
+//            System.out.println("\n");
+//        }
+        //documents.stream().map(d -> d.getId() + d.getFeatureVector().)
         final Map<String, RankList> rankLists = convertToRankList(documents);
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
         ranker = new RankerTrainer().train(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));

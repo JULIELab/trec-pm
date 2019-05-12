@@ -65,10 +65,10 @@ public class TrecPM1718LitCrossval {
         List<Double> rankLibScores = new ArrayList<>();
         List<Metrics> allMetrics = new ArrayList<>();
         int[] features = null;
-        final int numfeatures = 50;
-        features = new int[numfeatures];
-        for (int i = 0; i < numfeatures; i++)
-            features[i] = i;
+//        final int numfeatures = 50;
+//        features = new int[numfeatures];
+//        for (int i = 0; i < numfeatures; i++)
+//            features[i] = i;
         for (int i = 0; i < CROSSVAL_SIZE; i++) {
             File modelFile = Path.of("rankLibModels", aggregatedGoldStandard.getDatasetId() + "-xval" + CROSSVAL_SIZE + "-" + rType + "-" + trainMetric + "-" + k + "-round" + i).toFile();
             log.info("Crossval round {}", i);
@@ -85,12 +85,15 @@ public class TrecPM1718LitCrossval {
             FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, features, trainMetric, k, null);
-            if (!modelFile.exists()) {
+           // if (!modelFile.exists()) {
+            long time = System.currentTimeMillis();
                 ranker.train(trainDocs);
-                ranker.save(modelFile);
-            } else {
-                ranker.load(modelFile);
-            }
+            time = System.currentTimeMillis() - time;
+            log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, trainDocs.size(), time, time/1000/60);
+             //   ranker.save(modelFile);
+            //} else {
+              //  ranker.load(modelFile);
+            //}
             final DocumentList<Topic> result = ranker.rank(testDocs);
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);

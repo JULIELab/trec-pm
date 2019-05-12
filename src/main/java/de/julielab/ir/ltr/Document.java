@@ -4,6 +4,7 @@ import cc.mallet.types.FeatureVector;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.jcas.JCas;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class Document<Q extends QueryDescription> {
      * This field will mostly be null because it is very expansive to keep a lot of CAS instances around.
      * Thus, this field will be populated on request.
      */
-    private JCas cas;
+    private CAS cas;
 
     public int getStratum() {
         return stratum;
@@ -79,11 +80,11 @@ public class Document<Q extends QueryDescription> {
      *
      * @return The UIMA CAS of this document.
      */
-    public JCas getCas() {
+    public CAS getCas() {
         if (cas == null && fullDocumentData == null)
             throw new IllegalStateException("Cannot create a CAS because the XMI data has not been set to this document.");
         if (cas == null)
-            OriginalDocumentRetrieval.getInstance().parseXmiDataIntoJCas(fullDocumentData);
+            cas = OriginalDocumentRetrieval.getInstance().parseXmiDataIntoJCas(fullDocumentData);
         return cas;
     }
 
@@ -149,7 +150,7 @@ public class Document<Q extends QueryDescription> {
      */
     public void releaseJCas() {
         if (cas != null)
-            cas.release();
+            OriginalDocumentRetrieval.getInstance().releaseCas(cas);
         cas = null;
     }
 }
