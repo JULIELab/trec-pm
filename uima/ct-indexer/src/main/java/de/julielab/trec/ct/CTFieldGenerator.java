@@ -4,6 +4,8 @@ import de.julielab.jcore.consumer.es.FieldGenerationException;
 import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
+import de.julielab.jcore.types.AutoDescriptor;
+import de.julielab.jcore.types.DocumentClass;
 import de.julielab.jcore.types.Keyword;
 import de.julielab.jcore.types.MeshHeading;
 import de.julielab.jcore.types.ct.*;
@@ -17,6 +19,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,6 +96,8 @@ public class CTFieldGenerator extends FieldGenerator {
             document.addField("exclusion", exclusion);
             document.addField("keywords", keywords);
             document.addField("meshTags", meshTags);
+
+            addDocumentClasses(jCas, document);
         } catch (Throwable t) {
             log.error("Error while indexing document {}", header.getDocId(), t);
             throw t;
@@ -106,5 +111,36 @@ public class CTFieldGenerator extends FieldGenerator {
             ret.add(a.getCoveredText());
         }
         return ret;
+    }
+
+    private void addDocumentClasses(JCas jCas, Document document) {
+        Optional<AutoDescriptor> any = JCasUtil.select(jCas, AutoDescriptor.class).stream().findAny();
+        if (any.isPresent() && any.get().getDocumentClasses() != null) {
+            AutoDescriptor ad = any.get();
+            if (ad.getDocumentClasses().size() != 2)
+                throw new IllegalStateException("This field generator expects two document classes given from PM classifiers. The first should be from the classifier trained on the TREC PM 2017, the second trained on 2018.");
+            DocumentClass dc2017 = ad.getDocumentClasses(0);
+            DocumentClass dc2018 = ad.getDocumentClasses(1);
+            document.addField("pmclass2017", dc2017.getClassname());
+            document.addField("pmclass2017confidence", dc2017.getConfidence());
+
+            document.addField("pmclass2018", dc2018.getClassname());
+            document.addField("pmclass2018confidence", dc2018.getConfidence());
+        }
+        CTFilterBoard fb = filterRegistry.getFilterBoard(CTFilterBoard.class);
+        if (fb.gru2017 != null && fb.gru2017.get(document.getId()) != null) {
+            final Double prob = fb.gru2017.get(document.getId());
+            document.addField("pmclass2017gru", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2017gruconfidence", prob);
+        } else if (fb.gru2017 != null) {
+            log.warn("No value for document {} in GRU2017 data", document.getId());
+        }
+        if (fb.gru2018 != null && fb.gru2018.get(document.getId()) != null) {
+            final Double prob = fb.gru2018.get(document.getId());
+            document.addField("pmclass2018gru", prob > .5 ? "PM" : "Not PM");
+            document.addField("pmclass2018gruconfidence", prob);
+        } else if (fb.gru2018 != null) {
+            log.warn("No value for document {} in GRU2018 data", document.getId());
+        }
     }
 }

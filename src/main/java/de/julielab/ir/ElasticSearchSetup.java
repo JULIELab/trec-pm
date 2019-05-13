@@ -61,7 +61,7 @@ public class ElasticSearchSetup {
 
     }
 
-    private static String[] allSimilarities = new String[]{"bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
+    private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
 
     public static void main(String args[]) {
         createPubmedIndices();

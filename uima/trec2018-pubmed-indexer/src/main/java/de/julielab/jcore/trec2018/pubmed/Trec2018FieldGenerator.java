@@ -112,40 +112,12 @@ public class Trec2018FieldGenerator extends FieldGenerator {
             document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
         Trec2018FilterBoard fb = filterRegistry.getFilterBoard(Trec2018FilterBoard.class);
-        if (fb.lstm2017 != null && fb.lstm2017.get(document.getId()) != null) {
-            final Double prob = fb.lstm2017.get(document.getId());
-            document.addField("pmclass2017lstm", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2017lstmconfidence", prob);
-        } else if (fb.lstm2017 != null) {
-            log.warn("No value for document {} in LSTM2017 data", document.getId());
-        }
-        if (fb.lstmatt2017 != null && fb.lstmatt2017.get(document.getId()) != null) {
-            final Double prob = fb.lstmatt2017.get(document.getId());
-            document.addField("pmclass2017lstmatt", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2017lstmattconfidence", prob);
-        } else if (fb.lstmatt2017 != null) {
-            log.warn("No value for document {} in LSTMATT2017 data", document.getId());
-        }
         if (fb.gru2017 != null && fb.gru2017.get(document.getId()) != null) {
             final Double prob = fb.gru2017.get(document.getId());
             document.addField("pmclass2017lstmgru", prob > .5 ? "PM" : "Not PM");
             document.addField("pmclass2017lstmgruconfidence", prob);
         } else if (fb.gru2017 != null) {
             log.warn("No value for document {} in GRU2017 data", document.getId());
-        }
-        if (fb.lstm2018 != null && fb.lstm2018.get(document.getId()) != null) {
-            final Double prob = fb.lstm2018.get(document.getId());
-            document.addField("pmclass2018lstm", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2018lstmconfidence", prob);
-        } else if (fb.lstm2018 != null) {
-            log.warn("No value for document {} in LSTM2018 data", document.getId());
-        }
-        if (fb.lstmatt2018 != null && fb.lstmatt2018.get(document.getId()) != null) {
-            final Double prob = fb.lstmatt2018.get(document.getId());
-            document.addField("pmclass2018lstmatt", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2018lstmattconfidence", prob);
-        } else if (fb.lstmatt2018 != null) {
-            log.warn("No value for document {} in LSTMATT2018 data", document.getId());
         }
         if (fb.gru2018 != null && fb.gru2018.get(document.getId()) != null) {
             final Double prob = fb.gru2018.get(document.getId());

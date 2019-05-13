@@ -18,17 +18,9 @@ public class Trec2018FilterBoard extends FilterBoard {
     @ExternalResource(key = "goldstandard")
     private List<String> gsData;
 
-    @ExternalResource(key = "lstm2017")
-    public Map<String, Double> lstm2017;
-    @ExternalResource(key = "lstmatt2017")
-    public Map<String, Double> lstmatt2017;
     @ExternalResource(key = "gru2017")
     public Map<String, Double> gru2017;
 
-    @ExternalResource(key = "lstm2018")
-    public Map<String, Double> lstm2018;
-    @ExternalResource(key = "lstmatt2018")
-    public Map<String, Double> lstmatt2018;
     @ExternalResource(key = "gru2018")
     public Map<String, Double> gru2018;
 
