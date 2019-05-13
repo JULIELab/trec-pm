@@ -1,0 +1,67 @@
+{
+  "settings": {
+    "number_of_replicas": 1,
+    "number_of_shards": 1,
+    "similarity": {
+      "my_bm25": {
+        "type": "BM25",
+        "k1": {{k1}},
+        "b": {{b}}
+      }
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": false
+      },
+      "_source": {
+        "enabled": true
+      }
+    },
+    "medline": {
+      "properties": {
+        "title": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "abstract": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "keywords": {
+          "type": "keyword",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "meshTags": {
+          "type": "keyword",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}

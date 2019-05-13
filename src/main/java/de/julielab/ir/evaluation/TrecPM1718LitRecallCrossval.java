@@ -121,5 +121,18 @@ public class TrecPM1718LitRecallCrossval {
         }
     }
 
+    private class RetrievalHyperParameters {
+        private double disease_dismax_boost;
+        private double gene_dismax_boost;
+        private double disease_boost;
+        private double gene_boost;
+        private double disease_synonym_boost;
+        private double gene_synonym_boost;
+        private String disease_match_type;
+        private String gene_match_type;
+        private boolean withDiseaseSynonyms;
+        private boolean withGeneSynonyms;
+        private boolean withGeneDescription;
+    }
 
 }
