@@ -7,12 +7,15 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.DummyElasticSearchQuery;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -27,41 +30,116 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ElasticSearchSetup {
     private static final Logger log = LogManager.getLogger();
 
+    private static Map<String, String> defaultProperties = new HashMap<>();
+
+    static {
+        defaultProperties.put("k1", "1.2");
+        defaultProperties.put("b", "0.75");
+
+        defaultProperties.put("dfr_basic_model", "be");
+        defaultProperties.put("dfr_after_effect", "l");
+        defaultProperties.put("dfr_normalization", "z");
+
+        defaultProperties.put("dfi_independence_measure", "standardized");
+
+        defaultProperties.put("ib_distribution", "ll");
+        defaultProperties.put("ib_lambda", "df");
+        defaultProperties.put("ib_normalization", "z");
+
+        defaultProperties.put("lmd_mu", "2000");
+
+        defaultProperties.put("lmjm_lambda", "0.1");
+
+
+    }
+
+    private static String[] allSimilarities = new String[]{"bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
+
     public static void main(String args[]) {
-        putMapping();
+        createPubmedIndices();
+        createCtIndices();
+//        deletePubmedIndices();
+//        deleteCtIndices();
     }
 
-    public static void putMapping() {
-        String similarity = "bm25";
-
-        Map<String, String> properties = new HashMap<>();
-        properties.put("k1", "1.2");
-        properties.put("b", "0.75");
-
-        properties.put("dfr_basic_model", "be");
-        properties.put("dfr_after_effect", "l");
-        properties.put("dfr_normalization", "z");
-
-        properties.put("similarity", "my_"+similarity);
-
-        final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(new File("es-mappings/cikm19-pubmed-template.json"), new StaticMapQueryDecorator(properties, new DummyElasticSearchQuery()));
-        final Topic t = new Topic();
-        decorator.query(t);
-        final String jsonQuery = decorator.getJSONQuery();
-        final JSONObject jsonObject = new JSONObject(jsonQuery);
-        putMapping(jsonObject.getJSONObject("settings"), jsonObject.getJSONObject("mappings").getJSONObject("medline"), "medline", similarity);
-
+    public static void deletePubmedIndices() {
+        deleteIndices(TrecConfig.ELASTIC_BA_INDEX);
     }
 
-    private static void putMapping(JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
+    public static void deleteCtIndices() {
+        deleteIndices(TrecConfig.ELASTIC_CT_INDEX);
+    }
+
+    public static void deleteIndices(String indexbaseName) {
+        try {
+            final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all "+indexbaseName+" indices. Are you sure?", false);
+            if (doDelete) {
+                final Client client = ElasticClientFactory.getClient();
+                for (String similarity : allSimilarities) {
+                    String indexName = indexbaseName + "_" + similarity;
+                    deleteIndex(client, indexName);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void deleteIndex(Client client, String indexName) {
+        log.info("Deleting index {}.", indexName);
+        final DeleteIndexRequest deleteIndexRequest = Requests.deleteIndexRequest(indexName);
+        final DeleteIndexResponse deleteIndexResponse = client.admin().indices().delete(deleteIndexRequest).actionGet();
+        if (!deleteIndexResponse.isAcknowledged())
+            throw new IllegalArgumentException("Could not delete index " + indexName + ", ES did not acknowledge.");
+    }
+
+    public static void createPubmedIndices() {
+        File esConfigTemplate = Path.of("es-mappings", "cikm19-pubmed-template.json").toFile();
+        createIndices(TrecConfig.ELASTIC_BA_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
+    }
+
+    public static void createCtIndices() {
+        File esConfigTemplate = Path.of("es-mappings", "cikm19-ct-template.json").toFile();
+        createIndices(TrecConfig.ELASTIC_CT_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_CT_TYPE);
+    }
+
+    public static void createIndices(String indexBasename, File configurationTemplateFile, Map<String, String> properties, String esType) {
+        Map<String, String> parameters = new HashMap<>(properties);
+        for (String similarity : allSimilarities) {
+            parameters.put("similarity", "my_" + similarity);
+            final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(configurationTemplateFile, new StaticMapQueryDecorator(parameters, new DummyElasticSearchQuery()));
+            final Topic t = new Topic();
+            decorator.query(t);
+            final String indexSettingsAndMappings = decorator.getJSONQuery();
+            JSONObject indexSettingsAndMappingsObject = new JSONObject(indexSettingsAndMappings);
+
+            final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
+            final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
+
+            configureIndex(indexBasename,settings, mappings, esType, similarity);
+        }
+    }
+
+
+    /**
+     * Creates and/or configures an ElasticSearch index.
+     * @param indexBasename
+     * @param settingsJson The settings configuration.
+     * @param mappingJson The mapping configuration.
+     * @param esType The index type.
+     * @param similarity The base similarity used by the index. Is used as a index name suffix.
+     */
+    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
         final Client client = ElasticClientFactory.getClient();
-        final String indexName = TrecConfig.ELASTIC_BA_INDEX + "_" + similarity;
+        final String indexName = indexBasename + "_" + similarity;
         boolean indexExisted = false;
 
         final IndicesExistsRequest indicesExistsRequest = Requests.indicesExistsRequest(indexName);
@@ -81,7 +159,7 @@ public class ElasticSearchSetup {
             if (!closeIndexResponse.isAcknowledged())
                 throw new IllegalStateException("Could not close index " + indexName + ", ES did not acknowledge.");
         }
-        if (indexExisted == true) {
+        if (indexExisted) {
             log.info("Sending update settings request to {}.", indexName);
             final UpdateSettingsRequest updateSettingsRequest = Requests.updateSettingsRequest(indexName);
             final JSONObject similarityJson = settingsJson.getJSONObject("similarity");
