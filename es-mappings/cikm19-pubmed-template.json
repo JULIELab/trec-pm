@@ -7,6 +7,12 @@
         "type": "BM25",
         "k1": {{k1}},
         "b": {{b}}
+      },
+      "my_dfr" : {
+        "type" : "DFR",
+        "basic_model" : "{{dfr_basic_model}}",
+        "after_effect" : "{{dfr_after_effect}}",
+        "normalization" : "{{dfr_normalization}}"
       }
     }
   },

@@ -38,17 +38,24 @@ public class ElasticSearchSetup {
     }
 
     public static void putMapping() {
+        String similarity = "bm25";
 
         Map<String, String> properties = new HashMap<>();
         properties.put("k1", "1.2");
         properties.put("b", "0.75");
-        properties.put("similarity", "my_bm25");
-        final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(new File("es-mappings/cikm19-pubmed-bm25.json"), new StaticMapQueryDecorator(properties, new DummyElasticSearchQuery()));
+
+        properties.put("dfr_basic_model", "be");
+        properties.put("dfr_after_effect", "l");
+        properties.put("dfr_normalization", "z");
+
+        properties.put("similarity", "my_"+similarity);
+
+        final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(new File("es-mappings/cikm19-pubmed-template.json"), new StaticMapQueryDecorator(properties, new DummyElasticSearchQuery()));
         final Topic t = new Topic();
         decorator.query(t);
         final String jsonQuery = decorator.getJSONQuery();
         final JSONObject jsonObject = new JSONObject(jsonQuery);
-        putMapping(jsonObject.getJSONObject("settings"), jsonObject.getJSONObject("mappings").getJSONObject("medline"), "medline", "bm25");
+        putMapping(jsonObject.getJSONObject("settings"), jsonObject.getJSONObject("mappings").getJSONObject("medline"), "medline", similarity);
 
     }
 
@@ -62,7 +69,7 @@ public class ElasticSearchSetup {
         if (!indicesExistsResponse.isExists()) {
             log.info("Index {} does not exist and is created.", indexName);
             final CreateIndexRequest indexRequest = Requests.createIndexRequest(indexName);
-            indexRequest.settings(settingsJson, XContentType.JSON);
+            indexRequest.settings(settingsJson.toString(), XContentType.JSON);
             final CreateIndexResponse createIndexResponse = client.admin().indices().create(indexRequest).actionGet();
             if (!createIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not create index " + indexName);
