@@ -1,4 +1,4 @@
-package de.julielab.ir;
+package de.julielab.ir.es;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.StaticMapQueryDecorator;
@@ -6,6 +6,8 @@ import at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.DummyElasticSearchQuery;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.apache.logging.log4j.LogManager;
@@ -128,6 +130,19 @@ public class ElasticSearchSetup {
         }
     }
 
+    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters, String esType) {
+        File esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile();
+        final ObjectMapper om = new ObjectMapper();
+        final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
+        final Map<String, String> parameterMap = new HashMap<>(defaultProperties);
+        parameterMap.putAll(om.convertValue(parameters, mapType));
+        final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(esSettingsTemplate, new StaticMapQueryDecorator(parameterMap, new DummyElasticSearchQuery()));
+        final Topic t = new Topic();
+        decorator.query(t);
+        final String settingsJson = decorator.getJSONQuery();
+        final JSONObject settingsObject = new JSONObject(settingsJson);
+        configureIndex(indexBasename, settingsObject, null, esType, parameters.getBaseSimilarity());
+    }
 
     /**
      * Creates and/or configures an ElasticSearch index.
@@ -170,15 +185,15 @@ public class ElasticSearchSetup {
             if (!updateSettingsResponse.isAcknowledged())
                 throw new IllegalStateException("Could not update index settings for index" + indexName + ", ES did not acknowledge.");
         }
-        log.info("Putting the mapping to index {}.", indexName);
-        final PutMappingRequest putMappingRequest = Requests.putMappingRequest(indexName);
-        putMappingRequest.source(mappingJson.toString(), XContentType.JSON);
-        putMappingRequest.type(esType);
-        if (putMappingRequest.validate() != null)
-            throw putMappingRequest.validate();
-        final PutMappingResponse putMappingResponse = client.admin().indices().putMapping(putMappingRequest).actionGet();
-        if (!putMappingResponse.isAcknowledged())
-            throw new IllegalArgumentException("Could not put mapping " + mappingJson + ", ES did not acknowledge.");
+        if (mappingJson != null) {
+            log.info("Putting the mapping to index {}.", indexName);
+            final PutMappingRequest putMappingRequest = Requests.putMappingRequest(indexName);
+            putMappingRequest.source(mappingJson.toString(), XContentType.JSON);
+            putMappingRequest.type(esType);
+            final PutMappingResponse putMappingResponse = client.admin().indices().putMapping(putMappingRequest).actionGet();
+            if (!putMappingResponse.isAcknowledged())
+                throw new IllegalArgumentException("Could not put mapping " + mappingJson + ", ES did not acknowledge.");
+        }
         if (indexExisted) {
             log.info("Reopening index {}.", indexName);
             final OpenIndexRequest openIndexRequest = Requests.openIndexRequest(indexName);

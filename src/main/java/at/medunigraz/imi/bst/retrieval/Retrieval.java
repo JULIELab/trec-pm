@@ -6,6 +6,7 @@ import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import at.medunigraz.imi.bst.trec.model.Task;
+import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
@@ -117,6 +118,14 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
+    public T withSimilarityParameters(SimilarityParameters parameters) {
+        if (query == null || !(query instanceof  ElasticSearchQuery))
+            throw new IllegalStateException("Cannot set similarity parameters to the current query " + query + ". This call must immediately follow a call to withTarget(Task) where Task is CLINICAL_TRIALS or PUBMED.");
+        ElasticSearchQuery q = (ElasticSearchQuery) query;
+        q.setSimilarityParameters(parameters);
+        return (T) this;
+    }
+
     public T withYear(int year) {
         this.year = year;
         return (T) this;
@@ -177,7 +186,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         List<ResultList<Q>> resultListSet = new ArrayList<>();
         for (Q topic : queryDescriptions) {
             List<Result> results = query.query(topic);
-
 
             if (results.isEmpty())
                 throw new IllegalStateException("RESULT EMPTY for " + experimentName);

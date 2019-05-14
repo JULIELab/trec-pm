@@ -4,6 +4,9 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
 import de.julielab.ir.cache.CacheService;
+import de.julielab.ir.es.ElasticSearchSetup;
+import de.julielab.ir.es.NoParameters;
+import de.julielab.ir.es.SimilarityParameters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -22,6 +25,7 @@ import org.springframework.cache.Cache;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ElasticSearch implements SearchEngine {
@@ -31,7 +35,8 @@ public class ElasticSearch implements SearchEngine {
 	private Client client = ElasticClientFactory.getClient();
 
 	private String index = "_all";
-	private String[] types = new String[0];
+    private SimilarityParameters parameters;
+    private String[] types = new String[0];
 
 	private static HTreeMap<String, List<Result>> resultListCache;
     private static DB filedb;
@@ -45,27 +50,31 @@ public class ElasticSearch implements SearchEngine {
         cacheReadOnly = cacheService.isDbReadOnly(cacheDbFile);
 	}
 
-	public ElasticSearch(String index) {
+	public ElasticSearch(String index, SimilarityParameters parameters) {
 		this();
 		this.index = index;
-	}
+        this.parameters = parameters != null ? parameters : new NoParameters();
+    }
 
-	public ElasticSearch(String index, String... types) {
-		this();
-		this.index = index;
+	public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
+		this(index, parameters);
 		this.types = types;
 	}
 
 	public List<Result> query(JSONObject jsonQuery) {
         final String json = jsonQuery.toString();
-        List<Result> result = resultListCache.get(json);
+		String cacheKey = index + Arrays.toString(types) + parameters.printToString() + json;
+        List<Result> result = resultListCache.get(cacheKey);
         if (result == null) {
+            if (!(parameters instanceof NoParameters)) {
+//                ElasticSearchSetup.
+            }
             QueryBuilder qb = QueryBuilders.wrapperQuery(json);
             LOG.trace(JsonUtils.prettify(jsonQuery));
 
             result = query(qb);
             if (!cacheReadOnly) {
-                resultListCache.put(json, result);
+                resultListCache.put(cacheKey, result);
 
                 filedb.commit();
             }
