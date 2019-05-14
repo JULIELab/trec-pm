@@ -20,6 +20,7 @@ public class UmlsSynsetProvider {
     private final String umlsSynsetFile;
     private final String separator;
     private final boolean containTermInSynset;
+    private boolean useCache;
     private CacheAccess<String, Set<Set<String>>> cache;
 
     /**
@@ -29,22 +30,10 @@ public class UmlsSynsetProvider {
      * @param umlsSynsetFile Qualified file name with synsets
      * @throws IOException
      */
-    private UmlsSynsetProvider(String umlsSynsetFile) throws IOException {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, false);
+    private UmlsSynsetProvider(String umlsSynsetFile, boolean useCache) throws IOException {
+        this(umlsSynsetFile, DEFAULT_SEPARATOR, false, useCache);
     }
 
-    /**
-     * Provides synsets for a term and will not include term as part of its
-     * synset
-     *
-     * @param umlsSynsetFile Qualified file name with synsets
-     * @param separator      Used in synset file to separate terms
-     * @throws IOException
-     */
-    private UmlsSynsetProvider(String umlsSynsetFile, String separator)
-            throws IOException {
-        this(umlsSynsetFile, separator, false);
-    }
 
     /**
      * Provides synsets for a term
@@ -55,11 +44,12 @@ public class UmlsSynsetProvider {
      * @throws IOException
      */
     private UmlsSynsetProvider(String umlsSynsetFile, String separator,
-                               boolean containTermInSynset) throws IOException {
+                               boolean containTermInSynset, boolean useCache) throws IOException {
 
         this.umlsSynsetFile = umlsSynsetFile;
         this.separator = separator;
         this.containTermInSynset = containTermInSynset;
+        this.useCache = useCache;
 
         cache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
     }
@@ -73,14 +63,14 @@ public class UmlsSynsetProvider {
      * @throws IOException
      */
     public UmlsSynsetProvider(String umlsSynsetFile,
-                              boolean containTermInSynset) throws IOException {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, containTermInSynset);
+                              boolean containTermInSynset, boolean useCache) throws IOException {
+        this(umlsSynsetFile, DEFAULT_SEPARATOR, containTermInSynset, useCache);
     }
 
     public static UmlsSynsetProvider getInstance() {
         if (instance == null) {
             try {
-                instance = new UmlsSynsetProvider("resources/umlsSynsets.txt.gz");
+                instance = new UmlsSynsetProvider("resources/umlsSynsets.txt.gz", true);
             } catch (IOException e) {
                 log.error("Could not read UMLS data from resources/umlsSynsets.txt.gz", e);
             }
@@ -104,11 +94,12 @@ public class UmlsSynsetProvider {
     }
 
     public Set<Set<String>> getSynsets(String term) {
-        Set<Set<String>> sets = cache.get(term);
+        Set<Set<String>> sets = useCache ? cache.get(term) : null;
         if (sets == null) {
             try {
                 sets = getSynsetsFromFile(umlsSynsetFile, separator, containTermInSynset, term);
-                cache.put(term, sets);
+                if (useCache)
+                    cache.put(term, sets);
             } catch (IOException e) {
                 log.error("Could not retrieve synsets for term {}", term, e);
             }

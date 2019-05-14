@@ -33,17 +33,17 @@ public class RemoteCacheAccess<K, V> extends CacheAccess<K, V> {
     @Override
     public V get(K key) {
         try (Socket s = getSocket()) {
-            final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
             final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-            writeDefaultInformation(key, oos);
+            writeDefaultInformation(CacheServer.METHOD_GET, key, oos);
+            final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
             return (V) ois.readObject();
         } catch (IOException  | ClassNotFoundException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private void writeDefaultInformation(K key, ObjectOutputStream oos) throws IOException {
-        oos.writeUTF(CacheServer.METHOD_GET);
+    private void writeDefaultInformation(String method, K key, ObjectOutputStream oos) throws IOException {
+        oos.writeUTF(method);
         oos.writeUTF(cacheId);
         oos.writeUTF(cacheRegion);
         oos.writeUTF(keySerializer);
@@ -54,13 +54,19 @@ public class RemoteCacheAccess<K, V> extends CacheAccess<K, V> {
     @Override
     public boolean put(K key, V value) {
         try (Socket s = getSocket()) {
-            final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
             final ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
-            writeDefaultInformation(key, oos);
+            writeDefaultInformation(CacheServer.METHOD_PUT, key, oos);
             oos.writeObject(value);
+            final ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
             final String response = ois.readUTF();
+            if (response.equalsIgnoreCase(CacheServer.RESPONSE_FAILURE)) {
+                Exception e = (Exception) ois.readObject();
+                log.error("Could not put data into the remote cache:", e);
+            }
             return response.equals(CacheServer.RESPONSE_OK);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return false;

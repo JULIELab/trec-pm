@@ -2,6 +2,8 @@ package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.units.qual.K;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -15,6 +17,7 @@ import java.lang.management.ManagementFactory;
 import java.util.*;
 
 public class CacheService {
+    private static final Logger log = LogManager.getLogger();
     private static CacheService service;
     private final String thisJvmName;
     private Map<String, DB> dbs = new HashMap<>();
@@ -62,6 +65,8 @@ public class CacheService {
     void commitCache(File dbFile) {
         if (!isDbReadOnly(dbFile))
             getFiledb(dbFile).commit();
+        else
+            log.debug("Cannot commit cache {} because it is read-only.", dbFile);
     }
 
     private DB getFiledb(File cacheDir) {
@@ -73,7 +78,7 @@ public class CacheService {
                         .fileMmapEnable()
                         .transactionEnable()
                         .closeOnJvmShutdown();
-                if (TrecConfig.CACHE_READ_ONLY && cacheDir.exists()) {
+                if (TrecConfig.CACHE_TYPE.equalsIgnoreCase("local") && TrecConfig.CACHE_READ_ONLY && cacheDir.exists()) {
                     dbmaker.readOnly();
                     readOnly.add(cacheDir.getCanonicalPath());
                 }

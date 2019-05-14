@@ -44,6 +44,7 @@ public class ElasticSearch implements SearchEngine {
 
     public ElasticSearch() {
         cache = CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java");
+        this.parameters = new NoParameters();
     }
 
     public ElasticSearch(String index, SimilarityParameters parameters) {

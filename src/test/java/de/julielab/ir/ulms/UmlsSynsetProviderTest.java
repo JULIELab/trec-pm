@@ -18,7 +18,7 @@ public class UmlsSynsetProviderTest {
 
 	@Test
 	public void testContainTerm() throws IOException {
-		UmlsSynsetProvider u = new UmlsSynsetProvider("src/test/resources/umls/example.synsets", true);
+		UmlsSynsetProvider u = new UmlsSynsetProvider("src/test/resources/umls/example.synsets", true, false);
 		assertEquals(0,u.getSynsets("X").size());
 		assertEquals(1,u.getSynsets("F").size());
 		assertEquals(2,u.getSynsets("A").size());
@@ -27,7 +27,7 @@ public class UmlsSynsetProviderTest {
 	
 	@Test
 	public void testNotContainTerm() throws IOException {
-		UmlsSynsetProvider u = new UmlsSynsetProvider("src/test/resources/umls/example.synsets", false);
+		UmlsSynsetProvider u = new UmlsSynsetProvider("src/test/resources/umls/example.synsets", false, false);
 		assertEquals(0,u.getSynsets("X").size());
 		assertEquals(1,u.getSynsets("F").size());
 		assertEquals(2,u.getSynsets("A").size());
