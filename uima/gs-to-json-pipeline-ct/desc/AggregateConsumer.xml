@@ -7,15 +7,15 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe Annotation Adder GRU Doc Class 2017">
+        <delegateAnalysisEngine key="JCoRe JSON Writer">
                         
-            <import location="JCoRe Annotation Adder GRU Doc Class 2017.xml"/>
+            <import location="JCoRe JSON Writer.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Annotation Adder">
+        <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
                         
-            <import location="JCoRe Annotation Adder.xml"/>
+            <import location="JCoRe Database Checkpoint Writer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -23,9 +23,9 @@
         
     <analysisEngineMetaData>
                 
-        <name>JCoRe Pipeline AAE</name>
+        <name>JCoRe Consumer AAE</name>
                 
-        <description>This AAE descriptor directly contains the analysis engines added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
+        <description>This consumer AAE descriptor directly contains the CAS consumers added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
                 
         <configurationParameters/>
                 
@@ -35,9 +35,9 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe Annotation Adder GRU Doc Class 2017</node>
+                <node>JCoRe JSON Writer</node>
                                 
-                <node>JCoRe Annotation Adder</node>
+                <node>JCoRe Database Checkpoint Writer</node>
                             
             </fixedFlow>
                     

@@ -5,45 +5,43 @@
         
     <primitive>true</primitive>
         
-    <annotatorImplementationName>de.julielab.jcore.ae.banner.BANNERAnnotator</annotatorImplementationName>
+    <annotatorImplementationName>de.julielab.jcore.ae.annotationadder.AnnotationAdderAnnotator</annotatorImplementationName>
         
     <analysisEngineMetaData>
                 
-        <name>JCoRe BANNER AE for Biomedical English</name>
+        <name>JCoRe Annotation Adder</name>
                 
-        <description>This component uses the BANNER named entity recognizer with a model trained on the complete (train and test) dataset of the BioCreative II gene mention challenge.</description>
+        <description>This component helps to import annotations made on the exact CAS document text by an external process back into the CAS. To this end, the component is prepared to read several data formats. Currently, simple offset-based annotations are supported with configurable UIMA types. The component supports character and token based offsets.</description>
                 
-        <version>1.0</version>
+        <version>2.5.0-SNAPSHOT</version>
                 
-        <vendor/>
+        <vendor>de.julielab.jcore.ae.annotationadder</vendor>
                 
         <configurationParameters>
                         
             <configurationParameter>
                                 
-                <name>ConfigFile</name>
+                <name>OffsetMode</name>
                                 
-                <description>An XML configuration file that does all settings for the BANNER AnalysisEngine. May point
-                    to a regular file or a classpath resource.</description>
+                <description>Determines the interpretation of annotation offsets. Possible values: "CHARACTER" and "TOKEN". For the TOKEN offset mode, the correct tokenization must be given in the CAS. TOKEN offsets start with 1, CHARACTER offsets are 0-based. Defaults to CHARACTER.</description>
                                 
                 <type>String</type>
                                 
                 <multiValued>false</multiValued>
                                 
-                <mandatory>true</mandatory>
+                <mandatory>false</mandatory>
                             
             </configurationParameter>
                         
             <configurationParameter>
                                 
-                <name>TypeMapping</name>
+                <name>DefaultUimaType</name>
                                 
-                <description>A list of mappings from entity labels to UIMA types in the form &lt;label&gt;=&lt;fully
-                    qualified type name&gt;. If not given, all entities will be realized as EntityMention instances.</description>
+                <description>Most external annotation formats require that the qualified name a UIMA type is provided which reflects the annotation to be created for the respective annotation. With this parameter, a default type can be provided which will be forwarded to the format parser. If the parser supports it, the type can then be omitted from the external annotation source.</description>
                                 
                 <type>String</type>
                                 
-                <multiValued>true</multiValued>
+                <multiValued>false</multiValued>
                                 
                 <mandatory>false</mandatory>
                             
@@ -55,27 +53,11 @@
                         
             <nameValuePair>
                                 
-                <name>ConfigFile</name>
+                <name>OffsetMode</name>
                                 
                 <value>
                                         
-                    <string>de/julielab/jcore/ae/banner/config/banner_biomed_english.xml</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>TypeMapping</name>
-                                
-                <value>
-                                        
-                    <array>
-                                                
-                        <string>Gene=de.julielab.jcore.types.Gene</string>
-                                            
-                    </array>
+                    <string>CHARACTER</string>
                                     
                 </value>
                             
@@ -89,97 +71,9 @@
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Paragraph</name>
+                    <name>de.julielab.jcore.types.DocumentAnnotation</name>
                                         
-                    <description>A paragraph is a self-contained unit of discourse in a written text dealing with a particular point or idea.</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.Section</name>
-                                        
-                    <description>a section is a part of the text that often has a heading, an id, a section type, figures, tables, citations and footnotes that occur in this section</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>sectionHeading</name>
-                                                        
-                            <description>the title of the section</description>
-                                                        
-                            <rangeTypeName>de.julielab.jcore.types.Title</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>sectionType</name>
-                                                        
-                            <description>the type of the section (e.g. results)</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>textObjects</name>
-                                                        
-                            <description>the text objects (figure, table, boxed text etc.) that are associated with a particular section</description>
-                                                        
-                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                                                        
-                            <elementType>de.julielab.jcore.types.TextObject</elementType>
-                                                        
-                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>sectionId</name>
-                                                        
-                            <description>the id of the section, for example as mentioned in the original file, or level of the section</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>depth</name>
-                                                        
-                            <description>depth of the section, e.g. 0 -&gt; section, 1 -&gt; subsection, 2 -&gt; sub-subsection, ...</description>
-                                                        
-                            <rangeTypeName>uima.cas.Integer</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>label</name>
-                                                        
-                            <description>The section label, if given. This might, for example, just be the section number.</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.Zone</name>
-                                        
-                    <description>A Zone is a distinct division of text. It is an abstract Type and provides a parent type for sub-types which represent various kinds of text zones.</description>
+                    <description>The super-type for the document annotation types (Header, Descriptor)</description>
                                         
                     <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                     
@@ -187,85 +81,29 @@
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Title</name>
+                    <name>de.julielab.jcore.types.Header</name>
                                         
-                    <description>Title annotates titles covering various text units, including the whole paper, sections and subsections.</description>
+                    <description>The Header type stores the bibliographical document information.</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>titleType</name>
-                                                        
-                            <description>The type of the title:
-table: title of a table
-figure: title of a figure
-caption: title of a caption
-footnote: title of a footnote</description>
-                                                        
-                            <rangeTypeName>de.julielab.jcore.types.TitleType</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.Caption</name>
-                                        
-                    <description>the caption of figures, tables etc.
-
-feature captionTitle is a Title-Annotation of the title of the caption, if existent.
-
-feature captionType is an Enumeration, stating to what type of entity the caption belongs, e.g. figure or table</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.DocumentAnnotation</supertypeName>
                                         
                     <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>captionTitle</name>
+                            <name>docType</name>
                                                         
-                            <description>The title of a figure / table caption, if it exists</description>
+                            <description>The type of the document (e.g. abstract, fulltext, randomized).</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Title</rangeTypeName>
+                            <rangeTypeName>de.julielab.jcore.types.DocType</rangeTypeName>
                                                     
                         </featureDescription>
                                                 
                         <featureDescription>
                                                         
-                            <name>captionType</name>
+                            <name>source</name>
                                                         
-                            <description>The type of entity, this caption belongs to, e.g. figure or table</description>
-                                                        
-                            <rangeTypeName>de.julielab.jcore.types.CaptionType</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.TextObject</name>
-                                        
-                    <description>Object, on our case, are annotations such as figures, tables, boxed text etc.</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>objectType</name>
-                                                        
-                            <description>such as figure, table, boxed-text etc.</description>
+                            <description>The source of the document (e.g. WWW, database, etc).</description>
                                                         
                             <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
@@ -273,19 +111,9 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                                 
                         <featureDescription>
                                                         
-                            <name>objectId</name>
+                            <name>docId</name>
                                                         
-                            <description>the id of the object as found in the text</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>objectLabel</name>
-                                                        
-                            <description>the label of an object</description>
+                            <description>The identifier of the document with respect to its source. E.g.: PMID in PubMed. In combination with the source, this is a unique identifier for a document.</description>
                                                         
                             <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
@@ -293,47 +121,77 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                                 
                         <featureDescription>
                                                         
-                            <name>objectCaption</name>
+                            <name>copyright</name>
                                                         
-                            <description>the caption that comes with the object</description>
+                            <description>Copyright information.</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Caption</rangeTypeName>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                                 
                         <featureDescription>
                                                         
-                            <name>objectTitle</name>
+                            <name>truncated</name>
                                                         
-                            <description>The title annotation of the text object, if it exists. The title might correspond to the objectLabel (which is of type String and thus no annotation on its own).</description>
+                            <description>Indicates whether the document is truncated.</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Title</rangeTypeName>
+                            <rangeTypeName>uima.cas.Boolean</rangeTypeName>
                                                     
                         </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.AbstractText</name>
-                                        
-                    <description>Annotation of the complete abstract.</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                        
-                    <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>structuredAbstractParts</name>
+                            <name>authors</name>
                                                         
-                            <description>A List of all parts of a structured abstract. Empty, if the abstract consists of only one part and has no titles.</description>
+                            <description>The authors of the document.</description>
                                                         
                             <rangeTypeName>uima.cas.FSArray</rangeTypeName>
                                                         
-                            <elementType>de.julielab.jcore.types.AbstractSection</elementType>
+                            <elementType>de.julielab.jcore.types.AuthorInfo</elementType>
+                                                        
+                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>title</name>
+                                                        
+                            <description>The title of the document.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>pubTypeList</name>
+                                                        
+                            <description>The list of the publication types.</description>
+                                                        
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.PubType</elementType>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>language</name>
+                                                        
+                            <description>The language of the document.</description>
+                                                        
+                            <rangeTypeName>de.julielab.jcore.types.Language</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>doi</name>
+                                                        
+                            <description>document object identifier</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                             
@@ -343,9 +201,9 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Style</name>
+                    <name>de.julielab.jcore.types.PubType</name>
                                         
-                    <description>Text-markup information (italic, bold etc.) on any (e.g. character) level. Allows to keep the original style markup of the text, several style types might be set to same (or overlapping) range, when different styles are set to the same text region.</description>
+                    <description>An abstract type which should be used to store information on the publication. See subtypes Journal and an accumulative type (OtherPub)</description>
                                         
                     <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
@@ -353,133 +211,21 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                                 
                         <featureDescription>
                                                         
-                            <name>styleName</name>
+                            <name>name</name>
                                                         
-                            <description>the name of the style used.</description>
+                            <description>The name of the publication type (e.g. journal, technical report, book).</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.StyleName</rangeTypeName>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                                 
                         <featureDescription>
                                                         
-                            <name>encoding</name>
+                            <name>pubDate</name>
                                                         
-                            <description>the encoding used.</description>
+                            <description>The date on which the document was published.</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Encoding</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.StyleName</name>
-                                        
-                    <description/>
-                                        
-                    <supertypeName>uima.cas.String</supertypeName>
-                                        
-                    <allowedValues>
-                                                
-                        <value>
-                                                        
-                            <string>slanted</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>italic</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>bold</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>underscore</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>stricke-though</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                            
-                    </allowedValues>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.Encoding</name>
-                                        
-                    <description>Encoding Information</description>
-                                        
-                    <supertypeName>uima.cas.String</supertypeName>
-                                        
-                    <allowedValues>
-                                                
-                        <value>
-                                                        
-                            <string>UTF-8</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>UTF-16</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                            
-                    </allowedValues>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.List</name>
-                                        
-                    <description>used for annotation of lists</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>itemList</name>
-                                                        
-                            <description>contains items of the level 1. The items of the level 1 could contain further items of next level and so on in order to represent an iterative structure of list items.</description>
-                                                        
-                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                                                        
-                            <elementType>de.julielab.jcore.types.ListItem</elementType>
-                                                        
-                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
+                            <rangeTypeName>de.julielab.jcore.types.Date</rangeTypeName>
                                                     
                         </featureDescription>
                                             
@@ -489,33 +235,133 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.ListItem</name>
+                    <name>de.julielab.jcore.types.Journal</name>
                                         
-                    <description>item of a list</description>
+                    <description>This type contains attributes to describe a journal publication.</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.PubType</supertypeName>
                                         
                     <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>itemList</name>
+                            <name>ISSN</name>
                                                         
-                            <description>items of the next level (sub-items)</description>
+                            <description>The international standard serial number.</description>
                                                         
-                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                                                        
-                            <elementType>de.julielab.jcore.types.ListItem</elementType>
-                                                        
-                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                                 
                         <featureDescription>
                                                         
-                            <name>level</name>
+                            <name>volume</name>
                                                         
-                            <description>Level of indentation of the list item.</description>
+                            <description>The volume number of the journal in which the article was published.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>title</name>
+                                                        
+                            <description>Full journal title.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>impactFactor</name>
+                                                        
+                            <description>The impact factor of the journal at the time of publication.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>shortTitle</name>
+                                                        
+                            <description>the short title of the Journal (e.g. "Nicotine Tob Res" for "Nicotine &amp; tobacco research : official journal of the Society for Research on Nicotine and Tobacco")</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>issue</name>
+                                                        
+                            <description>Issue of Journal</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>pages</name>
+                                                        
+                            <description>Pages of Journal</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>nlmId</name>
+                                                        
+                            <description>the nlm id of the journal</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.Date</name>
+                                        
+                    <description>Type to store dates</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>day</name>
+                                                        
+                            <description>day of the month.</description>
+                                                        
+                            <rangeTypeName>uima.cas.Integer</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>month</name>
+                                                        
+                            <description>month of the year.</description>
+                                                        
+                            <rangeTypeName>uima.cas.Integer</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>year</name>
+                                                        
+                            <description>full year (e.g. 2006 and NOT 06).</description>
                                                         
                             <rangeTypeName>uima.cas.Integer</rangeTypeName>
                                                     
@@ -527,57 +373,55 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.SectionTitle</name>
+                    <name>de.julielab.jcore.types.OtherPub</name>
                                         
-                    <description>Title of a text section in contrast to the title of the whole document.</description>
+                    <description>Accumulative type for all other types of publications</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.Title</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>depth</name>
-                                                        
-                            <description>depth of the section, e.g. 0 -&gt; section, 1 -&gt; subsection, 2 -&gt; sub-subsection, ...</description>
-                                                        
-                            <rangeTypeName>uima.cas.Integer</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
+                    <supertypeName>de.julielab.jcore.types.PubType</supertypeName>
                                     
                 </typeDescription>
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Figure</name>
+                    <name>de.julielab.jcore.types.Descriptor</name>
                                         
-                    <description>Annotation for all elements in the CAS that belong to figures, e.g. figure title, figure caption etc.</description>
+                    <description>An abstract type for the document descriptors, there are two subclasses: one for automatically acquired meta information and one for meta information that was added manually (such as e.g. MeSH term lists)</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.TextObject</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                     
                 </typeDescription>
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Table</name>
+                    <name>de.julielab.jcore.types.AutoDescriptor</name>
                                         
-                    <description>An annotation for CAS elements that belong to a table, e.g. table title, table caption etc.</description>
+                    <description>The descriptor type for automatically (i.e. algorithmically) acquired meta information. It can be refined and extended.</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.TextObject</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Descriptor</supertypeName>
                                         
                     <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>footnotes</name>
+                            <name>documentClasses</name>
                                                         
-                            <description>An array collecting all footnotes, appearing in this table</description>
+                            <description>Here the document classification result will be stored, for example for storing infos if the document is age-related or not.</description>
                                                         
                             <rangeTypeName>uima.cas.FSArray</rangeTypeName>
                                                         
-                            <elementType>de.julielab.jcore.types.Footnote</elementType>
+                            <elementType>de.julielab.jcore.types.DocumentClass</elementType>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>documentTopics</name>
+                                                        
+                            <description>A list of document topics derived from a topic model.</description>
+                                                        
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.DocumentTopics</elementType>
                                                     
                         </featureDescription>
                                             
@@ -587,21 +431,21 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Footnote</name>
+                    <name>de.julielab.jcore.types.ManualDescriptor</name>
                                         
-                    <description>Footnotes of all kinds, i.e. footnotes found in running text or in tables etc.</description>
+                    <description>The descriptor type for the manually added information.</description>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Descriptor</supertypeName>
                                         
                     <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>footnoteTitle</name>
+                            <name>metaInfo</name>
                                                         
-                            <description/>
+                            <description>meta information about thos document, for example who is the annotator and which semantic types are annotated in this document</description>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Title</rangeTypeName>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                             
@@ -611,21 +455,441 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.AbstractSection</name>
+                    <name>de.julielab.jcore.types.MeshHeading</name>
+                                        
+                    <description>Medical Subject Headings, see NLM's MeSH for a detailed description.</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>descriptorName</name>
+                                                        
+                            <description>see MeSH</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>qualifierName</name>
+                                                        
+                            <description>see MeSH</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>descriptorNameMajorTopic</name>
+                                                        
+                            <description>see MeSH</description>
+                                                        
+                            <rangeTypeName>uima.cas.Boolean</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>qualifierNameMajorTopic</name>
+                                                        
+                            <description>see MeSH</description>
+                                                        
+                            <rangeTypeName>uima.cas.Boolean</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.Chemical</name>
+                                        
+                    <description>A chemical type</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>registryNumber</name>
+                                                        
+                            <description>A unique 5 to 9 digit number in hyphenated format assigned by the Chemical Abstract Service to specify chemical substances, a zero is a valid number when an actual number cannot be located or is not yet available..</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>nameOfSubstance</name>
+                                                        
+                            <description>The name of the substance that the registry number or the E.C. number identifies.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.DBInfo</name>
+                                        
+                    <description>References to other databases, e.g. SwissProt, INTERPRO e.g.</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>name</name>
+                                                        
+                            <description>The name of the DB referred to</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>acList</name>
+                                                        
+                            <description>A list of accession numbers for this DB.</description>
+                                                        
+                            <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.Keyword</name>
+                                        
+                    <description>A term of a controlled keyword list to describe the content of the publication.</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>name</name>
+                                                        
+                            <description>The name of the keyword.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>source</name>
+                                                        
+                            <description>The keyword source (terminology).</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.DocType</name>
+                                        
+                    <description>The document type</description>
+                                        
+                    <supertypeName>uima.cas.String</supertypeName>
+                                        
+                    <allowedValues>
+                                                
+                        <value>
+                                                        
+                            <string>abstract</string>
+                                                        
+                            <description>abstract</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>fulltext</string>
+                                                        
+                            <description>fulltext</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>randomized</string>
+                                                        
+                            <description>randomized</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>article</string>
+                                                        
+                            <description>used for Wikipedia articles</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>disambiguation-page</string>
+                                                        
+                            <description>used for Wikipedia disambiguation-pages</description>
+                                                    
+                        </value>
+                                            
+                    </allowedValues>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.Language</name>
+                                        
+                    <description>The language of the document. Possible values: based on ISO-639-1 language codes; we start with a first selection (which might be extended later).</description>
+                                        
+                    <supertypeName>uima.cas.String</supertypeName>
+                                        
+                    <allowedValues>
+                                                
+                        <value>
+                                                        
+                            <string>de</string>
+                                                        
+                            <description>German</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>en</string>
+                                                        
+                            <description>English</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>es</string>
+                                                        
+                            <description>Espagnol</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>fr</string>
+                                                        
+                            <description>French</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>it</string>
+                                                        
+                            <description>Italian</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>pt</string>
+                                                        
+                            <description>Portuguese</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>other</string>
+                                                        
+                            <description>Other languages</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>eng</string>
+                                                        
+                            <description>English</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>ger</string>
+                                                        
+                            <description>German</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>fre</string>
+                                                        
+                            <description>Französisch</description>
+                                                    
+                        </value>
+                                                
+                        <value>
+                                                        
+                            <string>ita</string>
+                                                        
+                            <description>Italienisch</description>
+                                                    
+                        </value>
+                                            
+                    </allowedValues>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.DocumentClass</name>
+                                        
+                    <description>A document class specification for the CAS' document text.</description>
+                                        
+                    <supertypeName>uima.tcas.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>classname</name>
+                                                        
+                            <description>The name of the document class this CAS has been classified to.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>confidence</name>
+                                                        
+                            <description>Confidence value of the classification into this class.</description>
+                                                        
+                            <rangeTypeName>uima.cas.Double</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>componentId</name>
+                                                        
+                            <description>An ID of the system that did assign this document class.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.AuthorInfo</name>
+                                        
+                    <description>AuthorInfo Type annotates the text segments containing the information about an author and his/her affiliation information.</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>foreName</name>
+                                                        
+                            <description>An author's forename,C</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>affiliation</name>
+                                                        
+                            <description>Affiliation of the author.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>contact</name>
+                                                        
+                            <description>Contact information (emails, phones, etc.).</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>lastName</name>
+                                                        
+                            <description>The last name of the author.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>initials</name>
+                                                        
+                            <description>Initials</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.RelatedArticle</name>
                                         
                     <description/>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
                     <features>
                                                 
                         <featureDescription>
                                                         
-                            <name>abstractSectionHeading</name>
+                            <name>relatedArticle</name>
                                                         
-                            <description>The title of a part of a structured abstract, e.g. "Background", "Methods", "Results", ...</description>
+                            <description/>
                                                         
-                            <rangeTypeName>de.julielab.jcore.types.Title</rangeTypeName>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
                         </featureDescription>
                                             
@@ -635,144 +899,209 @@ feature captionType is an Enumeration, stating to what type of entity the captio
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Bibliography</name>
+                    <name>de.julielab.jcore.types.RelatedArticleList</name>
                                         
-                    <description>The whole bibliography, beginning with a title like e.g. References or Literature and ending at the end of the last reference.</description>
+                    <description/>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
-                    <name>de.julielab.jcore.types.TitleType</name>
-                                        
-                    <description>The type of a title:
-abstract: title of an abstract or abstract part
-table: title of a table
-figure: title of a figure
-caption: title of a caption
-footnote: title of a footnote
-abstract: title of an abstract or abstract part
-document: title of the document</description>
-                                        
-                    <supertypeName>uima.cas.String</supertypeName>
-                                        
-                    <allowedValues>
+                    <features>
                                                 
-                        <value>
+                        <featureDescription>
                                                         
-                            <string>table</string>
+                            <name>relatedArticles</name>
                                                         
                             <description/>
+                                                        
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.RelatedArticle</elementType>
+                                                        
+                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
                                                     
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>figure</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>caption</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>footnote</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>abstractSection</string>
-                                                        
-                            <description>Denotes the heading of a section of a structured abstract</description>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>document</string>
-                                                        
-                            <description>Denotes the document title</description>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>other</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
-                                                        
-                            <string>section</string>
-                                                        
-                            <description/>
-                                                    
-                        </value>
+                        </featureDescription>
                                             
-                    </allowedValues>
+                    </features>
                                     
                 </typeDescription>
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.CaptionType</name>
+                    <name>de.julielab.jcore.types.FullTextLink</name>
                                         
-                    <description>The type of entity the Caption belongs to, e.g. a figure or a table</description>
+                    <description/>
                                         
-                    <supertypeName>uima.cas.String</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
-                    <allowedValues>
+                    <features>
                                                 
-                        <value>
+                        <featureDescription>
                                                         
-                            <string>table</string>
+                            <name>url</name>
                                                         
                             <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
                                                         
-                            <string>figure</string>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>iconUrl</name>
                                                         
                             <description/>
-                                                    
-                        </value>
-                                                
-                        <value>
                                                         
-                            <string>other</string>
-                                                        
-                            <description/>
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
-                        </value>
+                        </featureDescription>
                                             
-                    </allowedValues>
+                    </features>
                                     
                 </typeDescription>
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.Segment</name>
+                    <name>de.julielab.jcore.types.FullTextLinkList</name>
                                         
-                    <description>A segment is comparable to "de.julielab.jcore.types.Section" but for medical document (e.g. discharge summaries) we want a distinction between these types</description>
+                    <description/>
                                         
-                    <supertypeName>de.julielab.jcore.types.Zone</supertypeName>
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>fullTextLinks</name>
+                                                        
+                            <description/>
+                                                        
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.FullTextLink</elementType>
+                                                        
+                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.DocumentTopics</name>
+                                        
+                    <description>Topics label documents with vectors weights for their semantically most prominent words</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.DocumentAnnotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>Weights</name>
+                                                        
+                            <description>Vector of weights denoting the semantical descriptivity of one word for the respective topic</description>
+                                                        
+                            <rangeTypeName>uima.cas.DoubleArray</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>IDs</name>
+                                                        
+                            <description>IDs for topics determined by the modeling implementation</description>
+                                                        
+                            <rangeTypeName>uima.cas.IntegerArray</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>ModelID</name>
+                                                        
+                            <description>ID identifying the model holding the topics to be labeled</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>TopicWords</name>
+                                                        
+                            <description>The top words for the respective topic</description>
+                                                        
+                            <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>ModelVersion</name>
+                                                        
+                            <description>Version of the model holding the topics</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.Annotation</name>
+                                        
+                    <description>The super-type for all types.</description>
+                                        
+                    <supertypeName>uima.tcas.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>confidence</name>
+                                                        
+                            <description>The component that made the annotation may put its confidence/score calculated internally here, O</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>componentId</name>
+                                                        
+                            <description>Indicates which NLP component has been used to derive the annotation, C</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>id</name>
+                                                        
+                            <description/>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.DiscontinuousAnnotation</name>
+                                        
+                    <description>Chains annotations of the same type</description>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
                     <features>
                                                 
@@ -780,9 +1109,11 @@ document: title of the document</description>
                                                         
                             <name>value</name>
                                                         
-                            <description>SecTag reference??</description>
+                            <description>Annotations to be chained.</description>
                                                         
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.Annotation</elementType>
                                                     
                         </featureDescription>
                                             
@@ -792,9 +1123,9 @@ document: title of the document</description>
                                 
                 <typeDescription>
                                         
-                    <name>de.julielab.jcore.types.InternalReference</name>
+                    <name>de.julielab.jcore.types.ResourceEntry</name>
                                         
-                    <description>Used for document-internal references like literature references, footnotes etc.</description>
+                    <description>The reference to an external resource</description>
                                         
                     <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
                                         
@@ -802,9 +1133,9 @@ document: title of the document</description>
                                                 
                         <featureDescription>
                                                         
-                            <name>reftype</name>
+                            <name>source</name>
                                                         
-                            <description>The reference type: literature, figure, footnote etc.</description>
+                            <description>The name of the resource, C</description>
                                                         
                             <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
@@ -812,9 +1143,19 @@ document: title of the document</description>
                                                 
                         <featureDescription>
                                                         
-                            <name>refid</name>
+                            <name>entryId</name>
                                                         
-                            <description>The ID of the referenced object.</description>
+                            <description>The identifier of the entry, C</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>version</name>
+                                                        
+                            <description>The version of the resource, C</description>
                                                         
                             <rangeTypeName>uima.cas.String</rangeTypeName>
                                                     
@@ -919,6 +1260,54 @@ document: title of the document</description>
                             <description/>
                                                         
                             <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>embeddingVectors</name>
+                                                        
+                            <description>An array of embedding vectors for this token.</description>
+                                                        
+                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+                                                        
+                            <elementType>de.julielab.jcore.types.EmbeddingVector</elementType>
+                                                        
+                            <multipleReferencesAllowed>true</multipleReferencesAllowed>
+                                                    
+                        </featureDescription>
+                                            
+                    </features>
+                                    
+                </typeDescription>
+                                
+                <typeDescription>
+                                        
+                    <name>de.julielab.jcore.types.EmbeddingVector</name>
+                                        
+                    <description/>
+                                        
+                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
+                                        
+                    <features>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>source</name>
+                                                        
+                            <description>The source of the embedding, i.e. some identifier of the method that produces the embedding.</description>
+                                                        
+                            <rangeTypeName>uima.cas.String</rangeTypeName>
+                                                    
+                        </featureDescription>
+                                                
+                        <featureDescription>
+                                                        
+                            <name>vector</name>
+                                                        
+                            <description>The actual embedding vector.</description>
+                                                        
+                            <rangeTypeName>uima.cas.DoubleArray</rangeTypeName>
                                                     
                         </featureDescription>
                                             
@@ -2301,120 +2690,6 @@ document: title of the document</description>
                     <description>This annotation type represents the text reference to an abbreviation.</description>
                                         
                     <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.Annotation</name>
-                                        
-                    <description>The super-type for all types.</description>
-                                        
-                    <supertypeName>uima.tcas.Annotation</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>confidence</name>
-                                                        
-                            <description>The component that made the annotation may put its confidence/score calculated internally here, O</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>componentId</name>
-                                                        
-                            <description>Indicates which NLP component has been used to derive the annotation, C</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>id</name>
-                                                        
-                            <description/>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.DiscontinuousAnnotation</name>
-                                        
-                    <description>Chains annotations of the same type</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>value</name>
-                                                        
-                            <description>Annotations to be chained.</description>
-                                                        
-                            <rangeTypeName>uima.cas.FSArray</rangeTypeName>
-                                                        
-                            <elementType>de.julielab.jcore.types.Annotation</elementType>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
-                                    
-                </typeDescription>
-                                
-                <typeDescription>
-                                        
-                    <name>de.julielab.jcore.types.ResourceEntry</name>
-                                        
-                    <description>The reference to an external resource</description>
-                                        
-                    <supertypeName>de.julielab.jcore.types.Annotation</supertypeName>
-                                        
-                    <features>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>source</name>
-                                                        
-                            <description>The name of the resource, C</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>entryId</name>
-                                                        
-                            <description>The identifier of the entry, C</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                                
-                        <featureDescription>
-                                                        
-                            <name>version</name>
-                                                        
-                            <description>The version of the resource, C</description>
-                                                        
-                            <rangeTypeName>uima.cas.String</rangeTypeName>
-                                                    
-                        </featureDescription>
-                                            
-                    </features>
                                     
                 </typeDescription>
                                 
@@ -4068,31 +4343,9 @@ Trimmed Dependency Graphs" (http://www.db-thueringen.de/servlets/DerivateServlet
                     
         </typeSystemDescription>
                 
-        <typePriorities/>
-                
         <fsIndexCollection/>
                 
-        <capabilities>
-                        
-            <capability>
-                                
-                <inputs>
-                                        
-                    <type allAnnotatorFeatures="true">de.julielab.jcore.types.Sentence</type>
-                                    
-                </inputs>
-                                
-                <outputs>
-                                        
-                    <type allAnnotatorFeatures="true">de.julielab.jcore.types.Gene</type>
-                                    
-                </outputs>
-                                
-                <languagesSupported/>
-                            
-            </capability>
-                    
-        </capabilities>
+        <capabilities/>
                 
         <operationalProperties>
                         
@@ -4106,6 +4359,67 @@ Trimmed Dependency Graphs" (http://www.db-thueringen.de/servlets/DerivateServlet
             
     </analysisEngineMetaData>
         
-    <resourceManagerConfiguration/>
+    <externalResourceDependencies>
+                
+        <externalResourceDependency>
+                        
+            <key>AnnotationSource</key>
+                        
+            <description>A provider of annotations to add to the CAS. Must implement the
+                de.julielab.jcore.ae.annotationadder.annotationsources.AnnotationProvider interface.</description>
+                        
+            <interfaceName>de.julielab.jcore.ae.annotationadder.annotationsources.AnnotationProvider</interfaceName>
+                        
+            <optional>false</optional>
+                    
+        </externalResourceDependency>
+            
+    </externalResourceDependencies>
+        
+    <resourceManagerConfiguration>
+                
+        <externalResources>
+                        
+            <externalResource>
+                                
+                <name>GRU 2018</name>
+                                
+                <description/>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:/var/data/data_corpora/SIGIR2019_classified_class/model2018_gru_out_class</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name/>
+                                                
+                        <configurationParameters/>
+                                                
+                        <configurationParameterSettings/>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.ae.annotationadder.annotationsources.InMemoryFileDocumentClassAnnotationProvider</implementationName>
+                            
+            </externalResource>
+                    
+        </externalResources>
+                
+        <externalResourceBindings>
+                        
+            <externalResourceBinding>
+                                
+                <key>AnnotationSource</key>
+                                
+                <resourceName>GRU 2018</resourceName>
+                            
+            </externalResourceBinding>
+                    
+        </externalResourceBindings>
+            
+    </resourceManagerConfiguration>
     
 </analysisEngineDescription>

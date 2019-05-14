@@ -321,23 +321,7 @@
                                         
                     <array>
                                                 
-                        <string>de.julielab.jcore.types.Token</string>
-                                                
-                        <string>de.julielab.jcore.types.Sentence</string>
-                                                
-                        <string>de.julielab.jcore.types.Organism</string>
-                                                
-                        <string>de.julielab.jcore.types.Gene</string>
-                                                
                         <string>de.julielab.jcore.types.AutoDescriptor</string>
-                                                
-                        <string>de.julielab.jcore.types.Scope</string>
-                                                
-                        <string>de.julielab.jcore.types.LikelihoodIndicator</string>
-                                                
-                        <string>de.julielab.jcore.types.PointMutation</string>
-                                                
-                        <string>de.julielab.jcore.types.Abbreviation</string>
                                             
                     </array>
                                     

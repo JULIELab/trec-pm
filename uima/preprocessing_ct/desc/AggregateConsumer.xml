@@ -7,9 +7,15 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe Sentence Annotator">
+        <delegateAnalysisEngine key="JCoRe XMI Database Writer">
                         
-            <import location="JCoRe Sentence Annotator.xml"/>
+            <import location="JCoRe XMI Database Writer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
+                        
+            <import location="JCoRe Database Checkpoint Writer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -17,9 +23,9 @@
         
     <analysisEngineMetaData>
                 
-        <name>JCoRe Pipeline AAE</name>
+        <name>JCoRe Consumer AAE</name>
                 
-        <description>This AAE descriptor directly contains the analysis engines added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
+        <description>This consumer AAE descriptor directly contains the CAS consumers added through the JCoRe pipeline builder. The AAE serves to bundle all the components together.</description>
                 
         <configurationParameters/>
                 
@@ -29,7 +35,9 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe Sentence Annotator</node>
+                <node>JCoRe XMI Database Writer</node>
+                                
+                <node>JCoRe Database Checkpoint Writer</node>
                             
             </fixedFlow>
                     

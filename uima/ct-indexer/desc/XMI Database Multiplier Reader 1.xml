@@ -297,7 +297,7 @@
                                 
                 <value>
                                         
-                    <integer>500</integer>
+                    <integer>50</integer>
                                     
                 </value>
                             
@@ -345,43 +345,7 @@
                                 
                 <value>
                                         
-                    <string>pm_tfidf</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>AdditionalTableSchemas</name>
-                                
-                <value>
-                                        
-                    <array/>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>AdditionalTables</name>
-                                
-                <value>
-                                        
-                    <array>
-                                                
-                        <string>de.julielab.jcore.types.Gene</string>
-                                                
-                        <string>de.julielab.jcore.types.Organism</string>
-                                                
-                        <string>de.julielab.jcore.types.AutoDescriptor</string>
-                                                
-                        <string>de.julielab.jcore.types.Scope</string>
-                                                
-                        <string>de.julielab.jcore.types.PointMutation</string>
-                                            
-                    </array>
+                    <string>ct_lmjm</string>
                                     
                 </value>
                             

@@ -158,23 +158,23 @@
                 </value>
                             
             </nameValuePair>
-
+                        
             <nameValuePair>
-
+                                
                 <name>FilterBoards</name>
-
+                                
                 <value>
-
+                                        
                     <array>
-
+                                                
                         <string>de.julielab.trec.ct.CTFilterBoard</string>
-
+                                            
                     </array>
-
+                                    
                 </value>
-
+                            
             </nameValuePair>
-
+                        
             <nameValuePair>
                                 
                 <name>urls</name>
@@ -236,190 +236,113 @@
         </operationalProperties>
             
     </analysisEngineMetaData>
-
+        
     <externalResourceDependencies>
-
+                
         <externalResourceDependency>
-
-            <key>goldstandard</key>
-
-            <description>The file 20180622processedGoldStandardTopics.tsv created by Ariane. It should have columns for
-                indicated if a document is precision medicince or not, how the queried gene for which query ID was
-                matched or not matched etc.
-            </description>
-
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
-
-            <optional>false</optional>
-
-        </externalResourceDependency>
-
-        <externalResourceDependency>
-
-            <key>lstm2017</key>
-
-            <description>List of results from the LSTM PM classifier trained on the 2017 GS</description>
-
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-
-            <optional>true</optional>
-
-        </externalResourceDependency>
-
-        <externalResourceDependency>
-
-            <key>lstmatt2017</key>
-
-            <description>List of results from the LSTM PM classifier with attention trained on the 2017 GS</description>
-
-            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-
-            <optional>true</optional>
-
-        </externalResourceDependency>
-
-        <externalResourceDependency>
-
+                        
             <key>gru2017</key>
-
+                        
             <description>List of results from the LSTM PM classifier with GRU trained on the 2017 GS</description>
-
+                        
             <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-
+                        
             <optional>true</optional>
-
+                    
         </externalResourceDependency>
-
-
+                
         <externalResourceDependency>
-
+                        
             <key>gru2018</key>
-
+                        
             <description>List of results from the LSTM PM classifier with GRU trained on the 2018 GS</description>
-
+                        
             <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IMapProvider</interfaceName>
-
+                        
             <optional>true</optional>
-
+                    
         </externalResourceDependency>
-
+            
     </externalResourceDependencies>
-
+        
     <resourceManagerConfiguration>
-
+                
         <externalResources>
-
+                        
             <externalResource>
-
-                <name>GoldStandard</name>
-
-                <description>GoldStandard Analysis from Ariane</description>
-
-                <configurableDataResourceSpecifier>
-
-                    <url>file:../20180622processedGoldStandardTopics.tsv.gz</url>
-
-                    <resourceMetaData>
-
-                        <name/>
-
-                        <configurationParameters/>
-
-                        <configurationParameterSettings/>
-
-                    </resourceMetaData>
-
-                </configurableDataResourceSpecifier>
-
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
-
-            </externalResource>
-
-            <externalResource>
-
+                                
                 <name>gru2017</name>
-
+                                
                 <description>GRU trained on TRECPM 2017</description>
-
+                                
                 <configurableDataResourceSpecifier>
-
+                                        
                     <url>file:/var/data/data_corpora/SIGIR2019_classified/ct_model2017_out</url>
-
+                                        
                     <resourceMetaData>
-
+                                                
                         <name/>
-
+                                                
                         <configurationParameters/>
-
+                                                
                         <configurationParameterSettings/>
-
+                                            
                     </resourceMetaData>
-
+                                    
                 </configurableDataResourceSpecifier>
-
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider
-                </implementationName>
-
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
+                            
             </externalResource>
-
-
+                        
             <externalResource>
-
+                                
                 <name>gru2018</name>
-
+                                
                 <description>GRU trained on TRECPM 2018</description>
-
+                                
                 <configurableDataResourceSpecifier>
-
+                                        
                     <url>file:/var/data/data_corpora/SIGIR2019_classified/ct_model2018_out</url>
-
+                                        
                     <resourceMetaData>
-
+                                                
                         <name/>
-
+                                                
                         <configurationParameters/>
-
+                                                
                         <configurationParameterSettings/>
-
+                                            
                     </resourceMetaData>
-
+                                    
                 </configurableDataResourceSpecifier>
-
-                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider
-                </implementationName>
-
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ReversedDoubleMapProvider</implementationName>
+                            
             </externalResource>
-
+                    
         </externalResources>
-
+                
         <externalResourceBindings>
-
+                        
             <externalResourceBinding>
-
-                <key>goldstandard</key>
-
-                <resourceName>GoldStandard</resourceName>
-
-            </externalResourceBinding>
-
-            <externalResourceBinding>
-
+                                
                 <key>gru2017</key>
-
+                                
                 <resourceName>gru2017</resourceName>
-
+                            
             </externalResourceBinding>
-
+                        
             <externalResourceBinding>
-
+                                
                 <key>gru2018</key>
-
+                                
                 <resourceName>gru2018</resourceName>
-
+                            
             </externalResourceBinding>
-
+                    
         </externalResourceBindings>
-
+            
     </resourceManagerConfiguration>
     
 </analysisEngineDescription>

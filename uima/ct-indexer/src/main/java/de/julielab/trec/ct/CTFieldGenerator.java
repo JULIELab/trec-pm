@@ -75,6 +75,7 @@ public class CTFieldGenerator extends FieldGenerator {
             final List<String> keywords = md != null && md.getKeywordList() != null  ? Stream.of(md.getKeywordList().toArray()).map(Keyword.class::cast).map(Keyword::getName).collect(Collectors.toList()) : null;
             final List<String> meshTags = md != null && md.getMeSHList() != null     ? Stream.of(md.getMeSHList().toArray()).map(MeshHeading.class::cast).map(MeshHeading::getDescriptorName).collect(Collectors.toList()) : null;
 
+            document.setId(id);
             document.addField("id", id);
             document.addField("brief_title", brief_title);
             document.addField("official_title", official_title);

@@ -60,6 +60,18 @@
             <import location="JCoRe Mutation Annotator.xml"/>
                     
         </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder GRU Doc Class 2017">
+                        
+            <import location="JCoRe Annotation Adder GRU Doc Class 2017.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder">
+                        
+            <import location="JCoRe Annotation Adder.xml"/>
+                    
+        </delegateAnalysisEngine>
             
     </delegateAnalysisEngineSpecifiers>
         
@@ -92,6 +104,10 @@
                 <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
+                                
+                <node>JCoRe Annotation Adder GRU Doc Class 2017</node>
+                                
+                <node>JCoRe Annotation Adder</node>
                             
             </fixedFlow>
                     
