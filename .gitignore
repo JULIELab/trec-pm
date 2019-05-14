@@ -43,3 +43,6 @@ models
 # Big resource files
 src/main/resources/genes/*.gene_info*
 resources/umlsSynsets.txt.gz
+
+# May not redistribute
+resources/CosmicResistanceMutations.tsv*

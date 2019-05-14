@@ -43,8 +43,8 @@ public class ElasticSearchSetup {
     private static Map<String, String> defaultProperties = new HashMap<>();
 
     static {
-        defaultProperties.put("k1", "1.2");
-        defaultProperties.put("b", "0.75");
+        defaultProperties.put("bm25_k1", "1.2");
+        defaultProperties.put("bm25_b", "0.75");
 
         defaultProperties.put("dfr_basic_model", "be");
         defaultProperties.put("dfr_after_effect", "l");
@@ -66,10 +66,10 @@ public class ElasticSearchSetup {
     private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
 
     public static void main(String args[]) {
+        deletePubmedIndices();
+        deleteCtIndices();
         createPubmedIndices();
         createCtIndices();
-//        deletePubmedIndices();
-//        deleteCtIndices();
     }
 
     public static void deletePubmedIndices() {

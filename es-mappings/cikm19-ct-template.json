@@ -5,8 +5,8 @@
     "similarity": {
       "my_bm25": {
         "type": "BM25",
-        "k1": {{k1}},
-        "b": {{b}}
+        "k1": {{bm25_k1}},
+        "b": {{bm25_b}}
       },
       "my_tfidf": {
         "type": "classic",

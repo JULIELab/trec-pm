@@ -1,26 +1,13 @@
 package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.trec.PubmedExperimenter;
-import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
-import ciir.umass.edu.learning.RANKER_TYPE;
-import ciir.umass.edu.metric.METRIC;
-import com.wcohen.ss.TFIDF;
-import de.julielab.ir.OriginalDocumentRetrieval;
-import de.julielab.ir.TfIdfManager;
-import de.julielab.ir.VocabularyRestrictor;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
-import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.RankLibRanker;
-import de.julielab.ir.ltr.features.FeatureControlCenter;
-import de.julielab.ir.ltr.features.IRScore;
-import de.julielab.java.utilities.ConfigurationUtilities;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +22,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TrecPM1718LitRecallCrossval {
 
@@ -64,7 +50,7 @@ public class TrecPM1718LitRecallCrossval {
         runRecallExperiment(retrieval, experimentName, new File("recallResults"), aggregatedGoldStandard, topicPartitioning);
     }
 
-    private static void runRecallExperiment(TrecPmRetrieval retrieval, String experimentName, File resultDir, AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard, List<List<Topic>> topicPartitioning) {
+    private static void runRecallExperiment(TrecPmRetrieval retrieval, String experimentName, File resultDir, de.julielab.ir.goldstandards.GoldStandard<Topic> aggregatedGoldStandard, List<List<Topic>> topicPartitioning) {
         List<Metrics> allESMetrics = new ArrayList<>();
         Map<Topic, Double> allRecall = new HashMap<>();
         List<Double> meanRecallPerRound = new ArrayList<>();
@@ -133,6 +119,19 @@ public class TrecPM1718LitRecallCrossval {
         private boolean withDiseaseSynonyms;
         private boolean withGeneSynonyms;
         private boolean withGeneDescription;
+        private boolean withDrugInteraction;
+        private String baseSimilarity;
+        private String bm25_k1;
+        private String bm25_b;
+        private String dfr_basic_model;
+        private String dfr_after_effect;
+        private String dfr_normalization;
+        private String dfi_independence_measure;
+        private String ib_distribution;
+        private String ib_lambda;
+        private String ib_normalization;
+        private int lmd_mu;
+        private double lmjm_lambda;
     }
 
 }
