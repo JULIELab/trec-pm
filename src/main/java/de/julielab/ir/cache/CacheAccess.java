@@ -1,15 +1,34 @@
 package de.julielab.ir.cache;
 
-public class CacheAccess<K, V> {
-    private CacheService cacheService;
-    private String cacheId;
+import org.mapdb.Serializer;
 
-    public CacheAccess(String cacheId) {
+public abstract class CacheAccess<K, V> {
+    protected String cacheId;
+    protected String cacheRegion;
+
+    public static final String STRING = "string";
+    public static final String JAVA = "java";
+    public static final String BYTEARRAY = "bytearray";
+
+    public CacheAccess(String cacheId, String cacheRegion) {
         this.cacheId = cacheId;
-        this.cacheService = CacheService.getInstance();
+        this.cacheRegion = cacheRegion;
     }
 
-    public V get(K key) {
-
+    public static <T> Serializer<T> getSerializerByName(String name) {
+        switch (name.toLowerCase()) {
+            case STRING:
+                return (Serializer<T>) Serializer.STRING;
+            case JAVA:
+                return Serializer.JAVA;
+            case BYTEARRAY:
+                return (Serializer<T>) Serializer.BYTE_ARRAY;
+            default:
+                throw new IllegalArgumentException("Unsupported cache serializer '" + name + "'.");
+        }
     }
+
+    public abstract V get(K key);
+
+    public abstract void put(K key, V value);
 }

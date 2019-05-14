@@ -1,23 +1,17 @@
 package de.julielab.ir.umls;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
+import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mapdb.DB;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UmlsSynsetProvider {
     private static final String DEFAULT_SEPARATOR = "---";
@@ -26,8 +20,7 @@ public class UmlsSynsetProvider {
     private final String umlsSynsetFile;
     private final String separator;
     private final boolean containTermInSynset;
-    private HTreeMap<String, Set<Set<String>>> cache;
-    private DB filedb;
+    private CacheAccess<String, Set<Set<String>>> cache;
 
     /**
      * Provides synsets for a term, assumes synset file uses default separator
@@ -68,9 +61,7 @@ public class UmlsSynsetProvider {
         this.separator = separator;
         this.containTermInSynset = containTermInSynset;
 
-        final File cachePath = Path.of("cache", "umls.db").toFile();
-        filedb = CacheService.getInstance().getFiledb(cachePath);
-        this.cache = CacheService.getInstance().getCache(cachePath, "UmlsSynsets", Serializer.STRING, Serializer.JAVA);
+        cache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
     }
 
     /**
@@ -113,14 +104,13 @@ public class UmlsSynsetProvider {
     }
 
     public Set<Set<String>> getSynsets(String term) {
-         Set<Set<String>> sets = cache.get(term);
+        Set<Set<String>> sets = cache.get(term);
         if (sets == null) {
             try {
                 sets = getSynsetsFromFile(umlsSynsetFile, separator, containTermInSynset, term);
                 cache.put(term, sets);
-                filedb.commit();
             } catch (IOException e) {
-                log.error("Could not retrieve synsets for term {}",term, e );
+                log.error("Could not retrieve synsets for term {}", term, e);
             }
         }
         return sets;

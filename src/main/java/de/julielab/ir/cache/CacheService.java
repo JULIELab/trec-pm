@@ -1,17 +1,16 @@
 package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.trec.model.Result;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
+import org.mapdb.serializer.GroupSerializer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CacheService {
     private static CacheService service;
@@ -21,10 +20,14 @@ public class CacheService {
     private CacheService() {
     }
 
-    static CacheService getInstance() {
+   public static CacheService getInstance() {
         if (service == null)
             service = new CacheService();
         return service;
+    }
+
+    public CacheAccess getCacheAccess(String cacheId, String cacheRegion, String keySerializerName, String valueSerializerName) {
+        return TrecConfig.CACHE_TYPE.equalsIgnoreCase("local") ? new LocalFileCacheAccess<String, List<Result>>(cacheId, cacheRegion, keySerializerName, valueSerializerName) : null;
     }
 
      boolean isDbReadOnly(File file) {
@@ -59,7 +62,7 @@ public class CacheService {
                         .fileMmapEnable()
                         .transactionEnable()
                         .closeOnJvmShutdown();
-                if (TrecConfig.DOCUMENT_DB_CACHE_READ_ONLY && cacheDir.exists()) {
+                if (TrecConfig.CACHE_READ_ONLY && cacheDir.exists()) {
                     dbmaker.readOnly();
                     readOnly.add(cacheDir.getCanonicalPath());
                 }

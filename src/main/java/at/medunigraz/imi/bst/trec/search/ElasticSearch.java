@@ -3,7 +3,9 @@ package at.medunigraz.imi.bst.trec.search;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
+import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
+import de.julielab.ir.cache.LocalFileCacheAccess;
 import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
@@ -30,40 +32,36 @@ import java.util.List;
 
 public class ElasticSearch implements SearchEngine {
 
-	private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LogManager.getLogger();
 
-	private Client client = ElasticClientFactory.getClient();
+    private Client client = ElasticClientFactory.getClient();
 
-	private String index = "_all";
+    private String index = "_all";
     private SimilarityParameters parameters;
     private String[] types = new String[0];
 
-	private static HTreeMap<String, List<Result>> resultListCache;
-    private boolean cacheReadOnly = true;
+    private CacheAccess<String, List<Result>> cache;
 
     public ElasticSearch() {
-        final CacheService cacheService = CacheService.getInstance();
-        final File cacheDbFile = Path.of("cache", "elasticsearch.db").toFile();
-        resultListCache = cacheService.getCache(cacheDbFile, "ElasticSearchResultListCache", Serializer.STRING, Serializer.JAVA);
-        cacheReadOnly = cacheService.isDbReadOnly(cacheDbFile);
-	}
+        cache = CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java");
+    }
 
-	public ElasticSearch(String index, SimilarityParameters parameters) {
-		this();
-		this.index = index;
+    public ElasticSearch(String index, SimilarityParameters parameters) {
+        this();
+        this.index = index;
         this.parameters = parameters != null ? parameters : new NoParameters();
     }
 
-	public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
-		this(index, parameters);
-		this.types = types;
-	}
+    public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
+        this(index, parameters);
+        this.types = types;
+    }
 
-	public List<Result> query(JSONObject jsonQuery) {
+    public List<Result> query(JSONObject jsonQuery) {
         final String json = jsonQuery.toString();
-		String cacheKey = index + Arrays.toString(types) + parameters.printToString() + json;
-		LOG.debug("Query ID for cache: {}", cacheKey);
-        List<Result> result = resultListCache.get(cacheKey);
+        String cacheKey = index + Arrays.toString(types) + parameters.printToString() + json;
+        LOG.debug("Query ID for cache: {}", cacheKey);
+        List<Result> result = cache.get(cacheKey);
         if (result == null) {
             if (!(parameters instanceof NoParameters)) {
 //                ElasticSearchSetup.
@@ -72,31 +70,27 @@ public class ElasticSearch implements SearchEngine {
             LOG.trace(JsonUtils.prettify(jsonQuery));
 
             result = query(qb);
-            if (!cacheReadOnly) {
-                resultListCache.put(cacheKey, result);
-
-                filedb.commit();
-            }
+            cache.put(cacheKey, result);
         }
         return result;
-	}
+    }
 
-	private List<Result> query(QueryBuilder qb) {
-		SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(types).setQuery(qb)
-				.setSize(1000).addStoredField("_id");
+    private List<Result> query(QueryBuilder qb) {
+        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(types).setQuery(qb)
+                .setSize(1000).addStoredField("_id");
 
-		SearchResponse response = searchRequestBuilder.get();
-		//LOG.trace(JsonUtils.prettify(response.toString()));
+        SearchResponse response = searchRequestBuilder.get();
+        //LOG.trace(JsonUtils.prettify(response.toString()));
 
-		SearchHit[] results = response.getHits().getHits();
+        SearchHit[] results = response.getHits().getHits();
 
-		List<Result> ret = new ArrayList<>();
-		for (SearchHit hit : results) {
-			Result result = new Result(hit.getId(), hit.getScore());
-			ret.add(result);
-		}
+        List<Result> ret = new ArrayList<>();
+        for (SearchHit hit : results) {
+            Result result = new Result(hit.getId(), hit.getScore());
+            ret.add(result);
+        }
 
-		return ret;
-	}
+        return ret;
+    }
 
 }

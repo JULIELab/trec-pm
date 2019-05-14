@@ -1,6 +1,7 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -20,9 +21,6 @@ import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.resource.metadata.impl.ProcessingResourceMetaData_impl;
 import org.apache.uima.util.CasPool;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -38,7 +36,8 @@ import java.util.stream.Stream;
 public class OriginalDocumentRetrieval {
 
     private static OriginalDocumentRetrieval instance;
-    private final DB filedb;
+    private final CacheAccess<String, String> documentTextCache;
+    private final CacheAccess<String, byte[]> xmiCache;
     /**
      * This map contains the XMI namespace definitions required to rebuild valid XMI documents from the
      * XMI elements we will retrieve from the database. The base document and the annotations are all stored
@@ -55,9 +54,6 @@ public class OriginalDocumentRetrieval {
      * retrieved data for the keys, the document and the annotation data.
      */
     private int primaryKeyLength;
-    private HTreeMap<String, String> documentTextCache;
-    private HTreeMap<String, byte[]> xmiCache;
-    private boolean cacheReadOnly = true;
     /**
      * CAS objects are expensive to create, especially in terms of memory, but also in CPU time. Reusing them
      * is much more appropriate which is why we use a CasPool.
@@ -106,12 +102,8 @@ public class OriginalDocumentRetrieval {
         }
 
 
-        final CacheService cacheService = CacheService.getInstance();
-        File cacheDir = new File("cache" + File.separator + "uimaDocText.db");
-        filedb = cacheService.getFiledb(cacheDir);
-        documentTextCache = cacheService.getCache(cacheDir, "UIMACasDocumentTextCache", Serializer.STRING, Serializer.STRING);
-        xmiCache = cacheService.getCache(cacheDir, "UIMACasXMICache", Serializer.STRING, Serializer.BYTE_ARRAY);
-        cacheReadOnly = cacheService.isDbReadOnly(cacheDir);
+        documentTextCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasDocumentTextCache", CacheAccess.STRING, CacheAccess.STRING);
+        xmiCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasXMICache", CacheAccess.STRING, CacheAccess.BYTEARRAY);
     }
 
     public static OriginalDocumentRetrieval getInstance() {
@@ -161,23 +153,17 @@ public class OriginalDocumentRetrieval {
     }
 
     public Stream<String> getDocumentText(DocumentList<?> documents) {
-        try {
-            setXmiCasDataToDocuments(documents);
-            return documents.stream().map(d -> {
-                String text = documentTextCache.get(d.getId());
-                if (text == null) {
-                    final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
-                    text = cas.getDocumentText();
-                    if (!cacheReadOnly)
-                        documentTextCache.put(d.getId(), text);
-                    releaseCas(cas);
-                }
-                return text;
-            });
-        } finally {
-            if (!cacheReadOnly)
-                filedb.commit();
-        }
+        setXmiCasDataToDocuments(documents);
+        return documents.stream().map(d -> {
+            String text = documentTextCache.get(d.getId());
+            if (text == null) {
+                final CAS cas = parseXmiDataIntoJCas(d.getFullDocumentData());
+                text = cas.getDocumentText();
+                documentTextCache.put(d.getId(), text);
+                releaseCas(cas);
+            }
+            return text;
+        });
     }
 
     /**
@@ -245,7 +231,7 @@ public class OriginalDocumentRetrieval {
      * @param documents The documents to populate with the UIMA XMI CAS data.
      */
     public void setXmiCasDataToDocuments(DocumentList<?> documents) {
-        final List<Object[]> documentIDs = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> !xmiCache.containsKey(d.getId())).map(d -> new String[]{d.getId()}).collect(Collectors.toList());
+        final List<Object[]> documentIDs = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).map(d -> new String[]{d.getId()}).collect(Collectors.toList());
 
 
         Map<String, byte[][]> dataByDocId = new HashMap<>();
@@ -278,13 +264,10 @@ public class OriginalDocumentRetrieval {
                 }
                 final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
                 docXmiData = xmiBaos.toByteArray();
-                if (!cacheReadOnly)
-                    xmiCache.put(doc.getId(), docXmiData);
+                xmiCache.put(doc.getId(), docXmiData);
             }
             doc.setFullDocumentData(docXmiData);
         }
-        if (!cacheReadOnly)
-            filedb.commit();
         releaseCas(cas);
     }
 }

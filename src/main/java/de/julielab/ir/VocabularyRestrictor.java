@@ -1,29 +1,15 @@
 package de.julielab.ir;
 
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
 import com.wcohen.ss.BasicStringWrapper;
 import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
-import com.wcohen.ss.api.StringWrapper;
 import com.wcohen.ss.api.Token;
-import com.wcohen.ss.tokens.BasicSourcedToken;
-import com.wcohen.ss.tokens.BasicToken;
 import com.wcohen.ss.tokens.SimpleTokenizer;
+import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
-import de.julielab.java.utilities.FileUtilities;
-import org.apache.commons.collections4.multiset.HashMultiSet;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.mapdb.DB;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
-import org.springframework.cache.CacheManager;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,20 +17,11 @@ import java.util.stream.Stream;
 
 public class VocabularyRestrictor {
     private static VocabularyRestrictor instance;
-    private final HTreeMap<String, Set<String>> fieldVocabularies;
-    private final DB filedb;
+    private final CacheAccess<String, Set<String>> cacheAccess;
     private Set<String> stopwords;
-    private final File cacheFile;
 
     private VocabularyRestrictor() {
-        cacheFile = Path.of("cache", "fieldVocabularies.db").toFile();
-        filedb = CacheService.getInstance().getFiledb(cacheFile);
-        fieldVocabularies = CacheService.getInstance().getCache(cacheFile, "FieldVocabularies", Serializer.STRING, Serializer.JAVA);
-        try {
-            stopwords = FileUtilities.getReaderFromFile(new File("resources/stopwords.txt")).lines().collect(Collectors.toSet());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        cacheAccess = CacheService.getInstance().getCacheAccess("fieldVocablaries.db", "FieldVobabularies", "string", "java");
     }
 
     public static VocabularyRestrictor getInstance() {
@@ -55,7 +32,7 @@ public class VocabularyRestrictor {
     }
 
     public Set<String> calculateVocabulary(String field, Stream<String> fieldContents, Restriction restriction, int cutoff) {
-        Set<String> vocabulary = fieldVocabularies.get(field);
+        Set<String> vocabulary = cacheAccess.get(field);
         if (vocabulary == null) {
             switch (restriction) {
                 case TFIDF:
@@ -65,10 +42,7 @@ public class VocabularyRestrictor {
                     vocabulary = calculateFrequencyVocabulary(fieldContents, cutoff);
                     break;
             }
-            if(!CacheService.getInstance().isDbReadOnly(cacheFile)) {
-                fieldVocabularies.put(field, vocabulary);
-                filedb.commit();
-            }
+            cacheAccess.put(field, vocabulary);
         }
         return vocabulary;
     }

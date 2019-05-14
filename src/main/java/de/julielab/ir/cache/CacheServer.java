@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
@@ -15,31 +16,37 @@ import java.util.concurrent.Executors;
 
 public class CacheServer {
     private File cacheDir;
+    private String host;
     private int port;
     private ExecutorService executorService;
 
 
-    public CacheServer(File cacheDir, int port, int numThreads) {
+    public CacheServer(File cacheDir, String host, int port, int numThreads) {
         this.cacheDir = cacheDir;
+        this.host = host;
         this.port = port;
         executorService = Executors.newFixedThreadPool(numThreads);
     }
 
     public static void main(String args[]) throws IOException {
         final File cacheDir = new File(args[0]);
-        final int port = Integer.valueOf(args[1]);
-        final int numThreads = Integer.valueOf(args[2]);
-        final CacheServer cacheServer = new CacheServer(cacheDir, port, numThreads);
+        final String host = args[1];
+        final int port = Integer.valueOf(args[2]);
+        final int numThreads = Integer.valueOf(args[3]);
+        final CacheServer cacheServer = new CacheServer(cacheDir, host, port, numThreads);
         cacheServer.run();
     }
 
     private void run() throws IOException {
-        final ServerSocket serverSocket = new ServerSocket(port);
-        while (true) {
-            final Socket socket = serverSocket.accept();
-            executorService.submit(new RequestServer(socket));
+        final ServerSocket serverSocket = new ServerSocket(port, 1000, InetAddress.getByName(host));
+        try {
+            while (true) {
+                final Socket socket = serverSocket.accept();
+                executorService.submit(new RequestServer(socket));
+            }
+        } finally {
+            serverSocket.close();
         }
-
     }
 
     private class RequestServer extends Thread {
@@ -74,13 +81,15 @@ public class CacheServer {
                     else if (valueSerializerName.equalsIgnoreCase("java"))
                         valueSerializer = Serializer.JAVA;
                     final CacheService cacheService = CacheService.getInstance();
-                    final HTreeMap cache = cacheService.getCache(Path.of(cacheDir.getAbsolutePath(), cacheName).toFile(), cacheRegion, keySerializer, valueSerializer);
+                    final File cacheFile = Path.of(cacheDir.getAbsolutePath(), cacheName).toFile();
+                    final HTreeMap cache = cacheService.getCache(cacheFile, cacheRegion, keySerializer, valueSerializer);
 
                     if (method.equalsIgnoreCase("get")) {
                         final Object o = cache.get(key);
                         oos.writeObject(o);
                     } else if (method.equalsIgnoreCase("put")) {
                         cache.put(key, value);
+                        cacheService.commitCache(cacheFile);
                         oos.writeObject("OK");
                     }
                 } catch (IOException | ClassNotFoundException e) {
@@ -95,6 +104,12 @@ public class CacheServer {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
