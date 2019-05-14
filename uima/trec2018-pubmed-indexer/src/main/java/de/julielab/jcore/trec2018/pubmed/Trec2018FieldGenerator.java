@@ -12,6 +12,7 @@ import de.julielab.jcore.utility.JCoReTools;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.CASException;
+import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
@@ -44,7 +45,18 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addPublicationType(jCas, document);
         addNegationScopes(jCas, document);
         addMutations(jCas, document);
+        addKeywords(jCas, document);
         return document;
+    }
+
+    private void addKeywords(JCas jCas, Document document) {
+        final de.julielab.jcore.types.pubmed.ManualDescriptor md = JCasUtil.selectSingle(jCas, de.julielab.jcore.types.pubmed.ManualDescriptor.class);
+        final ArrayFieldValue keywords = new ArrayFieldValue();
+        for (FeatureStructure fs : md.getKeywordList()) {
+            Keyword kw = (Keyword) fs;
+            keywords.add(new RawToken(kw.getName()));
+        }
+        document.addField("keyword", keywords);
     }
 
     private void addNegationScopes(JCas jCas, Document document) {

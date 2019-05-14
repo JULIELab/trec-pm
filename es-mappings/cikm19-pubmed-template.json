@@ -1,7 +1,7 @@
 {
   "settings": {
     "number_of_replicas": 0,
-    "number_of_shards": 1,
+    "number_of_shards": 8,
     "similarity": {
       "my_bm25": {
         "type": "BM25",
@@ -69,8 +69,8 @@
             }
           }
         },
-        "keywords": {
-          "type": "keyword",
+        "keyword": {
+          "type": "text",
           "similarity": "{{similarity}}",
           "fields": {
             "keyword": {
@@ -80,7 +80,7 @@
           }
         },
         "meshTags": {
-          "type": "keyword",
+          "type": "text",
           "similarity": "{{similarity}}",
           "fields": {
             "keyword": {

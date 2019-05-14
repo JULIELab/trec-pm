@@ -39,13 +39,11 @@ public class ElasticSearch implements SearchEngine {
     private String[] types = new String[0];
 
 	private static HTreeMap<String, List<Result>> resultListCache;
-    private static DB filedb;
     private boolean cacheReadOnly = true;
 
     public ElasticSearch() {
         final CacheService cacheService = CacheService.getInstance();
         final File cacheDbFile = Path.of("cache", "elasticsearch.db").toFile();
-        filedb = cacheService.getFiledb(cacheDbFile);
         resultListCache = cacheService.getCache(cacheDbFile, "ElasticSearchResultListCache", Serializer.STRING, Serializer.JAVA);
         cacheReadOnly = cacheService.isDbReadOnly(cacheDbFile);
 	}
@@ -64,6 +62,7 @@ public class ElasticSearch implements SearchEngine {
 	public List<Result> query(JSONObject jsonQuery) {
         final String json = jsonQuery.toString();
 		String cacheKey = index + Arrays.toString(types) + parameters.printToString() + json;
+		LOG.debug("Query ID for cache: {}", cacheKey);
         List<Result> result = resultListCache.get(cacheKey);
         if (result == null) {
             if (!(parameters instanceof NoParameters)) {

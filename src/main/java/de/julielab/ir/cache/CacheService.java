@@ -1,13 +1,10 @@
 package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.K;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
-import org.springframework.cache.Cache;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,13 +21,13 @@ public class CacheService {
     private CacheService() {
     }
 
-    public static CacheService getInstance() {
+    static CacheService getInstance() {
         if (service == null)
             service = new CacheService();
         return service;
     }
 
-    public boolean isDbReadOnly(File file) {
+     boolean isDbReadOnly(File file) {
         try {
             return readOnly.contains(file.getCanonicalPath());
         } catch (IOException e) {
@@ -38,13 +35,22 @@ public class CacheService {
         }
     }
 
-    public <K, V> HTreeMap<K, V> getCache(File dbFile, String regionName, Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+    <K, V> HTreeMap<K, V> getCache(File dbFile, String regionName, Serializer<K> keySerializer, Serializer<V> valueSerializer) {
         final DB filedb = getFiledb(dbFile);
-        return filedb.hashMap(regionName).keySerializer(keySerializer).valueSerializer(valueSerializer).
+        final DB.HashMapMaker<K, V> dbmaker = filedb.hashMap(regionName).keySerializer(keySerializer).valueSerializer(valueSerializer);
+        if (isDbReadOnly(dbFile))
+            return dbmaker.open();
+        return dbmaker.
                 createOrOpen();
     }
 
-    public DB getFiledb(File cacheDir) {
+
+    void commitCache(File dbFile) {
+        if (!isDbReadOnly(dbFile))
+            getFiledb(dbFile).commit();
+    }
+
+    private DB getFiledb(File cacheDir) {
         try {
             DB db = dbs.get(cacheDir.getCanonicalPath());
             if (db == null) {

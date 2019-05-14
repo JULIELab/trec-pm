@@ -273,7 +273,7 @@
                                 
                 <value>
                                         
-                    <boolean>true</boolean>
+                    <boolean>false</boolean>
                                     
                 </value>
                             
@@ -345,7 +345,7 @@
                                 
                 <value>
                                         
-                    <string>pm_tfidf</string>
+                    <string>pm_bm25</string>
                                     
                 </value>
                             

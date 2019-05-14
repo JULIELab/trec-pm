@@ -188,9 +188,9 @@ public class Experiment<Q extends QueryDescription> extends Thread {
             if (year == 2017)
                 return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
             else if (year == 2018 && task == Task.PUBMED)
-                return new File("resources/qrels-sample-abstracts.txt");
+                return new File(getClass().getResource("/gold-standard/qrels-treceval-abstracts.2018.txt").getPath());
             else if (year == 2018 && task == Task.CLINICAL_TRIALS)
-                return new File("resources/qrels-sample-trials.txt");
+                return new File(getClass().getResource("/gold-standard/qrels-sample-ct.2018.txt").getPath());
             else
                 throw new IllegalStateException("There should be a sample gold standard but no condition did meet for year, task, gstype: " + year + ", " + task + ", " + goldStandard);
         } else {

@@ -195,7 +195,7 @@
                                 
                 <value>
                                         
-                    <string>cikm19_pm_tfidf</string>
+                    <string>cikm19_pm_bm25</string>
                                     
                 </value>
                             
