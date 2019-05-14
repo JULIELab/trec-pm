@@ -2,6 +2,7 @@ package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
+import org.checkerframework.checker.units.qual.K;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
@@ -10,27 +11,37 @@ import org.mapdb.serializer.GroupSerializer;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.*;
 
 public class CacheService {
     private static CacheService service;
+    private final String thisJvmName;
     private Map<String, DB> dbs = new HashMap<>();
     private Set<String> readOnly = new HashSet<>();
 
     private CacheService() {
+        thisJvmName = ManagementFactory.getRuntimeMXBean().getName();
     }
 
-   public static CacheService getInstance() {
+    public static CacheService getInstance() {
         if (service == null)
             service = new CacheService();
         return service;
     }
 
-    public CacheAccess getCacheAccess(String cacheId, String cacheRegion, String keySerializerName, String valueSerializerName) {
-        return TrecConfig.CACHE_TYPE.equalsIgnoreCase("local") ? new LocalFileCacheAccess<String, List<Result>>(cacheId, cacheRegion, keySerializerName, valueSerializerName) : null;
+    public <K, V> CacheAccess<K, V> getCacheAccess(String cacheId, String cacheRegion, String keySerializerName, String valueSerializerName) {
+        switch (TrecConfig.CACHE_TYPE.toLowerCase()) {
+            case "local":
+                return new LocalFileCacheAccess<>(cacheId, cacheRegion, keySerializerName, valueSerializerName);
+            case "remote":
+                return new RemoteCacheAccess<>(cacheId, cacheRegion, keySerializerName, valueSerializerName);
+            default:
+                throw new IllegalArgumentException("Unknown cache type '" + TrecConfig.CACHE_TYPE + "' in the configuration.");
+        }
     }
 
-     boolean isDbReadOnly(File file) {
+    boolean isDbReadOnly(File file) {
         try {
             return readOnly.contains(file.getCanonicalPath());
         } catch (IOException e) {

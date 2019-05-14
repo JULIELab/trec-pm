@@ -1,5 +1,6 @@
 package de.julielab.ir.cache;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
 
@@ -20,6 +21,10 @@ public class CacheServer {
     private int port;
     private ExecutorService executorService;
 
+    public static final String METHOD_GET = "get";
+    public static final String METHOD_PUT = "put";
+    public static final String RESPONSE_OK = "OK";
+
 
     public CacheServer(File cacheDir, String host, int port, int numThreads) {
         this.cacheDir = cacheDir;
@@ -29,10 +34,10 @@ public class CacheServer {
     }
 
     public static void main(String args[]) throws IOException {
-        final File cacheDir = new File(args[0]);
-        final String host = args[1];
-        final int port = Integer.valueOf(args[2]);
-        final int numThreads = Integer.valueOf(args[3]);
+        final File cacheDir = new File(TrecConfig.CACHE_DIR);
+        final String host = TrecConfig.CACHE_HOST;
+        final int port = TrecConfig.CACHE_PORT;
+        final int numThreads = Integer.valueOf(args[0]);
         final CacheServer cacheServer = new CacheServer(cacheDir, host, port, numThreads);
         cacheServer.run();
     }
@@ -67,27 +72,19 @@ public class CacheServer {
                     final String valueSerializerName = ois.readUTF();
                     final Object key = ois.readObject();
                     Object value = null;
-                    if (method.equalsIgnoreCase("put"))
+                    if (method.equalsIgnoreCase(METHOD_PUT))
                         value = ois.readObject();
 
-                    Serializer<?> keySerializer = null;
-                    Serializer<?> valueSerializer = null;
-                    if (keySerializerName.equalsIgnoreCase("string"))
-                        keySerializer = Serializer.STRING;
-                    else if (keySerializerName.equalsIgnoreCase("java"))
-                        keySerializer = Serializer.JAVA;
-                    if (valueSerializerName.equalsIgnoreCase("string"))
-                        valueSerializer = Serializer.STRING;
-                    else if (valueSerializerName.equalsIgnoreCase("java"))
-                        valueSerializer = Serializer.JAVA;
+                    Serializer<?> keySerializer = CacheAccess.getSerializerByName(keySerializerName);
+                    Serializer<?> valueSerializer = CacheAccess.getSerializerByName(valueSerializerName);
                     final CacheService cacheService = CacheService.getInstance();
                     final File cacheFile = Path.of(cacheDir.getAbsolutePath(), cacheName).toFile();
                     final HTreeMap cache = cacheService.getCache(cacheFile, cacheRegion, keySerializer, valueSerializer);
 
-                    if (method.equalsIgnoreCase("get")) {
+                    if (method.equalsIgnoreCase(METHOD_GET)) {
                         final Object o = cache.get(key);
                         oos.writeObject(o);
-                    } else if (method.equalsIgnoreCase("put")) {
+                    } else if (method.equalsIgnoreCase(METHOD_PUT)) {
                         cache.put(key, value);
                         cacheService.commitCache(cacheFile);
                         oos.writeObject("OK");

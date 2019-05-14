@@ -30,5 +30,5 @@ public abstract class CacheAccess<K, V> {
 
     public abstract V get(K key);
 
-    public abstract void put(K key, V value);
+    public abstract boolean put(K key, V value);
 }

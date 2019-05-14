@@ -26,6 +26,8 @@ public final class TrecConfig {
     public static final boolean CACHE_READ_ONLY = getBoolean("CACHE_READ_ONLY");
     public static final String CACHE_DIR = getString("CACHE_DIR");
     public static final String CACHE_TYPE = getString("CACHE_TYPE");
+    public static final String CACHE_HOST = getString("CACHE_HOST");
+    public static final int CACHE_PORT = getInteger("CACHE_PORT");
 
     public static String getString(String key) {
         return PROPERTIES.getString(key);

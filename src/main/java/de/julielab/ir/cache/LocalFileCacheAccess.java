@@ -1,13 +1,15 @@
 package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mapdb.Serializer;
 
 import java.io.File;
 import java.nio.file.Path;
 
 public class LocalFileCacheAccess<K, V> extends CacheAccess<K, V> {
-
+    private static final Logger log = LogManager.getLogger();
     private final CacheService cacheService;
     private final File cacheFile;
     private final Serializer<K> keySerializer;
@@ -28,8 +30,12 @@ public class LocalFileCacheAccess<K, V> extends CacheAccess<K, V> {
 
     @Override
     public void put(K key, V value) {
-        cacheService.getCache(cacheFile, cacheRegion, keySerializer, valueSerializer).put(key, value);
-        cacheService.commitCache(cacheFile);
+        if (!cacheService.isDbReadOnly(cacheFile)) {
+            cacheService.getCache(cacheFile, cacheRegion, keySerializer, valueSerializer).put(key, value);
+            cacheService.commitCache(cacheFile);
+        } else {
+            log.debug("Could not write value to cache {} because it is read-only.", cacheFile);
+        }
     }
 
 }
