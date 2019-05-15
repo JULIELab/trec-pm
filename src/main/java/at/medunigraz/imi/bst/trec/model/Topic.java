@@ -2,11 +2,14 @@ package at.medunigraz.imi.bst.trec.model;
 
 import java.io.File;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import de.julielab.ir.model.QueryDescription;
+import org.apache.commons.collections.ArrayStack;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -27,7 +30,8 @@ public class Topic extends QueryDescription {
     public List<String> drugInteractions = new ArrayList<>();
 
     private String disease = "";
-    private String gene = "";
+    private String geneField = "";
+    private TopicGene[] genes = new TopicGene[0];
     private String demographic = "";
     private String other = "";
 
@@ -69,6 +73,7 @@ public class Topic extends QueryDescription {
         return fromElement(element);
     }
 
+    private static Pattern mutationPattern = Pattern.compile("\\(([^)]+)\\)");
     public static Topic fromElement(Element element) {
         int number = Integer.parseInt(getAttribute(element, "number"));
         String disease = getElement(element, "disease");
@@ -81,6 +86,19 @@ public class Topic extends QueryDescription {
             gene = getElement(element, "gene");
         }
 
+        final String[] geneSplit = gene.split(",");
+        List<TopicGene> topicGenes = new ArrayStack();
+        for (String geneItem : geneSplit) {
+            String geneName = geneItem;
+            String mutation = null;
+            final Matcher m = mutationPattern.matcher(geneItem);
+            if (m.find()) {
+                mutation = m.group(1).trim();
+                geneName = geneItem.substring(0, m.start());
+            }
+            topicGenes.add(new TopicGene(geneName.trim(), mutation));
+        }
+
         String demographic = getElement(element, "demographic");
 
         // 2018 topics have no "other" field
@@ -89,7 +107,7 @@ public class Topic extends QueryDescription {
             other = getElement(element, "other");
         }
 
-        Topic topic = new Topic().withNumber(number).withDisease(disease).withGene(gene)
+        Topic topic = new Topic().withNumber(number).withDisease(disease).withGeneField(gene).withGenes(topicGenes.toArray(new TopicGene[0]))
                 .withDemographic(demographic).withOther(other);
 
         return topic;
@@ -134,8 +152,13 @@ public class Topic extends QueryDescription {
         return this;
     }
 
-    public Topic withGene(String gene) {
-        this.gene = gene;
+    public Topic withGenes(TopicGene... genes) {
+        this.genes = genes;
+        return this;
+    }
+
+    public Topic withGeneField(String gene) {
+        this.geneField = gene;
         return this;
     }
 
@@ -192,12 +215,20 @@ public class Topic extends QueryDescription {
         return disease;
     }
 
-    public String getGene() {
-        return gene;
+    /**
+     * Returns the exact contents of the <tt>gene</tt> field. Multiple genes are comma-separated, mutations
+     * are enclosed in parenthesis following the gene name, e.g.
+     * <pre>
+     *     BRAF (V600E), CDKN2A Deletion
+     * </pre>
+     * @return
+     */
+    public String getGeneField() {
+        return geneField;
     }
 
-    public String[] getGeneTokens() {
-        return gene.split(" ");
+    public String[] getGeneFieldTokens() {
+        return geneField.split(" ");
     }
 
     public String getDemographic() {
@@ -230,8 +261,8 @@ public class Topic extends QueryDescription {
         // TODO use reflection
         ret.put("number", String.valueOf(number));
         ret.put("disease", disease);
-        ret.put("gene", gene);
-        ret.put("variant", gene);    // Backwards compatibility
+        ret.put("gene", geneField);
+        ret.put("variant", geneField);    // Backwards compatibility
         ret.put("demographic", demographic);
         ret.put("other", other);
         ret.put("sex", getSex());
@@ -268,7 +299,7 @@ public class Topic extends QueryDescription {
 
     @Override
     public String toString() {
-        return "Topic [number=" + number + ", disease=" + disease + ", gene=" + gene
+        return "Topic [number=" + number + ", disease=" + disease + ", gene=" + geneField
                 + ", demographic=" + demographic + ", other=" + other + "]";
     }
 

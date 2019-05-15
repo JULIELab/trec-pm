@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class TopicSetTest {
 		Topic firstTopic = topics.iterator().next();
 		assertEquals(1, firstTopic.getNumber());
 		assertEquals("Liposarcoma", firstTopic.getDisease());
-		assertEquals("CDK4 Amplification", firstTopic.getGene());
+		assertEquals("CDK4 Amplification", firstTopic.getGeneField());
 		assertEquals("38-year-old male", firstTopic.getDemographic());
 		assertEquals("GERD", firstTopic.getOther());
 	}

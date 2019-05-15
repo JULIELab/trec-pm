@@ -23,7 +23,7 @@ public class TopicSet {
 	public TopicSet(File xmlFile, Challenge challenge, Task task, int year) {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
-		Document doc = null;
+		Document doc;
 		try {
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			doc = documentBuilder.parse(xmlFile);

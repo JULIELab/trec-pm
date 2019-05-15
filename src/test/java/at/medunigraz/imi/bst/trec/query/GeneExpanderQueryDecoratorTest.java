@@ -23,7 +23,7 @@ public class GeneExpanderQueryDecoratorTest extends QueryDecoratorTest {
 	public GeneExpanderQueryDecoratorTest() {
 		this.decoratedQuery = new GeneExpanderQueryDecorator(EXPAND_TO,
 				new TemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX)));
-		this.topic = new Topic().withGene(GENE);
+		this.topic = new Topic().withGeneField(GENE);
 	}
 
 	@Test
@@ -31,8 +31,8 @@ public class GeneExpanderQueryDecoratorTest extends QueryDecoratorTest {
 		DummyElasticSearchQuery<Topic> dummyQuery = new DummyElasticSearchQuery<>();
 		Query decorator = new GeneExpanderQueryDecorator(EXPAND_TO, dummyQuery);
 
-		decorator.query(new Topic().withGene(GENE));
-		String actual = dummyQuery.getTopic().getGene();
+		decorator.query(new Topic().withGeneField(GENE));
+		String actual = dummyQuery.getTopic().getGeneField();
 		String expected = "TRP53 BCC7 BMFS5 LFS1 TP53 P53";
 		assertEquals(expected, actual);
 	}

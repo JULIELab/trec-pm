@@ -20,7 +20,7 @@ public class PubMedOnlineQuery implements Query<Topic> {
         l.addAll(topic.diseaseSynonyms);
         l.addAll(topic.diseaseHypernyms);
         // gene
-        l.add(topic.getGene());
+        l.add(topic.getGeneField());
         l.addAll(topic.geneSynonyms);
         l.addAll(topic.geneHypernyms);
         l.addAll(topic.geneDescriptions);

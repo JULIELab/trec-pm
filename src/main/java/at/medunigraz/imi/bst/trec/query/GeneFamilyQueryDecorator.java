@@ -26,7 +26,7 @@ public class GeneFamilyQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
-        String[] geneTokens = topic.getGeneTokens();
+        String[] geneTokens = topic.getGeneFieldTokens();
 
         for (String token : geneTokens) {
             String family = REMOVAL.matcher(token).replaceAll("");

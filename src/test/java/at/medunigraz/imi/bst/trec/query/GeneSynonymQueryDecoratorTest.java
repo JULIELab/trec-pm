@@ -20,7 +20,7 @@ public class GeneSynonymQueryDecoratorTest extends QueryDecoratorTest {
     public GeneSynonymQueryDecoratorTest() {
         this.decoratedQuery = new GeneSynonymQueryDecorator(
                 new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX)));
-        this.topic = new Topic().withGene(GENE);
+        this.topic = new Topic().withGeneField(GENE);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class GeneSynonymQueryDecoratorTest extends QueryDecoratorTest {
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
         Query decorator = new GeneSynonymQueryDecorator(dummyQuery);
 
-        decorator.query(new Topic().withGene(GENE));
+        decorator.query(new Topic().withGeneField(GENE));
 
         Map<String, String> actual = dummyQuery.getTopic().getAttributes();
         Assert.assertThat(actual, Matchers.hasValue("BCC7"));

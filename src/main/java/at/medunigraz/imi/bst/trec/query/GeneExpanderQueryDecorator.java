@@ -29,7 +29,7 @@ public class GeneExpanderQueryDecorator extends QueryDecorator<Topic> {
 	}
 
 	private void expandGenes(Topic topic) {
-		String[] geneTokens = topic.getGeneTokens();
+		String[] geneTokens = topic.getGeneFieldTokens();
 
 		StringBuilder expandedGenes = new StringBuilder();
 		for (String token : geneTokens) {
@@ -43,6 +43,6 @@ public class GeneExpanderQueryDecorator extends QueryDecorator<Topic> {
 			expandedGenes.append(TOKEN_SEPARATOR);
 		}
 
-		topic.withGene(expandedGenes.toString().trim());
+		topic.withGeneField(expandedGenes.toString().trim());
 	}
 }

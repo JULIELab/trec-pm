@@ -27,7 +27,7 @@ public class DrugInteractionQueryDecoratorTest extends QueryDecoratorTest {
     public DrugInteractionQueryDecoratorTest() {
         this.decoratedQuery = new DrugInteractionQueryDecorator(
                 new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX)));
-        this.topic = new Topic().withGene(GENE);
+        this.topic = new Topic().withGeneField(GENE);
     }
 
     @Test
@@ -35,7 +35,7 @@ public class DrugInteractionQueryDecoratorTest extends QueryDecoratorTest {
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
         Query decorator = new DrugInteractionQueryDecorator(dummyQuery);
 
-        decorator.query(new Topic().withGene(GENE));
+        decorator.query(new Topic().withGeneField(GENE));
 
         Map<String, String> actual = dummyQuery.getTopic().getAttributes();
         Assert.assertThat(actual, Matchers.hasValue("selumetinib"));

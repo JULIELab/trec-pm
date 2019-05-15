@@ -16,7 +16,7 @@ public class GeneSynonymQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
-        String[] geneTokens = topic.getGeneTokens();
+        String[] geneTokens = topic.getGeneFieldTokens();
 
         for (String token : geneTokens) {
             List<String> synonyms = NCBI_GENE_INFO.getSynonyms(token);

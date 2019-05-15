@@ -16,7 +16,7 @@ public class GeneDescriptionQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
-        String[] geneTokens = topic.getGeneTokens();
+        String[] geneTokens = topic.getGeneFieldTokens();
 
         for (String token : geneTokens) {
             Optional<String> description = NCBI_GENE_INFO.getDescription(token);
