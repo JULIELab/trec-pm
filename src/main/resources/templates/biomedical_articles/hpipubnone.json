@@ -10,7 +10,8 @@
 			{{biomedical_articles/cancer.json}},
 			{{biomedical_articles/dna.json}},
 			{{biomedical_articles/positive_boosters.json}},
-			{{biomedical_articles/negative_boosters.json}}
+			{{biomedical_articles/negative_boosters.json}},
+			{{resistantDrugs:biomedical_articles/resistant_drugs.json}}
 		],
 		"must_not": [
 			{{biomedical_articles/non_melanoma.json}}

@@ -1,25 +1,45 @@
 package at.medunigraz.imi.bst.trec.expansion;
 
-import com.opencsv.*;
+import at.medunigraz.imi.bst.trec.model.TopicGene;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReaderHeaderAware;
 import de.julielab.java.utilities.FileUtilities;
-import de.julielab.java.utilities.IOStreamUtilities;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Cosmic {
-public static void main(String args[]) {
-    final Cosmic cosmic = new Cosmic();
-    final Map<String, Set<String>> stringSetMap = cosmic.readResistanceMutationsFile(new File("resources/CosmicResistanceMutations.tsv.gz"));
-    System.out.println(stringSetMap);
-}
-
     private Map<String, Set<String>> drugsByGeneMutation;
+
+
+    private static Cosmic instance;
+
+    private Cosmic() {
+        drugsByGeneMutation = readResistanceMutationsFile(new File("resources/CosmicResistanceMutations.tsv.gz"));
+    }
+
+    public static Cosmic getInstance() {
+        if (instance == null) {
+            instance = new Cosmic();
+        }
+        return instance;
+
+    }
+
+    /**
+     * Returns drugs against which the passed gene with its mutation is resistant
+     * according to the COSMIC CosmicResistanceMutations.tsv file.
+     *
+     * @param gene The gene instance for that we seek drugs for which is known that the gene with its mutation confers resistance against.
+     * @return The drugs that the gene mutation confers resistance against according to COSMIS.
+     */
+    public Set<String> getDrugsThatGeneMutationConfersResistanceAgainst(TopicGene gene) {
+        String mapkey = (gene.getGeneSymbol() + "-" + gene.getMutation()).toUpperCase();
+        return drugsByGeneMutation.getOrDefault(mapkey, Collections.emptySet());
+    }
 
     private Map<String, Set<String>> readResistanceMutationsFile(File resistanceMutationsFile) {
         Map<String, Set<String>> map = new HashMap<>();

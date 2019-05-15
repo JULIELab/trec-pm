@@ -75,4 +75,10 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         query = new DrugInteractionQueryDecorator(query);
         return this;
     }
+
+    public TrecPmRetrieval withResistantDrugs() {
+
+        query = new ResistantDrugsQueryDecorator(query);
+        return this;
+    }
 }

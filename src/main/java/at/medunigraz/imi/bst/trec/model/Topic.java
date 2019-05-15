@@ -28,6 +28,11 @@ public class Topic extends QueryDescription {
     // MUST be public to be accessed via Reflection on SubTemplateQueryDecorator
     public List<String> geneHypernyms = new ArrayList<>();
     public List<String> drugInteractions = new ArrayList<>();
+    /**
+     * This field is meant to collect mentions of drugs against which this gene with this mutation is resistant
+     * according to the COSMIC CosmicResistanceMutations.tsv file.
+     */
+    public List<String> resistantDrugs = new ArrayList<>();
 
     private String disease = "";
     private String geneField = "";
@@ -74,6 +79,11 @@ public class Topic extends QueryDescription {
     }
 
     private static Pattern mutationPattern = Pattern.compile("\\(([^)]+)\\)");
+
+    public TopicGene[] getGenes() {
+        return genes;
+    }
+
     public static Topic fromElement(Element element) {
         int number = Integer.parseInt(getAttribute(element, "number"));
         String disease = getElement(element, "disease");
@@ -207,6 +217,11 @@ public class Topic extends QueryDescription {
         return this;
     }
 
+    public Topic withResistantDrug(String drug) {
+        this.resistantDrugs.add(drug);
+        return this;
+    }
+
     public int getNumber() {
         return number;
     }
@@ -292,6 +307,10 @@ public class Topic extends QueryDescription {
 
         for (int i = 0; i < drugInteractions.size(); i++) {
             ret.put("drugInteractions" + i, drugInteractions.get(i));
+        }
+
+        for (int i = 0; i < resistantDrugs.size(); i++) {
+            ret.put("resistantDrugs" + i, resistantDrugs.get(i));
         }
 
         return ret;

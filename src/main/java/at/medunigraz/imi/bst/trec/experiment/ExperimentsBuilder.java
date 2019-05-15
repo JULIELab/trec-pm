@@ -114,6 +114,11 @@ public class ExperimentsBuilder {
         return this;
     }
 
+    public ExperimentsBuilder withResistantDrugs() {
+        retrieval.withResistantDrugs();
+        return this;
+    }
+
     public ExperimentsBuilder withGeneSynonym() {
         retrieval.withGeneSynonym();
         return this;
