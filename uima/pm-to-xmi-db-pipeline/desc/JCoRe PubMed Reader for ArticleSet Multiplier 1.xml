@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collectionReaderDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
+    <implementationName>de.julielab.jcore.reader.xml.XMLMultiplierReader</implementationName>
+        
+    <processingResourceMetaData>
+                
+        <name>JCoRe Pubmed Reader for ArticleSet Multiplier</name>
+                
+        <description/>
+                
+        <version>1.0</version>
+                
+        <vendor/>
+                
+        <configurationParameters>
+                        
+            <configurationParameter>
+                                
+                <name>InputDirectory</name>
+                                
+                <description/>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>InputFile</name>
+                                
+                <description/>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>FileNameRegex</name>
+                                
+                <description>If a directory is given, all inputUris with a name matching one of these regular expressions will be read, others will be discarded. Defaults to {'.*\.xml', '.*\.xml.gz'}.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>true</multiValued>
+                                
+                <mandatory>true</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>SearchInZipFiles</name>
+                                
+                <description>If set to true, contents of ZIP files in the given input directory will also be searched for files matching the specified file name regular expression. Defaults to false.</description>
+                                
+                <type>Boolean</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                    
+        </configurationParameters>
+                
+        <configurationParameterSettings>
+                        
+            <nameValuePair>
+                                
+                <name>FileNameRegex</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>.*\.xml</string>
+                                                
+                        <string>.*\.xml\.gz</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>SearchInZipFiles</name>
+                                
+                <value>
+                                        
+                    <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>InputDirectory</name>
+                                
+                <value>
+                                        
+                    <string>/data/data_corpora/MEDLINE/medline2019/original_download/</string>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                    
+        </configurationParameterSettings>
+                
+        <typeSystemDescription>
+                        
+            <imports>
+                                
+                <import name="de.julielab.jcore.types.casmultiplier.jcore-uri-multiplier-types"/>
+                                
+                <import name="org.apache.uima.ducc.FlowControllerTS"/>
+                            
+            </imports>
+                    
+        </typeSystemDescription>
+                
+        <fsIndexCollection/>
+                
+        <capabilities>
+                        
+            <capability>
+                                
+                <inputs/>
+                                
+                <outputs/>
+                                
+                <languagesSupported/>
+                            
+            </capability>
+                    
+        </capabilities>
+                
+        <operationalProperties>
+                        
+            <modifiesCas>true</modifiesCas>
+                        
+            <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+                        
+            <outputsNewCASes>true</outputsNewCASes>
+                    
+        </operationalProperties>
+            
+    </processingResourceMetaData>
+        
+    <resourceManagerConfiguration/>
+    
+</collectionReaderDescription>
