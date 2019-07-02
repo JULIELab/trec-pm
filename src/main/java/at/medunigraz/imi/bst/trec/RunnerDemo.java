@@ -5,6 +5,8 @@ import java.util.Set;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 
 public class RunnerDemo {
 	public static void main(String[] args) {
@@ -16,10 +18,10 @@ public class RunnerDemo {
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();
 
-		builder.newExperiment().withYear(year).withGoldStandard(Experiment.GoldStandard.OFFICIAL).withTarget(Experiment.Task.PUBMED)
+		builder.newExperiment().withYear(year).withGoldStandard(GoldStandard.OFFICIAL).withTarget(Task.PUBMED)
 				.withSubTemplate(pmTemplate).withWordRemoval();
-		builder.newExperiment().withYear(year).withGoldStandard(Experiment.GoldStandard.OFFICIAL)
-				.withTarget(Experiment.Task.CLINICAL_TRIALS).withSubTemplate(ctTemplate).withWordRemoval();
+		builder.newExperiment().withYear(year).withGoldStandard(GoldStandard.OFFICIAL)
+				.withTarget(Task.CLINICAL_TRIALS).withSubTemplate(ctTemplate).withWordRemoval();
 
 		Set<Experiment> bestExperiments = builder.build();
 

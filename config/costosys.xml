@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<databaseConnectorConfiguration>
+    <DBSchemaInformation>
+        <activePostgresSchema>trecpm</activePostgresSchema>
+        <activeTableSchema>medline_2016</activeTableSchema>
+        <activeDataPostgresSchema>_data</activeDataPostgresSchema>
+        <tableSchemas>
+            <tableSchema forEach="." name="xmi_anno_view">
+                <field name="pmid" primaryKey="true" retrieve="true" type="text" xpath="PMID"/>
+                <field gzip="true" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
+            </tableSchema>
+        </tableSchemas>
+    </DBSchemaInformation>
+    <DBConnectionInformation>
+        <activeDBConnection>trecpm</activeDBConnection>
+        <DBConnections>
+            <DBConnection name="trecpm" url="jdbc:postgresql://localhost:5432/trecpm"/>
+        </DBConnections>
+    </DBConnectionInformation>
+</databaseConnectorConfiguration>

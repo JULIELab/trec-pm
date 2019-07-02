@@ -6,7 +6,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import at.medunigraz.imi.bst.retrieval.*;
 import at.medunigraz.imi.bst.trec.model.Gene;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.query.*;
 
 public class ExperimentsBuilder {
@@ -16,6 +19,7 @@ public class ExperimentsBuilder {
     private Experiment buildingExp = null;
     private String statsDir;
     private String resultsDir;
+    private TrecPmRetrieval retrieval;
 
     public ExperimentsBuilder() {
     }
@@ -23,6 +27,8 @@ public class ExperimentsBuilder {
     public ExperimentsBuilder newExperiment() {
         validate();
         buildingExp = new Experiment();
+        retrieval = new TrecPmRetrieval();
+        buildingExp.setRetrieval(retrieval);
         if (statsDir != null)
             withStatsDir(statsDir);
         if (resultsDir != null)
@@ -31,26 +37,23 @@ public class ExperimentsBuilder {
     }
 
     public ExperimentsBuilder withName(String name) {
-        buildingExp.setExperimentName(name);
+        retrieval.withExperimentName(name);
         return this;
     }
 
-    @Deprecated
     public ExperimentsBuilder withDecorator(Query decorator) {
-        buildingExp.setDecorator(decorator);
+        retrieval.setQuery(decorator);
         return this;
     }
 
     public ExperimentsBuilder withTemplate(File template) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new TemplateQueryDecorator(template, previousDecorator));
+        retrieval.withTemplate(template);
         return this;
     }
 
 
     public ExperimentsBuilder withSubTemplate(File template) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SubTemplateQueryDecorator(template, previousDecorator));
+        retrieval.withSubTemplate(template);
         return this;
     }
 
@@ -63,9 +66,7 @@ public class ExperimentsBuilder {
      * @return This ExperimentsBuilder.
      */
     public ExperimentsBuilder withProperties(Map<String, String> templateProperties) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new StaticMapQueryDecorator(templateProperties, previousDecorator));
-
+        retrieval.withProperties(templateProperties);
         return this;
     }
 
@@ -79,95 +80,86 @@ public class ExperimentsBuilder {
      * @return This ExperimentsBuilder.
      */
     public ExperimentsBuilder withProperties(String... templatePropertiesAndValues) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), previousDecorator));
-
+        retrieval.withProperties(templatePropertiesAndValues);
         return this;
     }
 
     public ExperimentsBuilder withWordRemoval() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new WordRemovalQueryDecorator(previousDecorator));
+        retrieval.withWordRemoval();
         return this;
     }
 
     public ExperimentsBuilder withGeneExpansion(Gene.Field[] expandTo) {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneExpanderQueryDecorator(expandTo, previousDecorator));
+        retrieval.withGeneExpansion(expandTo);
         return this;
     }
 
     public ExperimentsBuilder withDiseaseReplacer() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseReplacerQueryDecorator(previousDecorator));
+        retrieval.withDiseaseReplacer();
         return this;
     }
 
     public ExperimentsBuilder withDiseaseExpander() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseExpanderQueryDecorator(previousDecorator));
+        retrieval.withDiseaseExpander();
         return this;
     }
 
     public ExperimentsBuilder withDiseasePreferredTerm() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseasePreferredTermQueryDecorator(previousDecorator));
+        retrieval.withDiseasePreferredTerm();
         return this;
     }
 
     public ExperimentsBuilder withDiseaseSynonym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseSynonymQueryDecorator(previousDecorator));
+        retrieval.withDiseaseSynonym();
+        return this;
+    }
+
+    public ExperimentsBuilder withResistantDrugs() {
+        retrieval.withResistantDrugs();
         return this;
     }
 
     public ExperimentsBuilder withGeneSynonym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneSynonymQueryDecorator(previousDecorator));
+        retrieval.withGeneSynonym();
         return this;
     }
 
     public ExperimentsBuilder withGeneDescription() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneDescriptionQueryDecorator(previousDecorator));
+        retrieval.withGeneDescription();
         return this;
     }
 
     public ExperimentsBuilder withDiseaseHypernym() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DiseaseHypernymQueryDecorator(previousDecorator));
+        retrieval.withDiseaseHypernym();
         return this;
     }
 
     public ExperimentsBuilder withSolidTumor() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new SolidTumorQueryDecorator(previousDecorator));
+        retrieval.withSolidTumor();
         return this;
     }
 
     public ExperimentsBuilder withGeneFamily() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new GeneFamilyQueryDecorator(previousDecorator));
+        retrieval.withGeneFamily();
         return this;
     }
 
     public ExperimentsBuilder withDrugInteraction() {
-        Query previousDecorator = buildingExp.getDecorator();
-        buildingExp.setDecorator(new DrugInteractionQueryDecorator(previousDecorator));
+        retrieval.withDrugInteraction();
         return this;
     }
 
-    public ExperimentsBuilder withGoldStandard(Experiment.GoldStandard gold) {
+    public ExperimentsBuilder withGoldStandard(GoldStandard gold) {
         buildingExp.setGoldStandard(gold);
         return this;
     }
 
-    public ExperimentsBuilder withTarget(Experiment.Task task) {
+    public ExperimentsBuilder withTarget(Task task) {
         buildingExp.setTask(task);
-        if (task != Experiment.Task.PUBMED_ONLINE)
-            buildingExp.setDecorator(new ElasticSearchQuery(buildingExp.getIndexName(), buildingExp.getTypes()));
+        if (task != Task.PUBMED_ONLINE)
+            retrieval.setQuery(new ElasticSearchQuery(buildingExp.getGoldStandard()));
         else
-            buildingExp.setDecorator(new PubMedOnlineQuery());
+            retrieval.setQuery(new PubMedOnlineQuery());
         return this;
     }
 
@@ -200,18 +192,6 @@ public class ExperimentsBuilder {
             this.experiments.add(buildingExp);
             return;
         }
-    }
-
-    private Map<String, String> array2Map(String[] mapItems) {
-        Map<String, String> map = new HashMap<>();
-        for (int i = 0; i < mapItems.length; i++) {
-            if (i % 2 == 1) {
-                String key = mapItems[i - 1];
-                String value = mapItems[i];
-                map.put(key, value);
-            }
-        }
-        return map;
     }
 
     public void setDefaultStatsDir(String statsDir) {

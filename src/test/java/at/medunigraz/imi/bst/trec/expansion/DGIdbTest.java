@@ -1,7 +1,9 @@
 package at.medunigraz.imi.bst.trec.expansion;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
@@ -11,6 +13,13 @@ import static org.junit.Assert.assertThat;
 public class DGIdbTest {
 
     private static final DGIdb DGI_DB = new DGIdb();
+
+    @BeforeClass
+    public static void setup() {
+        File cache = new File("cache");
+        if (!cache.exists())
+            cache.mkdir();
+    }
 
     @Test
     public void getInteractions() {

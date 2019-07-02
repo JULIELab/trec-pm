@@ -1,8 +1,5 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,18 +11,24 @@ public class TrecEval extends AbstractEvaluator {
     /**
      * -m all_trec -q -c -M1000
      */
-    private static final String COMMAND = TREC_EVAL_SCRIPT + " -m all_trec -q -c -M1000";
-
+    private String command;
 
     public TrecEval(File goldStandard, File results) {
+        this(goldStandard, results, 1000, true);
+    }
+
+    public TrecEval(File goldStandard, File results, int k, boolean calculateWithMissingResults) {
         super.goldStandard = goldStandard;
         super.results = results;
+        command = TREC_EVAL_SCRIPT + " -m all_trec -q -M"+k;
+        if (calculateWithMissingResults)
+            command = command + " -c";
         evaluate();
     }
 
     public List<String> getFullCommand() {
         List<String> fullCommand = new ArrayList<>();
-        fullCommand.add(COMMAND);
+        fullCommand.add(command);
         fullCommand.add(goldStandard.getAbsolutePath());
         fullCommand.add(results.getAbsolutePath());
         return fullCommand;

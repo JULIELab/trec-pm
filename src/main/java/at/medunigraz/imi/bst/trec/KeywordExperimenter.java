@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 import org.apache.commons.io.FileUtils;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
@@ -39,8 +41,8 @@ public class KeywordExperimenter {
 			}
 
 			for (String keyword : lines) {
-				builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(Experiment.GoldStandard.OFFICIAL)
-						.withTarget(Experiment.Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
+				builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
+						.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
 						.withWordRemoval();
 			}
 		}
@@ -64,8 +66,8 @@ public class KeywordExperimenter {
 			keyword = keyword + " " + entry.getValue();
 			keyword = keyword.trim();
 
-			builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(Experiment.GoldStandard.OFFICIAL)
-					.withTarget(Experiment.Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
+			builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
+					.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
 					.withWordRemoval();
 		}
 

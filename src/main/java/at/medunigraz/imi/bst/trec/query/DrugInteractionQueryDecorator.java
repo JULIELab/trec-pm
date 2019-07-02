@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.query;
 
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.expansion.DGIdb;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
@@ -15,7 +16,7 @@ public class DrugInteractionQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
-        String[] geneTokens = topic.getGeneTokens();
+        String[] geneTokens = topic.getGeneFieldTokens();
 
         for (String token : geneTokens) {
             Set<String> interactions = dgidb.getDrugInteractions(token, true, 150);

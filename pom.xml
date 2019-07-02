@@ -6,7 +6,7 @@
 
     <groupId>at.medunigraz.imi.bst</groupId>
     <artifactId>trec-pm</artifactId>
-    <version>2.1.0</version>
+    <version>3.0.0-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -140,22 +140,6 @@
             <version>1.2.3</version>
         </dependency>
         <dependency>
-            <groupId>de.julielab</groupId>
-            <artifactId>jcore-topic-indexing-ae</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-beanutils</groupId>
-                    <artifactId>commons-beanutils-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>de.julielab</groupId>
-            <artifactId>java-stdio-ipc</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>com.wcohen</groupId>
             <artifactId>com.wcohen.secondstring</artifactId>
             <version>0.1</version>
@@ -163,12 +147,12 @@
         <dependency>
             <groupId>de.julielab</groupId>
             <artifactId>julielab-java-utilities</artifactId>
-            <version>1.0.4</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.julielab</groupId>
             <artifactId>julie-xml-tools</artifactId>
-            <version>0.4.2</version>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -242,32 +226,50 @@
             <artifactId>opencsv</artifactId>
             <version>4.2</version>
         </dependency>
-
-        <!-- If topic models should be used for the Precision Medicine Classifier -->
         <dependency>
-            <groupId>de.julielab</groupId>
-            <artifactId>jcore-opennlp-postag-ae-biomedical-english</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-jxpath</groupId>
+            <artifactId>commons-jxpath</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.12.2</version>
         </dependency>
         <dependency>
             <groupId>de.julielab</groupId>
-            <artifactId>jcore-jsbd-ae-biomedical-english</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
+            <artifactId>costosys</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.uima</groupId>
+            <artifactId>uimaj-core</artifactId>
+            <version>2.10.3</version>
         </dependency>
         <dependency>
             <groupId>de.julielab</groupId>
-            <artifactId>jcore-jtbd-ae-biomedical-english</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
+            <artifactId>jcore-xmi-splitter</artifactId>
+            <version>2.3.3</version>
         </dependency>
         <dependency>
             <groupId>de.julielab</groupId>
-            <artifactId>jcore-biolemmatizer-ae</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
+            <artifactId>jcore-types</artifactId>
+            <version>2.5.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.julielab</groupId>
-            <artifactId>jcore-topic-indexing-ae</artifactId>
-            <version>2.4.0-SNAPSHOT</version>
+            <artifactId>RankLib</artifactId>
+            <version>2.11-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>3.0.7</version>
         </dependency>
     </dependencies>
 

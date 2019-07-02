@@ -1,14 +1,17 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import de.julielab.ir.model.QueryDescription;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class ResultList {
-	private Topic topic;
+public class ResultList<T extends QueryDescription> {
+	private T topic;
 	
 	private List<Result> results = new ArrayList<>();
 	
-	public ResultList(Topic topic) {
+	public ResultList(T topic) {
 		this.topic = topic;
 	}
 	
@@ -16,16 +19,11 @@ public class ResultList {
 		return results.add(result);
 	}
 
-	/**
-	 * 
-	 * @deprecated Use add(Result result) instead
-	 * @param results
-	 */
-	public void setResults(List<Result> results) {
-		this.results = results;
+	public boolean addAll(Collection<Result> results) {
+		return this.results.addAll(results);
 	}
 
-	public Topic getTopic() {
+	public T getTopic() {
 		return topic;
 	}
 	

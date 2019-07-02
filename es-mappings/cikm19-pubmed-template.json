@@ -1,0 +1,95 @@
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 8,
+    "similarity": {
+      "my_bm25": {
+        "type": "BM25",
+        "k1": {{bm25_k1}},
+        "b": {{bm25_b}}
+      },
+      "my_tfidf": {
+        "type": "classic",
+        "discount_overlaps": true
+      },
+      "my_dfr" : {
+        "type" : "DFR",
+        "basic_model" : "{{dfr_basic_model}}",
+        "after_effect" : "{{dfr_after_effect}}",
+        "normalization" : "{{dfr_normalization}}"
+      },
+      "my_dfi": {
+        "type": "DFI",
+        "independence_measure": "{{dfi_independence_measure}}"
+      },
+      "my_ib": {
+        "type" : "IB",
+        "distribution" : "{{ib_distribution}}",
+        "lambda" : "{{ib_lambda}}",
+        "normalization" : "{{ib_normalization}}"
+      },
+      "my_lmd": {
+        "type" : "LMDirichlet",
+        "mu" : {{lmd_mu}}
+      },
+      "my_lmjm": {
+        "type" : "LMJelinekMercer",
+        "lambda" : {{lmjm_lambda}}
+      }
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "_all": {
+        "enabled": false
+      },
+      "_source": {
+        "enabled": true
+      }
+    },
+    "medline": {
+      "properties": {
+        "title": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "abstract": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "keyword": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "meshTags": {
+          "type": "text",
+          "similarity": "{{similarity}}",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}

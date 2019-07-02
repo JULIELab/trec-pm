@@ -1,2 +1,0 @@
-Could not reader "<AAE delegate>"due to a parsing error: Could not parse an AAE delegate specifier: An import could not be resolved.  No file with name "de/julielab/jcore/types/jcore-morpho-syntax-types.xml" was found in the class path or data path. (Descriptor: file:/Users/faessler/Coding/git/ourtrecpm/uima/preprocessing_ct/y/desc/JCoRe Sentence Annotator.xml)
-

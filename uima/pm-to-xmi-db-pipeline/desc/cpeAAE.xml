@@ -1,30 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
     <primitive>false</primitive>
+        
     <delegateAnalysisEngineSpecifiers>
+                
         <delegateAnalysisEngine key="JCoRe PubMed ArticleSet Multiplier">
-            <import location="JCoRe PubMed ArticleSet Multiplier.xml"/>
+                        
+            <import location="JCoRe PubMed XML Database Multiplier.xml"/>
+                    
         </delegateAnalysisEngine>
+                
         <delegateAnalysisEngine key="JCoRe XMI Database Writer">
+                        
             <import location="JCoRe XMI Database Writer.xml"/>
+                    
         </delegateAnalysisEngine>
+            
     </delegateAnalysisEngineSpecifiers>
+        
     <analysisEngineMetaData>
+                
         <name/>
+                
         <configurationParameters/>
+                
         <configurationParameterSettings/>
+                
         <flowConstraints>
+                        
             <fixedFlow>
+                                
                 <node>JCoRe PubMed ArticleSet Multiplier</node>
+                                
                 <node>JCoRe XMI Database Writer</node>
+                            
             </fixedFlow>
+                    
         </flowConstraints>
+                
         <capabilities/>
+                
         <operationalProperties>
+                        
             <modifiesCas>true</modifiesCas>
+                        
             <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
             <outputsNewCASes>false</outputsNewCASes>
+                    
         </operationalProperties>
+            
     </analysisEngineMetaData>
+    
 </analysisEngineDescription>

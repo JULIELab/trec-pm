@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.query;
 
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ public class GeneFamilyQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
-        String[] geneTokens = topic.getGeneTokens();
+        String[] geneTokens = topic.getGeneFieldTokens();
 
         for (String token : geneTokens) {
             String family = REMOVAL.matcher(token).replaceAll("");

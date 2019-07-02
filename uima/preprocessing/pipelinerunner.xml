@@ -3,8 +3,9 @@
     <runners>
         <runner>
             <name>CPERunner</name>
-	    <pipelinepath>/home/faessler/Coding/git/ourtrecpm/uima/preprocessing</pipelinepath>
+	    <pipelinepath>.</pipelinepath>
             <numthreads>20</numthreads>
-        </runner>
+	    <heapsize>35G</heapsize>
+    </runner>
     </runners>
 </configuration>

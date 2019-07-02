@@ -42,15 +42,7 @@ models
 
 # Big resource files
 src/main/resources/genes/*.gene_info*
+resources/umlsSynsets.txt.gz
 
-# Resources that are not public yet
-resources/abstracts.judgments.2018.csv
-resources/clinical_trials.judgments.2018.csv
-resources/gs2018DocsJson.zip
-src/main/resources/gold-standard/qrels-treceval-abstracts.2018.txt
-src/main/resources/gold-standard/qrels-treceval-clinical_trials.2018.txt
-resources/20190111processedGoldStandardPub2018.tsv.gz
-uima/gsdocids2018.txt
-resources/qrels-sample-abstracts.txt
-resources/qrels-sample-trials.txt
-resources/20180712processedGoldStandardCT2017.tsv.gz
+# May not redistribute
+resources/CosmicResistanceMutations.tsv*

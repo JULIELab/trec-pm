@@ -8,11 +8,7 @@
 			</pattern>
 		</encoder>
 	</appender>
-	<!--
-	<logger name="de.julielab.jcore.reader.xmi.CasPopulator" level="trace"/>
-	<logger name="de.julielab.jcore.consumer.xmi.XMIDBWriter" level="trace"/>
-	<logger name="de.julielab.jcore.consumer.xmi.XmiDataInserter" level="trace"/>
-	-->
+	<logger name="de.julielab.jcore.ae.annotationadder" level="TRACE" />
 	<root level="INFO">
 		<appender-ref ref="STXOUT" />
 	</root>
