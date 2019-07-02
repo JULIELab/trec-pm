@@ -1,1 +1,21 @@
-../../costosys.xml
+<?xml version="1.0" ?>
+<databaseConnectorConfiguration>
+    <DBSchemaInformation>
+        <activePostgresSchema>erik</activePostgresSchema>
+        <activeTableSchema>medline_2017</activeTableSchema>
+        <tableSchemas>
+            <tableSchema forEach="." name="xmi_anno_view">
+                <field name="pmid" primaryKey="true" retrieve="true" type="text" xpath="PMID"/>
+                <field gzip="false" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
+            </tableSchema>
+        </tableSchemas>
+    </DBSchemaInformation>
+    <DBConnectionInformation>
+        <activeDBConnection>trecpm2019</activeDBConnection>
+	<maxActiveDBConnections>4</maxActiveDBConnections>
+	<DBConnections>
+            <DBConnection name="trecpm2019" url="jdbc:postgresql://h4:5432/trecpm2019"/>
+        </DBConnections>
+    </DBConnectionInformation>
+	
+</databaseConnectorConfiguration>
