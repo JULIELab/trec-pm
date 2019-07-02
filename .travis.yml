@@ -1,9 +1,7 @@
 language: java
 jdk:
-  - openjdk8
-  - openjdk9
-  - openjdk10
   - openjdk11
+  - openjdk12
 script: mvn test -Delastic.hostname=$ELASTIC_HOSTNAME -Dlexigram.apikey=$LEXIGRAM_APIKEY -B
 after_success:
   - mvn -Delastic.hostname=$ELASTIC_HOSTNAME -Dlexigram.apikey=$LEXIGRAM_APIKEY clean test jacoco:report coveralls:report

@@ -16,6 +16,7 @@ public class CachedWebRequester {
 
     public CachedWebRequester(String filename) {
         this.cacheFile = new File(filename);
+        cacheFile.getParentFile().mkdirs();
 
         if (cacheFile.exists()) {
             try {
