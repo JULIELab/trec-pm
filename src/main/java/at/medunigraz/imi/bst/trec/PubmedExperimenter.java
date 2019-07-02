@@ -5,6 +5,8 @@ import java.util.Set;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 
 public class PubmedExperimenter {
 	public static void main(String[] args) {
@@ -15,8 +17,8 @@ public class PubmedExperimenter {
 		final File extraBoostTemplate = new File(
 				PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
 
-		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
-		final Experiment.Task target = Experiment.Task.PUBMED;
+		final GoldStandard goldStandard = GoldStandard.OFFICIAL;
+		final Task target = Task.PUBMED;
 		final int year = 2017;
 
 

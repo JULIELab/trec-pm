@@ -5,6 +5,8 @@ import java.util.Set;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 
 public class BoostExperimenter {
 	public static void main(String[] args) {
@@ -13,8 +15,8 @@ public class BoostExperimenter {
 		ExperimentsBuilder builder = new ExperimentsBuilder();
 
 		for (float i = 1; i <= 5; i += 0.5) {
-			builder.newExperiment().withYear(2017).withGoldStandard(Experiment.GoldStandard.OFFICIAL)
-					.withTarget(Experiment.Task.PUBMED).withProperties("keyword", String.valueOf(i)).withTemplate(relaxedTemplate)
+			builder.newExperiment().withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
+					.withTarget(Task.PUBMED).withProperties("keyword", String.valueOf(i)).withTemplate(relaxedTemplate)
 					.withWordRemoval();
 		}
 

@@ -1,0 +1,17 @@
+{
+  "dis_max": {
+    "boost": {{disease_dismax_boost}},
+    "queries": [
+      {
+        "multi_match": {
+          "query": "{{disease}}",
+          "fields": {{biomedical_articles_recall/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "{{disease_match_type}}",
+          "boost": {{disease_boost}}
+        }
+      },
+      {{diseaseSynonyms:biomedical_articles_recall/disease_synonym.json}},
+    ]
+  }
+}

@@ -1,6 +1,9 @@
 package at.medunigraz.imi.bst.trec.query;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
+import at.medunigraz.imi.bst.retrieval.Query;
+import at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -17,7 +20,7 @@ public class GeneDescriptionQueryDecoratorTest extends QueryDecoratorTest {
     public GeneDescriptionQueryDecoratorTest() {
         this.decoratedQuery = new GeneDescriptionQueryDecorator(
                 new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX)));
-        this.topic = new Topic().withGene(GENE);
+        this.topic = new Topic().withGeneField(GENE);
     }
 
     @Test
@@ -25,7 +28,7 @@ public class GeneDescriptionQueryDecoratorTest extends QueryDecoratorTest {
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
         Query decorator = new GeneDescriptionQueryDecorator(dummyQuery);
 
-        decorator.query(new Topic().withGene(GENE));
+        decorator.query(new Topic().withGeneField(GENE));
 
         Map<String, String> actual = dummyQuery.getTopic().getAttributes();
         Assert.assertThat(actual, Matchers.hasEntry("geneDescriptions0", "tumor protein p53"));

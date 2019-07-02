@@ -2,24 +2,19 @@ package at.medunigraz.imi.bst.lexigram;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.expansion.CachedWebRequester;
+import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.File;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -214,7 +209,7 @@ public class Lexigram {
     public static void main(String[] args) {
         final File topicsFile = new File(CSVStatsWriter.class.getResource("/topics/topics2018.xml").getPath());
 
-        TopicSet topicSet = new TopicSet(topicsFile);
+        TopicSet topicSet = new TopicSet(topicsFile, Challenge.TREC_PM, Task.PUBMED, 2018);
         JSONObject output = createDump(topicSet);
 
         System.out.println(JsonUtils.prettify(output));

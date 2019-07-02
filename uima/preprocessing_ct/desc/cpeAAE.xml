@@ -19,9 +19,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe XMI Database Writer">
+        <delegateAnalysisEngine key="JCoRe Consumer AAE">
                         
-            <import location="JCoRe XMI Database Writer.xml"/>
+            <import location="AggregateConsumer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -43,7 +43,7 @@
                                 
                 <node>JCoRe Pipeline AAE</node>
                                 
-                <node>JCoRe XMI Database Writer</node>
+                <node>JCoRe Consumer AAE</node>
                             
             </fixedFlow>
                     

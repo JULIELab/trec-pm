@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --mem 60g
+#SBATCH --mem 25g
 #SBATCH --cpus-per-task 10 
 #SBATCH -J trecpubindex 
 

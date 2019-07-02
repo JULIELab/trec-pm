@@ -1,5 +1,7 @@
 package at.medunigraz.imi.bst.trec.query;
 
+import at.medunigraz.imi.bst.retrieval.Query;
+import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.expansion.NCBIGeneInfo;
 import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.Result;
@@ -7,7 +9,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.List;
 
-public class GeneExpanderQueryDecorator extends QueryDecorator {
+public class GeneExpanderQueryDecorator extends QueryDecorator<Topic> {
 
 	private static final String TOKEN_SEPARATOR = " ";
 
@@ -27,7 +29,7 @@ public class GeneExpanderQueryDecorator extends QueryDecorator {
 	}
 
 	private void expandGenes(Topic topic) {
-		String[] geneTokens = topic.getGeneTokens();
+		String[] geneTokens = topic.getGeneFieldTokens();
 
 		StringBuilder expandedGenes = new StringBuilder();
 		for (String token : geneTokens) {
@@ -41,6 +43,6 @@ public class GeneExpanderQueryDecorator extends QueryDecorator {
 			expandedGenes.append(TOKEN_SEPARATOR);
 		}
 
-		topic.withGene(expandedGenes.toString().trim());
+		topic.withGeneField(expandedGenes.toString().trim());
 	}
 }

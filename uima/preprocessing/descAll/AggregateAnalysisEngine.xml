@@ -72,6 +72,18 @@
             <import location="PM Classifier 2018.xml"/>
                     
         </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder">
+                        
+            <import location="JCoRe Annotation Adder.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder 1">
+                        
+            <import location="JCoRe Annotation Adder 1.xml"/>
+                    
+        </delegateAnalysisEngine>
             
     </delegateAnalysisEngineSpecifiers>
         
@@ -108,6 +120,10 @@
                 <node>PM Classifier 2017</node>
                                 
                 <node>PM Classifier 2018</node>
+                                
+                <node>JCoRe Annotation Adder</node>
+                                
+                <node>JCoRe Annotation Adder 1</node>
                             
             </fixedFlow>
                     

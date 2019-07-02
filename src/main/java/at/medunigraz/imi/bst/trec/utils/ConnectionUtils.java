@@ -1,10 +1,14 @@
 package at.medunigraz.imi.bst.trec.utils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.net.*;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.hiddenConfig.HiddenConfig;
+import de.julielab.xmlData.config.ConfigReader;
+import de.julielab.xmlData.config.DBConfig;
 
 public class ConnectionUtils {
 	/**
@@ -25,5 +29,12 @@ public class ConnectionUtils {
 
 	public static boolean checkElasticOpenPort() {
 		return ConnectionUtils.checkOpenPort(TrecConfig.ELASTIC_HOSTNAME, TrecConfig.ELASTIC_PORT);
+	}
+
+	public static boolean checkPostgresOpenPort() throws FileNotFoundException, MalformedURLException {
+		final ConfigReader configReader = new ConfigReader(new FileInputStream(TrecConfig.COSTOSYS_CONFIG));
+		final DBConfig dbConfig = configReader.getDatabaseConfig();
+        final String[] hostAndPort = dbConfig.getUrl().split("/")[2].split(":");
+        return ConnectionUtils.checkOpenPort(hostAndPort[0], Integer.valueOf(hostAndPort[1]));
 	}
 }

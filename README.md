@@ -65,7 +65,7 @@ mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.KeywordExperimenter" 
 cat out.txt | grep -e "\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)" | sed -r "s/"\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)"/\1 \2 \4/" > results.txt
 ```
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/00d52e98173d4629be22a4224a48a223)](https://www.codacy.com/app/michelole/trec-pm)
-[![Build Status](https://travis-ci.com/michelole/trec-pm.svg?branch=master)](https://travis-ci.com/michelole/trec-pm)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2b63c0e0c69140318323c9eb1cd19f32)](https://www.codacy.com/app/michelole/trec-pm)
+[![Build Status](https://travis-ci.com/JULIELab/trec-pm.svg?branch=master)](https://travis-ci.com/JULIELab/trec-pm)
 [![Coverage Status](https://coveralls.io/repos/github/michelole/trec-pm/badge.svg?branch=master)](https://coveralls.io/github/michelole/trec-pm?branch=master)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

@@ -7,7 +7,7 @@
                         
             <descriptor>
                                 
-                <import location="XMI Database Multiplier Reader.xml"/>
+                <import location="XMI Database Multiplier Reader 1.xml"/>
                             
             </descriptor>
                     
@@ -39,17 +39,5 @@
                 
         </casProcessor>
     </casProcessors>
-        
-    <cpeConfig>
-                
-        <numToProcess>-1</numToProcess>
-                
-        <deployAs>immediate</deployAs>
-                
-        <checkpoint batch="0" time="300000ms"/>
-                
-        <timerImpl/>
-            
-    </cpeConfig>
     
 </cpeDescription>

@@ -1,8 +1,8 @@
 package de.julielab.jcore.ae.pmclassifier;
 
-import at.medunigraz.imi.bst.pmclassifier.Document;
-import at.medunigraz.imi.bst.pmclassifier.MalletClassifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.julielab.ir.pm.pmclassifier.Document;
+import de.julielab.ir.pm.pmclassifier.MalletClassifier;
 import de.julielab.jcore.types.*;
 import de.julielab.jcore.utility.JCoReTools;
 import org.apache.commons.io.FileUtils;

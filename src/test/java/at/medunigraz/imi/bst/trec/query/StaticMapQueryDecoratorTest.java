@@ -7,6 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
+import at.medunigraz.imi.bst.retrieval.Query;
+import at.medunigraz.imi.bst.retrieval.StaticMapQueryDecorator;
+import at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator;
 import org.junit.Test;
 
 import at.medunigraz.imi.bst.trec.model.Topic;

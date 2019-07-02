@@ -17,12 +17,6 @@ public class LexigramTest {
     }
 
     @Test
-    public void mytest() {
-        final List<String> kras = Lexigram.addSynonymsFromBestConceptMatch("KRAS");
-        System.out.println(kras);
-    }
-
-    @Test
     public void preferredTerm() {
         Assert.assertEquals(Lexigram.getPreferredTerm("cervical cancer"), "carcinoma of cervix");
         Assert.assertEquals(Lexigram.getPreferredTerm("cholangiocarcinoma"), "cholangiocarcinoma of biliary tract");

@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<configuration>
+    <runners>
+        <runner>
+            <name>CPERunner</name>
+	    <pipelinepath>.</pipelinepath>
+            <numthreads>10</numthreads>
+	    <heapsize>20G</heapsize>
+    </runner>
+    </runners>
+</configuration>

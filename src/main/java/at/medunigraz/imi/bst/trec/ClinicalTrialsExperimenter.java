@@ -5,6 +5,8 @@ import java.util.Set;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Task;
 
 public class ClinicalTrialsExperimenter {
 	public static void main(String[] args) {
@@ -13,8 +15,8 @@ public class ClinicalTrialsExperimenter {
 		final File phraseTemplate = new File(
 				ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
 
-		final Experiment.GoldStandard goldStandard = Experiment.GoldStandard.OFFICIAL;
-		final Experiment.Task target = Experiment.Task.CLINICAL_TRIALS;
+		final GoldStandard goldStandard = GoldStandard.OFFICIAL;
+		final Task target = Task.CLINICAL_TRIALS;
 		final int year = 2018;
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();
