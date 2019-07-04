@@ -8,25 +8,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import at.medunigraz.imi.bst.trec.model.Metrics;
+import org.junit.rules.TemporaryFolder;
 
 public class XMLStatsWriterTest {
 
-	private final File actualFile = new File("stats/test.xml");
-	private final File expectedFile = new File(getClass().getResource("/stats/expected.xml").getFile());
+	@Rule
+	public TemporaryFolder testFolder = new TemporaryFolder();
 
-	@BeforeClass
-	public static void setup() {
-		File stats = new File("stats");
-		if (!stats.exists())
-			stats.mkdir();
-	}
+	private final File expectedFile = new File(getClass().getResource("/stats/expected.xml").getFile());
 
 	@Test
 	public void testWrite() throws IOException {
+		final File actualFile = testFolder.newFile("test.xml");
+
 		StatsWriter writer = new XMLStatsWriter(actualFile);
 
 		Metrics metrics = new Metrics();

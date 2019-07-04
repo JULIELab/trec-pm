@@ -161,7 +161,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
      * @todo Add support for 2018 topics
      */
     public String getGoldStandardFileName() {
-        // So far, we have only an internal gold standard for the 2017 edition on Scientific Abstracts
+        // Internal gold standard for the 2017 edition on Scientific Abstracts
         if (goldStandard == GoldStandard.INTERNAL && task == Task.PUBMED && year == YEAR_PUBLISHED_GS) {
             return "topics2017-pmid.qrels";
         } else if (goldStandard == GoldStandard.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == YEAR_PUBLISHED_GS) {
@@ -176,7 +176,11 @@ public class Experiment<Q extends QueryDescription> extends Thread {
             return "gsheets-abstracts.2018.qrels";
         } else if (goldStandard == GoldStandard.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2018) {
             return "gsheets-trials.2018.qrels";
-        } else {
+        } else if (goldStandard == GoldStandard.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2019) {
+            return "gsheets-abstracts-2019.qrels";
+        } else if (goldStandard == GoldStandard.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2019) {
+            return "gsheets-trials-2019.qrels";
+        }else {
             throw new UnsupportedOperationException("Invalid combination of gold standard, task and year.");
         }
     }
