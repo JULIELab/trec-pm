@@ -1,7 +1,5 @@
 package at.medunigraz.imi.bst.config;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public final class TrecConfig {

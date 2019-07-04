@@ -1,13 +1,6 @@
 package de.julielab.ir.es;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BM25Parameters implements SimilarityParameters{
     private double k1;

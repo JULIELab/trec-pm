@@ -2,10 +2,11 @@ package at.medunigraz.imi.bst.clinicaltrial;
 
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

@@ -1,16 +1,16 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import at.medunigraz.imi.bst.retrieval.*;
+import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
+import at.medunigraz.imi.bst.retrieval.PubMedOnlineQuery;
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
-import at.medunigraz.imi.bst.trec.query.*;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ExperimentsBuilder {
 

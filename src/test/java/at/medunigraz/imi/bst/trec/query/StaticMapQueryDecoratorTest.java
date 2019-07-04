@@ -1,19 +1,18 @@
 package at.medunigraz.imi.bst.trec.query;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.StaticMapQueryDecorator;
 import at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator;
+import at.medunigraz.imi.bst.trec.model.Topic;
 import org.junit.Test;
 
-import at.medunigraz.imi.bst.trec.model.Topic;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class StaticMapQueryDecoratorTest extends QueryDecoratorTest {
 	

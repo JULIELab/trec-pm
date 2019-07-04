@@ -1,12 +1,9 @@
 package at.medunigraz.imi.bst.trec.search;
 
-import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
 import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
-import de.julielab.ir.cache.LocalFileCacheAccess;
-import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import org.apache.logging.log4j.LogManager;
@@ -18,14 +15,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.json.JSONObject;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
-import org.springframework.cache.Cache;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

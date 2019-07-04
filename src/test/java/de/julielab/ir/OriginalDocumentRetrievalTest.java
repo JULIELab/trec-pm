@@ -6,23 +6,17 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.jcore.types.AutoDescriptor;
 import de.julielab.jcore.types.pubmed.Header;
-import org.apache.uima.UIMAException;
 import org.apache.uima.cas.CASException;
-import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class OriginalDocumentRetrievalTest {
 

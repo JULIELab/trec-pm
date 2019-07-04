@@ -1,10 +1,10 @@
 package at.medunigraz.imi.bst.trec.model;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.io.File;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class TopicTest {
 

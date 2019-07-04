@@ -1,16 +1,15 @@
 package at.medunigraz.imi.bst.trec.search;
 
-import java.io.Closeable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
+import at.medunigraz.imi.bst.config.TrecConfig;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
-import at.medunigraz.imi.bst.config.TrecConfig;
+import java.io.Closeable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class ElasticClientFactory implements Closeable {
 

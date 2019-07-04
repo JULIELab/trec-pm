@@ -1,13 +1,13 @@
 package at.medunigraz.imi.bst.clinicaltrial;
 
+import org.junit.Test;
+
+import java.io.File;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-
-import java.io.File;
-
-import org.junit.Test;
 
 public class ClinicalTrialTest {
 

@@ -1,20 +1,16 @@
 package de.julielab.ir.pm.pmclassifier.apps;
 
-import de.julielab.ir.pm.pmclassifier.*;
-import de.julielab.ir.pm.pmclassifier.lucene.LuceneClassifier;
-import cc.mallet.classify.Classifier;
 import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import de.julielab.ir.pm.pmclassifier.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class Train {

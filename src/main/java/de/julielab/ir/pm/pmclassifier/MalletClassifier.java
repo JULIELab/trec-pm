@@ -2,9 +2,10 @@ package de.julielab.ir.pm.pmclassifier;
 
 import cc.mallet.classify.Classification;
 import cc.mallet.classify.Classifier;
-import cc.mallet.classify.FeatureSelectingClassifierTrainer;
 import cc.mallet.classify.MaxEntTrainer;
-import cc.mallet.types.*;
+import cc.mallet.types.Instance;
+import cc.mallet.types.InstanceList;
+import cc.mallet.types.Label;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

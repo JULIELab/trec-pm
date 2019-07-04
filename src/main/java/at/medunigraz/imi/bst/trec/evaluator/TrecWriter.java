@@ -1,5 +1,13 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import com.opencsv.CSVWriter;
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.model.QueryDescription;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileWriter;
@@ -7,18 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.regex.Pattern;
-
-import com.opencsv.CSVWriter;
-
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import de.julielab.ir.ltr.Document;
-import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.IRScore;
-import de.julielab.ir.model.QueryDescription;
 
 public class TrecWriter implements Closeable {
 	private static final String VALID_RUN_NAME_REGEX = "[a-zA-Z0-9]{1,12}";

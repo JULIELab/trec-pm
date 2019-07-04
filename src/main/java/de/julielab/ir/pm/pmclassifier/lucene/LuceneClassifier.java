@@ -1,11 +1,6 @@
 package de.julielab.ir.pm.pmclassifier.lucene;
 
 import de.julielab.ir.pm.pmclassifier.*;
-import cc.mallet.classify.Classification;
-import cc.mallet.types.Instance;
-import cc.mallet.types.Label;
-import de.julielab.java.utilities.CLIInteractionUtilities;
-import de.julielab.java.utilities.FileUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -13,13 +8,18 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.*;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.*;
-import org.apache.lucene.store.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.IOContext;
+import org.apache.lucene.store.RAMDirectory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;

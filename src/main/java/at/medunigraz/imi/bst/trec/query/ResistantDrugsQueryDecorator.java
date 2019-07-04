@@ -2,7 +2,6 @@ package at.medunigraz.imi.bst.trec.query;
 
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.expansion.Cosmic;
-import at.medunigraz.imi.bst.trec.expansion.DGIdb;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicGene;
 

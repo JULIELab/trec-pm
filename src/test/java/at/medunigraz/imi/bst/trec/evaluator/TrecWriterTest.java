@@ -1,19 +1,18 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Topic;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.Topic;
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TrecWriterTest {
 	private static final String OUTPUT = "TrecWriterTest.trec_results";

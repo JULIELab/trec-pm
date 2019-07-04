@@ -1,8 +1,9 @@
 package at.medunigraz.imi.bst.lexigram;
 
-import org.junit.*;
-
-import java.util.List;
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.empty;

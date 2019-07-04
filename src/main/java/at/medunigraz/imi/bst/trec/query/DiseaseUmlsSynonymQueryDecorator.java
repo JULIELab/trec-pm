@@ -1,15 +1,11 @@
 package at.medunigraz.imi.bst.trec.query;
 
-import at.medunigraz.imi.bst.lexigram.Lexigram;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {

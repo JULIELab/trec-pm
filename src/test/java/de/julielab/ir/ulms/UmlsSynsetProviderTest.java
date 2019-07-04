@@ -1,18 +1,12 @@
 package de.julielab.ir.ulms;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.IOException;
-
-import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Task;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
+import com.google.common.collect.Sets;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class UmlsSynsetProviderTest {
 

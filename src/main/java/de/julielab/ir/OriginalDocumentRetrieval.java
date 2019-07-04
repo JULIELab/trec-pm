@@ -20,7 +20,6 @@ import org.apache.uima.resource.impl.ResourceManager_impl;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.resource.metadata.impl.ProcessingResourceMetaData_impl;
 import org.apache.uima.util.CasPool;
-import org.mapdb.DB;
 import org.xml.sax.SAXException;
 
 import java.io.*;

@@ -5,7 +5,6 @@ import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
 
-import java.io.File;
 import java.util.Set;
 
 public class PubMedOnlineExperimenter {

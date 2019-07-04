@@ -1,14 +1,15 @@
 package at.medunigraz.imi.bst.trec.utils;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.xmlData.config.ConfigReader;
+import de.julielab.xmlData.config.DBConfig;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.*;
-
-import at.medunigraz.imi.bst.config.TrecConfig;
-import de.julielab.hiddenConfig.HiddenConfig;
-import de.julielab.xmlData.config.ConfigReader;
-import de.julielab.xmlData.config.DBConfig;
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.net.Socket;
 
 public class ConnectionUtils {
 	/**

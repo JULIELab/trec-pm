@@ -1,11 +1,10 @@
 package at.medunigraz.imi.bst.retrieval;
 
+import at.medunigraz.imi.bst.trec.model.Result;
+import de.julielab.ir.model.QueryDescription;
+
 import java.util.List;
 import java.util.Map;
-
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import de.julielab.ir.model.QueryDescription;
 
 public class StaticMapQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
 	

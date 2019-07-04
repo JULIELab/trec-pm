@@ -1,27 +1,22 @@
 package de.julielab.ir.pm.pmclassifier;
 
-import de.julielab.ir.pm.pmclassifier.featurepipes.*;
 import cc.mallet.pipe.*;
-import cc.mallet.pipe.tsf.LexiconMembership;
-import cc.mallet.pipe.tsf.TrieLexiconMembership;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import com.wcohen.ss.BasicStringWrapper;
 import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
 import com.wcohen.ss.api.StringWrapper;
-import com.wcohen.ss.api.Token;
-import com.wcohen.ss.api.Tokenizer;
-import com.wcohen.ss.tokens.BasicSourcedToken;
-import com.wcohen.ss.tokens.BasicToken;
+import de.julielab.ir.pm.pmclassifier.featurepipes.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class InstancePreparator implements Serializable {
 

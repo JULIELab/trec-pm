@@ -1,6 +1,9 @@
 package de.julielab.ir.pm.pmclassifier.apps;
 
-import de.julielab.ir.pm.pmclassifier.*;
+import de.julielab.ir.pm.pmclassifier.DataReader;
+import de.julielab.ir.pm.pmclassifier.DataReadingException;
+import de.julielab.ir.pm.pmclassifier.Document;
+import de.julielab.ir.pm.pmclassifier.PMClassifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

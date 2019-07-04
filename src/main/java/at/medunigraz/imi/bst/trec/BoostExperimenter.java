@@ -1,12 +1,12 @@
 package at.medunigraz.imi.bst.trec;
 
-import java.io.File;
-import java.util.Set;
-
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
+
+import java.io.File;
+import java.util.Set;
 
 public class BoostExperimenter {
 	public static void main(String[] args) {

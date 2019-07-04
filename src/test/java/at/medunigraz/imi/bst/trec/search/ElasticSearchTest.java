@@ -1,17 +1,16 @@
 package at.medunigraz.imi.bst.trec.search;
 
-import static org.junit.Assert.assertFalse;
-
-import java.io.File;
-import java.util.List;
-
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.Assume;
 import org.junit.Test;
 
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import java.io.File;
+import java.util.List;
+
+import static org.junit.Assert.assertFalse;
 
 public class ElasticSearchTest {
 

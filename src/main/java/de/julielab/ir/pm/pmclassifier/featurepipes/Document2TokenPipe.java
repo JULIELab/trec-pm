@@ -1,12 +1,11 @@
 package de.julielab.ir.pm.pmclassifier.featurepipes;
 
-import de.julielab.ir.pm.pmclassifier.DataReader;
-import de.julielab.ir.pm.pmclassifier.Document;
 import cc.mallet.pipe.Pipe;
-import cc.mallet.types.*;
-
-import java.io.IOException;
-import java.util.List;
+import cc.mallet.types.Instance;
+import cc.mallet.types.Label;
+import cc.mallet.types.LabelAlphabet;
+import cc.mallet.types.Token;
+import de.julielab.ir.pm.pmclassifier.Document;
 
 public class Document2TokenPipe extends Pipe {
 

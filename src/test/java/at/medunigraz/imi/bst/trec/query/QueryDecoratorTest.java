@@ -1,18 +1,17 @@
 package at.medunigraz.imi.bst.trec.query;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-
-import java.util.List;
-
 import at.medunigraz.imi.bst.retrieval.Query;
-import org.junit.Assume;
-import org.junit.Test;
-
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import org.junit.Assume;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 
 public abstract class QueryDecoratorTest {
 

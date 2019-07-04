@@ -1,21 +1,18 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
-import java.io.File;
-import java.util.*;
-import java.util.function.Function;
-
+import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.*;
-import de.julielab.ir.ltr.Document;
-import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.IRScore;
+import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import at.medunigraz.imi.bst.retrieval.Query;
-import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
 public class Experiment<Q extends QueryDescription> extends Thread {
 

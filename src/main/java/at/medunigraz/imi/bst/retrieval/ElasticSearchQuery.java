@@ -1,16 +1,13 @@
 package at.medunigraz.imi.bst.retrieval;
 
-import java.util.List;
-
-import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.search.ElasticSearch;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.model.QueryDescription;
 import org.json.JSONObject;
 
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.search.ElasticSearch;
+import java.util.List;
 
 public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> {
 

@@ -6,7 +6,6 @@ import ciir.umass.edu.learning.*;
 import ciir.umass.edu.metric.METRIC;
 import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.metric.MetricScorerFactory;
-import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;

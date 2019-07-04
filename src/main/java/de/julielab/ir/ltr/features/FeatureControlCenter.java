@@ -62,6 +62,7 @@ public class FeatureControlCenter {
         featurePipes.add(new TfidfFeatureGroup(tfidf, vocabulary));
         featurePipes.add(new TopicMatchFeatureGroup());
         featurePipes.add(new Token2FeatureVector(false, false));
+        // Sort and consolidate the feature vector values for AugmentableFeatureVectors.
         featurePipes.add(new SetFeatureVectorPipe());
         final SerialPipes serialPipes = new SerialPipes(featurePipes);
 
@@ -82,6 +83,7 @@ public class FeatureControlCenter {
         for (Instance instance : instanceList) {
             final FeatureVector fv = (FeatureVector) instance.getData();
             // TODO continue
+            // TODO EF July 4th, 2019: but - continue what? I forgot what I wanted to do here XD
         }
     }
 

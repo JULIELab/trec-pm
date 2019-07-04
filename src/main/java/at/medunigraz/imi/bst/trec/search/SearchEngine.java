@@ -1,10 +1,9 @@
 package at.medunigraz.imi.bst.trec.search;
 
-import java.util.List;
-
+import at.medunigraz.imi.bst.trec.model.Result;
 import org.json.JSONObject;
 
-import at.medunigraz.imi.bst.trec.model.Result;
+import java.util.List;
 
 public interface SearchEngine {
     List<Result> query(JSONObject jsonQuery);

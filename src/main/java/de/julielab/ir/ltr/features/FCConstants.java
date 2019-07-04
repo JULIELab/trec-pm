@@ -1,8 +1,5 @@
 package de.julielab.ir.ltr.features;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * "FeatureConfigurationConstants".
  */

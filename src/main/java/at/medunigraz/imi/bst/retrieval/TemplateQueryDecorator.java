@@ -1,19 +1,19 @@
 package at.medunigraz.imi.bst.retrieval;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.io.FileUtils;
-
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TemplateQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
 	private static final Logger LOG = LogManager.getLogger();

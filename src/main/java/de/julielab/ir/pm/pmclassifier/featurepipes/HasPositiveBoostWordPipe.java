@@ -1,9 +1,9 @@
 package de.julielab.ir.pm.pmclassifier.featurepipes;
 
-import de.julielab.ir.pm.pmclassifier.AhoCorasickOptimized;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
+import de.julielab.ir.pm.pmclassifier.AhoCorasickOptimized;
 import de.julielab.java.utilities.FileUtilities;
 
 import java.io.BufferedReader;

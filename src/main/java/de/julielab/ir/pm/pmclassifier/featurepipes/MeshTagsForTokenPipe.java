@@ -1,11 +1,10 @@
 package de.julielab.ir.pm.pmclassifier.featurepipes;
 
 
-import de.julielab.ir.pm.pmclassifier.Document;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
-import cc.mallet.types.TokenSequence;
+import de.julielab.ir.pm.pmclassifier.Document;
 
 public class MeshTagsForTokenPipe extends Pipe {
     @Override

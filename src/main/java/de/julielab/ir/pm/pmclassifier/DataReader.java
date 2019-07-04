@@ -1,7 +1,5 @@
 package de.julielab.ir.pm.pmclassifier;
 
-import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.commons.csv.CSVFormat;
@@ -12,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;

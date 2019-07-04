@@ -1,20 +1,20 @@
 package de.julielab.ir.cache;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.trec.model.Result;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.units.qual.K;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.HTreeMap;
 import org.mapdb.Serializer;
-import org.mapdb.serializer.GroupSerializer;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CacheService {
     private static final Logger log = LogManager.getLogger();

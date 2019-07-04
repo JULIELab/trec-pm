@@ -1,12 +1,11 @@
 package at.medunigraz.imi.bst.trec.stats;
 
+import at.medunigraz.imi.bst.trec.model.Metrics;
+import com.opencsv.CSVWriter;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import com.opencsv.CSVWriter;
-
-import at.medunigraz.imi.bst.trec.model.Metrics;
 
 public class CSVStatsWriter implements StatsWriter {
 

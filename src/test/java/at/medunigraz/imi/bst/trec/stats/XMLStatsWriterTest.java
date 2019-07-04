@@ -1,18 +1,17 @@
 package at.medunigraz.imi.bst.trec.stats;
 
-import static org.junit.Assert.assertEquals;
+import at.medunigraz.imi.bst.trec.model.Metrics;
+import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Rule;
-import org.junit.Test;
-
-import at.medunigraz.imi.bst.trec.model.Metrics;
-import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.assertEquals;
 
 public class XMLStatsWriterTest {
 

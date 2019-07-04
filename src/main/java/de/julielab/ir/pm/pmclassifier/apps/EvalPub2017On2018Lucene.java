@@ -1,9 +1,7 @@
 package de.julielab.ir.pm.pmclassifier.apps;
 
 import de.julielab.ir.pm.pmclassifier.DataReadingException;
-import de.julielab.ir.pm.pmclassifier.MalletClassifier;
 import de.julielab.ir.pm.pmclassifier.lucene.LuceneClassifier;
-import cc.mallet.classify.Classifier;
 
 import java.io.IOException;
 

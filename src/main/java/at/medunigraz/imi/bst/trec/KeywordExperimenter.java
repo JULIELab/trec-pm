@@ -1,15 +1,14 @@
 package at.medunigraz.imi.bst.trec;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
+import at.medunigraz.imi.bst.trec.experiment.Experiment;
+import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
 import org.apache.commons.io.FileUtils;
 
-import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class KeywordExperimenter {
 	public static void main(String[] args) {

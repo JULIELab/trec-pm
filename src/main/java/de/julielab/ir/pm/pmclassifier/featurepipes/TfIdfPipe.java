@@ -1,18 +1,14 @@
 package de.julielab.ir.pm.pmclassifier.featurepipes;
 
-import de.julielab.ir.pm.pmclassifier.DataReader;
-import de.julielab.ir.pm.pmclassifier.DataReadingException;
-import de.julielab.ir.pm.pmclassifier.Document;
-import de.julielab.ir.pm.pmclassifier.InstancePreparator;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import com.wcohen.ss.TFIDF;
+import de.julielab.ir.pm.pmclassifier.InstancePreparator;
 import de.julielab.java.utilities.FileUtilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 

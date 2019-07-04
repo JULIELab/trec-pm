@@ -1,10 +1,9 @@
 package de.julielab.ir.pm.pmclassifier.featurepipes;
 
-import de.julielab.ir.pm.pmclassifier.DataReader;
-import de.julielab.ir.pm.pmclassifier.InstancePreparator;
-import de.julielab.ir.pm.pmclassifier.Document;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.*;
+import de.julielab.ir.pm.pmclassifier.DataReader;
+import de.julielab.ir.pm.pmclassifier.Document;
 
 import java.io.IOException;
 import java.util.List;

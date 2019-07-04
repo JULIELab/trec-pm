@@ -1,10 +1,10 @@
 package at.medunigraz.imi.bst.trec.stats;
 
+import at.medunigraz.imi.bst.trec.model.Metrics;
+
 import java.io.Closeable;
 import java.io.Flushable;
 import java.util.Map;
-
-import at.medunigraz.imi.bst.trec.model.Metrics;
 
 public interface StatsWriter extends Closeable, Flushable {
 

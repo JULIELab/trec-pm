@@ -9,7 +9,6 @@ import de.julielab.ir.model.QueryDescription;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;

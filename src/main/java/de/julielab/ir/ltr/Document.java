@@ -5,7 +5,6 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.uima.cas.CAS;
-import org.apache.uima.jcas.JCas;
 
 import java.util.HashMap;
 import java.util.Map;

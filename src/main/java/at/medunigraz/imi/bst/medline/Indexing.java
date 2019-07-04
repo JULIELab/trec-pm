@@ -1,19 +1,18 @@
 package at.medunigraz.imi.bst.medline;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.client.Client;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.Client;
-
-import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class Indexing {
 
