@@ -41,7 +41,6 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addGenes(jCas, document);
         addOrganisms(jCas, document);
         addDocumentClasses(jCas, document);
-//        addGsInfo(jCas, document);
         addPublicationType(jCas, document);
         addNegationScopes(jCas, document);
         addMutations(jCas, document);
@@ -123,21 +122,7 @@ public class Trec2018FieldGenerator extends FieldGenerator {
             document.addField("pmclass2018", dc2018.getClassname());
             document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
-        Trec2018FilterBoard fb = filterRegistry.getFilterBoard(Trec2018FilterBoard.class);
-        if (fb.gru2017 != null && fb.gru2017.get(document.getId()) != null) {
-            final Double prob = fb.gru2017.get(document.getId());
-            document.addField("pmclass2017lstmgru", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2017lstmgruconfidence", prob);
-        } else if (fb.gru2017 != null) {
-            log.warn("No value for document {} in GRU2017 data", document.getId());
-        }
-        if (fb.gru2018 != null && fb.gru2018.get(document.getId()) != null) {
-            final Double prob = fb.gru2018.get(document.getId());
-            document.addField("pmclass2018lstmgru", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2018lstmgruconfidence", prob);
-        } else if (fb.gru2018 != null) {
-            log.warn("No value for document {} in GRU2018 data", document.getId());
-        }
+
     }
 
     private void addGenes(JCas jCas, Document document) {
@@ -149,30 +134,6 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         document.addField("genes", genesFieldValue);
     }
 
-    private void addGsInfo(JCas jCas, Document document) {
-        Trec2018FilterBoard filterBoard = filterRegistry.getFilterBoard(Trec2018FilterBoard.class);
-        Map<String, List<CSVRecord>> gsRecords = filterBoard.gsRecords;
-        String docId = JCoReTools.getDocId(jCas);
-        List<CSVRecord> records = gsRecords.get(docId);
-        if (records != null) {
-            for (CSVRecord record : records) {
-                // Here we add all the GS information about the document. Note that this often includes multiple
-                // records because documents are repeated across topics
-                Map<String, Integer> gsHeaderMap = filterBoard.gsHeaderMap;
-
-                // Here we add the GS information for each topic separately. By making this a sub-document,
-                // the resulting field will be called 'topic_<topicNr>.<record header>' and thus make it possible
-                // to query documents depending on their topic
-                final Document gsInfoByTopic = new Document();
-                for (String header : gsHeaderMap.keySet()) {
-                    if (unwantedGsFields.contains(header) || StringUtils.isBlank(header))
-                        continue;
-                    gsInfoByTopic.addField(header, record.get(header));
-                }
-                document.addField("topic_" + record.get("trec_topic_number"), gsInfoByTopic);
-            }
-        }
-    }
 
 
     private void addAbstractSections(JCas jCas, Document document) {
