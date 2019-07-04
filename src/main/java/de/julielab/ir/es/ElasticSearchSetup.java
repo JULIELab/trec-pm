@@ -66,10 +66,10 @@ public class ElasticSearchSetup {
     private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
 
     public static void main(String args[]) {
-        deletePubmedIndices();
-        deleteCtIndices();
-//        createPubmedIndices();
-//        createCtIndices();
+//        deletePubmedIndices();
+//        deleteCtIndices();
+        createPubmedIndices();
+        createCtIndices();
     }
 
     public static void deletePubmedIndices() {

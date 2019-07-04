@@ -15,9 +15,9 @@ public class ClinicalTrialsExperimenter {
 		final File phraseTemplate = new File(
 				ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
 
-		final GoldStandard goldStandard = GoldStandard.OFFICIAL;
+		final GoldStandard goldStandard = GoldStandard.INTERNAL;
 		final Task target = Task.CLINICAL_TRIALS;
-		final int year = 2018;
+		final int year = 2019;
 
 		ExperimentsBuilder builder = new ExperimentsBuilder();
 

@@ -30,7 +30,7 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 
 ## Code Dependencies
 
-- JDK 8+
+- JDK 11+
 - maven
 - make (for `trec_eval` tool)
 - gcc (for `trec_eval` tool)
