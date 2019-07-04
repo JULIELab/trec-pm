@@ -48,7 +48,7 @@ public class TrecPM1718LitCrossval {
 
         int vocabCutoff = 50;
 
-        FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(Path.of("config", "featureConfiguration.xml").toFile()));
+        FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
 
         File topicsFile2017 = new File(CSVStatsWriter.class.getResource("/topics/topics2017.xml").getPath());

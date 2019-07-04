@@ -37,6 +37,15 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 - perl (for `sample_eval` tool)
 - Elasticsearch 5.4.0+
 
+## How to Create the Resources for the Experiments
+
+### UMLS
+
+You require the `MRCONSO.RRF` which can be obtained from the official UMLS downloads.
+Then, adapt the paths in the `scripts/createUmlsTermSynsets.py` script to read from your `MRCONSO.RRF` file and
+create the `resources/umlsSynsets.txt` file. Framework classes making use of the UMLS synsets will expect
+the file at this location. 
+
 ## Some Examples on How to Run Experiments
 
 ```
