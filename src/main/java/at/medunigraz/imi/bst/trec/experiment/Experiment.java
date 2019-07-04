@@ -120,12 +120,12 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
 
         File output = retrieval.getOutput();
-        File goldStandard = goldDataset != null && goldDataset.getQrelFile() != null ? goldDataset.getQrelFile() : new File(CSVStatsWriter.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
+        File goldStandard = goldDataset != null && goldDataset.getQrelFile() != null ? goldDataset.getQrelFile() : new File(Experiment.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
         GoldStandard goldStandardType = this.goldStandard;
-        final File sampleGoldStandard = getSampleGoldStandard();
+        final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleGoldStandard() : null;
 
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
 
