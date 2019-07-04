@@ -20,7 +20,15 @@ public class LocalFileCacheAccess<K, V> extends CacheAccess<K, V> {
         this.keySerializer = getSerializerByName(keySerializer);
         this.valueSerializer = getSerializerByName(valueSerializer);
         cacheService = CacheService.getInstance();
-        cacheFile = Path.of(TrecConfig.CACHE_DIR, cacheId).toFile();
+        cacheFile = new File(getCacheDir(), cacheId);
+    }
+
+    private File getCacheDir() {
+        final File cacheDir = new File(TrecConfig.CACHE_DIR);
+        if (!cacheDir.exists()) {
+            cacheDir.mkdirs();
+        }
+        return cacheDir;
     }
 
     @Override
