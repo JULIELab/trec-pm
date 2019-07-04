@@ -30,12 +30,13 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 
 ## Code Dependencies
 
-- JDK 11+
+- JDK 11+ (won't compile with JDK8)
 - maven
 - make (for `trec_eval` tool)
 - gcc (for `trec_eval` tool)
 - perl (for `sample_eval` tool)
 - Elasticsearch 5.4.0+
+- python3 (to parse UMLS)
 
 ## How to Create the Resources for the Experiments
 
@@ -44,7 +45,13 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 You require the `MRCONSO.RRF` which can be obtained from the official UMLS downloads.
 Then, adapt the paths in the `scripts/createUmlsTermSynsets.py` script to read from your `MRCONSO.RRF` file and
 create the `resources/umlsSynsets.txt` file. Framework classes making use of the UMLS synsets will expect
-the file at this location. 
+the file at this location.
+
+- Download https://download.nlm.nih.gov/umls/kss/2019AA/umls-2019AA-mrconso.zip
+- `unzip umls-2019AA-mrconso.zip`
+- `python3 scripts/createUmlsTermSynsets.py MRCONSO.RRF ENG > resources/umlsSynsets.txt`
+- `md5 umlsSynsets.txt` = 8cab01c988050bde6806da99c7885bb
+- `gzip resources/umlsSynsets.txt`
 
 ## Some Examples on How to Run Experiments
 
