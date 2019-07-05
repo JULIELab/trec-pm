@@ -179,11 +179,7 @@
                                 
                 <value>
                                         
-                    <array>
-                                                
-                        <string>de.julielab.jcore.trec2018.pubmed.Trec2018FilterBoard</string>
-                                            
-                    </array>
+                    <array/>
                                     
                 </value>
                             
@@ -252,8 +248,6 @@
         </operationalProperties>
             
     </analysisEngineMetaData>
-        
-    <externalResourceDependencies/>
         
     <resourceManagerConfiguration/>
     

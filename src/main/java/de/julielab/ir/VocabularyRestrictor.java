@@ -7,9 +7,12 @@ import com.wcohen.ss.api.Token;
 import com.wcohen.ss.tokens.SimpleTokenizer;
 import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
+import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,6 +25,11 @@ public class VocabularyRestrictor {
 
     private VocabularyRestrictor() {
         cacheAccess = CacheService.getInstance().getCacheAccess("fieldVocablaries.db", "FieldVobabularies", "string", "java");
+        try {
+            stopwords = new HashSet<>(IOStreamUtilities.getLinesFromInputStream(getClass().getResourceAsStream("/data/stopwords.txt")));
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load the stopwords file from resource location /data/stopwords.txt");
+        }
     }
 
     public static VocabularyRestrictor getInstance() {

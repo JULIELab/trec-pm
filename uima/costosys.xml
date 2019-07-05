@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <databaseConnectorConfiguration>
     <DBSchemaInformation>
-        <activePostgresSchema>sigir</activePostgresSchema>
+        <activePostgresSchema>trecpm19</activePostgresSchema>
         <activeTableSchema>medline_2017</activeTableSchema>
         <tableSchemas>
             <tableSchema forEach="." name="xmi_anno_view">
@@ -11,10 +11,10 @@
         </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-        <activeDBConnection>trecpm</activeDBConnection>
+        <activeDBConnection>trecpm2019</activeDBConnection>
 	<maxActiveDBConnections>4</maxActiveDBConnections>
 	<DBConnections>
-            <DBConnection name="trecpm" url="jdbc:postgresql://h4:5432/trecpm"/>
+            <DBConnection name="trecpm2019" url="jdbc:postgresql://h4:5432/trecpm2019"/>
         </DBConnections>
     </DBConnectionInformation>
 	
