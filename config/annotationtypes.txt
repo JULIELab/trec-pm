@@ -1,1 +1,2 @@
 de.julielab.jcore.types.AutoDescriptor
+de.julielab.jcore.types.PointMutation
