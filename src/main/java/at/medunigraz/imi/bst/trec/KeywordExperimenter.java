@@ -1,7 +1,7 @@
 package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.experiment.ExperimentBuilder;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
 import org.apache.commons.io.FileUtils;
@@ -16,8 +16,6 @@ public class KeywordExperimenter {
 				KeywordExperimenter.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
 		final File keywordsSource = new File(KeywordExperimenter.class.getResource("/negative-keywords/").getFile());
 
-		ExperimentsBuilder builder = new ExperimentsBuilder();
-
 		File[] files = null;
 		if (keywordsSource.isDirectory()) {
 			files = keywordsSource.listFiles();
@@ -29,6 +27,7 @@ public class KeywordExperimenter {
 		double baselineMetric = 0;
 
 		// 1st step: collect metrics for individual keywords
+		Set<Experiment> experiments = new LinkedHashSet<>();
 
 		for (File keywordFile : files) {
 			List<String> lines;
@@ -40,18 +39,18 @@ public class KeywordExperimenter {
 			}
 
 			for (String keyword : lines) {
-				builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
+				experiments.add(new ExperimentBuilder().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
 						.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
-						.withWordRemoval();
+						.withWordRemoval().build());
 			}
 		}
 
-		TreeMap<Double, String> resultsUniqueKeywords = runExperiments(builder.build());
+		TreeMap<Double, String> resultsUniqueKeywords = runExperiments(experiments);
 
 
 
 		// 2nd step: collect metrics for combination of keywords in a greedy fashion
-		builder = new ExperimentsBuilder();
+		experiments = new LinkedHashSet<>();
 
 		String keyword = "";
 		for (Map.Entry<Double, String> entry : resultsUniqueKeywords.entrySet()) {
@@ -65,9 +64,9 @@ public class KeywordExperimenter {
 			keyword = keyword + " " + entry.getValue();
 			keyword = keyword.trim();
 
-			builder.newExperiment().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
+			experiments.add(new ExperimentBuilder().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
 					.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
-					.withWordRemoval();
+					.withWordRemoval().build());
 		}
 
 		//TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
