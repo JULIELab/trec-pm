@@ -1,10 +1,12 @@
 package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentsBuilder;
+import at.medunigraz.imi.bst.trec.experiment.ExperimentBuilder;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Task;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PubMedOnlineExperimenter {
@@ -13,16 +15,12 @@ public class PubMedOnlineExperimenter {
         final Task target = Task.PUBMED_ONLINE;
         final int year = 2017;
 
-
-        ExperimentsBuilder builder = new ExperimentsBuilder();
-
-
-        builder.newExperiment().withName("pmonlinetest").withYear(year).withGoldStandard(goldStandard).withTarget(target)
+        Experiment pmonlinetest = new ExperimentBuilder().withName("pmonlinetest").withYear(year).withGoldStandard(goldStandard).withTarget(target)
               .withWordRemoval().withGeneSynonym().
-               withGeneDescription();
+               withGeneDescription().build();
 
 
-        Set<Experiment> experiments = builder.build();
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(pmonlinetest));
 
         for (Experiment exp : experiments) {
             exp.start();
