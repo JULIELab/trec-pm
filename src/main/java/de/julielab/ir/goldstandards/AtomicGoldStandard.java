@@ -9,6 +9,7 @@ import de.julielab.ir.model.QueryDescription;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,6 +58,16 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         this.sampleQrels = sampleQrelsFile;
         qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
         sampleQrelDocuments = sampleQrelsReader.apply(sampleQrelsFile, getQueriesByNumber());
+    }
+
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, DocumentList<Q> qrelDocuments, BiConsumer<DocumentList<Q>, File> qrelsWriter) {
+        this.challenge = challenge;
+        this.task = task;
+        this.year = year;
+        this.queries = queries;
+        this.qrels = qrelsFile;
+        this.qrelDocuments = qrelDocuments;
+        qrelsWriter.accept(qrelDocuments, qrelsFile);
     }
 
     @Override

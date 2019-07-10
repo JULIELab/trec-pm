@@ -7,15 +7,13 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +23,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, File sampleQrels) {
         super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, sampleQrels, TrecQrelGoldStandard::readQrels, TrecQrelGoldStandard::readQrels);
+    }
+
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, DocumentList<Q> qrelDocuments) {
+        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, qrelDocuments, TrecQrelGoldStandard::writeQrels);
     }
 
     private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
@@ -56,6 +58,19 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
             log.error("Could not read the qrels file", e);
         }
         return documents;
+    }
+
+    private static void writeQrels(DocumentList<?> qrelDocuments, File qrels) {
+        List<String> lines = new ArrayList<>();
+
+        qrelDocuments.forEach(d -> lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance())));
+
+        try {
+            FileUtils.writeLines(qrels, lines);
+        } catch (IOException e) {
+            log.error("Could not write to file {}", qrels);
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
