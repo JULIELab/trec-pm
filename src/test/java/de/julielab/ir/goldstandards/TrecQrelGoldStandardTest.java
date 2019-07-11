@@ -49,7 +49,8 @@ public class TrecQrelGoldStandardTest {
 
         // Create a gold standard with it
         final File generatedQrels = testFolder.newFile("generated.qrels");
-        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), generatedQrels, qrelDocuments);
+        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), qrelDocuments);
+        gs.writeQrelFile(generatedQrels);
 
         assertTrue(generatedQrels.exists());
         assertTrue(generatedQrels.length() > 10);   // File must have some content
@@ -66,7 +67,8 @@ public class TrecQrelGoldStandardTest {
 
         // Write back the documents into a new file
         final File generatedQrels = testFolder.newFile("generated.qrels");
-        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<Topic>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), generatedQrels, qrelDocuments);
+        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), qrelDocuments);
+        gsCopy.writeQrelFile(generatedQrels);
 
         // Check files are identical
         assertEquals(FileUtils.readFileToString(QRELS, "UTF-8"), FileUtils.readFileToString(generatedQrels, "UTF-8"));

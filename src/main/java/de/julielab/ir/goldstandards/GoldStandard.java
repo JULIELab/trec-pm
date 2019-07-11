@@ -46,9 +46,15 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     Map<Q, DocumentList> getQrelDocumentsPerQuery();
 
+    /**
+     * @deprecated Use `writeQrelFile` instead.
+     * @return
+     */
     File getQrelFile();
 
     File getSampleQrelFile();
+
+    void writeQrelFile(File qrelFile);
 
     DocumentList<Q> getSampleQrelDocuments();
 

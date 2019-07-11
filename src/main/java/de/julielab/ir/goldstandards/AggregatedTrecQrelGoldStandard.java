@@ -32,6 +32,10 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
 
     }
 
+    @Override
+    public void writeQrelFile(File qrelFile) {
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments(), qrelRecordFunction);
+    }
 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {

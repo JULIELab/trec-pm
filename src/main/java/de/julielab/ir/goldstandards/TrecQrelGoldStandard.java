@@ -25,8 +25,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, sampleQrels, TrecQrelGoldStandard::readQrels, TrecQrelGoldStandard::readQrels);
     }
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, DocumentList<Q> qrelDocuments) {
-        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, qrelDocuments, TrecQrelGoldStandard::writeQrels);
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, DocumentList<Q> qrelDocuments) {
+        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
     }
 
     private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
@@ -60,7 +60,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         return documents;
     }
 
-    private static void writeQrels(DocumentList<?> qrelDocuments, File qrels) {
+    public void writeQrelFile(File qrelFile) {
         List<String> lines = new ArrayList<>();
 
         for (Document<?> d : qrelDocuments) {
@@ -75,9 +75,9 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         }
 
         try {
-            FileUtils.writeLines(qrels, lines);
+            FileUtils.writeLines(qrelFile, lines);
         } catch (IOException e) {
-            log.error("Could not write to file {}", qrels);
+            log.error("Could not write to file {}", qrelFile);
             throw new IllegalArgumentException(e);
         }
     }

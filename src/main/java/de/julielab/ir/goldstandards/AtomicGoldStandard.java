@@ -37,6 +37,9 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     protected Task task;
     protected int year;
 
+    /**
+     * @deprecated qrelDocuments might have changed since initialization. Use `writeQrelFile` instead.
+     */
     protected File qrels;
     protected File sampleQrels;
 
@@ -60,14 +63,12 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         sampleQrelDocuments = sampleQrelsReader.apply(sampleQrelsFile, getQueriesByNumber());
     }
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, DocumentList<Q> qrelDocuments, BiConsumer<DocumentList<Q>, File> qrelsWriter) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, DocumentList<Q> qrelDocuments) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;
         this.queries = queries;
-        this.qrels = qrelsFile;
         this.qrelDocuments = qrelDocuments;
-        qrelsWriter.accept(qrelDocuments, qrelsFile);
     }
 
     @Override
