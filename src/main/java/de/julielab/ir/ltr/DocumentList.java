@@ -3,7 +3,7 @@ package de.julielab.ir.ltr;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class DocumentList<Q extends QueryDescription> extends ArrayList<Document<Q>> {
     public DocumentList<Q> getSubsetWithUniqueDocumentIds() {
-        Set<String> seenIds = new HashSet<>();
+        Set<String> seenIds = new LinkedHashSet<>();
         final DocumentList<Q> ret = new DocumentList<>();
         for (Document doc : this) {
             if (seenIds.add(doc.getId()))
