@@ -26,7 +26,7 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     private Map<Integer, Q> queriesByNumber;
     private Map<String, Q> queriesByCrossDatasetId;
     private Logger log;
-    private Map<String, AtomicGoldStandard<Q>> goldStandards;
+    protected Map<String, AtomicGoldStandard<Q>> goldStandards;
     private List<Q> queryList;
     private Map<Q, DocumentList> documentsByQuery;
     private File qrelFile;

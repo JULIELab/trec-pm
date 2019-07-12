@@ -7,15 +7,13 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,6 +23,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, File sampleQrels) {
         super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, sampleQrels, TrecQrelGoldStandard::readQrels, TrecQrelGoldStandard::readQrels);
+    }
+
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, DocumentList<Q> qrelDocuments) {
+        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
     }
 
     private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
@@ -56,6 +58,28 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
             log.error("Could not read the qrels file", e);
         }
         return documents;
+    }
+
+    public void writeQrelFile(File qrelFile) {
+        List<String> lines = new ArrayList<>();
+
+        for (Document<?> d : qrelDocuments) {
+            // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
+            if (d.getStratum() != 0) {
+                // sample qrels format
+                lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
+            } else {
+                // qrels traditional format
+                lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
+            }
+        }
+
+        try {
+            FileUtils.writeLines(qrelFile, lines);
+        } catch (IOException e) {
+            log.error("Could not write to file {}", qrelFile);
+            throw new IllegalArgumentException(e);
+        }
     }
 
     @Override
