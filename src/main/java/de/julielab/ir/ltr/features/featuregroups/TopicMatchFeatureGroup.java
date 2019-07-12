@@ -1,9 +1,11 @@
 package de.julielab.ir.ltr.features.featuregroups;
 
+import at.medunigraz.imi.bst.trec.model.Topic;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
+import de.julielab.ir.pm.pmclassifier.AhoCorasickOptimized;
 
 import java.util.function.Consumer;
 
@@ -27,7 +29,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     private void addMatchTopicVariant() {
         Consumer<Instance> featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
-            final Document document = (Document) instance.getSource();
+            final Document<Topic> document = (Document<Topic>) instance.getSource();
         };
         addFeature(MATCH_TOPIC_VARIANT, featureValueAssigner);
     }
@@ -35,7 +37,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     private void addMatchTopicGene() {
         Consumer<Instance> featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
-            final Document document = (Document) instance.getSource();
+            final Document<Topic> document = (Document<Topic>) instance.getSource();
         };
         addFeature(MATCH_TOPIC_GENE, featureValueAssigner);
     }
@@ -43,7 +45,9 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     private void addMatchTopicDisease() {
         Consumer<Instance> featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
-            final Document document = (Document) instance.getSource();
+            final Document<Topic> document = (Document<Topic>) instance.getSource();
+
+            final AhoCorasickOptimized ac = new AhoCorasickOptimized(document.getQueryDescription().getDisease());
         };
         addFeature(MATCH_TOPIC_DISEASE, featureValueAssigner);
     }

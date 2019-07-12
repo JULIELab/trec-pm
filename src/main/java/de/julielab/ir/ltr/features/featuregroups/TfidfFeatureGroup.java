@@ -6,6 +6,7 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +30,7 @@ public class TfidfFeatureGroup extends FeatureGroup {
         super("TFIDF");
         this.tfidf = tfidf;
         this.vocabulary = vocabulary;
-        try {
-            stopwords = FileUtilities.getReaderFromFile(new File("resources/stopwords.txt")).lines().collect(Collectors.toSet());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        stopwords = IOStreamUtilities.getReaderFromInputStream(getClass().getResourceAsStream("/data/stopwords.txt")).lines().collect(Collectors.toSet());
     }
 
     @Override

@@ -40,17 +40,21 @@ public class FeatureUtils {
      * @return The normalized text.
      * @throws IOException If the stopwords cannot be read.
      */
-    public String normalizeString(String input) throws IOException {
-        final TokenStream ts = standardAnalyzer.tokenStream("none", input);
-        final SnowballFilter sbf = new SnowballFilter(ts, "English");
-        sbf.reset();
-        final CharTermAttribute cta = sbf.addAttribute(CharTermAttribute.class);
-        StringBuilder sb = new StringBuilder();
-        while (sbf.incrementToken()) {
-            sb.append(cta.buffer(), 0, cta.length()).append(' ');
+    public String normalizeString(String input)  {
+        try {
+            final TokenStream ts = standardAnalyzer.tokenStream("none", input);
+            final SnowballFilter sbf = new SnowballFilter(ts, "English");
+            sbf.reset();
+            final CharTermAttribute cta = sbf.addAttribute(CharTermAttribute.class);
+            StringBuilder sb = new StringBuilder();
+            while (sbf.incrementToken()) {
+                sb.append(cta.buffer(), 0, cta.length()).append(' ');
+            }
+            sb.deleteCharAt(sb.length() - 1);
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
     }
 
 }

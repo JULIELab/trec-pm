@@ -19,8 +19,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.*;
@@ -59,8 +61,11 @@ public class FeatureControlCenter {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
-        featurePipes.add(new TfidfFeatureGroup(tfidf, vocabulary));
-        featurePipes.add(new TopicMatchFeatureGroup());
+        Stream.of(
+                new TfidfFeatureGroup(tfidf, vocabulary),
+                new TopicMatchFeatureGroup()
+            ).filter(this::filterActive)
+            .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, false));
         // Sort and consolidate the feature vector values for AugmentableFeatureVectors.
         featurePipes.add(new SetFeatureVectorPipe());

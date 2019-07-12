@@ -128,20 +128,5 @@ public class CTFieldGenerator extends FieldGenerator {
             document.addField("pmclass2018", dc2018.getClassname());
             document.addField("pmclass2018confidence", dc2018.getConfidence());
         }
-        CTFilterBoard fb = filterRegistry.getFilterBoard(CTFilterBoard.class);
-        if (fb.gru2017 != null && fb.gru2017.get(document.getId()) != null) {
-            final Double prob = fb.gru2017.get(document.getId());
-            document.addField("pmclass2017gru", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2017gruconfidence", prob);
-        } else if (fb.gru2017 != null) {
-            log.warn("No value for document {} in GRU2017 data", document.getId());
-        }
-        if (fb.gru2018 != null && fb.gru2018.get(document.getId()) != null) {
-            final Double prob = fb.gru2018.get(document.getId());
-            document.addField("pmclass2018gru", prob > .5 ? "PM" : "Not PM");
-            document.addField("pmclass2018gruconfidence", prob);
-        } else if (fb.gru2018 != null) {
-            log.warn("No value for document {} in GRU2018 data", document.getId());
-        }
     }
 }

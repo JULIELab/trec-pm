@@ -7,7 +7,7 @@
                         
             <descriptor>
                                 
-                <import location="XMI Database Multiplier Reader.xml"/>
+                <import location="JCoRe XMI Database Multiplier Reader 1.xml"/>
                             
             </descriptor>
                     
