@@ -180,12 +180,7 @@ public class Document<Q extends QueryDescription> {
     private String getNormalizedDocumentText() {
         if (normalizedDocumentText == null) {
             final CAS cas = getCas();
-            try {
-                normalizedDocumentText = FeatureUtils.getInstance().normalizeString(cas.getDocumentText());
-            } catch (IOException e) {
-                log.error("Could not normalize text for document {}", id, e);
-                return "";
-            }
+            normalizedDocumentText = FeatureUtils.getInstance().normalizeString(cas.getDocumentText());
         }
         return normalizedDocumentText;
     }
