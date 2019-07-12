@@ -31,12 +31,28 @@ public class GoogleSheets implements Sheet {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
+    private final NetHttpTransport HTTP_TRANSPORT;
+    private final Sheets SERVICE;
+
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+
+    public GoogleSheets() {
+        try {
+            // Build a new authorized API client service.
+            this.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            this.SERVICE = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } catch (GeneralSecurityException | IOException e) {
+            LOG.error("Invalid credentials.");
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     /**
      * Creates an authorized Credential object.
@@ -64,21 +80,9 @@ public class GoogleSheets implements Sheet {
 
     @Override
     public List<List<Object>> read(String spreadsheetId, String range) throws IOException {
-        ValueRange response = null;
-        try {
-            // Build a new authorized API client service.
-            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-            response = service.spreadsheets().values()
-                    .get(spreadsheetId, range)
-                    .execute();
-        } catch (GeneralSecurityException e) {
-            LOG.error("Invalid credentials.");
-            throw new IllegalArgumentException(e);
-        }
-
+        ValueRange response = SERVICE.spreadsheets().values()
+                .get(spreadsheetId, range)
+                .execute();
         return response.getValues();
     }
 }
