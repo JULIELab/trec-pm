@@ -64,13 +64,17 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         List<String> lines = new ArrayList<>();
 
         for (Document<?> d : qrelDocuments) {
+            // sample qrels format
             // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
             if (d.getStratum() != 0) {
-                // sample qrels format
                 lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
-            } else {
-                // qrels traditional format
-                lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
+            }
+            // qrels traditional format
+            else {
+                // Do not write documents not judged.
+                if (d.getRelevance() != -1) {
+                    lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
+                }
             }
         }
 

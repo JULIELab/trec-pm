@@ -54,14 +54,14 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
         values.remove(0);
 
         for (List row : values) {
+            final Document<Q> doc = new Document<>();
+            Q topic = getQueriesByNumber().get(Integer.valueOf(row.get(TOPIC_COLUMN).toString()));
+            doc.setQueryDescription(topic);
+            doc.setId(row.get(DOC_COLUMN).toString());
             if (row.size() > MIN_ROW_SIZE) {
-                final Document<Q> doc = new Document<>();
-                Q topic = getQueriesByNumber().get(Integer.valueOf(row.get(TOPIC_COLUMN).toString()));
-                doc.setQueryDescription(topic);
-                doc.setId(row.get(DOC_COLUMN).toString());
                 doc.setRelevance(Integer.valueOf(row.get(RELEVANCE_COLUMN).toString()));
-                documents.add(doc);
             }
+            documents.add(doc);
         }
 
         return documents;
