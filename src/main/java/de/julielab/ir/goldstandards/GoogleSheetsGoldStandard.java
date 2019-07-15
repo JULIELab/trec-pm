@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -65,6 +67,32 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
         }
 
         return documents;
+    }
+
+    /**
+     * Sync the data in memory to the underlying representation, in this case, a Google Spreadsheet.
+     */
+    public void sync() {
+        List<List<Object>> values = new ArrayList<>();
+
+        // Header
+        values.add(Arrays.asList("Topic", "Q0", "ID", "Rel"));
+
+        // Don't write duplicates to the gold standard.
+        for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueDocumentIds()) {
+            values.add(Arrays.asList(doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance()));
+        }
+
+        int rowsUpdated = -1;
+        try {
+            rowsUpdated = sheet.write(spreadsheetId, range, values);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not write to Google spreadsheet.", e);
+        }
+
+        if (rowsUpdated <= 0) {
+            LOG.warn("No cells updated.");
+        }
     }
 
     @Override

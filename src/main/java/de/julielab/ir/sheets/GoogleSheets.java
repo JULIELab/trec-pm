@@ -12,6 +12,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +39,7 @@ public class GoogleSheets implements Sheet {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     public GoogleSheets() {
@@ -84,5 +85,15 @@ public class GoogleSheets implements Sheet {
                 .get(spreadsheetId, range)
                 .execute();
         return response.getValues();
+    }
+
+    @Override
+    public int write(String spreadsheetId, String range, List<List<Object>> values) throws IOException {
+        ValueRange body = new ValueRange().setValues(values);
+        UpdateValuesResponse result =
+                SERVICE.spreadsheets().values().update(spreadsheetId, range, body)
+                        .setValueInputOption("RAW") // Do not attempt to parse data
+                        .execute();
+        return result.getUpdatedCells();
     }
 }

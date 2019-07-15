@@ -37,6 +37,11 @@ public class GoogleSheetsSyncer {
     }
 
     private static void sync(Task task) {
+        GoogleSheetsGoldStandard<Topic> sheet = download(task);
+        upload(sheet);
+    }
+
+    private static GoogleSheetsGoldStandard<Topic> download(Task task) {
         List<Topic> topics = new TopicSet(TOPICS, CHALLENGE, task, YEAR).getTopics();
 
         Pair<String, File> taskDescription = TASK_MAP.get(task);
@@ -47,5 +52,11 @@ public class GoogleSheetsSyncer {
         // Save gold standard to a file
         TrecQrelGoldStandard<Topic> qrels = new TrecQrelGoldStandard<>(CHALLENGE, task, YEAR, topics, sheet.getQrelDocuments());
         qrels.writeQrelFile(taskDescription.getRight());
+
+        return sheet;
+    }
+
+    private static void upload(GoogleSheetsGoldStandard<Topic> sheet) {
+        sheet.sync();
     }
 }
