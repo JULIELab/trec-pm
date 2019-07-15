@@ -1,5 +1,7 @@
 package de.julielab.ir.ltr.features;
 
+import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
@@ -10,6 +12,7 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
 import de.julielab.ir.model.QueryDescription;
@@ -57,12 +60,13 @@ public class FeatureControlCenter {
         return isActive;
     }
 
-    public void createFeatures(DocumentList<? extends QueryDescription> documents, TFIDF tfidf, Set<String> vocabulary) {
+    public void createFeatures(DocumentList<? extends QueryDescription> documents, Iterable<Topic> topics, TFIDF tfidf, Set<String> vocabulary) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
+                new RunTopicMatchAnnotatorFeatureGroup(topics),
                 new TopicMatchFeatureGroup()
             ).filter(this::filterActive)
             .forEach(featurePipes::add);
