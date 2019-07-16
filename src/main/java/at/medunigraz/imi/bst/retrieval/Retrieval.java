@@ -21,6 +21,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     private int year;
     private String resultsDir;
     private String experimentName;
+    private int size = TrecConfig.SIZE;
 
     public static String[] getTypes(Task task, GoldStandard goldStandard) {
         String[] ret = new String[0];    // Everything
@@ -112,7 +113,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     public T withTarget(Task task) {
         this.task = task;
         if (task != Task.PUBMED_ONLINE)
-            query = new ElasticSearchQuery(goldStandard);
+            query = new ElasticSearchQuery(size, goldStandard);
         else
             query = new PubMedOnlineQuery();
         return (T) this;
@@ -137,6 +138,11 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     public T withResultsDir(String dir) {
         this.resultsDir = dir;
+        return (T) this;
+    }
+
+    public T withSize(int size) {
+        this.size = size;
         return (T) this;
     }
 

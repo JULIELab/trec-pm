@@ -161,6 +161,11 @@ public class ExperimentBuilder {
         return this;
     }
 
+    public ExperimentBuilder withSize(int size) {
+        retrieval.withSize(size);
+        return this;
+    }
+
     public Experiment build() {
         return buildingExp;
     }
