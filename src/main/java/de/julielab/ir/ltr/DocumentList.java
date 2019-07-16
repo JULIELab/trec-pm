@@ -19,4 +19,15 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
         }
         return ret;
     }
+
+    public DocumentList<Q> getSubsetWithUniqueTopicDocumentIds() {
+        Set<String> seenIds = new LinkedHashSet<>();
+        final DocumentList<Q> ret = new DocumentList<>();
+        for (Document doc : this) {
+            if (seenIds.add(doc.getQueryDescription().getNumber() + "-" + doc.getId())) {
+                ret.add(doc);
+            }
+        }
+        return ret;
+    }
 }
