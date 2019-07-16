@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.retrieval;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.search.ElasticSearch;
@@ -19,8 +20,21 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     private String index;
     private SimilarityParameters parameters;
 
+    private int size = TrecConfig.SIZE;
+
+    public ElasticSearchQuery(int size, GoldStandard goldStandard) {
+        this.size = size;
+        this.goldStandard = goldStandard;
+    }
+
     public ElasticSearchQuery(GoldStandard goldStandard) {
         this.goldStandard = goldStandard;
+    }
+
+    public ElasticSearchQuery(int size, String index, String... types) {
+        this.size = size;
+        this.index = index;
+        this.types = types;
     }
 
     public ElasticSearchQuery(String index, String... types) {
@@ -37,7 +51,7 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         } else {
             es = new ElasticSearch(index, parameters);
         }
-        return es.query(new JSONObject(jsonQuery));
+        return es.query(new JSONObject(jsonQuery), size);
     }
 
     @Override

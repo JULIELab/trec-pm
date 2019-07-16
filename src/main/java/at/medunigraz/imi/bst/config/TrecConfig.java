@@ -27,6 +27,7 @@ public final class TrecConfig {
     public static final String CACHE_HOST = getString("CACHE_HOST");
     public static final int CACHE_PORT = getInteger("CACHE_PORT");
     public static final String GSHEETS_SHEETID = getString("GSHEETS_SHEETID");
+    public static final int SIZE = 1000;
 
     public static String getString(String key) {
         return PROPERTIES.getString(key);
