@@ -9,7 +9,6 @@ import de.julielab.ir.model.QueryDescription;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -130,6 +129,10 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 
     public void setQueries(List<Q> queries) {
         this.queries = queries;
+    }
+
+    public Task getTask() {
+        return task;
     }
 
     @Override

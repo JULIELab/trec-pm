@@ -27,9 +27,9 @@ public class Document<Q extends QueryDescription> {
     private Q queryDescription;
     private String type;
     /**
-     * The gold standard given relevance level, e.g. 0, 1, 2 for not relevant, partially relevant and definitively relevant.
+     * The gold standard given relevance level, e.g. -1, 0, 1, 2 for not judged, not relevant, partially relevant and definitively relevant.
      */
-    private int relevance;
+    private int relevance = -1;
     /**
      * For infNDCG or infAP evaluation after
      * Yilmaz, E., Kanoulas, E., & Aslam, J. a. (2008). A simple and efficient sampling method for estimating AP and NDCG.

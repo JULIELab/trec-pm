@@ -1,5 +1,7 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.ArrayList;
@@ -29,5 +31,20 @@ public class ResultList<T extends QueryDescription> {
 	
 	public List<Result> getResults() {
 		return results;
+	}
+
+	/**
+	 * Converts this ResultList into a DocumentList object.
+	 * @return
+	 */
+	public DocumentList<T> toDocumentList() {
+		DocumentList<T> documentList = new DocumentList<>();
+		for (Result result : results) {
+			final Document<T> document = new Document<>();
+			document.setQueryDescription(topic);
+			document.setId(result.getId());
+			documentList.add(document);
+		}
+		return documentList;
 	}
 }

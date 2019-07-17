@@ -12,6 +12,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchGetValuesResponse;
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,12 +34,28 @@ public class GoogleSheets implements Sheet {
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
+    private final NetHttpTransport HTTP_TRANSPORT;
+    private final Sheets SERVICE;
+
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+
+    public GoogleSheets() {
+        try {
+            // Build a new authorized API client service.
+            this.HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            this.SERVICE = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
+        } catch (GeneralSecurityException | IOException e) {
+            LOG.error("Invalid credentials.");
+            throw new IllegalArgumentException(e);
+        }
+    }
 
     /**
      * Creates an authorized Credential object.
@@ -64,21 +83,41 @@ public class GoogleSheets implements Sheet {
 
     @Override
     public List<List<Object>> read(String spreadsheetId, String range) throws IOException {
-        ValueRange response = null;
-        try {
-            // Build a new authorized API client service.
-            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-            response = service.spreadsheets().values()
-                    .get(spreadsheetId, range)
-                    .execute();
-        } catch (GeneralSecurityException e) {
-            LOG.error("Invalid credentials.");
-            throw new IllegalArgumentException(e);
+        ValueRange response = SERVICE.spreadsheets().values()
+                .get(spreadsheetId, range)
+                .execute();
+        return response.getValues();
+    }
+
+    @Override
+    public List<List<Object>> read(String spreadsheetId, String... ranges) throws IOException {
+        BatchGetValuesResponse response = SERVICE.spreadsheets().values()
+                .batchGet(spreadsheetId)
+                .setRanges(Arrays.asList(ranges))
+                .execute();
+        List<ValueRange> valueRanges = response.getValueRanges();
+
+        // Initialize ret with the first range.
+        List<List<Object>> ret = valueRanges.remove(0).getValues();
+
+        // Merge the remaining ranges with the first one.
+        for (ValueRange valueRange : valueRanges) {
+            List<List<Object>> values = valueRange.getValues();
+            for (int i = 0; i < values.size(); i++) {
+                ret.get(i).addAll(values.get(i));
+            }
         }
 
-        return response.getValues();
+        return ret;
+    }
+
+    @Override
+    public int write(String spreadsheetId, String range, List<List<Object>> values) throws IOException {
+        ValueRange body = new ValueRange().setValues(values);
+        UpdateValuesResponse result =
+                SERVICE.spreadsheets().values().update(spreadsheetId, range, body)
+                        .setValueInputOption("RAW") // Do not attempt to parse data
+                        .execute();
+        return result.getUpdatedCells();
     }
 }

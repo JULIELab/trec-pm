@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -24,14 +26,16 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     private static final int MIN_ROW_SIZE = 3;
 
     private final String spreadsheetId;
-    private final String range;
+    private final String[] readRange;
+    private final String writeRange;
 
     private final GoogleSheets sheet = new GoogleSheets();
 
-    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, String spreadsheetId, String range) {
+    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, String spreadsheetId, String[] readRange, String writeRange) {
         super(challenge, task, year, queries, new DocumentList<>());
         this.spreadsheetId = spreadsheetId;
-        this.range = range;
+        this.readRange = readRange;
+        this.writeRange = writeRange;
         qrelDocuments = read();
     }
 
@@ -40,7 +44,7 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
 
         List<List<Object>> values = null;
         try {
-            values = sheet.read(spreadsheetId, range);
+            values = sheet.read(spreadsheetId, readRange);
         } catch (IOException e) {
             throw new RuntimeException("Could not read Google spreadsheet.", e);
         }
@@ -54,17 +58,43 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
         values.remove(0);
 
         for (List row : values) {
+            final Document<Q> doc = new Document<>();
+            Q topic = getQueriesByNumber().get(Integer.valueOf(row.get(TOPIC_COLUMN).toString()));
+            doc.setQueryDescription(topic);
+            doc.setId(row.get(DOC_COLUMN).toString());
             if (row.size() > MIN_ROW_SIZE) {
-                final Document<Q> doc = new Document<>();
-                Q topic = getQueriesByNumber().get(Integer.valueOf(row.get(TOPIC_COLUMN).toString()));
-                doc.setQueryDescription(topic);
-                doc.setId(row.get(DOC_COLUMN).toString());
                 doc.setRelevance(Integer.valueOf(row.get(RELEVANCE_COLUMN).toString()));
-                documents.add(doc);
             }
+            documents.add(doc);
         }
 
         return documents;
+    }
+
+    /**
+     * Sync the data in memory to the underlying representation, in this case, a Google Spreadsheet.
+     */
+    public void sync() {
+        List<List<Object>> values = new ArrayList<>();
+
+        // Header
+        values.add(Arrays.asList("Topic", "Q0", "ID", "Rel"));
+
+        // Don't write duplicates to the gold standard.
+        for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueTopicDocumentIds()) {
+            values.add(Arrays.asList(doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance()));
+        }
+
+        int rowsUpdated = -1;
+        try {
+            rowsUpdated = sheet.write(spreadsheetId, writeRange, values);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not write to Google spreadsheet.", e);
+        }
+
+        if (rowsUpdated <= 0) {
+            LOG.warn("No cells updated.");
+        }
     }
 
     @Override
