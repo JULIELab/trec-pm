@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.search;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
 import de.julielab.ir.cache.CacheAccess;
@@ -49,8 +50,12 @@ public class ElasticSearch implements SearchEngine {
     }
 
     public List<Result> query(JSONObject jsonQuery) {
+        return query(jsonQuery, TrecConfig.SIZE);
+    }
+
+    public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
-        String cacheKey = index + Arrays.toString(types) + parameters.printToString() + json;
+        String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + json;
         LOG.debug("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
@@ -60,15 +65,15 @@ public class ElasticSearch implements SearchEngine {
             QueryBuilder qb = QueryBuilders.wrapperQuery(json);
             LOG.trace(JsonUtils.prettify(jsonQuery));
 
-            result = query(qb);
+            result = query(qb, size);
             cache.put(cacheKey, result);
         }
         return result;
     }
 
-    private List<Result> query(QueryBuilder qb) {
+    private List<Result> query(QueryBuilder qb, int size) {
         SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(types).setQuery(qb)
-                .setSize(1000).addStoredField("_id");
+                .setSize(size).addStoredField("_id");
 
         SearchResponse response = searchRequestBuilder.get();
         //LOG.trace(JsonUtils.prettify(response.toString()));
