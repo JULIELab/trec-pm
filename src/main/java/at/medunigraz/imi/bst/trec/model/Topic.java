@@ -324,4 +324,35 @@ public class Topic extends QueryDescription {
                 + ", demographic=" + demographic + ", other=" + other + "]";
     }
 
+    public String getDiseasePreferredTerm() {
+        return diseasePreferredTerm;
+    }
+
+    public List<String> getGeneDescriptions() {
+        return geneDescriptions;
+    }
+
+    public List<String> getDiseaseSynonyms() {
+        return diseaseSynonyms;
+    }
+
+    public List<String> getGeneSynonyms() {
+        return geneSynonyms;
+    }
+
+    public List<String> getDiseaseHypernyms() {
+        return diseaseHypernyms;
+    }
+
+    public List<String> getGeneHypernyms() {
+        return geneHypernyms;
+    }
+
+    public List<String> getDrugInteractions() {
+        return drugInteractions;
+    }
+
+    public List<String> getResistantDrugs() {
+        return resistantDrugs;
+    }
 }

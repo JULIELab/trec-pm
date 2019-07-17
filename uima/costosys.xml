@@ -11,8 +11,8 @@
         </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-        <activeDBConnection>trecpm</activeDBConnection>
-	<maxActiveDBConnections>4</maxActiveDBConnections>
+        <activeDBConnection>trecpm2019</activeDBConnection>
+	<maxActiveDBConnections>8</maxActiveDBConnections>
 	<DBConnections>
 		<DBConnection name="trecpm2019" url="jdbc:postgresql://h4:5432/trecpm2019"/>
 		<DBConnection name="trecpm" url="jdbc:postgresql://h4:5432/trecpm"/>

@@ -7,15 +7,15 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
-                        
-            <import location="JCoRe Database Checkpoint Writer.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
         <delegateAnalysisEngine key="JCoRe XMI Database Writer">
                         
             <import location="JCoRe XMI Database Writer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
+                        
+            <import location="JCoRe Database Checkpoint Writer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -35,9 +35,9 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe Database Checkpoint Writer</node>
-                                
                 <node>JCoRe XMI Database Writer</node>
+                                
+                <node>JCoRe Database Checkpoint Writer</node>
                             
             </fixedFlow>
                     

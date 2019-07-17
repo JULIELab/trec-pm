@@ -3,7 +3,7 @@
   <runners>
     <runner>
       <name>CPERunner</name>
-      <pipelinepath>/home/faessler/Coding/git/ourtrecpm/uima/pm-to-xmi-db-pipeline/</pipelinepath>
+      <pipelinepath>.</pipelinepath>
       <numthreads>14</numthreads>
       <heapsize>20G</heapsize>
     </runner>

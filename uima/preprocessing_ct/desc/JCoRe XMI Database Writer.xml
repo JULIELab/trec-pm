@@ -307,6 +307,20 @@
                 <mandatory>false</mandatory>
                             
             </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>BinaryFeaturesToMapDryRun</name>
+                                
+                <description>This parameter is useful when using the binary format and has no effect if not. Then, the UIMA type features that should be mapped to integers will be determined automatically from the input. For each document that has a string (!) feature not seen before, the ratio of occurrences of that feature in the document to the number of distinct values of the feature in the document determines whether or not the feature values will be mapped. This purely one-instance statistical approach can have unwanted results in that a feature is mapped or not mapped that should not be or should. Setting this parameter to true will cause the algorithm that determines which features to map to output details about which features would be mapped without actually writing anything into the database. This is done on the INFO log level. This can be used for new corpora in order to check which features should manually be switched on or off for mapping.</description>
+                                
+                <type>Boolean</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
                     
         </configurationParameters>
                 
@@ -481,6 +495,18 @@
                 <value>
                                         
                     <string>_data_xmi.documents_ct</string>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>BinaryFeaturesToMapDryRun</name>
+                                
+                <value>
+                                        
+                    <boolean>false</boolean>
                                     
                 </value>
                             

@@ -51,6 +51,7 @@ public class FeatureUtils {
                 sb.append(cta.buffer(), 0, cta.length()).append(' ');
             }
             sb.deleteCharAt(sb.length() - 1);
+            sbf.reset();
             return sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);

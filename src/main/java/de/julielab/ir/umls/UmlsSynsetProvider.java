@@ -10,11 +10,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class UmlsSynsetProvider {
-    private static final String DEFAULT_SEPARATOR = "---";
+    private static final String DEFAULT_SEPARATOR = "\t";
     private static final Logger log = LogManager.getLogger();
     private static UmlsSynsetProvider instance;
     private final String umlsSynsetFile;
@@ -82,7 +83,9 @@ public class UmlsSynsetProvider {
         Set<Set<String>> ret = new HashSet<>();
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
-                HashSet<String> synset = Sets.newHashSet(line.split(separator));
+                final String[] record = line.split(separator);
+                // The first element of the record is the CUI so let's start at the second index
+                Set<String> synset = Sets.newHashSet(Arrays.copyOfRange(record, 1, record.length));
                 if (synset.contains(inputTerm)) {
                     if (!containTermInSynset)
                         synset.remove(inputTerm);
