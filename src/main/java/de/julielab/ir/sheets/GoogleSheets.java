@@ -12,6 +12,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchGetValuesResponse;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -85,6 +87,28 @@ public class GoogleSheets implements Sheet {
                 .get(spreadsheetId, range)
                 .execute();
         return response.getValues();
+    }
+
+    @Override
+    public List<List<Object>> read(String spreadsheetId, String... ranges) throws IOException {
+        BatchGetValuesResponse response = SERVICE.spreadsheets().values()
+                .batchGet(spreadsheetId)
+                .setRanges(Arrays.asList(ranges))
+                .execute();
+        List<ValueRange> valueRanges = response.getValueRanges();
+
+        // Initialize ret with the first range.
+        List<List<Object>> ret = valueRanges.remove(0).getValues();
+
+        // Merge the remaining ranges with the first one.
+        for (ValueRange valueRange : valueRanges) {
+            List<List<Object>> values = valueRange.getValues();
+            for (int i = 0; i < values.size(); i++) {
+                ret.get(i).addAll(values.get(i));
+            }
+        }
+
+        return ret;
     }
 
     @Override

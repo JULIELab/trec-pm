@@ -26,14 +26,16 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     private static final int MIN_ROW_SIZE = 3;
 
     private final String spreadsheetId;
-    private final String range;
+    private final String[] readRange;
+    private final String writeRange;
 
     private final GoogleSheets sheet = new GoogleSheets();
 
-    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, String spreadsheetId, String range) {
+    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, String spreadsheetId, String[] readRange, String writeRange) {
         super(challenge, task, year, queries, new DocumentList<>());
         this.spreadsheetId = spreadsheetId;
-        this.range = range;
+        this.readRange = readRange;
+        this.writeRange = writeRange;
         qrelDocuments = read();
     }
 
@@ -42,7 +44,7 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
 
         List<List<Object>> values = null;
         try {
-            values = sheet.read(spreadsheetId, range);
+            values = sheet.read(spreadsheetId, readRange);
         } catch (IOException e) {
             throw new RuntimeException("Could not read Google spreadsheet.", e);
         }
@@ -79,13 +81,13 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
         values.add(Arrays.asList("Topic", "Q0", "ID", "Rel"));
 
         // Don't write duplicates to the gold standard.
-        for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueDocumentIds()) {
+        for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueTopicDocumentIds()) {
             values.add(Arrays.asList(doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance()));
         }
 
         int rowsUpdated = -1;
         try {
-            rowsUpdated = sheet.write(spreadsheetId, range, values);
+            rowsUpdated = sheet.write(spreadsheetId, writeRange, values);
         } catch (IOException e) {
             throw new RuntimeException("Could not write to Google spreadsheet.", e);
         }
