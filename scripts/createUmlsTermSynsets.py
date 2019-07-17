@@ -8,7 +8,7 @@ from collections import defaultdict
 from sys import argv
 
 def getSynsets(mrconso, language):
-	cui2synsets = defaultdict(list)
+	cui2synsets = defaultdict(set)
 	for line in open(mrconso,"r"):
 		line = line.split(r"|")
 		cui = line[0]
@@ -16,15 +16,17 @@ def getSynsets(mrconso, language):
 		term = line[14]
 		suppressed = line[16]
 		if language == term_language and suppressed == "N":
-			cui2synsets[cui].append(term)
-	for synset in cui2synsets.values():
-		yield synset
+			cui2synsets[cui].add(term)
+	for item in cui2synsets.items():
+		yield item
 
 def main():
 	mrconso = argv[1]
 	language = argv[2]
-	for synset in getSynsets(mrconso, language):
-		print("---".join(synset))
+	for synsetEntry in getSynsets(mrconso, language):
+		print(synsetEntry[0], "\t", "\t".join(synsetEntry[1]))
+		#print(synsetEntry[0])
+		#print("---".join(synsetEntry[1]))
 
 if __name__ == "__main__":
 	main()
