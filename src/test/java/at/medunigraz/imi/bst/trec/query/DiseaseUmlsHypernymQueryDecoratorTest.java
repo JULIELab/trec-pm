@@ -4,26 +4,30 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
+import de.julielab.ir.umls.UmlsRelationsProvider;
 import de.julielab.ir.umls.UmlsSynsetProvider;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.assertj.core.api.Assertions.*;
-public class DiseaseUmlsSynonymQueryDecoratorTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class DiseaseUmlsHypernymQueryDecoratorTest {
     @Test
     public void testPmTopics() {
+        UmlsRelationsProvider.setRelationsSourceFile("src/test/resources/umls/melanoma.relations");
+        UmlsRelationsProvider.setUseCache(false);
+        // We must also set the synset provider for testing because it is internally used
         UmlsSynsetProvider.setSynsetSourceFile("src/test/resources/umls/melanoma.synset");
         UmlsSynsetProvider.setUseCache(false);
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
-        final DiseaseUmlsSynonymQueryDecorator decorator = new DiseaseUmlsSynonymQueryDecorator(dummyQuery);
+        final DiseaseUmlsHypernymQueryDecorator decorator = new DiseaseUmlsHypernymQueryDecorator(dummyQuery);
         final TopicSet topicSet = new TopicSet(new File("src/main/resources/topics/topics2018.xml"), Challenge.TREC_PM, Task.PUBMED, 2017);
         for (Topic topic : topicSet.getTopics()) {
             decorator.expandTopic(topic);
-            if (topic.getDisease().equals("melanoma"))
-                assertThat(topic.getDiseaseSynonyms()).contains("nevocarcinoma", "cutaneous melanoma", "melanoma (disorder)");
+            System.out.println(topic.getDiseaseHypernyms());
+//            if (topic.getDisease().equals("melanoma"))
+//                assertThat(topic.getDiseaseSynonyms()).contains("nevocarcinoma", "cutaneous melanoma", "melanoma (disorder)");
         }
     }
 }
