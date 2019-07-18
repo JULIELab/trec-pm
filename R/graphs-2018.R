@@ -13,7 +13,7 @@ tug_orange <- "#f79645"
 # Scientific Abstracts
 run_ids <- c('hpipubboost', 'hpipubnone', 'hpipubbase', 'hpipubclass', 'hpipubcommon')
 folder <- "."
-task_name <- "scientific_abstracts"
+task_name <- "biomedical-articles"
 metrics <- c("infNDCG", "P10", "R-prec")
 # Best, median and worst are averages over all topics
 # TODO calculate automatically from the "_trec_trec26_tables_pm-final-abstracts" file.
@@ -28,7 +28,7 @@ tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, 
 # Clinical Trials
 #run_ids <- c('mugctboost', 'mugctdisease', 'mugctbase', 'mugctgene', 'mugctmust')
 #folder <- "."
-#task_name <- "clinical_trials"
+#task_name <- "clinical-trials"
 #metrics <- c("P5", "P10", "P15")
 #metrics_best <- c(0.7724, 0.6759, 0.5908)
 #metrics_median <- c(0.2897, 0.2517, 0.2253)
@@ -36,6 +36,7 @@ tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, 
 #file_extension <- ""
 #tug_colors <- c(mugctboost=tug_red, mugctdisease=tug_blue, mugctbase=tug_green, mugctgene=tug_magenta, mugctmust=tug_orange)
 
+folder <- paste(folder, "/", task_name, sep="")
 
 # TODO create empty data.frame and iterate only?
 results <- read.table(paste(folder, "/", run_ids[1], file_extension, sep=""), header = FALSE)
