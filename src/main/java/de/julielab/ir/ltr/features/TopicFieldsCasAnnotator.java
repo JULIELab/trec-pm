@@ -2,7 +2,6 @@ package de.julielab.ir.ltr.features;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicGene;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
 import com.roklenarcic.util.strings.StringMap;
 import com.roklenarcic.util.strings.WholeWordLongestMatchMap;
 import de.julielab.ir.ltr.features.featurenames.MatchType;

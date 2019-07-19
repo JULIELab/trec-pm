@@ -1,20 +1,19 @@
 package de.julielab.ir.ulms;
 
 import com.google.common.collect.Sets;
-import de.julielab.ir.umls.UmlsRelationsProvider;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.assertj.core.api.Assertions.*;
 
 public class UmlsSynsetProviderTest {
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         UmlsSynsetProvider.setSynsetSourceFile("src/test/resources/umls/example.synsets");
         UmlsSynsetProvider.setUseCache(false);
     }

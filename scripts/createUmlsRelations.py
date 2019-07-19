@@ -1,7 +1,6 @@
 """
 """
 
-from collections import defaultdict
 from sys import argv
 
 def getRelations(mrrel):

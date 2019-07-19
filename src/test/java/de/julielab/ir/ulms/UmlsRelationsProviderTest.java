@@ -1,7 +1,6 @@
 package de.julielab.ir.ulms;
 
 import de.julielab.ir.umls.UmlsRelationsProvider;
-import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -12,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UmlsRelationsProviderTest {
 
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
         UmlsRelationsProvider.setRelationsSourceFile("src/test/resources/umls/example.relations");
         UmlsRelationsProvider.setUseCache(false);
     }

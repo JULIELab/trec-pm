@@ -4,7 +4,6 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import org.apache.uima.fit.factory.JCasFactory;
-import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
