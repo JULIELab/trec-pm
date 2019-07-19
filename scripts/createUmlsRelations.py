@@ -9,13 +9,16 @@ def getRelations(mrrel):
 	# RB  ~ broader
 	eligibleRelations = set(["PAR", "RB"])
 	for line in open(mrrel,"r"):
-		line = line.split(r"|") 
-		cui1 = line[0]
-		cui2 = line[4]
-		rel  = line[3]
+		line    = line.split(r"|")
+		cui1    = line[0]
+		idType1 = line[2]
+		cui2    = line[4]
+		idType2 = line[6]
+		rel     = line[3]
 		term_language = line[1]
 		suppressed = line[14]
-		if rel in eligibleRelations and suppressed == "N":
+		# Filter for CUI id references because those are the concept relations.
+		if rel in eligibleRelations and suppressed == "N" and idType1 == "CUI" and idType2 == "CUI":
 			yield "\t".join([cui1, rel, cui2])
 
 def main():

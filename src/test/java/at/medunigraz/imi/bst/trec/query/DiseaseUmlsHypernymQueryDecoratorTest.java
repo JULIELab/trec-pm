@@ -25,9 +25,8 @@ public class DiseaseUmlsHypernymQueryDecoratorTest {
         final TopicSet topicSet = new TopicSet(new File("src/main/resources/topics/topics2018.xml"), Challenge.TREC_PM, Task.PUBMED, 2017);
         for (Topic topic : topicSet.getTopics()) {
             decorator.expandTopic(topic);
-            System.out.println(topic.getDiseaseHypernyms());
-//            if (topic.getDisease().equals("melanoma"))
-//                assertThat(topic.getDiseaseSynonyms()).contains("nevocarcinoma", "cutaneous melanoma", "melanoma (disorder)");
+            if (topic.getDisease().equals("melanoma"))
+                assertThat(topic.getDiseaseHypernyms()).contains("neoplasm of skin", "melanocytes", "tumor", "disease of epidermal appendage");
         }
     }
 }

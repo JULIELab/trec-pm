@@ -26,7 +26,7 @@ public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
 
         for (String cui : cuis) {
             final Set<String> relatives = relationsProvider.getRelatives(cui, UmlsRelationsProvider.Relation.PARENT);
-            relatives.stream().map(synsetProvider::getCuiSynset).flatMap(Collection::stream).forEach(topic::withDiseaseHypernym);
+            relatives.stream().map(synsetProvider::getCuiSynset).flatMap(Collection::stream).map(String::toLowerCase).distinct().forEach(topic::withDiseaseHypernym);
         }
         return topic;
     }
