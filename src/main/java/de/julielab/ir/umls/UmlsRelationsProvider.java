@@ -15,36 +15,56 @@ public class UmlsRelationsProvider {
     private static final String DEFAULT_SEPARATOR = "\t";
     private static final Logger log = LogManager.getLogger();
     private static UmlsRelationsProvider instance;
+    private static boolean useCache;
+    private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";
     private final String umlsSynsetFile;
     private final String separator;
-    private static boolean useCache;
     private CacheAccess<String, Set<String>> parentsCache;
     private CacheAccess<String, Set<String>> childrenCache;
-    private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";
 
-    private UmlsRelationsProvider(String umlsSynsetFile, boolean useCache) throws IOException {
+    protected UmlsRelationsProvider(String umlsSynsetFile, boolean useCache) {
         this(umlsSynsetFile, DEFAULT_SEPARATOR, useCache);
     }
 
-    private UmlsRelationsProvider(String umlsSynsetFile, String separator, boolean useCache) throws IOException {
+    private UmlsRelationsProvider(String umlsSynsetFile, String separator, boolean useCache) {
 
         this.umlsSynsetFile = umlsSynsetFile;
         this.separator = separator;
         this.useCache = useCache;
 
-        parentsCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsRelationParents", CacheAccess.STRING, CacheAccess.JAVA);
-        childrenCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsRelationChildren", CacheAccess.STRING, CacheAccess.JAVA);
+        if (useCache) {
+            parentsCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsRelationParents", CacheAccess.STRING, CacheAccess.JAVA);
+            childrenCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsRelationChildren", CacheAccess.STRING, CacheAccess.JAVA);
+        }
     }
 
     public static UmlsRelationsProvider getInstance() {
         if (instance == null) {
-            try {
-                instance = new UmlsRelationsProvider(defaultRelationsFile, useCache);
-            } catch (IOException e) {
-                log.error("Could not read UMLS data from " + defaultRelationsFile, e);
-            }
+            instance = new UmlsRelationsProvider(defaultRelationsFile, useCache);
         }
         return instance;
+    }
+
+    /**
+     * <p>Resets the service to use the given source for relations.</p>
+     * <p>This is mostly used for testing.</p>
+     *
+     * @param file The UMLS relations file to use.
+     */
+    public static void setRelationsSourceFile(String file) {
+        defaultRelationsFile = file;
+        instance = null;
+    }
+
+    /**
+     * <p>Resets the service to make usage of caching as specified.</p>
+     * <p>This is mostly used for testing.</p>
+     *
+     * @param useCache Whether or not to use caching.
+     */
+    public static void setUseCache(boolean useCache) {
+        UmlsRelationsProvider.useCache = useCache;
+        instance = null;
     }
 
     private Set<String> getRelativesFromFile(String umlsSynsetFile, String separator, String cui, Relation relation) throws IOException {
@@ -61,26 +81,6 @@ public class UmlsRelationsProvider {
             });
         }
         return ret;
-    }
-
-    /**
-     * <p>Resets the service to use the given source for relations.</p>
-     * <p>This is mostly used for testing.</p>
-     * @param file The UMLS relations file to use.
-     */
-    public static void setRelationsSourceFile(String file) {
-        defaultRelationsFile = file;
-        instance = null;
-    }
-
-    /**
-     * <p>Resets the service to make usage of caching as specified.</p>
-     * <p>This is mostly used for testing.</p>
-     * @param useCache Whether or not to use caching.
-     */
-    public static void setUseCache(boolean useCache) {
-        UmlsRelationsProvider.useCache = useCache;
-        instance = null;
     }
 
     public List<Set<String>> getRelatives(String cui, Relation relation, int maxDistance) {

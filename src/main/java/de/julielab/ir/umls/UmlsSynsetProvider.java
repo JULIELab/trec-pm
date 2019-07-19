@@ -13,30 +13,19 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class UmlsSynsetProvider {
-    private static final String DEFAULT_SEPARATOR = "\t";
+    public static final String DEFAULT_SEPARATOR = "\t";
     private static final Logger log = LogManager.getLogger();
+    private final static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
     private static UmlsSynsetProvider instance;
-    private static boolean useCache = true;
-    private static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
-    private static boolean containTermInSynset;
     private final String umlsSynsetFile;
     private final String separator;
-    private final CacheAccess<String, Set<String>> cuisForTermCache;
-    private final CacheAccess<String, UmlsSynset> cuiSynsetCache;
+    private final boolean useCache;
+    private final boolean containTermInSynset;
+    private CacheAccess<String, Set<String>> cuisForTermCache;
+    private CacheAccess<String, UmlsSynset> cuiSynsetCache;
     private CacheAccess<String, Set<UmlsSynset>> synsetCache;
-    /**
-     * Provides synsets for a term, assumes synset file uses default separator
-     * "---" and will not include term as part of its synset
-     *
-     * @param umlsSynsetFile Qualified file name with synsets
-     * @throws IOException
-     */
-    private UmlsSynsetProvider(String umlsSynsetFile, boolean useCache) throws IOException {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, containTermInSynset, useCache);
-    }
 
     /**
      * Provides synsets for a term
@@ -44,62 +33,28 @@ public class UmlsSynsetProvider {
      * @param umlsSynsetFile      Qualified file name with synsets
      * @param separator           Used in synset file to separate terms
      * @param containTermInSynset Is term part of its own synset?
-     * @throws IOException
      */
-    private UmlsSynsetProvider(String umlsSynsetFile, String separator,
-                               boolean containTermInSynset, boolean useCache) throws IOException {
+    protected UmlsSynsetProvider(String umlsSynsetFile, String separator,
+                                 boolean containTermInSynset, boolean useCache) {
 
         this.umlsSynsetFile = umlsSynsetFile;
         this.separator = separator;
         this.containTermInSynset = containTermInSynset;
         this.useCache = useCache;
 
-        synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
-        cuisForTermCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIsForTerms", CacheAccess.STRING, CacheAccess.JAVA);
-        cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
+        if (useCache) {
+            synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
+            cuisForTermCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIsForTerms", CacheAccess.STRING, CacheAccess.JAVA);
+            cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
+        }
     }
 
-
-    /**
-     * <p>Used for testing.</p>
-     * @param containTermInSynset
-     */
-    public static void setContainTermInSynset(boolean containTermInSynset) {
-        UmlsSynsetProvider.containTermInSynset = containTermInSynset;
-        instance = null;
-    }
 
     public static UmlsSynsetProvider getInstance() {
         if (instance == null) {
-            try {
-                instance = new UmlsSynsetProvider(defaultSynsetFile, useCache);
-            } catch (IOException e) {
-                log.error("Could not read UMLS data from " + defaultSynsetFile, e);
-            }
+            instance = new UmlsSynsetProvider(defaultSynsetFile, DEFAULT_SEPARATOR, false, true);
         }
         return instance;
-    }
-
-    /**
-     * <p>Resets the service to use the given source for synsets.</p>
-     * <p>This is mostly used for testing.</p>
-     *
-     * @param file The UMLS synset file to use.
-     */
-    public static void setSynsetSourceFile(String file) {
-        defaultSynsetFile = file;
-        instance = null;
-    }
-
-    /**
-     * <p>Resets the service to make usage of caching as specified.</p>
-     * <p>This is mostly used for testing.</p>
-     *
-     * @param useCache Whether or not to use caching.
-     */
-    public static void setUseCache(boolean useCache) {
-        UmlsSynsetProvider.useCache = useCache;
-        instance = null;
     }
 
     private Set<UmlsSynset> getSynsetsFromFile(String umlsSynsetFile, String separator, boolean containTermInSynset, String inputTerm) throws IOException {
@@ -108,7 +63,7 @@ public class UmlsSynsetProvider {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);
                 // The first element of the record is the CUI so let's start at the second index
-                Set<String> synset = IntStream.range(1, record.length).mapToObj(i -> record[i]).collect(Collectors.toSet());
+                Set<String> synset = java.util.Arrays.stream(record, 1, record.length).collect(Collectors.toSet());
                 if (synset.contains(inputTerm)) {
                     if (!containTermInSynset)
                         synset.remove(inputTerm);
@@ -170,7 +125,7 @@ public class UmlsSynsetProvider {
                     .filter(record -> record[0].equals(cui))
                     .map(record -> {
                         // The first element of the record is the CUI so let's start at the second index
-                        Set<String> synset = IntStream.range(1, record.length).mapToObj(i -> record[i]).collect(Collectors.toSet());
+                        Set<String> synset = java.util.Arrays.stream(record, 1, record.length).collect(Collectors.toSet());
                         return new UmlsSynset(synset, record[0]);
                     }).findAny();
 
