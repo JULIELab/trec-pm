@@ -1,6 +1,8 @@
 package de.julielab.ir.ulms;
 
 import de.julielab.ir.umls.UmlsRelationsProvider;
+import de.julielab.ir.umls.UmlsSynsetProvider;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -8,9 +10,16 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 public class UmlsRelationsProviderTest {
+
+    @BeforeClass
+    public static void setup() {
+        UmlsRelationsProvider.setRelationsSourceFile("src/test/resources/umls/example.relations");
+        UmlsRelationsProvider.setUseCache(false);
+    }
+
     @Test
-    public void testGetParents() throws Exception {
-        final UmlsRelationsProvider rp = new UmlsRelationsProvider("src/test/resources/umls/example.relations", false);
+    public void testGetParents() {
+        final UmlsRelationsProvider rp = UmlsRelationsProvider.getInstance();
         assertThat(rp.getRelatives("CUI1", UmlsRelationsProvider.Relation.PARENT)).containsExactly("CUI2");
         assertThat(rp.getRelatives("CUI2", UmlsRelationsProvider.Relation.PARENT)).containsExactlyInAnyOrder("CUI3", "CUI4");
 
@@ -21,8 +30,8 @@ public class UmlsRelationsProviderTest {
     }
 
     @Test
-    public void testGetChildren() throws Exception {
-        final UmlsRelationsProvider rp = new UmlsRelationsProvider("src/test/resources/umls/example.relations", false);
+    public void testGetChildren() {
+        final UmlsRelationsProvider rp = UmlsRelationsProvider.getInstance();
         assertThat(rp.getRelatives("CUI2", UmlsRelationsProvider.Relation.CHILD)).containsExactly("CUI1");
         assertThat(rp.getRelatives("CUI3", UmlsRelationsProvider.Relation.CHILD)).containsExactlyInAnyOrder("CUI2");
         assertThat(rp.getRelatives("CUI4", UmlsRelationsProvider.Relation.CHILD)).containsExactlyInAnyOrder("CUI2");

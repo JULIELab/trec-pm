@@ -22,7 +22,7 @@ public class UmlsRelationsProvider {
     private CacheAccess<String, Set<String>> childrenCache;
     private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";
 
-    public UmlsRelationsProvider(String umlsSynsetFile, boolean useCache) throws IOException {
+    private UmlsRelationsProvider(String umlsSynsetFile, boolean useCache) throws IOException {
         this(umlsSynsetFile, DEFAULT_SEPARATOR, useCache);
     }
 

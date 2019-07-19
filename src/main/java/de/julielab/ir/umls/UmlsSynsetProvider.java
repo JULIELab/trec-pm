@@ -21,13 +21,12 @@ public class UmlsSynsetProvider {
     private static UmlsSynsetProvider instance;
     private static boolean useCache = true;
     private static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
+    private static boolean containTermInSynset;
     private final String umlsSynsetFile;
     private final String separator;
-    private final boolean containTermInSynset;
     private final CacheAccess<String, Set<String>> cuisForTermCache;
     private final CacheAccess<String, UmlsSynset> cuiSynsetCache;
     private CacheAccess<String, Set<UmlsSynset>> synsetCache;
-
     /**
      * Provides synsets for a term, assumes synset file uses default separator
      * "---" and will not include term as part of its synset
@@ -36,9 +35,8 @@ public class UmlsSynsetProvider {
      * @throws IOException
      */
     private UmlsSynsetProvider(String umlsSynsetFile, boolean useCache) throws IOException {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, false, useCache);
+        this(umlsSynsetFile, DEFAULT_SEPARATOR, containTermInSynset, useCache);
     }
-
 
     /**
      * Provides synsets for a term
@@ -61,17 +59,14 @@ public class UmlsSynsetProvider {
         cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
     }
 
+
     /**
-     * Provides synsets for a term, assumes synset file uses default separator
-     * "---"
-     *
-     * @param umlsSynsetFile      Qualified file name with synsets
-     * @param containTermInSynset Is term part of its own synset?
-     * @throws IOException
+     * <p>Used for testing.</p>
+     * @param containTermInSynset
      */
-    public UmlsSynsetProvider(String umlsSynsetFile,
-                              boolean containTermInSynset, boolean useCache) throws IOException {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, containTermInSynset, useCache);
+    public static void setContainTermInSynset(boolean containTermInSynset) {
+        UmlsSynsetProvider.containTermInSynset = containTermInSynset;
+        instance = null;
     }
 
     public static UmlsSynsetProvider getInstance() {
