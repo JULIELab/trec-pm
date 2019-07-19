@@ -9,14 +9,19 @@ import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +30,7 @@ public class ElasticSearch implements SearchEngine {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private Client client = ElasticClientFactory.getClient();
+    private RestHighLevelClient client = ElasticClientFactory.getClient();
 
     private String index = "_all";
     private SimilarityParameters parameters;
@@ -54,39 +59,50 @@ public class ElasticSearch implements SearchEngine {
     }
 
     public List<Result> query(JSONObject jsonQuery, int size) {
-        final String json = jsonQuery.toString();
-        String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + json;
-        LOG.debug("Query ID for cache: {}", cacheKey);
-        List<Result> result = cache.get(cacheKey);
-        if (result == null) {
-            if (!(parameters instanceof NoParameters)) {
-//                ElasticSearchSetup.
-            }
-            QueryBuilder qb = QueryBuilders.wrapperQuery(json);
-            LOG.trace(JsonUtils.prettify(jsonQuery));
+        try {
+            final String json = jsonQuery.toString();
+            String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + json;
+            LOG.debug("Query ID for cache: {}", cacheKey);
+            List<Result> result = cache.get(cacheKey);
+            if (result == null) {
+                if (!(parameters instanceof NoParameters)) {
+    //                ElasticSearchSetup.
+                }
+                QueryBuilder qb = QueryBuilders.wrapperQuery(json);
+                LOG.trace(JsonUtils.prettify(jsonQuery));
 
-            result = query(qb, size);
-            cache.put(cacheKey, result);
+                result = query(new SearchSourceBuilder(qb), size);
+                cache.put(cacheKey, result);
+            }
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return result;
+        return null;
     }
 
-    private List<Result> query(QueryBuilder qb, int size) {
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(types).setQuery(qb)
-                .setSize(size).addStoredField("_id");
+    private List<Result> query(SearchSourceBuilder qb, int size) {
 
-        SearchResponse response = searchRequestBuilder.get();
-        //LOG.trace(JsonUtils.prettify(response.toString()));
+        try {
+            SearchRequestBuilder searchRequestBuilder = client.search(new SearchRequest(index).source(qb), RequestOptions.DEFAULT).(qb)
+                    .setSize(size).addStoredField("_id");
 
-        SearchHit[] results = response.getHits().getHits();
+            SearchResponse response = searchRequestBuilder.get();
+            //LOG.trace(JsonUtils.prettify(response.toString()));
 
-        List<Result> ret = new ArrayList<>();
-        for (SearchHit hit : results) {
-            Result result = new Result(hit.getId(), hit.getScore());
-            ret.add(result);
+            SearchHit[] results = response.getHits().getHits();
+
+            List<Result> ret = new ArrayList<>();
+            for (SearchHit hit : results) {
+                Result result = new Result(hit.getId(), hit.getScore());
+                ret.add(result);
+            }
+
+            return ret;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        return ret;
+        return null;
     }
 
 }
