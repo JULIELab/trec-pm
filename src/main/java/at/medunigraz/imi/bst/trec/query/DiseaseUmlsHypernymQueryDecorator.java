@@ -3,12 +3,10 @@ package at.medunigraz.imi.bst.trec.query;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.umls.UmlsRelationsProvider;
-import de.julielab.ir.umls.UmlsSynset;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
 

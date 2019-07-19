@@ -15,7 +15,6 @@ def getRelations(mrrel):
 		cui2    = line[4]
 		idType2 = line[6]
 		rel     = line[3]
-		term_language = line[1]
 		suppressed = line[14]
 		# Filter for CUI id references because those are the concept relations.
 		if rel in eligibleRelations and suppressed == "N" and idType1 == "CUI" and idType2 == "CUI":

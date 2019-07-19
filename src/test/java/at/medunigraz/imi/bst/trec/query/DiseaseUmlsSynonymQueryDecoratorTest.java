@@ -5,13 +5,11 @@ import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import de.julielab.ir.umls.UmlsSynsetProvider;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 public class DiseaseUmlsSynonymQueryDecoratorTest {
     @Test
     public void testPmTopics() {
