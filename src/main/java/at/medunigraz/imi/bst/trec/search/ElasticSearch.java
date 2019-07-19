@@ -59,7 +59,6 @@ public class ElasticSearch implements SearchEngine {
     }
 
     public List<Result> query(JSONObject jsonQuery, int size) {
-        try {
             final String json = jsonQuery.toString();
             String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + json;
             LOG.debug("Query ID for cache: {}", cacheKey);
@@ -71,23 +70,16 @@ public class ElasticSearch implements SearchEngine {
                 QueryBuilder qb = QueryBuilders.wrapperQuery(json);
                 LOG.trace(JsonUtils.prettify(jsonQuery));
 
-                result = query(new SearchSourceBuilder(qb), size);
+                result = query(qb, size);
                 cache.put(cacheKey, result);
             }
             return result;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
-    private List<Result> query(SearchSourceBuilder qb, int size) {
+    private List<Result> query(QueryBuilder qb, int size) {
 
         try {
-            SearchRequestBuilder searchRequestBuilder = client.search(new SearchRequest(index).source(qb), RequestOptions.DEFAULT).(qb)
-                    .setSize(size).addStoredField("_id");
-
-            SearchResponse response = searchRequestBuilder.get();
+            SearchResponse response = client.search(new SearchRequest(index).source(new SearchSourceBuilder().query(qb).size(size).storedField("_id")), RequestOptions.DEFAULT);
             //LOG.trace(JsonUtils.prettify(response.toString()));
 
             SearchHit[] results = response.getHits().getHits();
