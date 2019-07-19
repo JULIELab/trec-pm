@@ -2,7 +2,6 @@ package de.julielab.ir.ltr.features;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicGene;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
 import com.roklenarcic.util.strings.StringMap;
 import com.roklenarcic.util.strings.WholeWordLongestMatchMap;
 import de.julielab.ir.ltr.features.featurenames.MatchType;
@@ -129,22 +128,23 @@ public class TopicFieldsCasAnnotator {
             ConceptMention cm;
             switch (tm.getMatchType()) {
                 case DISEASE:
-                    cm = new Disease(jCas, tm.getBegin(), tm.getEnd());
+                case DISEASE_SYNONYM:
+                case DISEASE_HYPERNYM:
+                    cm = new Disease(jCas);
                     break;
                 case GENE:
-                    cm = new Gene(jCas, tm.getBegin(), tm.getEnd());
+                case GENE_AND_VARIANT:
+                    cm = new Gene(jCas);
                     break;
                 case VARIANT:
-                    cm = new Gene(jCas, tm.getBegin(), tm.getEnd());
-                    break;
-                case GENE_AND_VARIANT:
-                    cm = new Gene(jCas, tm.getBegin(), tm.getEnd());
+                    cm = new Gene(jCas);
                     break;
                 default:
                     throw new IllegalStateException("Unhandled match type " + tm.getMatchType());
             }
             cm.setSpecificType(tm.getMatchType().name());
             cm.setComponentId(getClass().getCanonicalName());
+            cm.setTextualRepresentation(tm.keyword);
             cm.addToIndexes();
         }
     }
