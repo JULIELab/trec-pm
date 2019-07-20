@@ -9,6 +9,7 @@ import de.julielab.ir.ltr.features.featurenames.MatchType;
 import de.julielab.jcore.types.Disease;
 import de.julielab.jcore.types.Gene;
 import org.apache.uima.fit.factory.JCasFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
