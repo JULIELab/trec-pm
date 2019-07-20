@@ -1,22 +1,18 @@
 package de.julielab.jcore.reader.trecpmextra;
 
-import de.julielab.jcore.types.*;
-import org.apache.uima.cas.CASRuntimeException;
-import org.apache.uima.collection.CollectionException;
+import org.apache.uima.UimaContext;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.descriptor.ResourceMetaData;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
-import org.apache.uima.UimaContext;
 import org.apache.uima.jcas.cas.FSArray;
 import org.apache.uima.resource.ResourceInitializationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.regex.Matcher;

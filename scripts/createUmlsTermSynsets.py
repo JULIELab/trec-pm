@@ -24,9 +24,7 @@ def main():
 	mrconso = argv[1]
 	language = argv[2]
 	for synsetEntry in getSynsets(mrconso, language):
-		print(synsetEntry[0], "\t", "\t".join(synsetEntry[1]))
-		#print(synsetEntry[0])
-		#print("---".join(synsetEntry[1]))
+		print(synsetEntry[0] + "\t" + "\t".join(synsetEntry[1]))
 
 if __name__ == "__main__":
 	main()

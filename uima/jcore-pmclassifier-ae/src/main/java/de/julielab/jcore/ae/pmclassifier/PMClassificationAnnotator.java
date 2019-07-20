@@ -3,10 +3,7 @@ package de.julielab.jcore.ae.pmclassifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.julielab.ir.pm.pmclassifier.Document;
 import de.julielab.ir.pm.pmclassifier.MalletClassifier;
-import de.julielab.jcore.types.*;
 import de.julielab.jcore.utility.JCoReTools;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -20,12 +17,9 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
 
 @TypeCapability(inputs = {"de.julielab.jcore.types.Gene", "de.julielab.jcore.types.Organism", "de.julielab.jcore.types.Title", "de.julielab.jcore.types.AbstractText", "de.julielab.jcore.types.MeshHeading"})
 public class PMClassificationAnnotator extends JCasAnnotator_ImplBase {

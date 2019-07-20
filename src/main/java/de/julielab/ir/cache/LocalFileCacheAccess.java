@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import org.mapdb.Serializer;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public class LocalFileCacheAccess<K, V> extends CacheAccess<K, V> {
     private static final Logger log = LogManager.getLogger();
