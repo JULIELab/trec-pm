@@ -7,7 +7,6 @@ import com.wcohen.ss.api.Token;
 import com.wcohen.ss.tokens.SimpleTokenizer;
 import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
-import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;

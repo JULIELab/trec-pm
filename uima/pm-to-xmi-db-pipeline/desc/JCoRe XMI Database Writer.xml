@@ -337,7 +337,7 @@
                                 
                 <value>
                                         
-                    <boolean>true</boolean>
+                    <boolean>false</boolean>
                                     
                 </value>
                             
@@ -458,6 +458,8 @@
                 <value>
                                         
                     <array>
+                                                
+                        <string>de.julielab.jcore.types.Lemma:value</string>
                                                 
                         <string>de.julielab.jcore.types.POSTag:value</string>
                                                 

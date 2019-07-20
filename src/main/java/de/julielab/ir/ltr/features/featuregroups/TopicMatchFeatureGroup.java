@@ -9,8 +9,6 @@ import com.google.common.collect.Multiset;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.ir.ltr.features.TopicFieldsCasAnnotator;
-import de.julielab.ir.ltr.features.featurenames.MatchType;
-import de.julielab.ir.pm.pmclassifier.AhoCorasickOptimized;
 import de.julielab.jcore.types.Disease;
 import de.julielab.jcore.types.Gene;
 import de.julielab.jcore.types.PointMutation;

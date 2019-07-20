@@ -6,19 +6,13 @@ import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
 import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
-import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.Date;
 import de.julielab.jcore.utility.JCoReTools;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
-
-import java.util.*;
-import java.util.List;
 
 public class Trec2018FieldGenerator extends FieldGenerator {
 
