@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * via the {@link FeatureControlCenter} for experimental purposes.</p>
  */
 public class Feature {
-    private String name;
+    protected String name;
     /**
      * This consumer takes a MALLET token and sets a feature value to it.
      */
@@ -24,6 +24,11 @@ public class Feature {
         this.name = name;
         this.valueAssigner = valueAssigner;
     }
+
+    public Feature(String name) {
+        this.name = name;
+    }
+
 
     public void assignFeature(Instance inst) {
         valueAssigner.accept(inst);
