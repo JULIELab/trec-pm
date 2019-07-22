@@ -42,6 +42,8 @@ public abstract class FeatureGroup extends Pipe {
     public final Instance pipe(Instance instance) {
         if (!isActive())
             return instance;
+        if (features.isEmpty())
+            addFeatures();
         applyFeatures(instance);
         return instance;
     }

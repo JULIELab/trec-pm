@@ -54,7 +54,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
                         foundVariants.add(g.getSpecificType());
                 }
 
-                for (String variant : foundVariants) {
+                for (String variant : foundVariants.elementSet()) {
                     token.setFeatureValue(MATCH_TOPIC_VARIANT, foundVariants.count(variant));
                 }
             } catch (CASException e) {
@@ -78,7 +78,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
                         matchTypes.add(g.getSpecificType());
                 }
                 // For each match type (like GENE or GENE_AND_VARIANT)
-                for (String matchType : matchTypes) {
+                for (String matchType : matchTypes.elementSet()) {
                     token.setFeatureValue(matchType, matchTypes.count(matchType));
                 }
             } catch (CASException e) {
@@ -95,13 +95,13 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
             try {
                 Multiset<String> matchTypes = HashMultiset.create();
                 final JCas jCas = document.getCas().getJCas();
-                for (Disease d : jCas.<Disease>getAnnotationIndex(Gene.type)) {
+                for (Disease d : jCas.<Disease>getAnnotationIndex(Disease.type)) {
                     if (d.getComponentId().equals(TopicFieldsCasAnnotator.class.getCanonicalName()))
                         // The specific type is a name from the MatchType enum
                         matchTypes.add(d.getSpecificType());
                 }
                 // For each match type (like DISEASE or DISEASE_SYNONYM)
-                for (String matchType : matchTypes) {
+                for (String matchType : matchTypes.elementSet()) {
                     token.setFeatureValue(matchType, matchTypes.count(matchType));
                 }
             } catch (CASException e) {

@@ -105,6 +105,8 @@ public class TopicFieldsCasAnnotator {
      * @param topic The topic of the document. Only dictionary matches regarding this topic will be added to the CAS.
      */
     public void annotate(JCas jCas, Topic topic) {
+        if (topic == null)
+            throw new IllegalArgumentException("The passed topic is null");
         if (!knownTopicNumbers.contains(topic.getCrossDatasetId()))
             throw new IllegalStateException("The topic " + topic.getCrossDatasetId() + " should be matched to a document but this class was not initialized with this topic.");
         List<TopicMatch> matches = new ArrayList<>();

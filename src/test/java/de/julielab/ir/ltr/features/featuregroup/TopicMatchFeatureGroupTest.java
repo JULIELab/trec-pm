@@ -7,6 +7,7 @@ import at.medunigraz.imi.bst.trec.model.TopicSet;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
+import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
@@ -17,6 +18,7 @@ import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.SetFeatureVectorPipe;
 import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
+import de.julielab.ir.ltr.features.featurenames.MatchType;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ConfigurationUtils;
@@ -29,15 +31,15 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUP;
 import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUPS;
 import static de.julielab.ir.ltr.features.FCConstants.NAME_ATTR;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 import static de.julielab.java.utilities.ConfigurationUtilities.ws;
-
+import static org.assertj.core.api.Assertions.*;
 public class TopicMatchFeatureGroupTest {
     @Test
     public void test() throws Exception {
@@ -68,12 +70,32 @@ public class TopicMatchFeatureGroupTest {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         XmiCasSerializer.serialize(jCas.getCas(), baos);
         doc.setFullDocumentData(baos.toByteArray());
+        doc.setQueryDescription(testTopic);
 
         final Instance inst = new Instance(doc, 0, doc.getId(), doc);
         final InstanceList il = new InstanceList(pipe);
         il.addThruPipe(inst);
 
         FeatureVector fv = (FeatureVector) inst.getData();
-        System.out.println("Hier: " + fv);
+        final Alphabet alphabet = fv.getAlphabet();
+        assertThat(fv.getIndices().length).isEqualTo(6);
+        for (int i : fv.getIndices()) {
+            final String featureName = (String) alphabet.lookupObject(i);
+            assertThat(featureName).isIn(Arrays.stream(MatchType.values()).map(Enum::name).collect(Collectors.toSet()));
+            double value =  fv.value(i);
+            MatchType matchType = MatchType.valueOf(featureName);
+            if (matchType == MatchType.VARIANT)
+                assertThat(value).isEqualTo(1.0);
+            if (matchType == MatchType.GENE)
+                assertThat(value).isEqualTo(1.0);
+            if (matchType == MatchType.GENE_AND_VARIANT)
+                assertThat(value).isEqualTo(2.0);
+            if (matchType == MatchType.DISEASE_HYPERNYM)
+                assertThat(value).isEqualTo(1.0);
+            if (matchType == MatchType.DISEASE)
+                assertThat(value).isEqualTo(6.0);
+            if (matchType == MatchType.DISEASE_SYNONYM)
+                assertThat(value).isEqualTo(1.0);
+        }
     }
 }
