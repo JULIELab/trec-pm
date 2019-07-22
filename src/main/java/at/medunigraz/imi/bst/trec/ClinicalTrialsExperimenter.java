@@ -1,64 +1,64 @@
 package at.medunigraz.imi.bst.trec;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentBuilder;
+import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
-import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
+import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ClinicalTrialsExperimenter {
-	public static void main(String[] args) {
-		final File improvedTemplate = new File(
-				ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictboost.json").getFile());
-		final File phraseTemplate = new File(
-				ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
+public final class ClinicalTrialsExperimenter {
 
-		final GoldStandard goldStandard = GoldStandard.INTERNAL;
-		final Task target = Task.CLINICAL_TRIALS;
-		final int year = 2019;
+    private static final int YEAR = 2019;
+    /**
+     * @todo Unify GoldStandard (#16)
+     */
+    private static final GoldStandard GOLD_STANDARD_TYPE = GoldStandard.INTERNAL;
 
-		// Judging order: 1
-		Experiment hpictall = new ExperimentBuilder().withName("hpictall").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-                .withSubTemplate(improvedTemplate).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-                .withDiseaseSynonym().withGeneSynonym().withGeneDescription().withGeneFamily().build();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.trialsInternal2019();
 
-		// Judging order: 2
-		Experiment hpictphrase = new ExperimentBuilder().withName("hpictphrase").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(phraseTemplate).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-				.withDiseaseSynonym().withGeneSynonym().withGeneFamily().build();
+    private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2019();
 
-		// Judging order: 3
-		Experiment hpictboost = new ExperimentBuilder().withName("hpictboost").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(improvedTemplate).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-				.withDiseaseSynonym().withGeneSynonym().withGeneFamily().build();
+    public static void main(String[] args) {
+        // Judging order: 1
+        final Experiment hpictall = prototype();
+        hpictall.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictall(YEAR, TrecConfig.SIZE));
 
-	  	// Judging order: 4
-		Experiment hpictcommon = new ExperimentBuilder().withName("hpictcommon").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(improvedTemplate).withWordRemoval().withDiseasePreferredTerm().withDiseaseSynonym()
-				.withGeneSynonym().build();
+        // Judging order: 2
+        final Experiment hpictphrase = prototype();
+        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictphrase(YEAR, TrecConfig.SIZE));
 
-		// Judging order: 5
-		Experiment hpictbase = new ExperimentBuilder().withName("hpictbase").withYear(year).withGoldStandard(goldStandard).withTarget(target)
-				.withSubTemplate(improvedTemplate).build();
+        // Judging order: 3
+        final Experiment hpictboost = prototype();
+        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictboost(YEAR, TrecConfig.SIZE));
 
-		Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpictall, hpictphrase, hpictboost, hpictcommon, hpictbase));
+        // Judging order: 4
+        final Experiment hpictcommon = prototype();
+        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictcommon(YEAR, TrecConfig.SIZE));
 
-		for (Experiment exp : experiments) {
-			exp.start();
-			try {
-				exp.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+        // Judging order: 5
+        final Experiment hpictbase = prototype();
+        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictbase(YEAR, TrecConfig.SIZE));
 
-		for (Experiment exp : experiments) {
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpictall, hpictphrase, hpictboost, hpictcommon, hpictbase));
+        for (Experiment exp : experiments) {
+            exp.run();
+        }
+    }
 
-		}
-	}
+    private static Experiment prototype() {
+        final Experiment prototype = new Experiment();
+        prototype.setGoldDataset(GOLD_STANDARD);
+        prototype.setTopicSet(TOPICS);
+        prototype.setGoldStandard(GOLD_STANDARD_TYPE);
+        return prototype;
+    }
 
 }
