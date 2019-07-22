@@ -12,14 +12,11 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.Document2TokenPipe;
-import de.julielab.ir.ltr.features.FCConstants;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.SetFeatureVectorPipe;
 import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
 import de.julielab.java.utilities.ConfigurationUtilities;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ConfigurationUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.uima.cas.impl.XmiCasSerializer;
@@ -32,16 +29,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUP;
-import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUPS;
-import static de.julielab.ir.ltr.features.FCConstants.NAME_ATTR;
-import static de.julielab.java.utilities.ConfigurationUtilities.slash;
-import static de.julielab.java.utilities.ConfigurationUtilities.ws;
-
 public class TopicMatchFeatureGroupTest {
     @Test
     public void test() throws Exception {
         final HierarchicalConfiguration<ImmutableNode> featureConfig = ConfigurationUtilities.createEmptyConfiguration();
+        FeatureControlCenter.initialize(featureConfig);
       //  featureConfig.addProperty(slash(FEATUREGROUPS, FEATUREGROUP+ NAME_ATTR), RunTopicMatchAnnotatorFeatureGroup.);
 
         final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, Task.PUBMED, 2018);
