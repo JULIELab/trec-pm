@@ -5,11 +5,8 @@ import cc.mallet.types.Token;
 import com.wcohen.ss.TFIDF;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
-import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;

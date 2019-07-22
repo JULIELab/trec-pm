@@ -2,7 +2,6 @@ package de.julielab.ir.ltr.features.featuregroups;
 
 
 import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
 import cc.mallet.types.Instance;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;

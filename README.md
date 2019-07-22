@@ -50,7 +50,7 @@ the file at this location.
 - Download https://download.nlm.nih.gov/umls/kss/2019AA/umls-2019AA-mrconso.zip
 - `unzip umls-2019AA-mrconso.zip`
 - `python3 scripts/createUmlsTermSynsets.py MRCONSO.RRF ENG > resources/umlsSynsets.txt`
-- `md5 umlsSynsets.txt` = 8cab01c988050bde6806da99c7885bb
+- `wc -c umlsSynsets.txt` = 338449057
 - `gzip resources/umlsSynsets.txt`
 
 ## Some Examples on How to Run Experiments

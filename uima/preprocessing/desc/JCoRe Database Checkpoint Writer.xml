@@ -1,59 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<collectionReaderDescription xmlns="http://uima.apache.org/resourceSpecifier">
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
         
     <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
         
-    <implementationName>de.julielab.jcore.reader.xml.XMLMultiplierReader</implementationName>
+    <primitive>true</primitive>
         
-    <processingResourceMetaData>
+    <annotatorImplementationName>de.julielab.jcore.ae.checkpoint.DBCheckpointAE</annotatorImplementationName>
+        
+    <analysisEngineMetaData>
                 
-        <name>JCoRe Pubmed Reader for ArticleSet Multiplier</name>
+        <name>JCoRe Database Checkpoint Writer</name>
                 
-        <description/>
+        <description>This component can be used when using a JCoRe database reader that reads from a CoStoSys/JeDIS
+            subset. Enters the configured component name in the 'last component' column. Can also mark documents as
+            being completely processed.</description>
                 
-        <version>1.0</version>
-                
-        <vendor/>
+        <version>2.5.0-SNAPSHOT</version>
                 
         <configurationParameters>
                         
             <configurationParameter>
                                 
-                <name>InputDirectory</name>
+                <name>CheckpointName</name>
                                 
-                <description/>
-                                
-                <type>String</type>
-                                
-                <multiValued>false</multiValued>
-                                
-                <mandatory>false</mandatory>
-                            
-            </configurationParameter>
-                        
-            <configurationParameter>
-                                
-                <name>InputFile</name>
-                                
-                <description/>
+                <description>String parameter. A name that identifies this checkpoint in the database.</description>
                                 
                 <type>String</type>
                                 
                 <multiValued>false</multiValued>
-                                
-                <mandatory>false</mandatory>
-                            
-            </configurationParameter>
-                        
-            <configurationParameter>
-                                
-                <name>FileNameRegex</name>
-                                
-                <description>If a directory is given, all inputUris with a name matching one of these regular expressions will be read, others will be discarded. Defaults to {'.*\.xml', '.*\.xml.gz'}.</description>
-                                
-                <type>String</type>
-                                
-                <multiValued>true</multiValued>
                                 
                 <mandatory>true</mandatory>
                             
@@ -61,11 +35,47 @@
                         
             <configurationParameter>
                                 
-                <name>SearchInZipFiles</name>
+                <name>IndicateFinished</name>
                                 
-                <description>If set to true, contents of ZIP files in the given input directory will also be searched for files matching the specified file name regular expression. Defaults to false.</description>
+                <description>Whether or not the checkpoint should mark the end of processing of the pipeline. If set to
+                    true, this component will not only set its name as checkpoint in the subset table but also set the
+                    'is processed' flag to true and the 'is in process' flag to false.</description>
                                 
                 <type>Boolean</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>CostosysConfigFile</name>
+                                
+                <description>File path or classpath resource location of a Corpus Storage System (CoStoSys)
+                    configuration file. This file specifies the database to write the XMI data into and the data table
+                    schema. This schema must at least define the primary key columns that the storage tables should have
+                    for each document. The primary key is currently just the document ID. Thus, at the moment, primary
+                    keys can only consist of a single element when using this component. This is a shortcoming of this
+                    specific component and must be changed here, if necessary.</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>false</multiValued>
+                                
+                <mandatory>true</mandatory>
+                            
+            </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>WriteBatchSize</name>
+                                
+                <description>The number of processed CASes after which the checkpoint should be written into the
+                    database. Defaults to 50.</description>
+                                
+                <type>Integer</type>
                                 
                 <multiValued>false</multiValued>
                                 
@@ -79,17 +89,11 @@
                         
             <nameValuePair>
                                 
-                <name>FileNameRegex</name>
+                <name>WriteBatchSize</name>
                                 
                 <value>
                                         
-                    <array>
-                                                
-                        <string>.*\.xml</string>
-                                                
-                        <string>.*\.xml\.gz</string>
-                                            
-                    </array>
+                    <integer>50</integer>
                                     
                 </value>
                             
@@ -97,23 +101,35 @@
                         
             <nameValuePair>
                                 
-                <name>SearchInZipFiles</name>
+                <name>CheckpointName</name>
+                                
+                <value>
+                                        
+                    <string>end</string>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>CostosysConfigFile</name>
+                                
+                <value>
+                                        
+                    <string>../costosys.xml</string>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>IndicateFinished</name>
                                 
                 <value>
                                         
                     <boolean>true</boolean>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>InputDirectory</name>
-                                
-                <value>
-                                        
-                    <string>/data/data_corpora/TREC-PM-2018/medline/</string>
                                     
                 </value>
                             
@@ -125,9 +141,7 @@
                         
             <imports>
                                 
-                <import name="de.julielab.jcore.types.casmultiplier.jcore-uri-multiplier-types"/>
-                                
-                <import name="org.apache.uima.ducc.FlowControllerTS"/>
+                <import name="de.julielab.jcore.types.extensions.jcore-document-meta-extension-types"/>
                             
             </imports>
                     
@@ -135,32 +149,18 @@
                 
         <fsIndexCollection/>
                 
-        <capabilities>
-                        
-            <capability>
-                                
-                <inputs/>
-                                
-                <outputs/>
-                                
-                <languagesSupported/>
-                            
-            </capability>
-                    
-        </capabilities>
+        <capabilities/>
                 
         <operationalProperties>
                         
             <modifiesCas>true</modifiesCas>
                         
-            <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+            <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
                         
-            <outputsNewCASes>true</outputsNewCASes>
+            <outputsNewCASes>false</outputsNewCASes>
                     
         </operationalProperties>
             
-    </processingResourceMetaData>
-        
-    <resourceManagerConfiguration/>
+    </analysisEngineMetaData>
     
-</collectionReaderDescription>
+</analysisEngineDescription>

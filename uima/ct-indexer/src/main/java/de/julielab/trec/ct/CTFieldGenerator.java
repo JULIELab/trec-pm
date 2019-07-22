@@ -1,6 +1,5 @@
 package de.julielab.trec.ct;
 
-import de.julielab.jcore.consumer.es.FieldGenerationException;
 import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
@@ -8,10 +7,7 @@ import de.julielab.jcore.types.AutoDescriptor;
 import de.julielab.jcore.types.DocumentClass;
 import de.julielab.jcore.types.Keyword;
 import de.julielab.jcore.types.MeshHeading;
-import de.julielab.jcore.types.ct.*;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.uima.cas.CASException;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
