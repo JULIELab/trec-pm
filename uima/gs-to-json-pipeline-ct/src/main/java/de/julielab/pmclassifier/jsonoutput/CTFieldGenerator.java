@@ -5,6 +5,8 @@ import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
 import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
+import de.julielab.jcore.types.*;
+import de.julielab.jcore.types.ct.*;
 import de.julielab.jcore.types.ct.Header;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import org.apache.uima.fit.util.JCasUtil;

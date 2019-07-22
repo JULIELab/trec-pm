@@ -3,7 +3,7 @@ package de.julielab.jcore.reader.ct;
 import at.medunigraz.imi.bst.clinicaltrial.ClinicalTrial;
 import de.julielab.jcore.types.Keyword;
 import de.julielab.jcore.types.MeshHeading;
-import de.julielab.jcore.types.ct.Header;
+import de.julielab.jcore.types.ct.*;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import de.julielab.jcore.utility.JCoReTools;
 import org.apache.uima.UimaContext;
@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class ClinicalTrialsReader extends JCasCollectionReader_ImplBase {

@@ -7,6 +7,7 @@ import de.julielab.jcore.types.AutoDescriptor;
 import de.julielab.jcore.types.DocumentClass;
 import de.julielab.jcore.types.Keyword;
 import de.julielab.jcore.types.MeshHeading;
+import de.julielab.jcore.types.ct.*;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;

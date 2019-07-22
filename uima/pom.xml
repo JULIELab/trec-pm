@@ -21,7 +21,6 @@
         <module>jcore-pmclassifier-ae</module>
         <module>jcore-trecpm-extraabstracts-reader</module>
         <module>gs-to-json-pipeline</module>
-        <module>jcore-ct-reader</module>
         <module>ct-indexer</module>
         <module>pubmed-indexer</module>
     </modules>

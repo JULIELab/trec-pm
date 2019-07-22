@@ -1,5 +1,6 @@
 package de.julielab.jcore.reader.trecpmextra;
 
+import de.julielab.jcore.types.*;
 import org.apache.uima.UimaContext;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
@@ -13,6 +14,7 @@ import org.apache.uima.util.ProgressImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.regex.Matcher;

@@ -3,6 +3,7 @@ package de.julielab.jcore.ae.pmclassifier;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.julielab.ir.pm.pmclassifier.Document;
 import de.julielab.ir.pm.pmclassifier.MalletClassifier;
+import de.julielab.jcore.types.*;
 import de.julielab.jcore.utility.JCoReTools;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
@@ -17,6 +18,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;

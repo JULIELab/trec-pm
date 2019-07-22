@@ -44,6 +44,8 @@ public class TopicMatchFeatureGroupTest {
         final HierarchicalConfiguration<ImmutableNode> featureConfig = ConfigurationUtilities.createEmptyConfiguration();
       //  featureConfig.addProperty(slash(FEATUREGROUPS, FEATUREGROUP+ NAME_ATTR), RunTopicMatchAnnotatorFeatureGroup.);
 
+        FeatureControlCenter.initialize(featureConfig);
+
         final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, Task.PUBMED, 2018);
         final Topic testTopic = topicSet.getTopics().get(4);
         // This topic matches to the document text
@@ -72,6 +74,6 @@ public class TopicMatchFeatureGroupTest {
         il.addThruPipe(inst);
 
         FeatureVector fv = (FeatureVector) inst.getData();
-        System.out.println(fv);
+        System.out.println("Hier: " + fv);
     }
 }
