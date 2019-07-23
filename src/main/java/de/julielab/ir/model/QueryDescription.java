@@ -1,7 +1,6 @@
 package de.julielab.ir.model;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
 import java.util.Map;
@@ -14,17 +13,15 @@ import java.util.stream.Stream;
  */
 public abstract class QueryDescription {
     protected Challenge challenge;
-    protected Task task;
     protected int year;
     protected int number;
 
     public QueryDescription() {
     }
 
-    public QueryDescription(Challenge challenge, Task task, int year, int number) {
+    public QueryDescription(Challenge challenge, int year, int number) {
 
         this.challenge = challenge;
-        this.task = task;
         this.year = year;
         this.number = number;
     }
@@ -60,28 +57,27 @@ public abstract class QueryDescription {
         QueryDescription query = (QueryDescription) o;
         return year == query.year &&
                 number == query.number &&
-                challenge == query.challenge &&
-                task == query.task;
+                challenge == query.challenge;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(challenge, task, year, number);
+        return Objects.hash(challenge, year, number);
     }
 
     /**
      * <p>
-     * Returns 'challenge-task-year-number'.
+     * Returns 'challenge-year-number'.
      * </p>
      * <p>this method is compatible with {@link AtomicGoldStandard#getDatasetId()} in the sense that that a topic
      * belonging to a specific gold standard always has a cross dataset ID that begins with the ID of its dataset
      * as given by the gold standard dataset ID method.</p>
      *
-     * @return A string including the challenge, the task, the year and the topic number for this topic, excluding null elements.
+     * @return A string including the challenge, the year and the topic number for this topic, excluding null elements.
      */
     public String getCrossDatasetId() {
-        return Stream.of(challenge, task, year, number).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
+        return Stream.of(challenge, year, number).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
     }
 
     /**
