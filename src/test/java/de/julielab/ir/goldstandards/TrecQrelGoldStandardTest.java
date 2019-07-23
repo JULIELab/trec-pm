@@ -1,9 +1,6 @@
 package de.julielab.ir.goldstandards;
 
-import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Task;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import org.apache.commons.io.FileUtils;
@@ -22,7 +19,7 @@ public class TrecQrelGoldStandardTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    private static final TopicSet TOPICS = new TopicSet(new File(TrecQrelGoldStandardTest.class.getResource("/topics/topics2017.xml").getPath()), Challenge.TREC_PM, 2017);
+    private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2017();
     private static final File QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/qrels-treceval-abstracts.2017.txt").getPath());
     private static final File SAMPLE_QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
 

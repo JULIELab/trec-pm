@@ -20,7 +20,6 @@ public class GoogleSheetsSyncer {
     private static final int YEAR = 2019;
     private static final int SIZE = 5;
 
-    private static final File TOPICS = new File(GoogleSheetsSyncer.class.getResource("/topics/topics2019.xml").getPath());
     private static final File ABSTRACTS = new File("src/main/resources/gold-standard/gsheets-abstracts-2019.qrels");
     private static final File TRIALS = new File("src/main/resources/gold-standard/gsheets-trials-2019.qrels");
 
@@ -43,7 +42,7 @@ public class GoogleSheetsSyncer {
     }
 
     private static GoogleSheetsGoldStandard<Topic> download(Task task) {
-        List<Topic> topics = new TopicSet(TOPICS, CHALLENGE, YEAR).getTopics();
+        final List<Topic> topics = TrecPMTopicSetFactory.topics(YEAR).getTopics();
 
         // TODO Move to GoldStandardBuilder (#17)
         String[] readRange = null;

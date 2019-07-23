@@ -1,13 +1,11 @@
 package at.medunigraz.imi.bst.trec.query;
 
-import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import de.julielab.ir.umls.UmlsRelationsProvider;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +26,7 @@ public class DiseaseUmlsHypernymQueryDecoratorTest {
         final DiseaseUmlsHypernymQueryDecorator decorator = new DiseaseUmlsHypernymQueryDecorator(dummyQuery);
         decorator.setSynsetProvider(new UmlsSynsetTestProvider());
         decorator.setRelationsProvider(new UmlsRelationsTestProvider());
-        final TopicSet topicSet = new TopicSet(new File("src/main/resources/topics/topics2018.xml"), Challenge.TREC_PM, 2017);
+        final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         for (Topic topic : topicSet.getTopics()) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))

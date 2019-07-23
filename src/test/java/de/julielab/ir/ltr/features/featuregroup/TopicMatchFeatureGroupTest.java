@@ -1,8 +1,8 @@
 package de.julielab.ir.ltr.features.featuregroup;
 
-import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
@@ -12,15 +12,12 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.Document2TokenPipe;
-import de.julielab.ir.ltr.features.FCConstants;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.SetFeatureVectorPipe;
 import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
 import de.julielab.ir.ltr.features.featurenames.MatchType;
 import de.julielab.java.utilities.ConfigurationUtilities;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ConfigurationUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.uima.cas.impl.XmiCasSerializer;
@@ -29,16 +26,12 @@ import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUP;
-import static de.julielab.ir.ltr.features.FCConstants.FEATUREGROUPS;
-import static de.julielab.ir.ltr.features.FCConstants.NAME_ATTR;
-import static de.julielab.java.utilities.ConfigurationUtilities.slash;
-import static de.julielab.java.utilities.ConfigurationUtilities.ws;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicMatchFeatureGroupTest {
     @Test
@@ -49,7 +42,7 @@ public class TopicMatchFeatureGroupTest {
         if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(featureConfig);
 
-        final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, 2018);
+        final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         final Topic testTopic = topicSet.getTopics().get(4);
         // This topic matches to the document text
         // The following topic expansions are semantic nonsense and just serve the test.

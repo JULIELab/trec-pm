@@ -1,12 +1,10 @@
 package at.medunigraz.imi.bst.trec.query;
 
-import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
 public class DiseaseUmlsSynonymQueryDecoratorTest {
@@ -20,7 +18,7 @@ public class DiseaseUmlsSynonymQueryDecoratorTest {
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
         final DiseaseUmlsSynonymQueryDecorator decorator = new DiseaseUmlsSynonymQueryDecorator(dummyQuery);
         decorator.setUmlsSynsetProvider(new UmlsSynsetTestProvider(false));
-        final TopicSet topicSet = new TopicSet(new File("src/main/resources/topics/topics2018.xml"), Challenge.TREC_PM, 2017);
+        final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         for (Topic topic : topicSet.getTopics()) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))

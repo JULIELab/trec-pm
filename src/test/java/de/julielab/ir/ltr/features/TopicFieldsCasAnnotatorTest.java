@@ -1,8 +1,8 @@
 package de.julielab.ir.ltr.features;
 
-import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import de.julielab.ir.ltr.features.featurenames.MatchType;
 import de.julielab.jcore.types.Disease;
 import de.julielab.jcore.types.Gene;
@@ -11,7 +11,6 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TopicFieldsCasAnnotatorTest {
     @Test
     public void test() throws Exception {
-        final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, 2018);
+        final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         final Topic testTopic = topicSet.getTopics().get(4);
         // This topic matches to the document text
         // The following topic expansions are semantic nonsense and just serve the test.

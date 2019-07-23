@@ -1,7 +1,10 @@
 package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
-import at.medunigraz.imi.bst.trec.model.*;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
 import org.junit.Assume;
 import org.junit.Test;
@@ -25,7 +28,7 @@ public class RetrievalTest {
     @Test
     public void withSize() {
         final Task task = Task.PUBMED;
-        final List<Topic> topics = new TopicSet(TOPICS, Challenge.TREC_PM, 2019).getTopics();
+        final List<Topic> topics = TrecPMTopicSetFactory.topics2019().getTopics();
         final int SIZE = 10;
 
         ResultList<Topic> firstTopicResults = new TrecPmRetrieval()
