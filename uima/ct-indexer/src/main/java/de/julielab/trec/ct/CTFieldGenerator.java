@@ -1,13 +1,13 @@
 package de.julielab.trec.ct;
 
+import de.julielab.jcore.consumer.es.ArrayFieldValue;
 import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
-import de.julielab.jcore.types.AutoDescriptor;
-import de.julielab.jcore.types.DocumentClass;
-import de.julielab.jcore.types.Keyword;
-import de.julielab.jcore.types.MeshHeading;
+import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
+import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.ct.*;
+import de.julielab.jcore.types.ct.Header;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -96,6 +96,8 @@ public class CTFieldGenerator extends FieldGenerator {
             document.addField("meshTags", meshTags);
 
             addDocumentClasses(jCas, document);
+            addNegationScopes(jCas, document);
+            addMutations(jCas, document);
         } catch (Throwable t) {
             log.error("Error while indexing document {}", header.getDocId(), t);
             throw t;
@@ -109,6 +111,24 @@ public class CTFieldGenerator extends FieldGenerator {
             ret.add(a.getCoveredText());
         }
         return ret;
+    }
+
+    private void addNegationScopes(JCas jCas, Document document) {
+        Collection<Scope> negationScopes = JCasUtil.select(jCas, Scope.class);
+        ArrayFieldValue fieldValue = new ArrayFieldValue();
+        for (Scope scope : negationScopes) {
+            fieldValue.add(new RawToken(scope.getCoveredText()));
+        }
+        document.addField("negationPhrases", fieldValue);
+    }
+
+    private void addMutations(JCas jCas, Document document) {
+        Collection<PointMutation> mutations = JCasUtil.select(jCas, PointMutation.class);
+        ArrayFieldValue fieldValue = new ArrayFieldValue();
+        for (PointMutation mutation : mutations) {
+            fieldValue.add(new RawToken(mutation.getSpecificType()));
+        }
+        document.addField("mutations", fieldValue);
     }
 
     private void addDocumentClasses(JCas jCas, Document document) {

@@ -348,6 +348,18 @@
                 </value>
                             
             </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>StoreMaxXmiId</name>
+                                
+                <value>
+                                        
+                    <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
                     
         </configurationParameterSettings>
                 

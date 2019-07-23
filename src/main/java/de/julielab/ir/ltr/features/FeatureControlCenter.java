@@ -49,6 +49,10 @@ public class FeatureControlCenter {
         singleton = new FeatureControlCenter(configuration);
     }
 
+    public static boolean isInitialized() {
+        return singleton != null;
+    }
+
     public boolean filterActive(FeatureGroup featureGroup) {
         final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
         log.trace("Checking if feature group '{}' is active: {} ", featureGroup.getName(), isActive);

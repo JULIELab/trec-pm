@@ -40,13 +40,15 @@ import static de.julielab.ir.ltr.features.FCConstants.NAME_ATTR;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 import static de.julielab.java.utilities.ConfigurationUtilities.ws;
 import static org.assertj.core.api.Assertions.*;
+
 public class TopicMatchFeatureGroupTest {
     @Test
     public void test() throws Exception {
         final HierarchicalConfiguration<ImmutableNode> featureConfig = ConfigurationUtilities.createEmptyConfiguration();
-      //  featureConfig.addProperty(slash(FEATUREGROUPS, FEATUREGROUP+ NAME_ATTR), RunTopicMatchAnnotatorFeatureGroup.);
+        //  featureConfig.addProperty(slash(FEATUREGROUPS, FEATUREGROUP+ NAME_ATTR), RunTopicMatchAnnotatorFeatureGroup.);
 
-        FeatureControlCenter.initialize(featureConfig);
+        if (!FeatureControlCenter.isInitialized())
+            FeatureControlCenter.initialize(featureConfig);
 
         final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, Task.PUBMED, 2018);
         final Topic testTopic = topicSet.getTopics().get(4);
@@ -82,7 +84,7 @@ public class TopicMatchFeatureGroupTest {
         for (int i : fv.getIndices()) {
             final String featureName = (String) alphabet.lookupObject(i);
             assertThat(featureName).isIn(Arrays.stream(MatchType.values()).map(Enum::name).collect(Collectors.toSet()));
-            double value =  fv.value(i);
+            double value = fv.value(i);
             MatchType matchType = MatchType.valueOf(featureName);
             if (matchType == MatchType.VARIANT)
                 assertThat(value).isEqualTo(1.0);

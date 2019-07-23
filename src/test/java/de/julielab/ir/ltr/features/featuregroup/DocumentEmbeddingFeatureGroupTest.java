@@ -12,29 +12,15 @@ import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.*;
+
 public class DocumentEmbeddingFeatureGroupTest {
-
-    private class DocumentEmbeddingTestFeature extends DocumentEmbeddingFeatures {
-        public DocumentEmbeddingTestFeature() {
-            super("TestEmbedding");
-        }
-
-        @Override
-        protected void assignDocumentEmbeddingFeatures(Instance inst) {
-            final Token t = (Token) inst.getData();
-            addDocumentEmbeddingFeatures(t, getDocumentEmbedding("dummy"));
-        }
-
-        @Override
-        protected double[] getDocumentEmbedding(String documentText) {
-            return new double[] {.1, .2, .3};
-        }
-    }
 
     @Test
     public void testEmbeddingFeatures() throws Exception {
-        FeatureControlCenter.initialize(ConfigurationUtilities.createEmptyConfiguration());
+        if (!FeatureControlCenter.isInitialized())
+            FeatureControlCenter.initialize(ConfigurationUtilities.createEmptyConfiguration());
         final DocumentEmbeddingFeatureGroup fg = new DocumentEmbeddingFeatureGroup();
         final Field featuresField = FeatureGroup.class.getDeclaredField("features");
         featuresField.setAccessible(true);
@@ -56,5 +42,22 @@ public class DocumentEmbeddingFeatureGroupTest {
                 assertThat(features.getNumericValue()).isEqualTo(0.2);
         }
 
+    }
+
+    private class DocumentEmbeddingTestFeature extends DocumentEmbeddingFeatures {
+        public DocumentEmbeddingTestFeature() {
+            super("TestEmbedding");
+        }
+
+        @Override
+        protected void assignDocumentEmbeddingFeatures(Instance inst) {
+            final Token t = (Token) inst.getData();
+            addDocumentEmbeddingFeatures(t, getDocumentEmbedding("dummy"));
+        }
+
+        @Override
+        protected double[] getDocumentEmbedding(String documentText) {
+            return new double[]{.1, .2, .3};
+        }
     }
 }
