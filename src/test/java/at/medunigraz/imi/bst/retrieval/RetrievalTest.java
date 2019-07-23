@@ -25,7 +25,7 @@ public class RetrievalTest {
     @Test
     public void withSize() {
         final Task task = Task.PUBMED;
-        final List<Topic> topics = new TopicSet(TOPICS, Challenge.TREC_PM, Task.PUBMED, 2019).getTopics();
+        final List<Topic> topics = new TopicSet(TOPICS, Challenge.TREC_PM, 2019).getTopics();
         final int SIZE = 10;
 
         ResultList<Topic> firstTopicResults = new TrecPmRetrieval()

@@ -1,7 +1,6 @@
 package de.julielab.ir.ltr.features.featuregroup;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import cc.mallet.pipe.Pipe;
@@ -50,7 +49,7 @@ public class TopicMatchFeatureGroupTest {
         if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(featureConfig);
 
-        final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, Task.PUBMED, 2018);
+        final TopicSet topicSet = new TopicSet(new File(getClass().getResource("/topics/topics2018.xml").getFile()), Challenge.TREC_PM, 2018);
         final Topic testTopic = topicSet.getTopics().get(4);
         // This topic matches to the document text
         // The following topic expansions are semantic nonsense and just serve the test.

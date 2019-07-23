@@ -37,14 +37,6 @@ public abstract class QueryDescription {
         this.challenge = challenge;
     }
 
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
     public int getYear() {
         return year;
     }

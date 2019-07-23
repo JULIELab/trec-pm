@@ -113,7 +113,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     public T withTarget(Task task) {
         this.task = task;
         if (task != Task.PUBMED_ONLINE)
-            query = new ElasticSearchQuery(size, goldStandard);
+            query = new ElasticSearchQuery(size, getIndexName(task));
         else
             query = new PubMedOnlineQuery();
         return (T) this;

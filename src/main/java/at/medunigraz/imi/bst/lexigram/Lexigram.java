@@ -3,7 +3,6 @@ package at.medunigraz.imi.bst.lexigram;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.expansion.CachedWebRequester;
 import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
@@ -209,7 +208,7 @@ public class Lexigram {
     public static void main(String[] args) {
         final File topicsFile = new File(CSVStatsWriter.class.getResource("/topics/topics2018.xml").getPath());
 
-        TopicSet topicSet = new TopicSet(topicsFile, Challenge.TREC_PM, Task.PUBMED, 2018);
+        TopicSet topicSet = new TopicSet(topicsFile, Challenge.TREC_PM, 2018);
         JSONObject output = createDump(topicSet);
 
         System.out.println(JsonUtils.prettify(output));

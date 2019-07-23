@@ -43,7 +43,7 @@ public class GoogleSheetsSyncer {
     }
 
     private static GoogleSheetsGoldStandard<Topic> download(Task task) {
-        List<Topic> topics = new TopicSet(TOPICS, CHALLENGE, task, YEAR).getTopics();
+        List<Topic> topics = new TopicSet(TOPICS, CHALLENGE, YEAR).getTopics();
 
         // TODO Move to GoldStandardBuilder (#17)
         String[] readRange = null;
