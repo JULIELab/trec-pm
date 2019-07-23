@@ -142,7 +142,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     @NotNull
     private TopicSet loadTopics() {
         File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
-        return new TopicSet(example, challenge, task, year);
+        return new TopicSet(example, challenge, year);
     }
 
     public void setYear(int year) {

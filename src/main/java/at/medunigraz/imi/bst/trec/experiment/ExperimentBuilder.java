@@ -1,7 +1,5 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
-import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
-import at.medunigraz.imi.bst.retrieval.PubMedOnlineQuery;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
@@ -139,10 +137,7 @@ public class ExperimentBuilder {
 
     public ExperimentBuilder withTarget(Task task) {
         buildingExp.setTask(task);
-        if (task != Task.PUBMED_ONLINE)
-            retrieval.setQuery(new ElasticSearchQuery(buildingExp.getGoldStandard()));
-        else
-            retrieval.setQuery(new PubMedOnlineQuery());
+        retrieval.withTarget(task);
         return this;
     }
 

@@ -149,11 +149,6 @@ public class Topic extends QueryDescription {
         return this;
     }
 
-    public Topic withTask(Task task) {
-        setTask(task);
-        return this;
-    }
-
     public Topic withYear(int year) {
         setYear(year);
         return this;

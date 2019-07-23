@@ -22,7 +22,7 @@ public class TrecQrelGoldStandardTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    private static final TopicSet TOPICS = new TopicSet(new File(TrecQrelGoldStandardTest.class.getResource("/topics/topics2017.xml").getPath()), Challenge.TREC_PM, Task.PUBMED, 2017);
+    private static final TopicSet TOPICS = new TopicSet(new File(TrecQrelGoldStandardTest.class.getResource("/topics/topics2017.xml").getPath()), Challenge.TREC_PM, 2017);
     private static final File QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/qrels-treceval-abstracts.2017.txt").getPath());
     private static final File SAMPLE_QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
 
