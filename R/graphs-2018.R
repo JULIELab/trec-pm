@@ -27,15 +27,15 @@ tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, 
 
 
 # Clinical Trials
-#run_ids <- c('mugctboost', 'mugctdisease', 'mugctbase', 'mugctgene', 'mugctmust')
-#folder <- "."
-#task_name <- "clinical-trials"
-#metrics <- c("P5", "P10", "P15")
-#metrics_best <- c(0.7724, 0.6759, 0.5908)
-#metrics_median <- c(0.2897, 0.2517, 0.2253)
-#metrics_worst <- c(0.0000, 0.0000, 0.0000)
-#file_extension <- ""
-#tug_colors <- c(mugctboost=tug_red, mugctdisease=tug_blue, mugctbase=tug_green, mugctgene=tug_magenta, mugctmust=tug_orange)
+# run_ids <- c('mugctboost', 'mugctdisease', 'mugctbase', 'mugctgene', 'mugctmust')
+# folder <- "."
+# task_name <- "clinical-trials"
+# metrics <- c("P5", "P10", "P15")
+# metrics_best <- c(0.7724, 0.6759, 0.5908)
+# metrics_median <- c(0.2897, 0.2517, 0.2253)
+# metrics_worst <- c(0.0000, 0.0000, 0.0000)
+# file_extension <- ""
+# tug_colors <- c(mugctboost=tug_red, mugctdisease=tug_blue, mugctbase=tug_green, mugctgene=tug_magenta, mugctmust=tug_orange)
 
 folder <- paste(folder, "/", task_name, sep="")
 
@@ -55,15 +55,15 @@ if (file.exists(sample_file)) {
 
 for(run_id in run_ids[seq(2, length(run_ids))]) {
     tmp <- read.table(paste(folder, "/", run_id, file_extension, sep=""), header = FALSE)
-    tmp <- tmp %>% mutate(run_id) 
+    tmp <- tmp %>% mutate(run_id)
     names(tmp) <- c('measure', 'topic', 'value', 'run')
     results <- results %>%  bind_rows(tmp)
     remove(tmp)
-    
+
     sample_file <- paste(folder, "/", run_ids, ".sampleval", sep="")
     if (file.exists(sample_file)) {
       tmp <- read.table(paste(folder, "/", run_id, ".sampleval", sep=""), header = FALSE)
-      tmp <- tmp %>% mutate(run_id) 
+      tmp <- tmp %>% mutate(run_id)
       names(tmp) <- c('measure', 'topic', 'value', 'run')
       results <- results %>%  bind_rows(tmp)
       remove(tmp)
@@ -82,34 +82,34 @@ for (i in seq(1, length(metrics))) {
   best <- metrics_best[i]
   median <- metrics_median[i]
   worst <- metrics_worst[i]
-    
+
   test <- results %>% filter(measure==target,topic!='all')
 
   means <- aggregate(value ~ run, test, mean)
-  
+
   g <- ggplot(test, aes(x=run, y=value, fill=run)) +
-      geom_boxplot(alpha=0.8) + 
+      geom_boxplot(alpha=0.8) +
       scale_fill_manual(values=tug_colors) +
       xlab("") +
-      ylab(target) + 
+      ylab(target) +
       theme_linedraw() +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
         plot.background = element_blank(),
         panel.background = element_blank()) +
-    
-      stat_summary(fun.y=mean, color=extra_color, geom="point", shape=18, size=2,show.legend = FALSE) + 
+
+      stat_summary(fun.y=mean, color=extra_color, geom="point", shape=18, size=2,show.legend = FALSE) +
       #geom_text(data = means, aes(label = round(value,4), y = value + 0.04)) +
       guides(fill=FALSE) + scale_y_continuous(breaks=seq(0,1,0.1), limits=c(0,1))
-  
+
   g <- g + geom_hline(yintercept=best, linetype="dashed", color = extra_color)
       # + geom_text(aes(0.6,best,label="best", vjust = 1), color=extra_color)
-  
+
   g <- g + geom_hline(yintercept=median, linetype="dashed", color = extra_color)
     # + geom_text(aes(0.7,median,label="median", vjust = 1), color=extra_color)
-  
+
   # g <- g + geom_hline(yintercept=worst, linetype="dashed", color = extra_color)
     # + geom_text(aes(0.7,median,label="median", vjust = 1), color=extra_color)
-  
+
   plots <- append(plots, list(g))
   #g
 }
