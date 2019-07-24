@@ -24,8 +24,7 @@ public class TrecQrelGoldStandardTest {
 
     @Test
     public void readQrels() {
-        // TODO Use GoldStandardBuilder (#17)
-        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS);
+        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2017();
 
         assertEquals(22642, gs.getQrelDocuments().size());
         assertEquals(439, gs.getQrelDocumentsForQuery(1).size());
@@ -56,7 +55,7 @@ public class TrecQrelGoldStandardTest {
     @Test
     public void readAndWriteQrels() throws IOException {
         // Read from official qrels file
-        final TrecQrelGoldStandard<Topic> officialGs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS);
+        final TrecQrelGoldStandard<Topic> officialGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
 
         // Extract documents
         DocumentList<Topic> qrelDocuments = officialGs.getQrelDocuments();
