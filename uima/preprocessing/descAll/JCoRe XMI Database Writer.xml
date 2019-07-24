@@ -315,7 +315,7 @@
                                 
                 <value>
                                         
-                    <boolean>false</boolean>
+                    <boolean>true</boolean>
                                     
                 </value>
                             
@@ -352,6 +352,8 @@
                 <value>
                                         
                     <array>
+
+                        <string>de.julielab.jcore.types.AutoDescriptor</string>
                                                 
                         <string>de.julielab.jcore.types.Sentence</string>
                                                 
@@ -379,7 +381,7 @@
                                 
                 <value>
                                         
-                    <boolean>true</boolean>
+                    <boolean>false</boolean>
                                     
                 </value>
                             
