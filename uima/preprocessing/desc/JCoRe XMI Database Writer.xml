@@ -353,6 +353,8 @@
                                         
                     <array>
                                                 
+                        <string>de.julielab.jcore.types.AutoDescriptor</string>
+                                                
                         <string>de.julielab.jcore.types.Sentence</string>
                                                 
                         <string>de.julileab.jcore.types.Token</string>

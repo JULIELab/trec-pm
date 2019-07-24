@@ -14,12 +14,12 @@ public class UmlsSynsetProviderTest {
 
     private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
         private UmlsSynsetTestProvider(boolean containTermInSynset) {
-            super("src/test/resources/umls/example.synsets", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
+            super("src/test/resources/umls/example.synsets", "src/test/resources/umls/semanticTypes.test", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
         }
     }
 
     @Test
-    public void testContainTerm() throws IOException {
+    public void testContainTerm()  {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(true);
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
@@ -28,7 +28,7 @@ public class UmlsSynsetProviderTest {
     }
 
     @Test
-    public void testNotContainTerm() throws IOException {
+    public void testNotContainTerm() {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
@@ -37,12 +37,26 @@ public class UmlsSynsetProviderTest {
     }
 
     @Test
-    public void testGetCuis() throws IOException {
+    public void testGetCuis() {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
         assertThat(u.getCuis("A")).containsExactlyInAnyOrder("CUI1", "CUI2");
         assertThat(u.getCuis("B")).containsExactlyInAnyOrder("CUI1");
         assertThat(u.getCuis("C")).containsExactlyInAnyOrder("CUI1");
         assertThat(u.getCuis("F")).containsExactlyInAnyOrder("CUI2");
         assertThat(u.getCuis("G")).containsExactlyInAnyOrder("CUI2");
+    }
+
+    @Test
+    public void getSemanticTypeForCui() {
+        UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
+        assertThat(u.getSemanticTypeForCui("CUI1")).containsExactly("T121");
+    }
+
+    @Test
+    public void getSemanticTypesForTerm() {
+        UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
+        // The term 'A' is associated with CUI1 and CUI2 in the examplet.synsets file. Those
+        // have been set the semantic types tested for.
+        assertThat(u.getSemanticTypes("A")).containsExactlyInAnyOrder("T121", "T130", "T109");
     }
 }

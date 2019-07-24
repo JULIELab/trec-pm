@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DiseaseUmlsSynonymQueryDecoratorTest {
     private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
         private UmlsSynsetTestProvider(boolean containTermInSynset) {
-            super("src/test/resources/umls/melanoma.synset", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
+            super("src/test/resources/umls/melanoma.synset", "src/test/resources/umls/semanticTypes.test", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
         }
     }
     @Test
