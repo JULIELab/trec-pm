@@ -21,8 +21,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     private static final Logger log = LogManager.getLogger();
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels, File sampleQrels) {
-        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, sampleQrels, TrecQrelGoldStandard::readQrels, TrecQrelGoldStandard::readQrels);
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels) {
+        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
     }
 
     public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, DocumentList<Q> qrelDocuments) {
@@ -64,20 +64,29 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         List<String> lines = new ArrayList<>();
 
         for (Document<?> d : qrelDocuments) {
-            // sample qrels format
-            // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
-            if (d.getStratum() != 0) {
-                lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
-            }
-            // qrels traditional format
-            else {
-                // Do not write documents not judged.
-                if (d.getRelevance() != -1) {
-                    lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
-                }
+            // Do not write documents not judged.
+            if (d.getRelevance() != -1) {
+                lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
             }
         }
 
+        write(lines, qrelFile);
+    }
+
+    public void writeSampleQrelFile(File qrelFile) {
+        if (!isSampleGoldStandard()) {
+            throw new UnsupportedOperationException("This is not a sample gold standard.");
+        }
+
+        List<String> lines = new ArrayList<>();
+        for (Document<?> d : qrelDocuments) {
+            lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
+        }
+
+        write(lines, qrelFile);
+    }
+
+    private void write(List<String> lines, File qrelFile) {
         try {
             FileUtils.writeLines(qrelFile, lines);
         } catch (IOException e) {
@@ -86,14 +95,16 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         }
     }
 
-    @Override
-    public File getQrelFile() {
-        return qrels;
-    }
-
-    @Override
-    public File getSampleQrelFile() {
-        return sampleQrels;
+    public boolean isSampleGoldStandard() {
+        if (qrelDocuments.size() == 0) {
+            return false;
+        }
+        // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
+        boolean isSample = qrelDocuments.get(0).getStratum() != 0;
+        if (!isSample) {
+            log.info("This is not a sample gold standard. `sample_eval` cannot be called and thus some metrics (like infNDCG) may not be available.");
+        }
+        return isSample;
     }
 
     @Override

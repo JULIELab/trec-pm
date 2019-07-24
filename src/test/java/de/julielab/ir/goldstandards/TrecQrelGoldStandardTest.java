@@ -21,12 +21,11 @@ public class TrecQrelGoldStandardTest {
 
     private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2017();
     private static final File QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/qrels-treceval-abstracts.2017.txt").getPath());
-    private static final File SAMPLE_QRELS = new File(TrecQrelGoldStandardTest.class.getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
 
     @Test
     public void readQrels() {
         // TODO Use GoldStandardBuilder (#17)
-        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS, SAMPLE_QRELS);
+        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS);
 
         assertEquals(22642, gs.getQrelDocuments().size());
         assertEquals(439, gs.getQrelDocumentsForQuery(1).size());
@@ -40,7 +39,7 @@ public class TrecQrelGoldStandardTest {
         document.setId("19860577");
         document.setRelevance(2);
 
-        // Add the document to the document list
+        // Add the document to a document list
         DocumentList<Topic> qrelDocuments = new DocumentList<>();
         qrelDocuments.add(document);
 
@@ -57,7 +56,7 @@ public class TrecQrelGoldStandardTest {
     @Test
     public void readAndWriteQrels() throws IOException {
         // Read from official qrels file
-        final TrecQrelGoldStandard<Topic> officialGs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS, SAMPLE_QRELS);
+        final TrecQrelGoldStandard<Topic> officialGs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, TOPICS.getTopics(), QRELS);
 
         // Extract documents
         DocumentList<Topic> qrelDocuments = officialGs.getQrelDocuments();

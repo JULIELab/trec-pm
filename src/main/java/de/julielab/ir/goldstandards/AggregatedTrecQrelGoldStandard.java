@@ -23,18 +23,37 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     private static Function<Document, String> qrelRecordFunction = gsDoc -> Stream.of(CROSS_DATASET_QUERY_ID_FUNCTION.apply(gsDoc.getQueryDescription()), "Q0", gsDoc.getId(), String.valueOf(gsDoc.getRelevance())).collect(Collectors.joining("\t"));
     private static Function<Document, String> sampleQrelRecordFunction = gsDoc -> Stream.of(CROSS_DATASET_QUERY_ID_FUNCTION.apply(gsDoc.getQueryDescription()), "Q0", gsDoc.getId(), String.valueOf(gsDoc.getStratum()), String.valueOf(gsDoc.getRelevance())).collect(Collectors.joining("\t"));
 
-    public AggregatedTrecQrelGoldStandard(File qrelFile, TrecQrelGoldStandard<Q>... goldStandards) {
-        this(qrelFile, null, goldStandards);
-    }
-
-    public AggregatedTrecQrelGoldStandard(File qrelFile, File sampleQrelFile, TrecQrelGoldStandard<Q>... goldStandards) {
-        super(log, qrelFile, sampleQrelFile, qrelRecordFunction, sampleQrelRecordFunction, goldStandards);
+    public AggregatedTrecQrelGoldStandard(TrecQrelGoldStandard<Q>... goldStandards) {
+        super(log, goldStandards);
 
     }
 
     @Override
     public void writeQrelFile(File qrelFile) {
         writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments(), qrelRecordFunction);
+    }
+
+    @Override
+    public void writeSampleQrelFile(File qrelFile) {
+        if (!isSampleGoldStandard()) {
+            throw new UnsupportedOperationException("This is not a sample gold standard.");
+        }
+
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments(), sampleQrelRecordFunction);
+    }
+
+    /**
+     * Aggregated gold standards created over a traditional qrel and a sample qrel (e.g. CT 2017 + CT 2018) get the
+     * representation of the simplest GS.
+     * @return
+     */
+    public boolean isSampleGoldStandard() {
+        for (AtomicGoldStandard<Q> gs : goldStandards.values()) {
+            if (!gs.isSampleGoldStandard()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

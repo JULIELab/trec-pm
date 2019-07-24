@@ -103,6 +103,16 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     }
 
     @Override
+    public void writeSampleQrelFile(File qrelFile) {
+        throw new NotImplementedException("Use TrecQrelGoldStandard.writeSampleQrelFile instead.");
+    }
+
+    @Override
+    public boolean isSampleGoldStandard() {
+        return false;
+    }
+
+    @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
         return q -> String.valueOf(q.getNumber());
     }
