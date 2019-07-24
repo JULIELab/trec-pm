@@ -33,8 +33,11 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     public AggregatedGoldStandard(Logger log, AtomicGoldStandard... goldStandards) {
         this.log = log;
         this.goldStandards = Stream.of(goldStandards).collect(Collectors.toMap(AtomicGoldStandard::getDatasetId, Function.identity()));
-//        if (qrelFile != null)
-//            writeAggregatedQrelFile(qrelFile, goldStandards, gs -> gs.getQrelDocuments(), qrelRecordFunction);
+    }
+
+    @Override
+    public DocumentList<Q> getSampleQrelDocuments() {
+        return goldStandards.values().stream().map(GoldStandard::getSampleQrelDocuments).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
     }
 
     @Override

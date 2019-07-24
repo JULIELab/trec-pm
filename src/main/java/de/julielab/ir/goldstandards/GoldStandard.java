@@ -62,6 +62,8 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     DocumentList<Q> getQrelDocuments();
 
+    DocumentList<Q> getSampleQrelDocuments();
+
     Map<Integer, Q> getQueriesByNumber();
 
     DocumentList<Q> getQrelDocumentsForQuery(int queryId);

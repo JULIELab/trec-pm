@@ -99,8 +99,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         if (qrelDocuments.size() == 0) {
             return false;
         }
-        // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
-        boolean isSample = qrelDocuments.get(0).getStratum() != 0;
+        boolean isSample = qrelDocuments.get(0).isStratified();
         if (!isSample) {
             log.info("This is not a sample gold standard. `sample_eval` cannot be called and thus some metrics (like infNDCG) may not be available.");
         }

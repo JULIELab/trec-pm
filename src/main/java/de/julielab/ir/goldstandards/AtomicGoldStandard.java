@@ -88,6 +88,29 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 
     @Override
     public DocumentList<Q> getQrelDocuments() {
+        if (isSampleGoldStandard()) {
+            return convertSampleToTraditional(qrelDocuments);
+        }
+        return qrelDocuments;
+    }
+
+    /**
+     * Converts a given DocumentList to a non-stratified list.
+     * @param sampleQrelDocuments
+     * @return
+     */
+    private DocumentList<Q> convertSampleToTraditional(DocumentList<Q> sampleQrelDocuments) {
+        DocumentList<Q> ret = new DocumentList<>();
+        for (Document<Q> doc : sampleQrelDocuments) {
+            if (doc.getRelevance() != -1) {
+                ret.add(doc);
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public DocumentList<Q> getSampleQrelDocuments() {
         return qrelDocuments;
     }
 
@@ -109,7 +132,6 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 
     @Override
     public String getDatasetId() {
-//        return Stream.of(challenge, task, year).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
         return String.valueOf(year);
     }
 
