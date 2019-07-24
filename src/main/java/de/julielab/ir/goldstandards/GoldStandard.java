@@ -47,16 +47,18 @@ public interface GoldStandard<Q extends QueryDescription> {
     Map<Q, DocumentList> getQrelDocumentsPerQuery();
 
     /**
-     * @deprecated Use `writeQrelFile` instead.
-     * @return
+     * Writes the underlying data structure to a traditional qrel file.
+     * @param qrelFile
      */
-    File getQrelFile();
-
-    File getSampleQrelFile();
-
     void writeQrelFile(File qrelFile);
 
-    DocumentList<Q> getSampleQrelDocuments();
+    /**
+     *  Writes the underlying data structure to a sample qrel file, if possible.
+     * @param qrelFile
+     */
+    void writeSampleQrelFile(File qrelFile);
+
+    boolean isSampleGoldStandard();
 
     DocumentList<Q> getQrelDocuments();
 

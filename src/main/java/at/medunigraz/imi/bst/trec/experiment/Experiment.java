@@ -120,12 +120,12 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
 
         File output = retrieval.getOutput();
-        File goldStandard = goldDataset != null && goldDataset.getQrelFile() != null ? goldDataset.getQrelFile() : new File(Experiment.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
+        File goldStandard = getQrelFile();
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
         GoldStandard goldStandardType = this.goldStandard;
-        final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleGoldStandard() : null;
+        final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleQrelFile() : null;
 
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
 
@@ -151,6 +151,16 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    public File getQrelFile() {
+        if (goldDataset != null) {
+            File qrelFile = new File("qrels", String.format("%s.qrels", getExperimentId()));
+            goldDataset.writeQrelFile(qrelFile);
+            return qrelFile;
+        }
+        // Old, fallback, code path. Should be replaced by `GoldStandardBuilder`.
+        return new File(Experiment.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
     }
 
     /**
@@ -182,9 +192,14 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         }
     }
 
-    private File getSampleGoldStandard() {
-        if (goldDataset != null && goldDataset.getSampleQrelFile() != null)
-            return goldDataset.getSampleQrelFile();
+    private File getSampleQrelFile() {
+        // New code path used when Experiment is not created with the deprecated `ExperimentBuilder`.
+        if (goldDataset != null && goldDataset.isSampleGoldStandard()) {
+            final File sampleQrelFile = new File("qrels", String.format("sample-%s.qrels", getExperimentId()));
+            goldDataset.writeSampleQrelFile(sampleQrelFile);
+            return sampleQrelFile;
+        }
+        // Old, fallback, code path. Should be replaced by `GoldStandardBuilder`.
         if (hasSampleGoldStandard()) {
             if (year == 2017)
                 return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
@@ -200,7 +215,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     }
 
     private boolean hasSampleGoldStandard() {
-        if (goldDataset != null && goldDataset.getSampleQrelFile() != null)
+        if (goldDataset != null && goldDataset.isSampleGoldStandard())
             return true;
         boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
         hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);

@@ -25,22 +25,12 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected DocumentList<Q> qrelDocuments;
     /**
-     * All documents from the sample qrel file, across all queries
-     */
-    protected DocumentList<Q> sampleQrelDocuments;
-    /**
      * All queries.
      */
     protected List<Q> queries;
     protected Challenge challenge;
     protected Task task;
     protected int year;
-
-    /**
-     * @deprecated qrelDocuments might have changed since initialization. Use `writeQrelFile` instead.
-     */
-    protected File qrels;
-    protected File sampleQrels;
 
     /**
      * The documents in {@link #qrelDocuments} grouped by query.
@@ -51,15 +41,12 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, File sampleQrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> sampleQrelsReader) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;
         this.queries = queries;
-        this.qrels = qrelsFile;
-        this.sampleQrels = sampleQrelsFile;
         qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
-        sampleQrelDocuments = sampleQrelsReader.apply(sampleQrelsFile, getQueriesByNumber());
     }
 
     public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, DocumentList<Q> qrelDocuments) {
@@ -92,21 +79,6 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         if (documentsByQuery == null)
             documentsByQuery = getQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new)));
         return documentsByQuery;
-    }
-
-    @Override
-    public File getQrelFile() {
-        return null;
-    }
-
-    @Override
-    public File getSampleQrelFile() {
-        return getSampleQrelFile();
-    }
-
-    @Override
-    public DocumentList<Q> getSampleQrelDocuments() {
-        return sampleQrelDocuments;
     }
 
     @Override
