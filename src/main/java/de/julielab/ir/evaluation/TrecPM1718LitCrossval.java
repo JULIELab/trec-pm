@@ -1,6 +1,5 @@
 package de.julielab.ir.evaluation;
 
-import at.medunigraz.imi.bst.trec.PubmedExperimenter;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
@@ -62,7 +61,7 @@ public class TrecPM1718LitCrossval {
         final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
         final File noClassifierTemplate = new File(
-                PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+                TrecPM1718LitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
         final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();

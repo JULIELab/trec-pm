@@ -3,7 +3,7 @@ package de.julielab.ir.evaluation;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
-import at.medunigraz.imi.bst.trec.experiment.registry.ScientificArticlesRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoogleSheetsGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
@@ -36,7 +36,6 @@ public class GoogleSheetsSyncer {
     private static GoogleSheetsGoldStandard<Topic> download(Task task) {
         final List<Topic> topics = TrecPMTopicSetFactory.topics(YEAR).getTopics();
 
-        // TODO Move to GoldStandardBuilder (#17)
         String[] readRange = null;
         String writeRange = null;
         File file = null;
@@ -69,11 +68,11 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(ScientificArticlesRetrievalRegistry.hpipubclass(YEAR, SIZE));
-                retrievalSet.add(ScientificArticlesRetrievalRegistry.hpipubnone(YEAR, SIZE));
-                retrievalSet.add(ScientificArticlesRetrievalRegistry.hpipubboost(YEAR, SIZE));
-                retrievalSet.add(ScientificArticlesRetrievalRegistry.hpipubcommon(YEAR, SIZE));
-                retrievalSet.add(ScientificArticlesRetrievalRegistry.hpipubbase(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(YEAR, SIZE));
                 break;
             case CLINICAL_TRIALS:
                 retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(YEAR, SIZE));

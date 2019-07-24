@@ -1,6 +1,5 @@
 package de.julielab.ir.evaluation;
 
-import at.medunigraz.imi.bst.trec.PubmedExperimenter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
@@ -31,7 +30,7 @@ public class TrecPM1718LitRecallCrossval {
     public static void main(String args[]) throws ConfigurationException, IOException {
 
         final File noClassifierTemplate = new File(
-                PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+                TrecPM1718LitRecallCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
         final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym().withResistantDrugs();
 
         String experimentName = "Base";

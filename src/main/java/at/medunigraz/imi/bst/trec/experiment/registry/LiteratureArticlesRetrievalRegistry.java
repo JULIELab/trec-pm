@@ -5,14 +5,14 @@ import at.medunigraz.imi.bst.trec.model.Task;
 
 import java.io.File;
 
-public final class ScientificArticlesRetrievalRegistry {
+public final class LiteratureArticlesRetrievalRegistry {
 
     private static final File IMPROVED_TEMPLATE = new File(
-            ScientificArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubboost.json").getFile());
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubboost.json").getFile());
     private static final File NONE_TEMPLATE = new File(
-            ScientificArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
     private static final File EXTRA_BOOST_TEMPLATE = new File(
-            ScientificArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
 
     public static TrecPmRetrieval hpipubclass(int year, int size) {
         return new TrecPmRetrieval().withExperimentName("hpipubclass").withSize(size).withYear(year).withTarget(Task.PUBMED)
