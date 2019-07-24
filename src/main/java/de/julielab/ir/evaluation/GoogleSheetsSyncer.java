@@ -2,8 +2,8 @@ package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
-import at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter;
-import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
+import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoogleSheetsGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
@@ -23,14 +23,6 @@ public class GoogleSheetsSyncer {
     private static final File ABSTRACTS = new File("src/main/resources/gold-standard/gsheets-abstracts-2019.qrels");
     private static final File TRIALS = new File("src/main/resources/gold-standard/gsheets-trials-2019.qrels");
 
-    private static final File NONE_TEMPLATE = new File(
-            ClinicalTrialsExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-
-    private static final File IMPROVED_TEMPLATE = new File(
-            ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictboost.json").getFile());
-    private static final File PHRASE_TEMPLATE = new File(
-            ClinicalTrialsExperimenter.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
-
     public static void main(String[] args) {
         sync(Task.PUBMED);
         sync(Task.CLINICAL_TRIALS);
@@ -44,7 +36,6 @@ public class GoogleSheetsSyncer {
     private static GoogleSheetsGoldStandard<Topic> download(Task task) {
         final List<Topic> topics = TrecPMTopicSetFactory.topics(YEAR).getTopics();
 
-        // TODO Move to GoldStandardBuilder (#17)
         String[] readRange = null;
         String writeRange = null;
         File file = null;
@@ -74,28 +65,21 @@ public class GoogleSheetsSyncer {
     }
 
     private static void upload(GoogleSheetsGoldStandard<Topic> sheet) {
-        // TODO Experiment Registry (#29)
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                // hpipubnone
-                retrievalSet.add(new TrecPmRetrieval().withSize(SIZE).withYear(2019).withTarget(sheet.getTask())
-                        .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym().withDiseasePreferredTerm()
-                        .withGeneDescription().withDiseaseSynonym());
-                // hpipubcommon
-                retrievalSet.add(new TrecPmRetrieval().withSize(SIZE).withYear(2019).withTarget(sheet.getTask())
-                        .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym().withDiseasePreferredTerm()
-                        .withDiseaseSynonym());
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(YEAR, SIZE));
                 break;
             case CLINICAL_TRIALS:
-                // hpictall
-                retrievalSet.add(new TrecPmRetrieval().withSize(SIZE).withYear(2019).withTarget(sheet.getTask())
-                        .withSubTemplate(IMPROVED_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-                        .withDiseaseSynonym().withGeneSynonym().withGeneDescription().withGeneFamily());
-                // hpictphrase
-                retrievalSet.add(new TrecPmRetrieval().withSize(SIZE).withYear(2019).withTarget(sheet.getTask())
-                        .withSubTemplate(PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-                        .withDiseaseSynonym().withGeneSynonym().withGeneFamily());
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(YEAR, SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictphrase(YEAR, SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictboost(YEAR, SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictcommon(YEAR, SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictbase(YEAR, SIZE));
                 break;
             default:
                 throw new IllegalArgumentException("Task not supported");

@@ -2,7 +2,7 @@ package at.medunigraz.imi.bst.trec;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public final class ClinicalTrialsExperimenter {
+public class LiteratureArticlesExperimenter {
 
     private static final int YEAR = 2019;
     /**
@@ -22,32 +22,32 @@ public final class ClinicalTrialsExperimenter {
      */
     private static final GoldStandard GOLD_STANDARD_TYPE = GoldStandard.INTERNAL;
 
-    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.trialsInternal2019();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedInternal2019();
 
     private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2019();
 
     public static void main(String[] args) {
         // Judging order: 1
-        final Experiment hpictall = prototype();
-        hpictall.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictall(YEAR, TrecConfig.SIZE));
+        Experiment hpipubclass = prototype();
+        hpipubclass.setRetrieval(LiteratureArticlesRetrievalRegistry.hpipubclass(YEAR, TrecConfig.SIZE));
 
         // Judging order: 2
-        final Experiment hpictphrase = prototype();
-        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictphrase(YEAR, TrecConfig.SIZE));
+        Experiment hpipubnone = prototype();
+        hpipubclass.setRetrieval(LiteratureArticlesRetrievalRegistry.hpipubnone(YEAR, TrecConfig.SIZE));
 
         // Judging order: 3
-        final Experiment hpictboost = prototype();
-        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictboost(YEAR, TrecConfig.SIZE));
+        Experiment hpipubboost = prototype();
+        hpipubclass.setRetrieval(LiteratureArticlesRetrievalRegistry.hpipubboost(YEAR, TrecConfig.SIZE));
 
         // Judging order: 4
-        final Experiment hpictcommon = prototype();
-        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictcommon(YEAR, TrecConfig.SIZE));
+        Experiment hpipubcommon = prototype();
+        hpipubclass.setRetrieval(LiteratureArticlesRetrievalRegistry.hpipubcommon(YEAR, TrecConfig.SIZE));
 
         // Judging order: 5
-        final Experiment hpictbase = prototype();
-        hpictphrase.setRetrieval(ClinicalTrialsRetrievalRegistry.hpictbase(YEAR, TrecConfig.SIZE));
+        Experiment hpipubbase = prototype();
+        hpipubclass.setRetrieval(LiteratureArticlesRetrievalRegistry.hpipubbase(YEAR, TrecConfig.SIZE));
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpictall, hpictphrase, hpictboost, hpictcommon, hpictbase));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpipubclass, hpipubnone, hpipubboost, hpipubcommon, hpipubbase));
         for (Experiment exp : experiments) {
             exp.run();
         }

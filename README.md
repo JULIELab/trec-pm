@@ -62,7 +62,7 @@ the file at this location.
 # Necessary to define the year and type of gold-standard (for evaluation)
 
 mvn clean install
-mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.PubmedExperimenter"
+mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter"
 
 # How to run the clinical trials experimenter
 # Necessary to define the year and type of gold-standard (for evaluation)
