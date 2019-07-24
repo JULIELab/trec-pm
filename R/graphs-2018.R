@@ -27,15 +27,15 @@ tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, 
 
 
 # Clinical Trials
-# run_ids <- c('mugctboost', 'mugctdisease', 'mugctbase', 'mugctgene', 'mugctmust')
+# run_ids <- c('hpictboost', 'hpictphrase', 'hpictbase', 'hpictall', 'hpictcommon')
 # folder <- "."
 # task_name <- "clinical-trials"
-# metrics <- c("P5", "P10", "P15")
-# metrics_best <- c(0.7724, 0.6759, 0.5908)
-# metrics_median <- c(0.2897, 0.2517, 0.2253)
-# metrics_worst <- c(0.0000, 0.0000, 0.0000)
-# file_extension <- ""
-# tug_colors <- c(mugctboost=tug_red, mugctdisease=tug_blue, mugctbase=tug_green, mugctgene=tug_magenta, mugctmust=tug_orange)
+# metrics <- c("infNDCG", "P10", "R-prec")
+# metrics_best <- c(0.7559, 0.7620, 0.5767)
+# metrics_median <- c(0.4297, 0.4680, 0.3268)
+# metrics_worst <- c(0.0063, 0.0000, 0.0033)
+# file_extension <- ".trec_eval"
+# tug_colors <- c(hpictboost=tug_red, hpictphrase=tug_blue, hpictbase=tug_green, hpictall=tug_magenta, hpictcommon=tug_orange)
 
 folder <- paste(folder, "/", task_name, sep="")
 
