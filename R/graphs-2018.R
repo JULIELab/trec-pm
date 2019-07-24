@@ -3,6 +3,7 @@ setwd("docs/2018/final-results")
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
+library(stringr)
 
 tug_red <- "#ff0a6e"
 tug_blue <- "#4f82bd"
@@ -115,4 +116,22 @@ for (i in seq(1, length(metrics))) {
 
 pdf(file = paste(task_name, ".pdf", sep=""), width = 7, height = 3.5)
 grid.arrange(grobs = plots, nrow = 1, ncol = 3)
+dev.off()
+
+
+### Precision - Recall Graphs ###
+ircl <- results %>%
+  filter(str_detect(measure,"ircl_prn."),topic=='all') %>%    # Filter only interpolated recall data
+  mutate(measure=str_replace(measure, "ircl_prn.", "")) %>%   # Remove prefix
+  mutate(measure=str_trunc(measure, 3, ellipsis=""))          # Remove second decimal place
+
+pdf(file = paste(task_name, "-PR.pdf", sep=""), width = 7, height = 3.5)
+ggplot(data=ircl, aes(x=measure, y=value, group=run)) +
+  geom_line(aes(color=run, linetype=run)) +
+  geom_point(size=0.5) +
+  scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL,limits=c(0,1)) +
+  xlab("Recall") +
+  ylab("Precision") +
+  theme_linedraw() +
+  theme(plot.background = element_blank(), panel.background = element_blank(), legend.title = element_blank())
 dev.off()
