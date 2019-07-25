@@ -7,6 +7,9 @@ import at.medunigraz.imi.bst.trec.query.*;
 
 public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
+    public TrecPmRetrieval(String indexName) {
+        super(indexName);
+    }
 
     public TrecPmRetrieval withWordRemoval() {
         query = new WordRemovalQueryDecorator(query);

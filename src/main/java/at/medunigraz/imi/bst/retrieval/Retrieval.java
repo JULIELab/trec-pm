@@ -4,7 +4,6 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.model.QueryDescription;
 
@@ -15,20 +14,14 @@ import java.util.function.Function;
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     protected Query query;
-    private Task task;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
+    private String indexName;
 
-    public static String getIndexName(Task task) {
-        switch (task) {
-            case CLINICAL_TRIALS:
-                return TrecConfig.ELASTIC_CT_INDEX;
-            case PUBMED:
-                return TrecConfig.ELASTIC_BA_INDEX;
-            default:
-                return "";
-        }
+    public Retrieval(String indexName) {
+        this.indexName = indexName;
+        this.query = new ElasticSearchQuery(size, indexName);
     }
 
     public T withExperimentName(String name) {
@@ -88,18 +81,9 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         this.query = query;
     }
 
-    public T withTarget(Task task) {
-        this.task = task;
-        if (task != Task.PUBMED_ONLINE)
-            query = new ElasticSearchQuery(size, getIndexName(task));
-        else
-            query = new PubMedOnlineQuery();
-        return (T) this;
-    }
-
     public T withSimilarityParameters(SimilarityParameters parameters) {
         if (query == null || !(query instanceof  ElasticSearchQuery))
-            throw new IllegalStateException("Cannot set similarity parameters to the current query " + query + ". This call must immediately follow a call to withTarget(Task) where Task is CLINICAL_TRIALS or PUBMED.");
+            throw new IllegalStateException("Cannot set similarity parameters to the current query " + query + ". This call must immediately follow a call to the constructor.");
         ElasticSearchQuery q = (ElasticSearchQuery) query;
         q.setSimilarityParameters(parameters);
         return (T) this;
@@ -193,18 +177,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         if (experimentName != null) {
             return experimentName.replace(" ", "_");
         }
-        return String.format("%s_%d_%s", getShortTaskName(), query.getName().replace(" ", "_"));
-    }
-
-    public String getShortTaskName() {
-        switch (task) {
-            case CLINICAL_TRIALS:
-                return "ct";
-            case PUBMED:
-                return "pmid";
-            default:
-                return "";
-        }
+        return String.format("%s_%d_%s", indexName, query.getName().replace(" ", "_"));
     }
 
     public String getExperimentName() {
