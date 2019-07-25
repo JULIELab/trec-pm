@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.search;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.xml.JulieXMLConstants;
 import de.julielab.xml.JulieXMLTools;
@@ -33,7 +34,7 @@ public class PubMedOnline implements SearchEngine {
 
     @Override
     public List<Result> query(JSONObject jsonQuery) {
-        List<Result> results = new ArrayList<>(1000);
+        List<Result> results = new ArrayList<>(TrecConfig.SIZE);
         String query = jsonQuery.getString("query");
         query = query.replaceAll("\\s+", "+");
 

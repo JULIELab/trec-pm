@@ -1,5 +1,7 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,7 @@ public class TrecEval extends AbstractEvaluator {
     private String command;
 
     public TrecEval(File goldStandard, File results) {
-        this(goldStandard, results, 1000, true);
+        this(goldStandard, results, TrecConfig.SIZE, true);
     }
 
     public TrecEval(File goldStandard, File results, int k, boolean calculateWithMissingResults) {

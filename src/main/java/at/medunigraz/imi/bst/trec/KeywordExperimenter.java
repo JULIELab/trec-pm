@@ -3,10 +3,8 @@ package at.medunigraz.imi.bst.trec;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
-import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
-import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import org.apache.commons.io.FileUtils;
@@ -19,10 +17,6 @@ public class KeywordExperimenter {
     private static final int YEAR = 2018;
 
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
-
-    private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2018();
-
-    private static final Task TASK = Task.PUBMED;
 
     public static void main(String[] args) {
         final File keywordsSource = new File(KeywordExperimenter.class.getResource("/negative-keywords/").getFile());
@@ -50,9 +44,7 @@ public class KeywordExperimenter {
             }
 
             for (String keyword : lines) {
-                Experiment exp = prototype();
-                exp.setRetrieval(LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword));
-                experiments.add(exp);
+                experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword)));
             }
         }
 
@@ -75,9 +67,7 @@ public class KeywordExperimenter {
             keyword = keyword + " " + entry.getValue();
             keyword = keyword.trim();
 
-            Experiment exp = prototype();
-            exp.setRetrieval(LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword));
-            experiments.add(exp);
+            experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword)));
         }
 
         //TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
@@ -87,34 +77,22 @@ public class KeywordExperimenter {
         TreeMap<Double, String> results = new TreeMap<>(Collections.reverseOrder());
 
         for (Experiment exp : experiments) {
-            exp.start();
-            try {
-                exp.join();
+            Metrics metrics = exp.run();
 
-                // Change comparison metric here
-                double metric = exp.allMetrics.getInfNDCG();
-//				double metric = exp.allMetrics.getP10();
-//				double metric = exp.allMetrics.getRPrec();
-//				double metric = exp.allMetrics.getP5();
-//				double metric = exp.allMetrics.getP15();
+            // Change comparison metric here
+            double metric = metrics.getInfNDCG();
+//            double metric = metrics.getP10();
+//            double metric = metricss.getRPrec();
+//            double metric = metricss.getP5();
+//            double metric = metrics.getP15();
 
-                results.put(metric, exp.getExperimentId());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            results.put(metric, exp.getExperimentId());
         }
 
         // Print the map
         results.entrySet().stream().forEach(System.out::println);
 
         return results;
-    }
-
-    private static Experiment prototype() {
-        final Experiment prototype = new Experiment();
-        prototype.setGoldDataset(GOLD_STANDARD);
-        prototype.setTopicSet(TOPICS);
-        return prototype;
     }
 
 }
