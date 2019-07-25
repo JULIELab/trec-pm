@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
+import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +32,29 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private boolean calculateTrecEvalWithMissingResults = true;
     private int k = 1000;
     private List<ResultList<Q>> lastResultListSet;
+
+    /**
+     * Build an Experiment using the topics provided by the gold standard.
+     *
+     * @param goldStandard
+     * @param retrieval
+     */
+    public Experiment(GoldStandard goldStandard, Retrieval retrieval) {
+        this(goldStandard, retrieval, new TopicSet(goldStandard.getQueriesAsList()));
+    }
+
+    /**
+     * Build an Experiment using the topics provided.
+     * @param goldStandard
+     * @param retrieval
+     * @param topics
+     */
+    public Experiment(GoldStandard goldStandard, Retrieval retrieval, TopicSet topics) {
+        this.goldDataset = goldStandard;
+        this.retrieval = retrieval;
+        this.topicSet = topics;
+        this.goldStandardType = goldStandard.getType();
+    }
 
 
     public Retrieval getRetrieval() {
