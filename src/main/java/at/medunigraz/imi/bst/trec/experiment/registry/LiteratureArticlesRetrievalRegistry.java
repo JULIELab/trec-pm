@@ -19,41 +19,41 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
 
     public static TrecPmRetrieval hpipubclass(int year, int size) {
-        return new TrecPmRetrieval().withExperimentName("hpipubclass").withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName("hpipubclass").withSize(size).withTarget(Task.PUBMED)
                 .withSubTemplate(EXTRA_BOOST_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubnone(int year, int size) {
-        return new TrecPmRetrieval().withExperimentName("hpipubnone").withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName("hpipubnone").withSize(size).withTarget(Task.PUBMED)
                 .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubboost(int year, int size) {
-        return new TrecPmRetrieval().withExperimentName("hpipubboost").withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName("hpipubboost").withSize(size).withTarget(Task.PUBMED)
                 .withSubTemplate(IMPROVED_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubcommon(int year, int size) {
-        return new TrecPmRetrieval().withExperimentName("hpipubcommon").withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName("hpipubcommon").withSize(size).withTarget(Task.PUBMED)
                 .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubbase(int year, int size) {
-        return new TrecPmRetrieval().withExperimentName("hpipubbase").withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName("hpipubbase").withSize(size).withTarget(Task.PUBMED)
                 .withSubTemplate(NONE_TEMPLATE);
     }
 
     public static TrecPmRetrieval keyword(int year, int size, String keyword) {
-        return new TrecPmRetrieval().withExperimentName(keyword).withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withExperimentName(keyword).withSize(size).withTarget(Task.PUBMED)
                 .withProperties("keyword", keyword).withTemplate(KEYWORD_TEMPLATE).withWordRemoval();
     }
 
     public static TrecPmRetrieval boost(int year, int size, String boost) {
-        return new TrecPmRetrieval().withSize(size).withYear(year).withTarget(Task.PUBMED)
+        return new TrecPmRetrieval().withSize(size).withTarget(Task.PUBMED)
                 .withProperties("keyword", boost).withTemplate(BOOST_TEMPLATE).withWordRemoval();
     }
 
