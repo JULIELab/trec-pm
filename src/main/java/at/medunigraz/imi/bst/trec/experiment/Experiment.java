@@ -3,12 +3,10 @@ package at.medunigraz.imi.bst.trec.experiment;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.*;
-import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Collection;
@@ -18,7 +16,6 @@ import java.util.function.Function;
 public class Experiment<Q extends QueryDescription> extends Thread {
 
     private static final Logger LOG = LogManager.getLogger();
-    private static final int YEAR_PUBLISHED_GS = 2017;
     public Metrics allMetrics = null;
     private Retrieval<?, Q> retrieval;
     private Challenge challenge;
@@ -132,10 +129,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
         LOG.info("Running collection " + longExperimentId + "...");
 
-        // Load the default TopicSet which is all topics for the given year
-        if (topicSet == null)
-            topicSet = loadTopics();
-
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
@@ -144,13 +137,12 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
 
         File output = retrieval.getOutput();
-        File goldStandard = getQrelFile();
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
-        final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleQrelFile() : null;
 
-        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
+        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, getSampleQrelFile())
+                .computeMetrics();
 
         this.allMetrics = allMetrics;
 
@@ -162,12 +154,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         return allMetrics;
     }
 
-    @NotNull
-    private TopicSet loadTopics() {
-        File example = new File(CSVStatsWriter.class.getResource("/topics/topics" + year + ".xml").getPath());
-        return new TopicSet(example, challenge, year);
-    }
-
     public void setYear(int year) {
         this.year = year;
     }
@@ -176,73 +162,19 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         this.task = task;
     }
 
-    public File getQrelFile() {
-        if (goldDataset != null) {
-            File qrelFile = new File("qrels", String.format("%s.qrels", getExperimentId()));
-            goldDataset.writeQrelFile(qrelFile);
-            return qrelFile;
-        }
-        // Old, fallback, code path. Should be replaced by `GoldStandardBuilder`.
-        return new File(Experiment.class.getResource("/gold-standard/" + getGoldStandardFileName()).getPath());
-    }
-
-    /**
-     * @return
-     * @todo Add support for 2018 topics
-     */
-    public String getGoldStandardFileName() {
-        // Internal gold standard for the 2017 edition on Scientific Abstracts
-        if (goldStandardType == GoldStandardType.INTERNAL && task == Task.PUBMED && year == YEAR_PUBLISHED_GS) {
-            return "topics2017-pmid.qrels";
-        } else if (goldStandardType == GoldStandardType.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == YEAR_PUBLISHED_GS) {
-            return "qrels-treceval-abstracts.2017.txt";
-        } else if (goldStandardType == GoldStandardType.OFFICIAL && task == Task.CLINICAL_TRIALS && year == YEAR_PUBLISHED_GS) {
-            return "qrels-treceval-clinical_trials.2017.txt";
-        } else if (goldStandardType == GoldStandardType.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
-            return "qrels-treceval-abstracts.2018.txt";
-        } else if (goldStandardType == GoldStandardType.OFFICIAL && task == Task.CLINICAL_TRIALS && year == 2018) {
-            return "qrels-treceval-clinical_trials.2018.txt";
-        } else if (goldStandardType == GoldStandardType.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
-            return "gsheets-abstracts.2018.qrels";
-        } else if (goldStandardType == GoldStandardType.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2018) {
-            return "gsheets-trials.2018.qrels";
-        } else if (goldStandardType == GoldStandardType.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2019) {
-            return "gsheets-abstracts-2019.qrels";
-        } else if (goldStandardType == GoldStandardType.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2019) {
-            return "gsheets-trials-2019.qrels";
-        }else {
-            throw new UnsupportedOperationException("Invalid combination of gold standard, task and year.");
-        }
+    private File getQrelFile() {
+        File qrelFile = new File("qrels", String.format("%s.qrels", getExperimentId()));
+        goldDataset.writeQrelFile(qrelFile);
+        return qrelFile;
     }
 
     private File getSampleQrelFile() {
-        // New code path used when Experiment is not created with the deprecated `ExperimentBuilder`.
-        if (goldDataset != null && goldDataset.isSampleGoldStandard()) {
+        if (goldDataset.isSampleGoldStandard()) {
             final File sampleQrelFile = new File("qrels", String.format("sample-%s.qrels", getExperimentId()));
             goldDataset.writeSampleQrelFile(sampleQrelFile);
             return sampleQrelFile;
         }
-        // Old, fallback, code path. Should be replaced by `GoldStandardBuilder`.
-        if (hasSampleGoldStandard()) {
-            if (year == 2017)
-                return new File(getClass().getResource("/gold-standard/sample-qrels-final-abstracts.2017.txt").getPath());
-            else if (year == 2018 && task == Task.PUBMED)
-                return new File(getClass().getResource("/gold-standard/qrels-treceval-abstracts.2018.txt").getPath());
-            else if (year == 2018 && task == Task.CLINICAL_TRIALS)
-                return new File(getClass().getResource("/gold-standard/qrels-sample-ct.2018.txt").getPath());
-            else
-                throw new IllegalStateException("There should be a sample gold standard but no condition did meet for year, task, gstype: " + year + ", " + task + ", " + goldStandardType);
-        } else {
-            throw new UnsupportedOperationException("No available sample gold standard.");
-        }
-    }
-
-    private boolean hasSampleGoldStandard() {
-        if (goldDataset != null && goldDataset.isSampleGoldStandard())
-            return true;
-        boolean hasgs = goldStandardType == GoldStandardType.OFFICIAL;
-        hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
-        return hasgs;
+        return null;
     }
 
     public Query getDecorator() {
