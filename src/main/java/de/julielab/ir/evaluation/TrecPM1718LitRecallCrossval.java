@@ -58,7 +58,6 @@ public class TrecPM1718LitRecallCrossval {
             experiment.setGoldDataset(aggregatedGoldStandard);
             experiment.setTopicSet(new TopicSet(test));
             experiment.setRetrieval(retrieval);
-            experiment.setGoldStandardType(GoldStandardType.OFFICIAL);
             experiment.setCalculateTrecEvalWithMissingResults(false);
             experiment.run();
             allESMetrics.add(experiment.getAllMetrics());

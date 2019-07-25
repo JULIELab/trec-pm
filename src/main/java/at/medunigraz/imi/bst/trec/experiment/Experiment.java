@@ -22,7 +22,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private Retrieval<?, Q> retrieval;
     private Challenge challenge;
     private Task task;
-    private GoldStandardType goldStandardType;
+    @Deprecated private GoldStandardType goldStandardType;
     private de.julielab.ir.goldstandards.GoldStandard goldDataset;
     private int year;
     private String statsDir = "stats/";
@@ -124,7 +124,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
-        GoldStandardType goldStandardType = this.goldStandardType;
         final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleQrelFile() : null;
 
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
@@ -222,20 +221,13 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         return hasgs;
     }
 
-    public GoldStandardType getGoldStandardType() {
-        return goldStandardType;
-    }
-
-    public void setGoldStandardType(GoldStandardType goldStandardType) {
-        this.goldStandardType = goldStandardType;
-    }
-
     public Query getDecorator() {
         return retrieval.getQuery();
     }
 
     public void setGoldDataset(de.julielab.ir.goldstandards.GoldStandard goldDataset) {
         this.goldDataset = goldDataset;
+        this.goldStandardType = goldDataset.getType();
     }
 
 

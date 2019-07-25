@@ -3,7 +3,6 @@ package at.medunigraz.imi.bst.trec;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
-import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
@@ -17,10 +16,6 @@ import java.util.Set;
 public class LiteratureArticlesExperimenter {
 
     private static final int YEAR = 2019;
-    /**
-     * @todo Unify GoldStandard (#16)
-     */
-    private static final GoldStandardType GOLD_STANDARD_TYPE = GoldStandardType.INTERNAL;
 
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedInternal2019();
 
@@ -57,7 +52,6 @@ public class LiteratureArticlesExperimenter {
         final Experiment prototype = new Experiment();
         prototype.setGoldDataset(GOLD_STANDARD);
         prototype.setTopicSet(TOPICS);
-        prototype.setGoldStandardType(GOLD_STANDARD_TYPE);
         return prototype;
     }
 
