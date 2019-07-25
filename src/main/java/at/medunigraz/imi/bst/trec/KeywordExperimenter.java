@@ -1,9 +1,11 @@
 package at.medunigraz.imi.bst.trec;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentBuilder;
-import at.medunigraz.imi.bst.trec.model.GoldStandard;
-import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.model.*;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
+import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -11,92 +13,110 @@ import java.io.IOException;
 import java.util.*;
 
 public class KeywordExperimenter {
-	public static void main(String[] args) {
-		final File keywordTemplate = new File(
-				KeywordExperimenter.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
-		final File keywordsSource = new File(KeywordExperimenter.class.getResource("/negative-keywords/").getFile());
+    private static final int YEAR = 2018;
+    /**
+     * @todo Unify GoldStandard (#16)
+     */
+    private static final GoldStandard GOLD_STANDARD_TYPE = GoldStandard.INTERNAL;
 
-		File[] files = null;
-		if (keywordsSource.isDirectory()) {
-			files = keywordsSource.listFiles();
-		} else {
-			files = new File[] { keywordsSource };
-		}
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
-		// FIXME set your baseline
-		double baselineMetric = 0;
+    private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2018();
 
-		// 1st step: collect metrics for individual keywords
-		Set<Experiment> experiments = new LinkedHashSet<>();
+    private static final Task TASK = Task.PUBMED;
 
-		for (File keywordFile : files) {
-			List<String> lines;
-			try {
-				lines = FileUtils.readLines(keywordFile, "UTF-8");
-			} catch (IOException e) {
-				e.printStackTrace();
-				continue;
-			}
+    public static void main(String[] args) {
+        final File keywordsSource = new File(KeywordExperimenter.class.getResource("/negative-keywords/").getFile());
 
-			for (String keyword : lines) {
-				experiments.add(new ExperimentBuilder().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
-						.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
-						.withWordRemoval().build());
-			}
-		}
+        File[] files = null;
+        if (keywordsSource.isDirectory()) {
+            files = keywordsSource.listFiles();
+        } else {
+            files = new File[] { keywordsSource };
+        }
 
-		TreeMap<Double, String> resultsUniqueKeywords = runExperiments(experiments);
+        // FIXME set your baseline
+        double baselineMetric = 0;
+
+        // 1st step: collect metrics for individual keywords
+        Set<Experiment> experiments = new LinkedHashSet<>();
+
+        for (File keywordFile : files) {
+            List<String> lines;
+            try {
+                lines = FileUtils.readLines(keywordFile, "UTF-8");
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            for (String keyword : lines) {
+                Experiment exp = prototype();
+                exp.setRetrieval(LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword));
+                experiments.add(exp);
+            }
+        }
+
+        TreeMap<Double, String> resultsUniqueKeywords = runExperiments(experiments);
 
 
 
-		// 2nd step: collect metrics for combination of keywords in a greedy fashion
-		experiments = new LinkedHashSet<>();
+        // 2nd step: collect metrics for combination of keywords in a greedy fashion
+        experiments = new LinkedHashSet<>();
 
-		String keyword = "";
-		for (Map.Entry<Double, String> entry : resultsUniqueKeywords.entrySet()) {
-			Double metric = entry.getKey();
+        String keyword = "";
+        for (Map.Entry<Double, String> entry : resultsUniqueKeywords.entrySet()) {
+            Double metric = entry.getKey();
 
-			// Only use words that improve results over a baseline
-			if (metric < baselineMetric) {
-				break;
-			}
+            // Only use words that improve results over a baseline
+            if (metric < baselineMetric) {
+                break;
+            }
 
-			keyword = keyword + " " + entry.getValue();
-			keyword = keyword.trim();
+            keyword = keyword + " " + entry.getValue();
+            keyword = keyword.trim();
 
-			experiments.add(new ExperimentBuilder().withName(keyword).withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
-					.withTarget(Task.PUBMED).withProperties("keyword", keyword).withTemplate(keywordTemplate)
-					.withWordRemoval().build());
-		}
+            Experiment exp = prototype();
+            exp.setRetrieval(LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword));
+            experiments.add(exp);
+        }
 
-		//TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
-	}
+        //TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());
+    }
 
-	private static TreeMap<Double, String> runExperiments(Set<Experiment> experiments) {
-		TreeMap<Double, String> results = new TreeMap<>(Collections.reverseOrder());
+    private static TreeMap<Double, String> runExperiments(Set<Experiment> experiments) {
+        TreeMap<Double, String> results = new TreeMap<>(Collections.reverseOrder());
 
-		for (Experiment exp : experiments) {
-			exp.start();
-			try {
-				exp.join();
+        for (Experiment exp : experiments) {
+            exp.start();
+            try {
+                exp.join();
 
-				// Change comparison metric here
-				double metric = exp.allMetrics.getInfNDCG();
+                // Change comparison metric here
+                double metric = exp.allMetrics.getInfNDCG();
 //				double metric = exp.allMetrics.getP10();
 //				double metric = exp.allMetrics.getRPrec();
 //				double metric = exp.allMetrics.getP5();
 //				double metric = exp.allMetrics.getP15();
 
-				results.put(metric, exp.getExperimentId());
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+                results.put(metric, exp.getExperimentId());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
-		// Print the map
-		results.entrySet().stream().forEach(System.out::println);
+        // Print the map
+        results.entrySet().stream().forEach(System.out::println);
 
-		return results;
-	}
+        return results;
+    }
+
+    private static Experiment prototype() {
+        final Experiment prototype = new Experiment();
+        prototype.setGoldDataset(GOLD_STANDARD);
+        prototype.setTopicSet(TOPICS);
+        prototype.setGoldStandard(GOLD_STANDARD_TYPE);
+        return prototype;
+    }
 
 }
