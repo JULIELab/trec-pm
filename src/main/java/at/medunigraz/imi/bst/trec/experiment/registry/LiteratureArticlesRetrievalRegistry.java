@@ -13,6 +13,10 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
     private static final File EXTRA_BOOST_TEMPLATE = new File(
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
+    private static final File KEYWORD_TEMPLATE = new File(
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
+    private static final File BOOST_TEMPLATE = new File(
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
 
     public static TrecPmRetrieval hpipubclass(int year, int size) {
         return new TrecPmRetrieval().withExperimentName("hpipubclass").withSize(size).withYear(year).withTarget(Task.PUBMED)
@@ -41,6 +45,16 @@ public final class LiteratureArticlesRetrievalRegistry {
     public static TrecPmRetrieval hpipubbase(int year, int size) {
         return new TrecPmRetrieval().withExperimentName("hpipubbase").withSize(size).withYear(year).withTarget(Task.PUBMED)
                 .withSubTemplate(NONE_TEMPLATE);
+    }
+
+    public static TrecPmRetrieval keyword(int year, int size, String keyword) {
+        return new TrecPmRetrieval().withExperimentName(keyword).withSize(size).withYear(year).withTarget(Task.PUBMED)
+                .withProperties("keyword", keyword).withTemplate(KEYWORD_TEMPLATE).withWordRemoval();
+    }
+
+    public static TrecPmRetrieval boost(int year, int size, String boost) {
+        return new TrecPmRetrieval().withSize(size).withYear(year).withTarget(Task.PUBMED)
+                .withProperties("keyword", boost).withTemplate(BOOST_TEMPLATE).withWordRemoval();
     }
 
 }

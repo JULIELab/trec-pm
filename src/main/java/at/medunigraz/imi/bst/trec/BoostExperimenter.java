@@ -1,38 +1,53 @@
 package at.medunigraz.imi.bst.trec;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
-import at.medunigraz.imi.bst.trec.experiment.ExperimentBuilder;
-import at.medunigraz.imi.bst.trec.model.GoldStandard;
-import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.model.*;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
+import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 
-import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class BoostExperimenter {
-	public static void main(String[] args) {
-		final File relaxedTemplate = new File(RunnerDemo.class.getResource("/templates/biomedical_articles/boost.json").getFile());
+    private static final int YEAR = 2018;
+    /**
+     * @todo Unify GoldStandard (#16)
+     */
+    private static final GoldStandard GOLD_STANDARD_TYPE = GoldStandard.INTERNAL;
 
-		Set<Experiment> experiments = new LinkedHashSet<>();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
-		for (float i = 1; i <= 5; i += 0.5) {
-			experiments.add(new ExperimentBuilder().withYear(2017).withGoldStandard(GoldStandard.OFFICIAL)
-					.withTarget(Task.PUBMED).withProperties("keyword", String.valueOf(i)).withTemplate(relaxedTemplate)
-					.withWordRemoval().build());
-		}
+    private static final TopicSet TOPICS = TrecPMTopicSetFactory.topics2018();
 
-		for (Experiment exp : experiments) {
-			exp.start();
-			try {
-				exp.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+    private static final Task TASK = Task.PUBMED;
 
-		for (Experiment exp : experiments) {
+    public static void main(String[] args) {
 
-		}
-	}
+
+        Set<Experiment> experiments = new LinkedHashSet<>();
+
+        for (float i = 1; i <= 5; i += 0.5) {
+            Retrieval retrieval = LiteratureArticlesRetrievalRegistry.boost(YEAR, TrecConfig.SIZE, String.valueOf(i));
+            Experiment exp = prototype();
+            exp.setRetrieval(retrieval);
+            experiments.add(exp);
+        }
+
+        for (Experiment exp : experiments) {
+            // TODO collect metrics and find optimal boost
+            exp.run();
+        }
+    }
+
+    private static Experiment prototype() {
+        final Experiment prototype = new Experiment();
+        prototype.setGoldDataset(GOLD_STANDARD);
+        prototype.setTopicSet(TOPICS);
+        prototype.setGoldStandard(GOLD_STANDARD_TYPE);
+        return prototype;
+    }
 
 }
