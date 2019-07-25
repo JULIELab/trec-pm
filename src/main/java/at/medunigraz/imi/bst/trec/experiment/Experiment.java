@@ -20,7 +20,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private static final Logger LOG = LogManager.getLogger();
     public Metrics allMetrics = null;
     private Retrieval<?, Q> retrieval;
-    private GoldStandard goldDataset;
+    private GoldStandard goldStandard;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
     private TopicSet topicSet;
@@ -44,7 +44,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
      * @param topics
      */
     public Experiment(GoldStandard goldStandard, Retrieval retrieval, TopicSet topics) {
-        this.goldDataset = goldStandard;
+        this.goldStandard = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
     }
@@ -89,7 +89,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
      */
     public boolean isCalculateTrecEvalWithMissingResults() {
         // If are querying just a subset of the GS, we won't get metrics for all topics and thus need to set -c to false.
-        if (topicSet.getTopics().size() < goldDataset.getQueriesAsList().size()) {
+        if (topicSet.getTopics().size() < goldStandard.getQueriesAsList().size()) {
             return false;
         }
         return true;
@@ -123,14 +123,14 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
-        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), goldDataset.getQueryIdFunction());
+        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), goldStandard.getQueryIdFunction());
 
         File output = retrieval.getOutput();
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = isCalculateTrecEvalWithMissingResults();
         String statsDir = this.statsDir;
 
-        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldDataset.getType(), getSampleQrelFile())
+        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard.getType(), getSampleQrelFile())
                 .computeMetrics();
 
         this.allMetrics = allMetrics;
@@ -145,14 +145,14 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
     private File getQrelFile() {
         File qrelFile = new File("qrels", String.format("%s.qrels", getExperimentId()));
-        goldDataset.writeQrelFile(qrelFile);
+        goldStandard.writeQrelFile(qrelFile);
         return qrelFile;
     }
 
     private File getSampleQrelFile() {
-        if (goldDataset.isSampleGoldStandard()) {
+        if (goldStandard.isSampleGoldStandard()) {
             final File sampleQrelFile = new File("qrels", String.format("sample-%s.qrels", getExperimentId()));
-            goldDataset.writeSampleQrelFile(sampleQrelFile);
+            goldStandard.writeSampleQrelFile(sampleQrelFile);
             return sampleQrelFile;
         }
         return null;
@@ -162,7 +162,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         return retrieval.getQuery();
     }
 
-    public void setGoldDataset(GoldStandard goldDataset) {
-        this.goldDataset = goldDataset;
+    public void setGoldStandard(GoldStandard goldStandard) {
+        this.goldStandard = goldStandard;
     }
 }
