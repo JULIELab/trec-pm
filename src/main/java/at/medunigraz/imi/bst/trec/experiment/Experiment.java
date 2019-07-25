@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 public class Experiment<Q extends QueryDescription> extends Thread {
 
@@ -49,7 +48,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         this.retrieval = retrieval;
         this.topicSet = topics;
     }
-
 
     public Retrieval getRetrieval() {
         return retrieval;
@@ -125,9 +123,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         if (retrieval.getResultsDir() == null)
             retrieval.withResultsDir(this.resultsDir);
 
-        final Function<QueryDescription, String> queryIdFunction = goldDataset != null ? goldDataset.getQueryIdFunction() : q -> String.valueOf(q.getNumber());
-        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), queryIdFunction);
-
+        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), goldDataset.getQueryIdFunction());
 
         File output = retrieval.getOutput();
         int k = this.k;
