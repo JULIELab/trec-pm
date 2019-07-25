@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -21,12 +22,12 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     private static final Logger log = LogManager.getLogger();
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, File qrels) {
-        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, File qrels) {
+        super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
     }
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, Collection<Q> topics, DocumentList<Q> qrelDocuments) {
-        super(challenge, task, year, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, DocumentList<Q> qrelDocuments) {
+        super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
     }
 
     private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {

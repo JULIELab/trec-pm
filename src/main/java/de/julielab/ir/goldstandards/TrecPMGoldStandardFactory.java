@@ -47,6 +47,6 @@ public final class TrecPMGoldStandardFactory {
      * @return
      */
     private static TrecQrelGoldStandard<Topic> gs(Task task, int year, GoldStandardType type, File qrels) {
-        return new TrecQrelGoldStandard<>(Challenge.TREC_PM, task, year, TrecPMTopicSetFactory.topics(year).getTopics(), qrels);
+        return new TrecQrelGoldStandard<>(Challenge.TREC_PM, task, year, type, TrecPMTopicSetFactory.topics(year).getTopics(), qrels);
     }
 }
