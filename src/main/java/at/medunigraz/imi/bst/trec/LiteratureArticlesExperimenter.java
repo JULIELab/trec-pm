@@ -13,30 +13,28 @@ import java.util.Set;
 
 public class LiteratureArticlesExperimenter {
 
-    private static final int YEAR = 2019;
-
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedInternal2019();
 
     public static void main(String[] args) {
         // Judging order: 1
         Experiment hpipubclass = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubclass(YEAR, TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.hpipubclass(TrecConfig.SIZE));
 
         // Judging order: 2
         Experiment hpipubnone = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubnone(YEAR, TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.hpipubnone(TrecConfig.SIZE));
 
         // Judging order: 3
         Experiment hpipubboost = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubboost(YEAR, TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.hpipubboost(TrecConfig.SIZE));
 
         // Judging order: 4
         Experiment hpipubcommon = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubcommon(YEAR, TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.hpipubcommon(TrecConfig.SIZE));
 
         // Judging order: 5
         Experiment hpipubbase = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubbase(YEAR, TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.hpipubbase(TrecConfig.SIZE));
 
         Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpipubclass, hpipubnone, hpipubboost, hpipubcommon, hpipubbase));
         for (Experiment exp : experiments) {
