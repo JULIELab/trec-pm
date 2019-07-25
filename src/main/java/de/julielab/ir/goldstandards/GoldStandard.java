@@ -1,5 +1,6 @@
 package de.julielab.ir.goldstandards;
 
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
@@ -77,4 +78,6 @@ public interface GoldStandard<Q extends QueryDescription> {
     }
 
     Function<QueryDescription, String> getQueryIdFunction();
+
+    GoldStandardType getType();
 }

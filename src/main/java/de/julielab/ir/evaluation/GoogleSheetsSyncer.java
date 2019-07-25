@@ -58,7 +58,7 @@ public class GoogleSheetsSyncer {
         GoogleSheetsGoldStandard<Topic> sheet = new GoogleSheetsGoldStandard<>(CHALLENGE, task, YEAR, topics, TrecConfig.GSHEETS_SHEETID, readRange, writeRange);
 
         // Save gold standard to a file
-        TrecQrelGoldStandard<Topic> qrels = new TrecQrelGoldStandard<>(CHALLENGE, task, YEAR, topics, sheet.getQrelDocuments());
+        TrecQrelGoldStandard<Topic> qrels = new TrecQrelGoldStandard<>(CHALLENGE, task, YEAR, GoldStandardType.INTERNAL, topics, sheet.getQrelDocuments());
         qrels.writeQrelFile(file);
 
         return sheet;

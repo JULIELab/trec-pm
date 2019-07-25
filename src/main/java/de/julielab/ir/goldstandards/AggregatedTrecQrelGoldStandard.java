@@ -1,5 +1,6 @@
 package de.julielab.ir.goldstandards;
 
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
@@ -59,5 +60,19 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
         return q -> q.getYear() + "" + q.getNumber();
+    }
+
+    /**
+     * An aggregated gold standard is said official if, and only if, all gold standards are official.
+     * @return
+     */
+    @Override
+    public GoldStandardType getType() {
+        for (AtomicGoldStandard<Q> gs : goldStandards.values()) {
+            if (gs.getType() == GoldStandardType.INTERNAL) {
+                return GoldStandardType.INTERNAL;
+            }
+        }
+        return GoldStandardType.OFFICIAL;
     }
 }

@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -32,7 +33,7 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     private final GoogleSheets sheet = new GoogleSheets();
 
     public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, String spreadsheetId, String[] readRange, String writeRange) {
-        super(challenge, task, year, queries, new DocumentList<>());
+        super(challenge, task, year, GoldStandardType.INTERNAL, queries, new DocumentList<>());
         this.spreadsheetId = spreadsheetId;
         this.readRange = readRange;
         this.writeRange = writeRange;

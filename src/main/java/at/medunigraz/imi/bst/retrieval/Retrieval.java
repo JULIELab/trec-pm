@@ -2,7 +2,6 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.GoldStandard;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import at.medunigraz.imi.bst.trec.model.Task;
@@ -17,25 +16,10 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     protected Query query;
     private Task task;
-    private GoldStandard goldStandard;
     private int year;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
-
-    public static String[] getTypes(Task task, GoldStandard goldStandard) {
-        String[] ret = new String[0];    // Everything
-
-        if (task == Task.CLINICAL_TRIALS) {
-            return new String[]{TrecConfig.ELASTIC_CT_TYPE};
-        }
-
-        if (task == Task.PUBMED && goldStandard == GoldStandard.INTERNAL) {
-            return new String[]{TrecConfig.ELASTIC_BA_EXTRA_TYPE, TrecConfig.ELASTIC_BA_MEDLINE_TYPE};
-        }
-
-        return ret;
-    }
 
     public static String getIndexName(Task task) {
         switch (task) {
@@ -94,11 +78,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     public T withProperties(String... templatePropertiesAndValues) {
         query = new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), query);
 
-        return (T) this;
-    }
-
-    public T withGoldStandard(GoldStandard gold) {
-        goldStandard = gold;
         return (T) this;
     }
 

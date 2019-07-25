@@ -48,7 +48,7 @@ public class TrecQrelGoldStandardTest {
 
         // Create a gold standard with it
         final File generatedQrels = testFolder.newFile("generated.qrels");
-        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, TOPICS.getTopics(), qrelDocuments);
+        final TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, GoldStandardType.INTERNAL, TOPICS.getTopics(), qrelDocuments);
 
         // Traditional qrel file
         gs.writeQrelFile(generatedQrels);
@@ -73,7 +73,7 @@ public class TrecQrelGoldStandardTest {
 
         // Write back the documents into a new file
         final File generatedQrels = testFolder.newFile("generated.qrels");
-        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, TOPICS.getTopics(), qrelDocuments);
+        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, GoldStandardType.OFFICIAL, TOPICS.getTopics(), qrelDocuments);
         gsCopy.writeQrelFile(generatedQrels);
 
         // Check files are identical
@@ -90,7 +90,7 @@ public class TrecQrelGoldStandardTest {
 
         // Write back the documents into a new file
         final File generatedQrels = testFolder.newFile("generated.qrels");
-        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, TOPICS.getTopics(), qrelDocuments);
+        final TrecQrelGoldStandard<Topic> gsCopy = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, GoldStandardType.OFFICIAL, TOPICS.getTopics(), qrelDocuments);
         gsCopy.writeSampleQrelFile(generatedQrels);
 
         // Check files are identical

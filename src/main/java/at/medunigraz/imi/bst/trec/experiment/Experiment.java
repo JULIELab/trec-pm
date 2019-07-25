@@ -22,7 +22,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private Retrieval<?, Q> retrieval;
     private Challenge challenge;
     private Task task;
-    private GoldStandard goldStandard;
+    @Deprecated private GoldStandardType goldStandardType;
     private de.julielab.ir.goldstandards.GoldStandard goldDataset;
     private int year;
     private String statsDir = "stats/";
@@ -124,7 +124,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
-        GoldStandard goldStandardType = this.goldStandard;
         final File sampleGoldStandard = hasSampleGoldStandard() ? getSampleQrelFile() : null;
 
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, goldStandard, k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, sampleGoldStandard).computeMetrics();
@@ -169,23 +168,23 @@ public class Experiment<Q extends QueryDescription> extends Thread {
      */
     public String getGoldStandardFileName() {
         // Internal gold standard for the 2017 edition on Scientific Abstracts
-        if (goldStandard == GoldStandard.INTERNAL && task == Task.PUBMED && year == YEAR_PUBLISHED_GS) {
+        if (goldStandardType == GoldStandardType.INTERNAL && task == Task.PUBMED && year == YEAR_PUBLISHED_GS) {
             return "topics2017-pmid.qrels";
-        } else if (goldStandard == GoldStandard.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == YEAR_PUBLISHED_GS) {
+        } else if (goldStandardType == GoldStandardType.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == YEAR_PUBLISHED_GS) {
             return "qrels-treceval-abstracts.2017.txt";
-        } else if (goldStandard == GoldStandard.OFFICIAL && task == Task.CLINICAL_TRIALS && year == YEAR_PUBLISHED_GS) {
+        } else if (goldStandardType == GoldStandardType.OFFICIAL && task == Task.CLINICAL_TRIALS && year == YEAR_PUBLISHED_GS) {
             return "qrels-treceval-clinical_trials.2017.txt";
-        } else if (goldStandard == GoldStandard.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
+        } else if (goldStandardType == GoldStandardType.OFFICIAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
             return "qrels-treceval-abstracts.2018.txt";
-        } else if (goldStandard == GoldStandard.OFFICIAL && task == Task.CLINICAL_TRIALS && year == 2018) {
+        } else if (goldStandardType == GoldStandardType.OFFICIAL && task == Task.CLINICAL_TRIALS && year == 2018) {
             return "qrels-treceval-clinical_trials.2018.txt";
-        } else if (goldStandard == GoldStandard.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
+        } else if (goldStandardType == GoldStandardType.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2018) {
             return "gsheets-abstracts.2018.qrels";
-        } else if (goldStandard == GoldStandard.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2018) {
+        } else if (goldStandardType == GoldStandardType.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2018) {
             return "gsheets-trials.2018.qrels";
-        } else if (goldStandard == GoldStandard.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2019) {
+        } else if (goldStandardType == GoldStandardType.INTERNAL && (task == Task.PUBMED || task == Task.PUBMED_ONLINE) && year == 2019) {
             return "gsheets-abstracts-2019.qrels";
-        } else if (goldStandard == GoldStandard.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2019) {
+        } else if (goldStandardType == GoldStandardType.INTERNAL && task == Task.CLINICAL_TRIALS && year == 2019) {
             return "gsheets-trials-2019.qrels";
         }else {
             throw new UnsupportedOperationException("Invalid combination of gold standard, task and year.");
@@ -208,7 +207,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
             else if (year == 2018 && task == Task.CLINICAL_TRIALS)
                 return new File(getClass().getResource("/gold-standard/qrels-sample-ct.2018.txt").getPath());
             else
-                throw new IllegalStateException("There should be a sample gold standard but no condition did meet for year, task, gstype: " + year + ", " + task + ", " + goldStandard);
+                throw new IllegalStateException("There should be a sample gold standard but no condition did meet for year, task, gstype: " + year + ", " + task + ", " + goldStandardType);
         } else {
             throw new UnsupportedOperationException("No available sample gold standard.");
         }
@@ -217,17 +216,9 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private boolean hasSampleGoldStandard() {
         if (goldDataset != null && goldDataset.isSampleGoldStandard())
             return true;
-        boolean hasgs = goldStandard == GoldStandard.OFFICIAL;
+        boolean hasgs = goldStandardType == GoldStandardType.OFFICIAL;
         hasgs &= task == Task.PUBMED || (task == Task.CLINICAL_TRIALS && year == 2018);
         return hasgs;
-    }
-
-    public GoldStandard getGoldStandard() {
-        return goldStandard;
-    }
-
-    public void setGoldStandard(GoldStandard goldStandard) {
-        this.goldStandard = goldStandard;
     }
 
     public Query getDecorator() {
@@ -236,6 +227,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
     public void setGoldDataset(de.julielab.ir.goldstandards.GoldStandard goldDataset) {
         this.goldDataset = goldDataset;
+        this.goldStandardType = goldDataset.getType();
     }
 
 
