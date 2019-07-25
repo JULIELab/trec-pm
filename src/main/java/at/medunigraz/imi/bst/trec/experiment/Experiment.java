@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.Metrics;
@@ -25,7 +26,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private String resultsDir = "results/";
     private TopicSet topicSet;
     private boolean calculateTrecEvalWithMissingResults = true;
-    private int k = 1000;
+    private int k = TrecConfig.SIZE;
     private List<ResultList<Q>> lastResultListSet;
 
     /**

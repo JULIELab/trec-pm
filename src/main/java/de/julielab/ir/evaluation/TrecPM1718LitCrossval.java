@@ -1,5 +1,6 @@
 package de.julielab.ir.evaluation;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
@@ -44,7 +45,7 @@ public class TrecPM1718LitCrossval {
 
         RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
         METRIC trainMetric = METRIC.NDCG;
-        int k = 1000;
+        int k = TrecConfig.SIZE;
 
         int vocabCutoff = 50;
 
@@ -135,7 +136,7 @@ public class TrecPM1718LitCrossval {
             final File sampleQrelFile = Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile();
             aggregatedGoldStandard.writeSampleQrelFile(sampleQrelFile);
 
-            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, qRelFile, 1000, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
+            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, qRelFile, TrecConfig.SIZE, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
             final Metrics metrics = trecMetricsCreator.computeMetrics();
             allLtrMetrics.add(metrics);
 
