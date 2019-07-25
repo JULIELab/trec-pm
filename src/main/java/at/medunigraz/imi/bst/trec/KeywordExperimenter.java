@@ -3,6 +3,7 @@ package at.medunigraz.imi.bst.trec;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
+import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
@@ -76,21 +77,16 @@ public class KeywordExperimenter {
         TreeMap<Double, String> results = new TreeMap<>(Collections.reverseOrder());
 
         for (Experiment exp : experiments) {
-            exp.start();
-            try {
-                exp.join();
+            Metrics metrics = exp.run();
 
-                // Change comparison metric here
-                double metric = exp.allMetrics.getInfNDCG();
-//				double metric = exp.allMetrics.getP10();
-//				double metric = exp.allMetrics.getRPrec();
-//				double metric = exp.allMetrics.getP5();
-//				double metric = exp.allMetrics.getP15();
+            // Change comparison metric here
+            double metric = metrics.getInfNDCG();
+//            double metric = metrics.getP10();
+//            double metric = metricss.getRPrec();
+//            double metric = metricss.getP5();
+//            double metric = metrics.getP15();
 
-                results.put(metric, exp.getExperimentId());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            results.put(metric, exp.getExperimentId());
         }
 
         // Print the map

@@ -55,8 +55,7 @@ public class TrecPM1718LitRecallCrossval {
             retrieval.withExperimentName(roundName);
 
             final Experiment<Topic> experiment = new Experiment(aggregatedGoldStandard, retrieval, new TopicSet(test));
-            experiment.run();
-            allESMetrics.add(experiment.getAllMetrics());
+            allESMetrics.add(experiment.run());
 
             final Map<Topic, ResultList<Topic>> resultListsByTopic = experiment.getLastResultListSet().stream().collect(Collectors.toMap(ResultList::getTopic, Function.identity()));
             double meanRecall = 0;

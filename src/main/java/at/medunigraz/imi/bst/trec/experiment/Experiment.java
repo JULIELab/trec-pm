@@ -15,10 +15,9 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
-public class Experiment<Q extends QueryDescription> extends Thread {
+public class Experiment<Q extends QueryDescription> {
 
     private static final Logger LOG = LogManager.getLogger();
-    public Metrics allMetrics = null;
     private Retrieval<?, Q> retrieval;
     private GoldStandard goldStandard;
     private String statsDir = "stats/";
@@ -113,8 +112,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         return lastResultListSet;
     }
 
-    @Override
-    public void run() {
+    public Metrics run() {
         final String experimentId = retrieval.getExperimentId();
         final String longExperimentId = experimentId + " with decorators " + retrieval.getQuery().getName();
 
@@ -133,14 +131,10 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard.getType(), getSampleQrelFile())
                 .computeMetrics();
 
-        this.allMetrics = allMetrics;
+        return allMetrics;
 
         // TODO Experiment API #53
 //        System.out.println(allMetrics.getInfNDCG() + ";" + longExperimentId);
-    }
-
-    public Metrics getAllMetrics() {
-        return allMetrics;
     }
 
     private File getQrelFile() {

@@ -104,8 +104,7 @@ public class TrecPM1718LitCrossval {
             retrieval.withExperimentName("pmround" + i + "es");
 
             final Experiment<Topic> experiment = new Experiment(aggregatedGoldStandard, retrieval, new TopicSet(test));
-            experiment.run();
-            allESMetrics.add(experiment.getAllMetrics());
+            allESMetrics.add(experiment.run());
 
             final List<ResultList<Topic>> lastResultListSet = experiment.getLastResultListSet();
             List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
