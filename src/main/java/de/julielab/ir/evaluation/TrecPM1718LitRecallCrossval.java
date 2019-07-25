@@ -55,7 +55,6 @@ public class TrecPM1718LitRecallCrossval {
             retrieval.withExperimentName(roundName);
 
             final Experiment<Topic> experiment = new Experiment(aggregatedGoldStandard, retrieval, new TopicSet(test));
-            experiment.setCalculateTrecEvalWithMissingResults(false);
             experiment.run();
             allESMetrics.add(experiment.getAllMetrics());
 

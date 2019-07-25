@@ -25,7 +25,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private String statsDir = "stats/";
     private String resultsDir = "results/";
     private TopicSet topicSet;
-    private boolean calculateTrecEvalWithMissingResults = true;
     private int k = TrecConfig.SIZE;
     private List<ResultList<Q>> lastResultListSet;
 
@@ -84,18 +83,18 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         this.topicSet = topicSet;
     }
 
-    public boolean isCalculateTrecEvalWithMissingResults() {
-        return calculateTrecEvalWithMissingResults;
-    }
-
     /**
      * <p>For the trec_eval script, specify if non-existing result entries should count as 0 in the 'all' performance values.</p>
      * <p>The sample_eval.pl script does not allow a setting here and always works as if this setting would be set to <tt>false</tt>.</p>
      *
-     * @param calculateTrecEvalWithMissingResults Whether or not to calculate the evaluation scores including or excluding missing result documents.
+     * @return Whether or not to calculate the evaluation scores including or excluding missing result documents.
      */
-    public void setCalculateTrecEvalWithMissingResults(boolean calculateTrecEvalWithMissingResults) {
-        this.calculateTrecEvalWithMissingResults = calculateTrecEvalWithMissingResults;
+    public boolean isCalculateTrecEvalWithMissingResults() {
+        // If are querying just a subset of the GS, we won't get metrics for all topics and thus need to set -c to false.
+        if (topicSet.getTopics().size() < goldDataset.getQueriesAsList().size()) {
+            return false;
+        }
+        return true;
     }
 
     public int getK() {
@@ -132,7 +131,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
         File output = retrieval.getOutput();
         int k = this.k;
-        boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
+        boolean calculateTrecEvalWithMissingResults = isCalculateTrecEvalWithMissingResults();
         String statsDir = this.statsDir;
 
         Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldDataset.getType(), getSampleQrelFile())
