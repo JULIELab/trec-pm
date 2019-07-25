@@ -16,7 +16,7 @@ public class BoostExperimenter {
     /**
      * @todo Unify GoldStandard (#16)
      */
-    private static final GoldStandard GOLD_STANDARD_TYPE = GoldStandard.INTERNAL;
+    private static final GoldStandardType GOLD_STANDARD_TYPE = GoldStandardType.INTERNAL;
 
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
@@ -46,7 +46,7 @@ public class BoostExperimenter {
         final Experiment prototype = new Experiment();
         prototype.setGoldDataset(GOLD_STANDARD);
         prototype.setTopicSet(TOPICS);
-        prototype.setGoldStandard(GOLD_STANDARD_TYPE);
+        prototype.setGoldStandardType(GOLD_STANDARD_TYPE);
         return prototype;
     }
 

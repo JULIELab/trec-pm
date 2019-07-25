@@ -2,7 +2,7 @@ package at.medunigraz.imi.bst.trec.experiment;
 
 import at.medunigraz.imi.bst.trec.evaluator.SampleEval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecEval;
-import at.medunigraz.imi.bst.trec.model.GoldStandard;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
@@ -21,11 +21,11 @@ public class TrecMetricsCreator {
     private int k;
     private boolean calculateTrecEvalWithMissingResults;
     private String statsDir;
-    private GoldStandard goldStandardType;
+    private GoldStandardType goldStandardType;
     private File sampleGoldStandard;
     private Metrics metrics;
 
-    public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File output, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandard goldStandardType, File sampleGoldStandard) {
+    public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File output, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
         this.experimentId = shortExperimentId;
         this.longExperimentId = longExperimentId;
         this.output = output;

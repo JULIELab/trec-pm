@@ -1,5 +1,5 @@
 package at.medunigraz.imi.bst.trec.model;
 
-public enum GoldStandard {
+public enum GoldStandardType {
     INTERNAL, OFFICIAL
 }

@@ -62,7 +62,7 @@ public class TrecPM1718LitCrossval {
 
         final File noClassifierTemplate = new File(
                 TrecPM1718LitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandardType.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();
         List<Metrics> allESMetrics = new ArrayList<>();
@@ -106,7 +106,7 @@ public class TrecPM1718LitCrossval {
             experiment.setGoldDataset(aggregatedGoldStandard);
             experiment.setTopicSet(new TopicSet(test));
             experiment.setRetrieval(retrieval);
-            experiment.setGoldStandard(GoldStandard.OFFICIAL);
+            experiment.setGoldStandardType(GoldStandardType.OFFICIAL);
             experiment.setCalculateTrecEvalWithMissingResults(false);
             experiment.run();
             allESMetrics.add(experiment.getAllMetrics());
@@ -139,7 +139,7 @@ public class TrecPM1718LitCrossval {
             final File sampleQrelFile = Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile();
             aggregatedGoldStandard.writeSampleQrelFile(sampleQrelFile);
 
-            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, qRelFile, 1000, false, "stats-tr/", GoldStandard.OFFICIAL, sampleQrelFile);
+            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, qRelFile, 1000, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
             final Metrics metrics = trecMetricsCreator.computeMetrics();
             allLtrMetrics.add(metrics);
 
