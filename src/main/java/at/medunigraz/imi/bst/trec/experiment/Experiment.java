@@ -2,7 +2,9 @@ package at.medunigraz.imi.bst.trec.experiment;
 
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
-import at.medunigraz.imi.bst.trec.model.*;
+import at.medunigraz.imi.bst.trec.model.Metrics;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
@@ -18,11 +20,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
     private static final Logger LOG = LogManager.getLogger();
     public Metrics allMetrics = null;
     private Retrieval<?, Q> retrieval;
-    private Challenge challenge;
-    private Task task;
-    @Deprecated private GoldStandardType goldStandardType;
-    private de.julielab.ir.goldstandards.GoldStandard goldDataset;
-    private int year;
+    private GoldStandard goldDataset;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
     private TopicSet topicSet;
@@ -50,7 +48,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         this.goldDataset = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
-        this.goldStandardType = goldStandard.getType();
     }
 
 
@@ -60,10 +57,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
     public void setRetrieval(Retrieval retrieval) {
         this.retrieval = retrieval;
-    }
-
-    public void setChallenge(Challenge challenge) {
-        this.challenge = challenge;
     }
 
     public String getStatsDir() {
@@ -141,7 +134,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         boolean calculateTrecEvalWithMissingResults = this.calculateTrecEvalWithMissingResults;
         String statsDir = this.statsDir;
 
-        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandardType, getSampleQrelFile())
+        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldDataset.getType(), getSampleQrelFile())
                 .computeMetrics();
 
         this.allMetrics = allMetrics;
@@ -152,14 +145,6 @@ public class Experiment<Q extends QueryDescription> extends Thread {
 
     public Metrics getAllMetrics() {
         return allMetrics;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
     }
 
     private File getQrelFile() {
@@ -181,10 +166,7 @@ public class Experiment<Q extends QueryDescription> extends Thread {
         return retrieval.getQuery();
     }
 
-    public void setGoldDataset(de.julielab.ir.goldstandards.GoldStandard goldDataset) {
+    public void setGoldDataset(GoldStandard goldDataset) {
         this.goldDataset = goldDataset;
-        this.goldStandardType = goldDataset.getType();
     }
-
-
 }
