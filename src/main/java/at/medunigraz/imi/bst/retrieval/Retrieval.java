@@ -16,7 +16,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     protected Query query;
     private Task task;
-    private int year;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
@@ -103,11 +102,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             throw new IllegalStateException("Cannot set similarity parameters to the current query " + query + ". This call must immediately follow a call to withTarget(Task) where Task is CLINICAL_TRIALS or PUBMED.");
         ElasticSearchQuery q = (ElasticSearchQuery) query;
         q.setSimilarityParameters(parameters);
-        return (T) this;
-    }
-
-    public T withYear(int year) {
-        this.year = year;
         return (T) this;
     }
 
@@ -199,7 +193,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         if (experimentName != null) {
             return experimentName.replace(" ", "_");
         }
-        return String.format("%s_%d_%s", getShortTaskName(), year, query.getName().replace(" ", "_"));
+        return String.format("%s_%d_%s", getShortTaskName(), query.getName().replace(" ", "_"));
     }
 
     public String getShortTaskName() {

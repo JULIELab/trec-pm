@@ -44,7 +44,7 @@ public class KeywordExperimenter {
             }
 
             for (String keyword : lines) {
-                experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword)));
+                experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(TrecConfig.SIZE, keyword)));
             }
         }
 
@@ -67,7 +67,7 @@ public class KeywordExperimenter {
             keyword = keyword + " " + entry.getValue();
             keyword = keyword.trim();
 
-            experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(YEAR, TrecConfig.SIZE, keyword)));
+            experiments.add(new Experiment(GOLD_STANDARD, LiteratureArticlesRetrievalRegistry.keyword(TrecConfig.SIZE, keyword)));
         }
 
         //TreeMap<Double, String> resultsCombinationKeywords = runExperiments(builder.build());

@@ -12,7 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class BoostExperimenter {
-    private static final int YEAR = 2018;
 
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
@@ -22,7 +21,7 @@ public class BoostExperimenter {
         Set<Experiment> experiments = new LinkedHashSet<>();
 
         for (float i = 1; i <= 5; i += 0.5) {
-            Retrieval retrieval = LiteratureArticlesRetrievalRegistry.boost(YEAR, TrecConfig.SIZE, String.valueOf(i));
+            Retrieval retrieval = LiteratureArticlesRetrievalRegistry.boost(TrecConfig.SIZE, String.valueOf(i));
             experiments.add(new Experiment(GOLD_STANDARD, retrieval));
         }
 

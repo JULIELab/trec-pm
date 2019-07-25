@@ -13,30 +13,28 @@ import java.util.Set;
 
 public final class ClinicalTrialsExperimenter {
 
-    private static final int YEAR = 2019;
-
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.trialsInternal2019();
 
     public static void main(String[] args) {
         // Judging order: 1
         final Experiment hpictall = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.hpictall(YEAR, TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.hpictall(TrecConfig.SIZE));
 
         // Judging order: 2
         final Experiment hpictphrase = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.hpictphrase(YEAR, TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.hpictphrase(TrecConfig.SIZE));
 
         // Judging order: 3
         final Experiment hpictboost = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.hpictboost(YEAR, TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.hpictboost(TrecConfig.SIZE));
 
         // Judging order: 4
         final Experiment hpictcommon = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.hpictcommon(YEAR, TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.hpictcommon(TrecConfig.SIZE));
 
         // Judging order: 5
         final Experiment hpictbase = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.hpictbase(YEAR, TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.hpictbase(TrecConfig.SIZE));
 
         Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpictall, hpictphrase, hpictboost, hpictcommon, hpictbase));
         for (Experiment exp : experiments) {

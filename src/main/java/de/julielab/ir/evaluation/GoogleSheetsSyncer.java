@@ -68,18 +68,18 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(YEAR, SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(YEAR, SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(YEAR, SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(YEAR, SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(YEAR, SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(SIZE));
                 break;
             case CLINICAL_TRIALS:
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(YEAR, SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictphrase(YEAR, SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictboost(YEAR, SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictcommon(YEAR, SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictbase(YEAR, SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictphrase(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictboost(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictcommon(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictbase(SIZE));
                 break;
             default:
                 throw new IllegalArgumentException("Task not supported");
