@@ -86,7 +86,7 @@ public class OriginalDocumentRetrieval {
             // Create a CasPool.
             String[] typeSystemDescriptorNames;
             try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.UIMA_TYPES_DESCRIPTORNAMES))) {
-                typeSystemDescriptorNames = br.lines().filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
+                typeSystemDescriptorNames = br.lines().filter(line -> !line.startsWith("#")).filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
             }
             final TypeSystemDescription tsDesc = TypeSystemDescriptionFactory.createTypeSystemDescription(typeSystemDescriptorNames);
             final ProcessingResourceMetaData_impl metaData = new ProcessingResourceMetaData_impl();

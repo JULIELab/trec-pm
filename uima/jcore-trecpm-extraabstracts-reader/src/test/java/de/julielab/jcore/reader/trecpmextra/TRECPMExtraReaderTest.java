@@ -1,14 +1,8 @@
 
 package de.julielab.jcore.reader.trecpmextra;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-
 import de.julielab.jcore.types.AbstractText;
 import de.julielab.jcore.types.Header;
-import de.julielab.jcore.types.OtherPub;
 import de.julielab.jcore.types.Title;
 import org.apache.uima.UIMAException;
 import org.apache.uima.collection.CollectionReader;

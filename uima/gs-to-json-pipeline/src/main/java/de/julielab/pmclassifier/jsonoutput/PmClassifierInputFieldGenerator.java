@@ -10,7 +10,6 @@ import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.pubmed.ManualDescriptor;
 import de.julielab.jcore.utility.JCoReTools;
 import org.apache.uima.cas.CASException;
-import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;

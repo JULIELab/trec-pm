@@ -1,11 +1,11 @@
 package de.julielab.ir.evaluation;
 
-import at.medunigraz.imi.bst.trec.PubmedExperimenter;
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
-import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.java.utilities.FileUtilities;
@@ -31,18 +31,14 @@ public class TrecPM1718LitRecallCrossval {
     public static void main(String args[]) throws ConfigurationException, IOException {
 
         final File noClassifierTemplate = new File(
-                PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym().withResistantDrugs();
+                TrecPM1718LitRecallCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym().withResistantDrugs();
 
         String experimentName = "Base";
-        File topicsFile2017 = new File(CSVStatsWriter.class.getResource("/topics/topics2017.xml").getPath());
-        final TopicSet topics2017 = new TopicSet(topicsFile2017, Challenge.TREC_PM, Task.PUBMED, 2017);
-        File topicsFile2018 = new File(CSVStatsWriter.class.getResource("/topics/topics2018.xml").getPath());
-        final TopicSet topics2018 = new TopicSet(topicsFile2018, Challenge.TREC_PM, Task.PUBMED, 2018);
 
-        final TrecQrelGoldStandard<Topic> trecPmLit2017 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, topics2017.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2017.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "sample-qrels-final-abstracts.2017.txt").toFile());
-        final TrecQrelGoldStandard<Topic> trecPmLit2018 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, topics2018.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2018.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "qrels-sample-abstracts.2018.txt").toFile());
-        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile(), Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile(), trecPmLit2017, trecPmLit2018);
+        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2017();
+        final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
+        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
         final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
@@ -59,14 +55,8 @@ public class TrecPM1718LitRecallCrossval {
             List<Topic> test = topicPartitioning.get(i);
             retrieval.withExperimentName(roundName);
 
-            final Experiment<Topic> experiment = new Experiment();
-            experiment.setGoldDataset(aggregatedGoldStandard);
-            experiment.setTopicSet(new TopicSet(test));
-            experiment.setRetrieval(retrieval);
-            experiment.setGoldStandard(GoldStandard.OFFICIAL);
-            experiment.setCalculateTrecEvalWithMissingResults(false);
-            experiment.run();
-            allESMetrics.add(experiment.getAllMetrics());
+            final Experiment<Topic> experiment = new Experiment(aggregatedGoldStandard, retrieval, new TopicSet(test));
+            allESMetrics.add(experiment.run());
 
             final Map<Topic, ResultList<Topic>> resultListsByTopic = experiment.getLastResultListSet().stream().collect(Collectors.toMap(ResultList::getTopic, Function.identity()));
             double meanRecall = 0;

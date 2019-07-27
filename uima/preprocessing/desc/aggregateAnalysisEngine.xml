@@ -37,9 +37,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
+        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
                         
-            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
+            <import location="JCore LINNAEUS Species AE.xml"/>
                     
         </delegateAnalysisEngine>
                 
@@ -55,15 +55,15 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Annotation Adder">
+        <delegateAnalysisEngine key="PM Classifier 2017">
                         
-            <import location="JCoRe Annotation Adder.xml"/>
+            <import location="PM Classifier 2017.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Annotation Adder 1">
+        <delegateAnalysisEngine key="PM Classifier 2018">
                         
-            <import location="JCoRe Annotation Adder 1.xml"/>
+            <import location="PM Classifier 2018.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -93,15 +93,15 @@
                                 
                 <node>BioLemmatizer</node>
                                 
-                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
+                <node>JCore LINNAEUS Species AE</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
                                 
                 <node>JCoRe Lingscope Negation AE</node>
                                 
-                <node>JCoRe Annotation Adder</node>
+                <node>PM Classifier 2017</node>
                                 
-                <node>JCoRe Annotation Adder 1</node>
+                <node>PM Classifier 2018</node>
                             
             </fixedFlow>
                     

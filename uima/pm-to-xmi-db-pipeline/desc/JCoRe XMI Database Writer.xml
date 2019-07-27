@@ -373,7 +373,7 @@
                                 
                 <value>
                                         
-                    <boolean>true</boolean>
+                    <boolean>false</boolean>
                                     
                 </value>
                             
@@ -459,6 +459,8 @@
                                         
                     <array>
                                                 
+                        <string>de.julielab.jcore.types.Lemma:value</string>
+                                                
                         <string>de.julielab.jcore.types.POSTag:value</string>
                                                 
                         <string>de.julielab.jcore.types.Annotation:confidence</string>
@@ -476,6 +478,8 @@
                         <string>de.julielab.jcore.types.Journal:volume</string>
                                                 
                         <string>de.julielab.jcore.types.AuthorInfo:affiliation</string>
+                                                
+                        <string>de.julielab.jcore.types.Abbreviation:expan</string>
                                             
                     </array>
                                     

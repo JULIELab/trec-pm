@@ -29,23 +29,10 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     protected Map<String, AtomicGoldStandard<Q>> goldStandards;
     private List<Q> queryList;
     private Map<Q, DocumentList> documentsByQuery;
-    private File qrelFile;
-    private File sampleQrelFile;
 
-    public AggregatedGoldStandard(Logger log, File qrelFile, Function<Document, String> qrelRecordFunction, AtomicGoldStandard... goldStandards) {
-        this(log, qrelFile, null, qrelRecordFunction, null, goldStandards);
-    }
-
-    public AggregatedGoldStandard(Logger log, File qrelFile, File sampleQrelFile, Function<Document, String> qrelRecordFunction, Function<Document, String> sampleQrelRecordFunction, AtomicGoldStandard... goldStandards) {
+    public AggregatedGoldStandard(Logger log, AtomicGoldStandard... goldStandards) {
         this.log = log;
-        this.qrelFile = qrelFile;
-        this.sampleQrelFile = sampleQrelFile;
         this.goldStandards = Stream.of(goldStandards).collect(Collectors.toMap(AtomicGoldStandard::getDatasetId, Function.identity()));
-        if (qrelFile != null)
-            writeAggregatedQrelFile(qrelFile, goldStandards, gs -> gs.getQrelDocuments(), qrelRecordFunction);
-        if (sampleQrelFile != null) {
-            writeAggregatedQrelFile(sampleQrelFile, goldStandards, gs -> gs.getSampleQrelDocuments(), sampleQrelRecordFunction);
-        }
     }
 
     @Override
@@ -136,15 +123,5 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
                 log.error("Exception while writing aggregated qrel file to {}", qrelFile, e);
             }
         }
-    }
-
-    @Override
-    public File getQrelFile() {
-        return qrelFile;
-    }
-
-    @Override
-    public File getSampleQrelFile() {
-        return sampleQrelFile;
     }
 }

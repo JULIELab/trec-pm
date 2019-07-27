@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -25,22 +26,13 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected DocumentList<Q> qrelDocuments;
     /**
-     * All documents from the sample qrel file, across all queries
-     */
-    protected DocumentList<Q> sampleQrelDocuments;
-    /**
      * All queries.
      */
     protected List<Q> queries;
     protected Challenge challenge;
     protected Task task;
     protected int year;
-
-    /**
-     * @deprecated qrelDocuments might have changed since initialization. Use `writeQrelFile` instead.
-     */
-    protected File qrels;
-    protected File sampleQrels;
+    protected GoldStandardType type;
 
     /**
      * The documents in {@link #qrelDocuments} grouped by query.
@@ -51,21 +43,20 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, File qrelsFile, File sampleQrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> sampleQrelsReader) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, File qrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;
+        this.type = type;
         this.queries = queries;
-        this.qrels = qrelsFile;
-        this.sampleQrels = sampleQrelsFile;
         qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
-        sampleQrelDocuments = sampleQrelsReader.apply(sampleQrelsFile, getQueriesByNumber());
     }
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, List<Q> queries, DocumentList<Q> qrelDocuments) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, DocumentList<Q> qrelDocuments) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;
+        this.type = type;
         this.queries = queries;
         this.qrelDocuments = qrelDocuments;
     }
@@ -95,27 +86,35 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     }
 
     @Override
-    public File getQrelFile() {
-        return null;
-    }
-
-    @Override
-    public File getSampleQrelFile() {
-        return getSampleQrelFile();
-    }
-
-    @Override
-    public DocumentList<Q> getSampleQrelDocuments() {
-        return sampleQrelDocuments;
-    }
-
-    @Override
     public DocumentList<Q> getQrelDocumentsForQuery(int queryId) {
         return getQrelDocumentsForQuery(getQueriesByNumber().get(queryId));
     }
 
     @Override
     public DocumentList<Q> getQrelDocuments() {
+        if (isSampleGoldStandard()) {
+            return convertSampleToTraditional(qrelDocuments);
+        }
+        return qrelDocuments;
+    }
+
+    /**
+     * Converts a given DocumentList to a non-stratified list.
+     * @param sampleQrelDocuments
+     * @return
+     */
+    private DocumentList<Q> convertSampleToTraditional(DocumentList<Q> sampleQrelDocuments) {
+        DocumentList<Q> ret = new DocumentList<>();
+        for (Document<Q> doc : sampleQrelDocuments) {
+            if (doc.getRelevance() != -1) {
+                ret.add(doc);
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public DocumentList<Q> getSampleQrelDocuments() {
         return qrelDocuments;
     }
 
@@ -137,8 +136,11 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
 
     @Override
     public String getDatasetId() {
-//        return Stream.of(challenge, task, year).filter(Objects::nonNull).map(String::valueOf).collect(Collectors.joining("-"));
         return String.valueOf(year);
     }
 
+    @Override
+    public GoldStandardType getType() {
+        return type;
+    }
 }

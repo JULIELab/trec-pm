@@ -21,7 +21,7 @@ public class TopicSet {
 		this.topics = new ArrayList<>(topics);
 	}
 
-	public TopicSet(File xmlFile, Challenge challenge, Task task, int year) {
+	public TopicSet(File xmlFile, Challenge challenge, int year) {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
 		Document doc;
@@ -39,7 +39,6 @@ public class TopicSet {
 			Element element = (Element) xmlTopics.item(i);
 			Topic t = Topic.fromElement(element);
 			t.setChallenge(challenge);
-			t.setTask(task);
 			t.setYear(year);
 			topics.add(t);
 		}

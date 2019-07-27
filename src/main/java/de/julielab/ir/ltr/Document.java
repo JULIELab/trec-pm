@@ -184,4 +184,9 @@ public class Document<Q extends QueryDescription> {
         }
         return normalizedDocumentText;
     }
+
+    public boolean isStratified() {
+        // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
+        return getStratum() != 0;
+    }
 }

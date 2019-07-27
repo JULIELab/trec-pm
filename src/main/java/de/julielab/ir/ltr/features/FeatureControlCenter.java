@@ -1,7 +1,6 @@
 package de.julielab.ir.ltr.features;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
@@ -22,7 +21,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -40,23 +38,31 @@ public class FeatureControlCenter {
     }
 
     public static FeatureControlCenter getInstance() {
+        if (singleton == null)
+            throw new IllegalStateException("The FeatureControlCenter must be initialized once per application start with the feature configuration to be used. This has not happened yet.");
         return singleton;
     }
 
     public static void initialize(HierarchicalConfiguration<ImmutableNode> configuration) {
+        if (singleton != null)
+            throw new IllegalStateException("The FeatureControlCenter has already been initialized. Do avoid confusion using the singleton pattern, reconfigurations are prohibited.");
         singleton = new FeatureControlCenter(configuration);
+    }
+
+    public static boolean isInitialized() {
+        return singleton != null;
     }
 
     public boolean filterActive(FeatureGroup featureGroup) {
         final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
-        log.trace("Checking if feature group '{}' is active {}: ", featureGroup.getName(), isActive);
+        log.trace("Checking if feature group '{}' is active: {} ", featureGroup.getName(), isActive);
         return isActive;
     }
 
     public boolean filterActive(FeatureGroup featureGroup, Feature feature) {
         // featuregroups/featuregroup[@name='fgname']/feature[@name='fname' and @active='true']
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE+ attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
-        log.trace("Checking if feature '{}' is active {}: ", slash(featureGroup.getName(), feature.getName()), isActive);
+        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
+        log.trace("Checking if feature '{}' is active: {} ", slash(featureGroup.getName(), feature.getName()), isActive);
         return isActive;
     }
 
@@ -68,8 +74,8 @@ public class FeatureControlCenter {
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(topics),
                 new TopicMatchFeatureGroup()
-            ).filter(this::filterActive)
-            .forEach(featurePipes::add);
+        ).filter(this::filterActive)
+                .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, false));
         // Sort and consolidate the feature vector values for AugmentableFeatureVectors.
         featurePipes.add(new SetFeatureVectorPipe());

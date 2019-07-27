@@ -1,2 +1,6 @@
+# These are the type system files loaded for the CAS pool from which the
+# Documents receive their CASes when loading XMI data from the database.
+# Thus, all types added to the Document CASes must be covered here.
 de.julielab.jcore.types.jcore-document-meta-pubmed-types
 de.julielab.jcore.types.jcore-document-structure-pubmed-types
+de.julielab.jcore.types.jcore-semantics-biology-types

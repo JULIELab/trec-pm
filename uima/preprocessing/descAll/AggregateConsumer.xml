@@ -7,15 +7,15 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe XMI DB Consumer">
+        <delegateAnalysisEngine key="JCoRe XMI Database Writer">
                         
-            <import location="JCoRe XMI DB Consumer.xml"/>
+            <import location="JCoRe XMI Database Writer.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Database Checkpoint Consumer">
+        <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
                         
-            <import location="JCoRe Database Checkpoint Consumer.xml"/>
+            <import location="JCoRe Database Checkpoint Writer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -33,9 +33,9 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe XMI DB Consumer</node>
+                <node>JCoRe XMI Database Writer</node>
                                 
-                <node>JCoRe Database Checkpoint Consumer</node>
+                <node>JCoRe Database Checkpoint Writer</node>
                             
             </fixedFlow>
                     

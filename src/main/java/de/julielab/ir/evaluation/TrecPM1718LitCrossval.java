@@ -1,12 +1,11 @@
 package de.julielab.ir.evaluation;
 
-import at.medunigraz.imi.bst.trec.PubmedExperimenter;
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
-import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import com.wcohen.ss.TFIDF;
@@ -14,6 +13,7 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.VocabularyRestrictor;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -45,27 +45,25 @@ public class TrecPM1718LitCrossval {
 
         RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
         METRIC trainMetric = METRIC.NDCG;
-        int k = 1000;
+        int k = TrecConfig.SIZE;
 
         int vocabCutoff = 50;
 
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
 
-        File topicsFile2017 = new File(CSVStatsWriter.class.getResource("/topics/topics2017.xml").getPath());
-        final TopicSet topics2017 = new TopicSet(topicsFile2017, Challenge.TREC_PM, Task.PUBMED, 2017);
-        File topicsFile2018 = new File(CSVStatsWriter.class.getResource("/topics/topics2018.xml").getPath());
-        final TopicSet topics2018 = new TopicSet(topicsFile2018, Challenge.TREC_PM, Task.PUBMED, 2018);
+        final TopicSet topics2017 = TrecPMTopicSetFactory.topics2017();
+        final TopicSet topics2018 = TrecPMTopicSetFactory.topics2018();
 
-        final TrecQrelGoldStandard<Topic> trecPmLit2017 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2017, topics2017.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2017.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "sample-qrels-final-abstracts.2017.txt").toFile());
-        final TrecQrelGoldStandard<Topic> trecPmLit2018 = new TrecQrelGoldStandard<>(Challenge.TREC_PM, Task.PUBMED, 2018, topics2018.getTopics(), Path.of("src", "main", "resources", "gold-standard", "qrels-treceval-abstracts.2018.txt").toFile(), Path.of("src", "main", "resources", "gold-standard", "qrels-sample-abstracts.2018.txt").toFile());
-        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile(), Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile(), trecPmLit2017, trecPmLit2018);
+        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2017();
+        final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
+        final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
         final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
         final File noClassifierTemplate = new File(
-                PubmedExperimenter.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval().withTarget(Task.PUBMED).withGoldStandard(GoldStandard.OFFICIAL).withYear(2017).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
+                TrecPM1718LitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();
         List<Metrics> allESMetrics = new ArrayList<>();
@@ -105,14 +103,8 @@ public class TrecPM1718LitCrossval {
 
             retrieval.withExperimentName("pmround" + i + "es");
 
-            final Experiment<Topic> experiment = new Experiment();
-            experiment.setGoldDataset(aggregatedGoldStandard);
-            experiment.setTopicSet(new TopicSet(test));
-            experiment.setRetrieval(retrieval);
-            experiment.setGoldStandard(GoldStandard.OFFICIAL);
-            experiment.setCalculateTrecEvalWithMissingResults(false);
-            experiment.run();
-            allESMetrics.add(experiment.getAllMetrics());
+            final Experiment<Topic> experiment = new Experiment(aggregatedGoldStandard, retrieval, new TopicSet(test));
+            allESMetrics.add(experiment.run());
 
             final List<ResultList<Topic>> lastResultListSet = experiment.getLastResultListSet();
             List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
@@ -137,8 +129,12 @@ public class TrecPM1718LitCrossval {
                 tw.writeDocuments(lastDocumentLists, IRScore.LTR, aggregatedGoldStandard.getQueryIdFunction());
             }
 
+            final File qRelFile = Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile();
+            aggregatedGoldStandard.writeQrelFile(qRelFile);
+            final File sampleQrelFile = Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile();
+            aggregatedGoldStandard.writeSampleQrelFile(sampleQrelFile);
 
-            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, aggregatedGoldStandard.getQrelFile(), 1000, false, "stats-tr/", GoldStandard.OFFICIAL, aggregatedGoldStandard.getSampleQrelFile());
+            final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + i + "ltr", "pmround" + i + "ltr", output, qRelFile, TrecConfig.SIZE, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
             final Metrics metrics = trecMetricsCreator.computeMetrics();
             allLtrMetrics.add(metrics);
 
