@@ -37,15 +37,15 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
+        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
                         
-            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
+            <import location="JCore LINNAEUS Species AE.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
                         
-            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
                     
         </delegateAnalysisEngine>
                 
@@ -109,9 +109,9 @@
                                 
                 <node>BioLemmatizer</node>
                                 
-                <node>JCoRe BANNER AE for Biomedical English</node>
+                <node>JCore LINNAEUS Species AE</node>
                                 
-                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
+                <node>JCoRe BANNER AE for Biomedical English</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
                                 

@@ -539,6 +539,8 @@
                         <string>de.julielab.jcore.types.Journal:volume</string>
                                                 
                         <string>de.julielab.jcore.types.AuthorInfo:affiliation</string>
+                                                
+                        <string>de.julielab.jcore.types.Abbreviation:expan</string>
                                             
                     </array>
                                     

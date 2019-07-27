@@ -37,9 +37,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
+        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
                         
-            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
+            <import location="JCore LINNAEUS Species AE.xml"/>
                     
         </delegateAnalysisEngine>
                 
@@ -93,7 +93,7 @@
                                 
                 <node>BioLemmatizer</node>
                                 
-                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
+                <node>JCore LINNAEUS Species AE</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
                                 

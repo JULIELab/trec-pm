@@ -49,12 +49,6 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe LINNEAUS Species AE with Genera and Proxies">
-                        
-            <import location="JCoRe LINNEAUS Species AE with Genera and Proxies.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
         <delegateAnalysisEngine key="JCoRe Mutation Annotator">
                         
             <import location="JCoRe Mutation Annotator.xml"/>
@@ -88,8 +82,6 @@
                 <node>JCoRe Lingscope Negation AE</node>
                                 
                 <node>JCoRe BANNER AE for Biomedical English</node>
-                                
-                <node>JCoRe LINNEAUS Species AE with Genera and Proxies</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
                             

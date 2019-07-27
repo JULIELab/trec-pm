@@ -43,6 +43,7 @@ models
 # Big resource files
 src/main/resources/genes/*.gene_info*
 resources/umlsSynsets.txt.gz
+uima/jcore-pmclassifier-ae/src/main/resources/malletPmClassifier*
 
 # May not redistribute
 resources/CosmicResistanceMutations.tsv*

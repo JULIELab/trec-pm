@@ -15,6 +15,7 @@ def getSynsets(mrconso, language):
 		term_language = line[1]
 		term = line[14]
 		suppressed = line[16]
+		preferredName = line[6]
 		if language == term_language and suppressed == "N":
 			cui2synsets[cui].add(term)
 	for item in cui2synsets.items():
