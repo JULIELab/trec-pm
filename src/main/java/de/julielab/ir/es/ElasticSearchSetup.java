@@ -37,13 +37,13 @@ public class ElasticSearchSetup {
     private static final Logger log = LogManager.getLogger();
 
     private static Map<String, String> defaultProperties = new HashMap<>();
-    private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};
+    private static String[] allSimilarities = new String[]{ "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
         defaultProperties.put("bm25_b", "0.75");
 
-        defaultProperties.put("dfr_basic_model", "be");
+        defaultProperties.put("dfr_basic_model", "ine");
         defaultProperties.put("dfr_after_effect", "l");
         defaultProperties.put("dfr_normalization", "z");
 
