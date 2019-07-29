@@ -11,6 +11,8 @@
                 
         <name>JCore ElasticSearch Consumer</name>
                 
+        <version>2.5.0-SNAPSHOT</version>
+                
         <configurationParameters>
                         
             <configurationParameter>
@@ -51,7 +53,7 @@
                                 
                 <multiValued>false</multiValued>
                                 
-                <mandatory>true</mandatory>
+                <mandatory>false</mandatory>
                             
             </configurationParameter>
                         
@@ -177,24 +179,6 @@
                         
             <nameValuePair>
                                 
-                <name>urls</name>
-                                
-                <value>
-                                        
-                    <array>
-                                                
-                        <string>http://h5:9200</string>
-                                                
-                        <string>http://h6:9200</string>
-                                            
-                    </array>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
                 <name>indexName</name>
                                 
                 <value>
@@ -207,11 +191,17 @@
                         
             <nameValuePair>
                                 
-                <name>type</name>
+                <name>urls</name>
                                 
                 <value>
                                         
-                    <string>clinicaltrials</string>
+                    <array>
+                                                
+                        <string>http://h5:9200</string>
+                                                
+                        <string>http://h6:9200</string>
+                                            
+                    </array>
                                     
                 </value>
                             
@@ -236,7 +226,5 @@
         </operationalProperties>
             
     </analysisEngineMetaData>
-        
-    <resourceManagerConfiguration/>
     
 </analysisEngineDescription>

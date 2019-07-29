@@ -355,7 +355,7 @@
                                 
                 <value>
                                         
-                    <string>public.ct_bm25</string>
+                    <string>indexing.ct_bm25</string>
                                     
                 </value>
                             

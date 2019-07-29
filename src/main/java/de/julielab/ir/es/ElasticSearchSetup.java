@@ -37,7 +37,7 @@ public class ElasticSearchSetup {
     private static final Logger log = LogManager.getLogger();
 
     private static Map<String, String> defaultProperties = new HashMap<>();
-    private static String[] allSimilarities = new String[]{ "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};
+    private static String[] allSimilarities = new String[]{"bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
@@ -121,11 +121,11 @@ public class ElasticSearchSetup {
             final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
             final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
 
-            configureIndex(indexBasename, settings, mappings, esType, similarity);
+            configureIndex(indexBasename, settings, mappings, similarity);
         }
     }
 
-    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters, String esType) throws IOException {
+    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters) throws IOException {
         File esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile();
         final ObjectMapper om = new ObjectMapper();
         final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
@@ -136,7 +136,7 @@ public class ElasticSearchSetup {
         decorator.query(t);
         final String settingsJson = decorator.getJSONQuery();
         final JSONObject settingsObject = new JSONObject(settingsJson);
-        configureIndex(indexBasename, settingsObject, null, esType, parameters.getBaseSimilarity());
+        configureIndex(indexBasename, settingsObject, null, parameters.getBaseSimilarity());
     }
 
     /**
@@ -145,10 +145,9 @@ public class ElasticSearchSetup {
      * @param indexBasename The basic index name. The similarity will be added as a suffix.
      * @param settingsJson  The settings configuration.
      * @param mappingJson   The mapping configuration.
-     * @param esType        The index type.
      * @param similarity    The base similarity used by the index. Is used as a index name suffix.
      */
-    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) throws IOException {
+    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String similarity) throws IOException {
         final RestHighLevelClient client = ElasticClientFactory.getClient();
         final String indexName = indexBasename + "_" + similarity;
         boolean indexExisted = false;

@@ -7,15 +7,15 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCore ElasticSearch Consumer">
-                        
-            <import location="JCore ElasticSearch Consumer.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
         <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
                         
             <import location="JCoRe Database Checkpoint Writer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCore ElasticSearch Consumer">
+                        
+            <import location="JCore ElasticSearch Consumer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -35,9 +35,9 @@
                         
             <fixedFlow>
                                 
-                <node>JCore ElasticSearch Consumer</node>
-                                
                 <node>JCoRe Database Checkpoint Writer</node>
+                                
+                <node>JCore ElasticSearch Consumer</node>
                             
             </fixedFlow>
                     

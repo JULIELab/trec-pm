@@ -59,7 +59,7 @@
                                 
                 <multiValued>false</multiValued>
                                 
-                <mandatory>true</mandatory>
+                <mandatory>false</mandatory>
                             
             </configurationParameter>
                         
@@ -192,18 +192,6 @@
                 <value>
                                         
                     <string>trecpm19_pm_bm25</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>type</name>
-                                
-                <value>
-                                        
-                    <string>medline</string>
                                     
                 </value>
                             

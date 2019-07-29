@@ -48,9 +48,11 @@ public class Trec2018FieldGenerator extends FieldGenerator {
     private void addKeywords(JCas jCas, Document document) {
         final de.julielab.jcore.types.pubmed.ManualDescriptor md = JCasUtil.selectSingle(jCas, de.julielab.jcore.types.pubmed.ManualDescriptor.class);
         final ArrayFieldValue keywords = new ArrayFieldValue();
-        for (FeatureStructure fs : md.getKeywordList()) {
-            Keyword kw = (Keyword) fs;
-            keywords.add(new RawToken(kw.getName()));
+        if (md.getKeywordList() != null) {
+            for (FeatureStructure fs : md.getKeywordList()) {
+                Keyword kw = (Keyword) fs;
+                keywords.add(new RawToken(kw.getName()));
+            }
         }
         document.addField("keyword", keywords);
     }
