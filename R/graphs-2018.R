@@ -16,28 +16,28 @@ run_ids <- c('hpipubboost', 'hpipubnone', 'hpipubbase', 'hpipubclass', 'hpipubco
 folder <- "."
 task_name <- "biomedical-articles"
 metrics <- c("infNDCG", "P10", "R-prec")
-# Best, median and worst are averages over all topics
-# TODO calculate automatically from the "_trec_trec26_tables_pm-final-abstracts" file.
-metrics_best <- c(0.71352, 0.866, 0.446098)
-metrics_median <- c(0.429096, 0.546, 0.267248)
-metrics_worst <- c(0.000296, 0, 0.00046)
-## best <- 0.71352
 file_extension <- ".trec_eval"
 tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, hpipubclass=tug_magenta, hpipubcommon=tug_orange)
-
+stats_name <- "pm.abstracts"
 
 # Clinical Trials
 # run_ids <- c('hpictboost', 'hpictphrase', 'hpictbase', 'hpictall', 'hpictcommon')
 # folder <- "."
 # task_name <- "clinical-trials"
 # metrics <- c("infNDCG", "P10", "R-prec")
-# metrics_best <- c(0.7559, 0.7620, 0.5767)
-# metrics_median <- c(0.4297, 0.4680, 0.3268)
-# metrics_worst <- c(0.0063, 0.0000, 0.0033)
 # file_extension <- ".trec_eval"
 # tug_colors <- c(hpictboost=tug_red, hpictphrase=tug_blue, hpictbase=tug_green, hpictall=tug_magenta, hpictcommon=tug_orange)
+# stats_name <- "pm.trials"
 
 folder <- paste(folder, "/", task_name, sep="")
+
+# Best, median and worst are averages over all topics
+stats_file <- paste(folder, "/", stats_name, sep="")
+stats <- read.table(stats_file, skip=5)
+metrics_best <- c(colMeans(stats)["V2"], colMeans(stats)["V5"], colMeans(stats)["V8"])
+metrics_median <- c(colMeans(stats)["V3"], colMeans(stats)["V6"], colMeans(stats)["V9"])
+metrics_worst <- c(colMeans(stats)["V4"], colMeans(stats)["V7"], colMeans(stats)["V10"])
+
 
 # TODO create empty data.frame and iterate only?
 results <- read.table(paste(folder, "/", run_ids[1], file_extension, sep=""), header = FALSE)
