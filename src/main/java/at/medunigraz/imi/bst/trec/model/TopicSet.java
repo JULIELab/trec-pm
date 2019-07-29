@@ -7,9 +7,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class TopicSet {
 
@@ -46,6 +44,62 @@ public class TopicSet {
 
 	public List<Topic> getTopics() {
 		return topics;
+	}
+
+	/**
+	 * Auxiliary main method to dump topics into a different format.
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		TopicSet topicSet = TrecPMTopicSetFactory.topics2019();
+		List<String> diseases = uniqueDiseases(topicSet);
+		List<String> genes = uniqueGenes(topicSet);
+
+		System.out.println(String.join(System.lineSeparator(), diseases));
+		System.out.println(String.join(System.lineSeparator(), genes));
+	}
+
+	private static List<String> uniqueDiseases(TopicSet topicSet) {
+		List<String> ret = new ArrayList<>();
+
+		Set<String> diseaseSet = new HashSet<>();
+
+		for (Topic topic : topicSet.getTopics()) {
+			String disease = topic.getDisease();
+
+			// Do not repeat diseases
+			if (diseaseSet.contains(disease)) {
+				continue;
+			}
+			diseaseSet.add(disease);
+
+			ret.add(disease);
+		}
+
+		return ret;
+	}
+
+	private static List<String> uniqueGenes(TopicSet topicSet) {
+		List<String> ret = new ArrayList<>();
+
+		Set<String> geneSet = new HashSet<>();
+
+		for (Topic topic : topicSet.getTopics()) {
+			TopicGene[] genes = topic.getGenes();
+			for (TopicGene gene : genes) {
+				String geneSymbol = gene.getGeneSymbol();
+
+				// Do not repeat genes
+				if (geneSet.contains(geneSymbol)) {
+					continue;
+				}
+				geneSet.add(geneSymbol);
+
+				ret.add(geneSymbol);
+			}
+		}
+
+		return ret;
 	}
 
 }
