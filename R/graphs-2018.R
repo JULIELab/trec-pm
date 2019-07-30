@@ -34,9 +34,9 @@ folder <- paste(folder, "/", task_name, sep="")
 # Best, median and worst are averages over all topics
 stats_file <- paste(folder, "/", stats_name, sep="")
 stats <- read.table(stats_file, skip=5)
-metrics_best <- c(colMeans(stats)["V2"], colMeans(stats)["V5"], colMeans(stats)["V8"])
-metrics_median <- c(colMeans(stats)["V3"], colMeans(stats)["V6"], colMeans(stats)["V9"])
-metrics_worst <- c(colMeans(stats)["V4"], colMeans(stats)["V7"], colMeans(stats)["V10"])
+metrics_best <- c(colMeans(stats)[2], colMeans(stats)[5], colMeans(stats)[8])
+metrics_median <- c(colMeans(stats)[3], colMeans(stats)[6], colMeans(stats)[9])
+metrics_worst <- c(colMeans(stats)[4], colMeans(stats)[7], colMeans(stats)[10])
 
 
 # TODO create empty data.frame and iterate only?
@@ -117,6 +117,41 @@ for (i in seq(1, length(metrics))) {
 pdf(file = paste(task_name, ".pdf", sep=""), width = 7, height = 3.5)
 grid.arrange(grobs = plots, nrow = 1, ncol = 3)
 dev.off()
+
+
+### Graphs per Topic ###
+for (i in seq(1, length(metrics))) {
+  target <- metrics[i]
+  
+  results_per_topic <- results %>%
+    filter(measure==target,topic!='all') %>%
+    mutate(topic = factor(topic, levels=unique(sort(as.numeric(topic))))) # Sort topics
+  
+  g <- ggplot(data=results_per_topic, aes(x=topic, y=value, group=run)) +
+    geom_line(aes(color=run, linetype=run)) +
+    xlab("Topic") +
+    ylab(target) +
+    theme_linedraw() +
+    scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL, limits=c(0,1.05)) +  # infNDCG can be higher than 1.00
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          plot.background = element_blank(),
+          panel.background = element_blank(),
+          legend.position = "bottom",
+          legend.title = element_blank())
+  
+  g <- g + geom_line(data=stats,
+                     aes(x=stats[,1], y=stats[,i*3-1], group=NULL),  # Best
+                     size=0.5,
+                     color=extra_color) +
+    geom_line(data=stats,
+              aes(x=stats[,1], y=stats[,i*3], group=NULL),      # Median
+              size=0.5,
+              color=extra_color)
+  
+  pdf(file = paste(task_name, "-", target, ".pdf", sep=""), width = 7, height = 3.5)
+  print(g)
+  dev.off()
+}
 
 
 ### Precision - Recall Graphs ###
