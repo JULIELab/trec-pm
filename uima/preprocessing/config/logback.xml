@@ -1,4 +1,4 @@
-<configuration scan="true">
+<configuration scan="true" scanPeriod="10s">
 
 	<appender name="STXOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
@@ -8,8 +8,8 @@
 			</pattern>
 		</encoder>
 	</appender>
-	<logger name="de.julielab.jcore.consumer.xmi.XMIDBWriter" level="DEBUG" />
-	<logger name="de.julielab.jcore.consumer.xmi.MetaTableManager" level="DEBUG" />
+	<logger name="de.julielab.jcore.consumer.xmi.XMIDBWriter" level="INFO" />
+	<logger name="de.julielab.jcore.consumer.xmi.MetaTableManager" level="INFO" />
 	<root level="INFO">
 		<appender-ref ref="STXOUT" />
 	</root>

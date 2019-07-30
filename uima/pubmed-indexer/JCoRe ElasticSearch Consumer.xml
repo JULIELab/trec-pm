@@ -316,13 +316,49 @@
             <optional>true</optional>
                     
         </externalResourceDependency>
+
+        <externalResourceDependency>
+
+            <key>mrsty</key>
+
+            <description>UMLS MRSTY.RRF file</description>
+
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+
+            <optional>true</optional>
+
+        </externalResourceDependency>
             
     </externalResourceDependencies>
         
     <resourceManagerConfiguration>
                 
         <externalResources>
-                        
+            <externalResource>
+
+                <name>MRSTY 2019AA file</name>
+
+                <description>The MRSTY.RRF file from the 2019AA UMLS distribution</description>
+
+                <configurableDataResourceSpecifier>
+
+                    <url>file:/data/data_resources/UMLS/UMLS2019/2019AA/META/MRSTY.RRF</url>
+
+                    <resourceMetaData>
+
+                        <name/>
+
+                        <configurationParameters/>
+
+                        <configurationParameterSettings/>
+
+                    </resourceMetaData>
+
+                </configurableDataResourceSpecifier>
+
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+
+            </externalResource>
             <externalResource>
                                 
                 <name>GoldStandard</name>
@@ -361,6 +397,14 @@
                                 
                 <resourceName>GoldStandard</resourceName>
                             
+            </externalResourceBinding>
+
+            <externalResourceBinding>
+
+                <key>mrsty</key>
+
+                <resourceName>MRSTY 2019AA file</resourceName>
+
             </externalResourceBinding>
                         
         

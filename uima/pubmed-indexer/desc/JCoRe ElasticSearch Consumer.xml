@@ -59,7 +59,7 @@
                                 
                 <multiValued>false</multiValued>
                                 
-                <mandatory>true</mandatory>
+                <mandatory>false</mandatory>
                             
             </configurationParameter>
                         
@@ -179,7 +179,11 @@
                                 
                 <value>
                                         
-                    <array/>
+                    <array>
+                                                
+                        <string>de.julielab.jcore.trec2018.pubmed.PubmedFilterBoard</string>
+                                            
+                    </array>
                                     
                 </value>
                             
@@ -192,18 +196,6 @@
                 <value>
                                         
                     <string>trecpm19_pm_bm25</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>type</name>
-                                
-                <value>
-                                        
-                    <string>medline</string>
                                     
                 </value>
                             
@@ -249,6 +241,94 @@
             
     </analysisEngineMetaData>
         
-    <resourceManagerConfiguration/>
+    <externalResourceDependencies>
+                
+        <externalResourceDependency>
+                        
+            <key>treatments</key>
+                        
+            <description>TREC provided Meta Map Light run of PubMed</description>
+                        
+            <interfaceName>de.julielab.jcore.trec2018.pubmed.IUmlsTreatmentsProvider</interfaceName>
+                        
+            <optional>true</optional>
+                    
+        </externalResourceDependency>
+            
+    </externalResourceDependencies>
+        
+    <resourceManagerConfiguration>
+                
+        <externalResources>
+                        
+            <externalResource>
+                                
+                <name>Treatments and UMLS Semantic Types</name>
+                                
+                <description>The MRSTY.RRF file from the 2019AA UMLS distribution</description>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:/data/data_resources/UMLS/UMLS2019/2019AA/META/MRSTY.RRF</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name>Treatments</name>
+                                                
+                        <configurationParameters>
+                                                        
+                            <configurationParameter>
+                                                                
+                                <name>uncompressedTreatmentsDir</name>
+                                                                
+                                <type>String</type>
+                                                                
+                                <multiValued>false</multiValued>
+                                                                
+                                <mandatory>true</mandatory>
+                                                            
+                            </configurationParameter>
+                                                    
+                        </configurationParameters>
+                                                
+                        <configurationParameterSettings>
+                                                        
+                            <nameValuePair>
+                                                                
+                                <name>uncompressedTreatmentsDir</name>
+                                                                
+                                <value>
+                                                                        
+                                    <string>/var/data/data_corpora/TREC-PM-2019/medline/medline_treatments</string>
+                                                                    
+                                </value>
+                                                            
+                            </nameValuePair>
+                                                    
+                        </configurationParameterSettings>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.trec2018.pubmed.UmlsTreatmentsProvider</implementationName>
+                            
+            </externalResource>
+                    
+        </externalResources>
+                
+        <externalResourceBindings>
+                        
+            <externalResourceBinding>
+                                
+                <key>treatments</key>
+                                
+                <resourceName>Treatments and UMLS Semantic Types</resourceName>
+                            
+            </externalResourceBinding>
+                    
+        </externalResourceBindings>
+            
+    </resourceManagerConfiguration>
     
 </analysisEngineDescription>

@@ -1,24 +1,22 @@
 package at.medunigraz.imi.bst.trec.search;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.transport.TransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 
 import java.io.Closeable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.util.stream.IntStream;
 
 public class ElasticClientFactory implements Closeable {
 
-	private static Client client = null;
+	private static RestHighLevelClient client = null;
 
 	public ElasticClientFactory() {
 	}
 
-	public static Client getClient() {
+	public static RestHighLevelClient getClient() {
 		if (client == null) {
 			open();
 		}
@@ -27,23 +25,21 @@ public class ElasticClientFactory implements Closeable {
 
 	@SuppressWarnings("resource")
 	private static void open() {
-		TransportAddress address;
-		try {
-			address = new InetSocketTransportAddress(InetAddress.getByName(TrecConfig.ELASTIC_HOSTNAME),
-					TrecConfig.ELASTIC_PORT);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		Settings settings = Settings.builder()
-				.put("cluster.name", TrecConfig.ELASTIC_CLUSTER).build();
-		client = new PreBuiltTransportClient(settings).addTransportAddress(address);
+		String[] hosts = TrecConfig.ELASTIC_HOSTNAME;
+		int[] ports = TrecConfig.ELASTIC_PORT;
+		if (hosts.length != ports.length)
+			throw new IllegalArgumentException("The number of ElasticSearch hosts and their ports must be equal in the configuration file.");
+		HttpHost[] httpHosts = IntStream.range(0, hosts.length).mapToObj(i -> new HttpHost(hosts[i], ports[i], "http")).toArray(HttpHost[]::new);
+		client = new RestHighLevelClient(RestClient.builder(httpHosts));
 	}
 
 	public void close() {
-		client.close();
-		client = null;
+		try {
+			client.close();
+			client = null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

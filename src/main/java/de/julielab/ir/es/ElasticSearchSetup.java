@@ -13,21 +13,17 @@ import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
-import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.PutMappingRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
 
@@ -41,12 +37,13 @@ public class ElasticSearchSetup {
     private static final Logger log = LogManager.getLogger();
 
     private static Map<String, String> defaultProperties = new HashMap<>();
+    private static String[] allSimilarities = new String[]{"bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
         defaultProperties.put("bm25_b", "0.75");
 
-        defaultProperties.put("dfr_basic_model", "be");
+        defaultProperties.put("dfr_basic_model", "ine");
         defaultProperties.put("dfr_after_effect", "l");
         defaultProperties.put("dfr_normalization", "z");
 
@@ -63,9 +60,7 @@ public class ElasticSearchSetup {
 
     }
 
-    private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
-
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
 //        deletePubmedIndices();
 //        deleteCtIndices();
         createPubmedIndices();
@@ -80,11 +75,11 @@ public class ElasticSearchSetup {
         deleteIndices(TrecConfig.ELASTIC_CT_INDEX);
     }
 
-    public static void deleteIndices(String indexbaseName) {
+    private static void deleteIndices(String indexbaseName) {
         try {
-            final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all "+indexbaseName+" indices. Are you sure?", false);
+            final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all " + indexbaseName + " indices. Are you sure?", false);
             if (doDelete) {
-                final Client client = ElasticClientFactory.getClient();
+                final RestHighLevelClient client = ElasticClientFactory.getClient();
                 for (String similarity : allSimilarities) {
                     String indexName = indexbaseName + "_" + similarity;
                     deleteIndex(client, indexName);
@@ -95,25 +90,25 @@ public class ElasticSearchSetup {
         }
     }
 
-    private static void deleteIndex(Client client, String indexName) {
+    private static void deleteIndex(RestHighLevelClient client, String indexName) throws IOException {
         log.info("Deleting index {}.", indexName);
         final DeleteIndexRequest deleteIndexRequest = Requests.deleteIndexRequest(indexName);
-        final DeleteIndexResponse deleteIndexResponse = client.admin().indices().delete(deleteIndexRequest).actionGet();
-        if (!deleteIndexResponse.isAcknowledged())
+        final AcknowledgedResponse response = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+        if (!response.isAcknowledged())
             throw new IllegalArgumentException("Could not delete index " + indexName + ", ES did not acknowledge.");
     }
 
-    public static void createPubmedIndices() {
+    private static void createPubmedIndices() throws IOException {
         File esConfigTemplate = Path.of("es-mappings", "cikm19-pubmed-template.json").toFile();
         createIndices(TrecConfig.ELASTIC_BA_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
     }
 
-    public static void createCtIndices() {
+    private static void createCtIndices() throws IOException {
         File esConfigTemplate = Path.of("es-mappings", "cikm19-ct-template.json").toFile();
         createIndices(TrecConfig.ELASTIC_CT_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_CT_TYPE);
     }
 
-    public static void createIndices(String indexBasename, File configurationTemplateFile, Map<String, String> properties, String esType) {
+    private static void createIndices(String indexBasename, File configurationTemplateFile, Map<String, String> properties, String esType) throws IOException {
         Map<String, String> parameters = new HashMap<>(properties);
         for (String similarity : allSimilarities) {
             parameters.put("similarity", "my_" + similarity);
@@ -126,11 +121,11 @@ public class ElasticSearchSetup {
             final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
             final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
 
-            configureIndex(indexBasename,settings, mappings, esType, similarity);
+            configureIndex(indexBasename, settings, mappings, similarity);
         }
     }
 
-    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters, String esType) {
+    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters) throws IOException {
         File esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile();
         final ObjectMapper om = new ObjectMapper();
         final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
@@ -141,36 +136,35 @@ public class ElasticSearchSetup {
         decorator.query(t);
         final String settingsJson = decorator.getJSONQuery();
         final JSONObject settingsObject = new JSONObject(settingsJson);
-        configureIndex(indexBasename, settingsObject, null, esType, parameters.getBaseSimilarity());
+        configureIndex(indexBasename, settingsObject, null, parameters.getBaseSimilarity());
     }
 
     /**
      * Creates and/or configures an ElasticSearch index.
-     * @param indexBasename
-     * @param settingsJson The settings configuration.
-     * @param mappingJson The mapping configuration.
-     * @param esType The index type.
-     * @param similarity The base similarity used by the index. Is used as a index name suffix.
+     *
+     * @param indexBasename The basic index name. The similarity will be added as a suffix.
+     * @param settingsJson  The settings configuration.
+     * @param mappingJson   The mapping configuration.
+     * @param similarity    The base similarity used by the index. Is used as a index name suffix.
      */
-    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
-        final Client client = ElasticClientFactory.getClient();
+    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String similarity) throws IOException {
+        final RestHighLevelClient client = ElasticClientFactory.getClient();
         final String indexName = indexBasename + "_" + similarity;
         boolean indexExisted = false;
 
-        final IndicesExistsRequest indicesExistsRequest = Requests.indicesExistsRequest(indexName);
-        final IndicesExistsResponse indicesExistsResponse = client.admin().indices().exists(indicesExistsRequest).actionGet();
-        if (!indicesExistsResponse.isExists()) {
+        final boolean indexExists = client.indices().exists(new GetIndexRequest(indexName), RequestOptions.DEFAULT);
+        if (!indexExists) {
             log.info("Index {} does not exist and is created.", indexName);
-            final CreateIndexRequest indexRequest = Requests.createIndexRequest(indexName);
+            final CreateIndexRequest indexRequest = new CreateIndexRequest(indexName);
             indexRequest.settings(settingsJson.toString(), XContentType.JSON);
-            final CreateIndexResponse createIndexResponse = client.admin().indices().create(indexRequest).actionGet();
+            final org.elasticsearch.client.indices.CreateIndexResponse createIndexResponse = client.indices().create(indexRequest, RequestOptions.DEFAULT);
             if (!createIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not create index " + indexName);
         } else {
             indexExisted = true;
             log.info("Closing index {} for settings/mapping update.", indexName);
             final CloseIndexRequest closeIndexRequest = Requests.closeIndexRequest(indexName);
-            final CloseIndexResponse closeIndexResponse = client.admin().indices().close(closeIndexRequest).actionGet();
+            final AcknowledgedResponse closeIndexResponse = client.indices().close(closeIndexRequest, RequestOptions.DEFAULT);
             if (!closeIndexResponse.isAcknowledged())
                 throw new IllegalStateException("Could not close index " + indexName + ", ES did not acknowledge.");
         }
@@ -181,23 +175,22 @@ public class ElasticSearchSetup {
             final JSONObject similaritySettings = new JSONObject();
             similaritySettings.put("similarity", similarityJson);
             updateSettingsRequest.settings(similaritySettings.toString(), XContentType.JSON);
-            final UpdateSettingsResponse updateSettingsResponse = client.admin().indices().updateSettings(updateSettingsRequest).actionGet();
+            final AcknowledgedResponse updateSettingsResponse = client.indices().putSettings(updateSettingsRequest, RequestOptions.DEFAULT);
             if (!updateSettingsResponse.isAcknowledged())
                 throw new IllegalStateException("Could not update index settings for index" + indexName + ", ES did not acknowledge.");
         }
         if (mappingJson != null) {
             log.info("Putting the mapping to index {}.", indexName);
-            final PutMappingRequest putMappingRequest = Requests.putMappingRequest(indexName);
+            final PutMappingRequest putMappingRequest = new PutMappingRequest(indexName);
             putMappingRequest.source(mappingJson.toString(), XContentType.JSON);
-            putMappingRequest.type(esType);
-            final PutMappingResponse putMappingResponse = client.admin().indices().putMapping(putMappingRequest).actionGet();
+            final AcknowledgedResponse putMappingResponse = client.indices().putMapping(putMappingRequest, RequestOptions.DEFAULT);
             if (!putMappingResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not put mapping " + mappingJson + ", ES did not acknowledge.");
         }
         if (indexExisted) {
             log.info("Reopening index {}.", indexName);
             final OpenIndexRequest openIndexRequest = Requests.openIndexRequest(indexName);
-            final OpenIndexResponse openIndexResponse = client.admin().indices().open(openIndexRequest).actionGet();
+            final OpenIndexResponse openIndexResponse = client.indices().open(openIndexRequest, RequestOptions.DEFAULT);
             if (!openIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not reopen index " + indexName + ", ES did not acknowledge.");
         }

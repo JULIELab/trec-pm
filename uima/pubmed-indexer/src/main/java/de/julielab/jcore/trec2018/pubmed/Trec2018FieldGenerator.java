@@ -9,6 +9,7 @@ import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
 import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.Date;
 import de.julielab.jcore.utility.JCoReTools;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
@@ -16,6 +17,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
 
 import java.util.*;
+import java.util.List;
 
 public class Trec2018FieldGenerator extends FieldGenerator {
 
@@ -42,15 +44,46 @@ public class Trec2018FieldGenerator extends FieldGenerator {
         addNegationScopes(jCas, document);
         addMutations(jCas, document);
         addKeywords(jCas, document);
+        addTreatments(jCas, document);
         return document;
+    }
+
+    private void addTreatments(JCas jCas, Document document) {
+        final String docId = document.getId();
+        final PubmedFilterBoard fb = filterRegistry.getFilterBoard(PubmedFilterBoard.class);
+        ArrayFieldValue focusedTreatmentCuis = new ArrayFieldValue();
+        ArrayFieldValue focusedTreatmentText = new ArrayFieldValue();
+        ArrayFieldValue broadTreatmentCuis = new ArrayFieldValue();
+        ArrayFieldValue broadTreatmentText = new ArrayFieldValue();
+        if (fb.cuisAndTextByPmid.containsKey(docId)) {
+            final List<Pair<String, String>> cuisAndText = fb.cuisAndTextByPmid.get(docId);
+            for (Pair<String, String> cuiAndText : cuisAndText) {
+                String cui = cuiAndText.getLeft();
+                String text = cuiAndText.getRight();
+                if (fb.focusedTreatmentCuis.contains(cui)) {
+                    focusedTreatmentCuis.add(new RawToken(cui));
+                    focusedTreatmentText.add(new RawToken(text));
+                }
+                if (fb.broadTreatmentCuis.contains(cui)) {
+                    broadTreatmentCuis.add(new RawToken(cui));
+                    broadTreatmentText.add(new RawToken(text));
+                }
+            }
+        }
+        document.addField("focusedTreatmentCuis", focusedTreatmentCuis);
+        document.addField("focusedTreatmentText", focusedTreatmentText);
+        document.addField("broadTreatmentCuis", broadTreatmentCuis);
+        document.addField("broadTreatmentText", broadTreatmentText);
     }
 
     private void addKeywords(JCas jCas, Document document) {
         final de.julielab.jcore.types.pubmed.ManualDescriptor md = JCasUtil.selectSingle(jCas, de.julielab.jcore.types.pubmed.ManualDescriptor.class);
         final ArrayFieldValue keywords = new ArrayFieldValue();
-        for (FeatureStructure fs : md.getKeywordList()) {
-            Keyword kw = (Keyword) fs;
-            keywords.add(new RawToken(kw.getName()));
+        if (md.getKeywordList() != null) {
+            for (FeatureStructure fs : md.getKeywordList()) {
+                Keyword kw = (Keyword) fs;
+                keywords.add(new RawToken(kw.getName()));
+            }
         }
         document.addField("keyword", keywords);
     }

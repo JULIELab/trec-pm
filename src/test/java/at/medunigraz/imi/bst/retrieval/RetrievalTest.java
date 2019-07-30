@@ -31,8 +31,7 @@ public class RetrievalTest {
         final List<Topic> topics = TrecPMTopicSetFactory.topics2019().getTopics();
         final int SIZE = 10;
 
-        ResultList<Topic> firstTopicResults = new TrecPmRetrieval(indexName)
-                .withSize(SIZE)
+        ResultList<Topic> firstTopicResults = new TrecPmRetrieval(indexName, SIZE)
                 .withTemplate(TEMPLATE)
                 .retrieve(topics, q -> String.valueOf(q.getNumber()))
                 .get(0);
