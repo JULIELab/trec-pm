@@ -1,5 +1,49 @@
 <configuration>
-    <featuregroups>
-        <featuregroup name="TFIDF" active="true"/>
-    </featuregroups>
+    <ltrfeatures>
+        <featuregroups>
+            <featuregroup name="TFIDF" active="true"/>
+        </featuregroups>
+    </ltrfeatures>
+    <indexparameters>
+        <bm25>
+            <k1>1.2</k1>
+            <b>0.75</b>
+        </bm25>
+        <dfr>
+            <basic_model>ine</basic_model>
+            <after_effect>l</after_effect>
+            <normalization>z</normalization>
+        </dfr>
+        <dfi>
+            <independence_measure>standardized</independence_measure>
+        </dfi>
+        <ib>
+            <distribution>
+                ll
+            </distribution>
+            <lambda>df</lambda>
+            <normalization>z</normalization>
+        </ib>
+        <lmd>
+            <mu>2000</mu>
+        </lmd>
+        <lmjm>
+            <lambda>0.1</lambda>
+        </lmjm>
+    </indexparameters>
+    <esqueryparameters>
+        <template>
+            hpipubnone.json
+        </template>
+        <templateparameters>
+            <gene_match_type>best_fields</gene_match_type>
+            <gene_boost>1</gene_boost>
+            <disease_match_type>best_fields</disease_match_type>
+            <disease_boost>1</disease_boost>
+            <title_boost>1</title_boost>
+            <abstract_boost>1</abstract_boost>
+            <keyword_boost>1</keyword_boost>
+            <meshTags_boost>1</meshTags_boost>
+        </templateparameters>
+    </esqueryparameters>
 </configuration>

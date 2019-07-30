@@ -57,7 +57,8 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.5</version>
-        </dependency><dependency>
+        </dependency>
+        <dependency>
             <groupId>de.julielab</groupId>
             <artifactId>jcore-elasticsearch-consumer</artifactId>
             <version>${jcore-version}</version>
