@@ -1,0 +1,7 @@
+pcs-file = config/smac/noltr/smac-parameters.pcs
+runObj = QUALITY
+cutoffTime = 300
+wallclock-limit = 172800
+deterministic = 0
+instance_file = example_scenarios/spear/instances-train.txt
+algo = de.julielab.ir.paramopt.RecallSmacWrapper

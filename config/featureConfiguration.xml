@@ -2,6 +2,28 @@
     <ltrfeatures>
         <featuregroups>
             <featuregroup name="TFIDF" active="true"/>
+            <featuregroup name="similarity" active="true">
+                <features>
+                    <bm25>
+                        <active>true</active>
+                    </bm25>
+                    <dfr>
+                        <active>true</active>
+                    </dfr>
+                    <dfi>
+                        <active>true</active>
+                    </dfi>
+                    <ib>
+                        <active>true</active>
+                    </ib>
+                    <lmd>
+                        <active>true</active>
+                    </lmd>
+                    <lmjm>
+                        <active>true</active>
+                    </lmjm>
+                </features>
+            </featuregroup>
         </featuregroups>
     </ltrfeatures>
     <indexparameters>
@@ -31,7 +53,7 @@
             <lambda>0.1</lambda>
         </lmjm>
     </indexparameters>
-    <esqueryparameters>
+    <retrievalparameters>
         <template>
             hpipubnone.json
         </template>
@@ -45,5 +67,5 @@
             <keyword_boost>1</keyword_boost>
             <meshTags_boost>1</meshTags_boost>
         </templateparameters>
-    </esqueryparameters>
+    </retrievalparameters>
 </configuration>

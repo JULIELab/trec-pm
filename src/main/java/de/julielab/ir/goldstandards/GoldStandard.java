@@ -20,7 +20,7 @@ public interface GoldStandard<Q extends QueryDescription> {
         // Then we will iterate through the (initially empty) partitions as long as there are still topics to distribute.
         // For each iteration round we put one topic from each property value into the current partition.
         // This way, the different property values are as well distributed over the partitions as possible.
-        final Map<String, Deque<Q>> topicsByProperty = getQueries().collect(Collectors.groupingBy(topicProperty, HashMap::new, Collectors.toCollection(ArrayDeque::new)));
+        final Map<String, Deque<Q>> topicsByProperty = getQueries().collect(Collectors.groupingBy(topicProperty, LinkedHashMap::new, Collectors.toCollection(ArrayDeque::new)));
 
         List<Map.Entry<String, Deque<Q>>> propertiesSortedByFrequency = new ArrayList<>(topicsByProperty.entrySet());
         propertiesSortedByFrequency.sort((e1,e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()));
