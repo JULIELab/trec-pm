@@ -24,6 +24,11 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         this.query = new ElasticSearchQuery(size, indexName);
     }
 
+    public Retrieval(String indexName, int resultSize) {
+        this.indexName = indexName;
+        this.query = new ElasticSearchQuery(resultSize, indexName);
+    }
+
     public T withExperimentName(String name) {
         this.experimentName = name;
         return (T) this;
@@ -95,11 +100,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     public T withResultsDir(String dir) {
         this.resultsDir = dir;
-        return (T) this;
-    }
-
-    public T withSize(int size) {
-        this.size = size;
         return (T) this;
     }
 

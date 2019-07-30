@@ -19,41 +19,41 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
 
     public static TrecPmRetrieval hpipubclass(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName("hpipubclass").withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubclass")
                 .withSubTemplate(EXTRA_BOOST_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubnone(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName("hpipubnone").withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubnone")
                 .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubboost(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName("hpipubboost").withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubboost")
                 .withSubTemplate(IMPROVED_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withGeneDescription().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubcommon(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName("hpipubcommon").withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubcommon")
                 .withSubTemplate(NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym();
     }
 
     public static TrecPmRetrieval hpipubbase(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName("hpipubbase").withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubbase")
                 .withSubTemplate(NONE_TEMPLATE);
     }
 
     public static TrecPmRetrieval keyword(int size, String keyword) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withExperimentName(keyword).withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName(keyword)
                 .withProperties("keyword", keyword).withTemplate(KEYWORD_TEMPLATE).withWordRemoval();
     }
 
     public static TrecPmRetrieval boost(int size, String boost) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withSize(size)
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
                 .withProperties("keyword", boost).withTemplate(BOOST_TEMPLATE).withWordRemoval();
     }
 

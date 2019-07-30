@@ -11,6 +11,10 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         super(indexName);
     }
 
+    public TrecPmRetrieval(String indexName, int resultSize) {
+        super(indexName, resultSize);
+    }
+
     public TrecPmRetrieval withWordRemoval() {
         query = new WordRemovalQueryDecorator(query);
         return this;
