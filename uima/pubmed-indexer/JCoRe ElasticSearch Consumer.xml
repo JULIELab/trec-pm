@@ -143,7 +143,7 @@
                                         
                     <array>
                                                 
-                        <string>de.julielab.jcore.trec2018.pubmed.Trec2018FieldGenerator</string>
+                        <string>de.julielab.jcore.trecpm.pubmed.PubmedFieldGenerator</string>
                                             
                     </array>
                                     

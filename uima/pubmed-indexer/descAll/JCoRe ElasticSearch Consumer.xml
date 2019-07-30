@@ -165,7 +165,7 @@
                                         
                     <array>
                                                 
-                        <string>de.julielab.jcore.trec2018.pubmed.Trec2018FieldGenerator</string>
+                        <string>de.julielab.jcore.trecpm.pubmed.PubmedFieldGenerator</string>
                                             
                     </array>
                                     
@@ -181,7 +181,7 @@
                                         
                     <array>
                                                 
-                        <string>de.julielab.jcore.trec2018.pubmed.PubmedFilterBoard</string>
+                        <string>de.julielab.jcore.trecpm.pubmed.PubmedFilterBoard</string>
                                             
                     </array>
                                     
@@ -249,7 +249,7 @@
                         
             <description>TREC provided Meta Map Light run of PubMed</description>
                         
-            <interfaceName>de.julielab.jcore.trec2018.pubmed.IUmlsTreatmentsProvider</interfaceName>
+            <interfaceName>de.julielab.jcore.trecpm.pubmed.IUmlsTreatmentsProvider</interfaceName>
                         
             <optional>true</optional>
                     
@@ -311,7 +311,7 @@
                                     
                 </configurableDataResourceSpecifier>
                                 
-                <implementationName>de.julielab.jcore.trec2018.pubmed.UmlsTreatmentsProvider</implementationName>
+                <implementationName>de.julielab.jcore.trecpm.pubmed.UmlsTreatmentsProvider</implementationName>
                             
             </externalResource>
                     

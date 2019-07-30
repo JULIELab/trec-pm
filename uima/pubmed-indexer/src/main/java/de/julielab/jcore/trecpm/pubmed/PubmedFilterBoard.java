@@ -1,4 +1,4 @@
-package de.julielab.jcore.trec2018.pubmed;
+package de.julielab.jcore.trecpm.pubmed;
 
 import de.julielab.jcore.consumer.es.ExternalResource;
 import de.julielab.jcore.consumer.es.FilterBoard;

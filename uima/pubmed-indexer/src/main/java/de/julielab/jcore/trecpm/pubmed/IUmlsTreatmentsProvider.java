@@ -1,4 +1,4 @@
-package de.julielab.jcore.trec2018.pubmed;
+package de.julielab.jcore.trecpm.pubmed;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.resource.SharedResourceObject;

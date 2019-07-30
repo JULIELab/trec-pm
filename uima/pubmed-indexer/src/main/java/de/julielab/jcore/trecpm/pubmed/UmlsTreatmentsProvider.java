@@ -1,4 +1,4 @@
-package de.julielab.jcore.trec2018.pubmed;
+package de.julielab.jcore.trecpm.pubmed;
 
 import com.google.common.collect.Sets;
 import de.julielab.jcore.utility.JCoReTools;
