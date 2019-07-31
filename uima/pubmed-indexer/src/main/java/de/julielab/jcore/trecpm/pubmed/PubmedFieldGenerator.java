@@ -1,9 +1,12 @@
 package de.julielab.jcore.trecpm.pubmed;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import de.julielab.jcore.consumer.es.ArrayFieldValue;
 import de.julielab.jcore.consumer.es.FieldGenerationException;
 import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
+import de.julielab.jcore.consumer.es.filter.SnowballFilter;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
 import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
 import de.julielab.jcore.types.*;
@@ -20,10 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PubmedFieldGenerator extends FieldGenerator {
 
     private final static Logger log = LoggerFactory.getLogger(PubmedFieldGenerator.class);
+    private static Set<String> negativeBoosters = new HashSet<>(Arrays.asList("dna", "tumor", "cell", "mouse", "model", "tissue", "development", "specific", "staining", "pathogenesis", "case"));
+    private SnowballFilter sb = new SnowballFilter();
 
     public PubmedFieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
@@ -46,7 +52,19 @@ public class PubmedFieldGenerator extends FieldGenerator {
         addMutations(jCas, document);
         addKeywords(jCas, document);
         addTreatments(document);
+        addNegativeKeywordCounts(jCas, document);
         return document;
+    }
+
+    private void addNegativeKeywordCounts(JCas jCas, Document document) {
+        Multiset<String> tokens = HashMultiset.create();
+        for (Token t : jCas.<Token>getAnnotationIndex(Token.type)) {
+            final String token = sb.filter(t.getCoveredText().toLowerCase()).get(0);
+            if (negativeBoosters.contains(token))
+                tokens.add(token);
+        }
+        document.addField("negativeBoosters", new ArrayFieldValue(tokens.elementSet().stream().map(RawToken::new).collect(Collectors.toList())));
+        document.addField("numNegativeBoosters",tokens.elementSet().stream().mapToInt(tokens::count).sum());
     }
 
     private void addTreatments(Document document) {
