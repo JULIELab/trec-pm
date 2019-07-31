@@ -20,8 +20,8 @@ public class GoogleSheetsSyncer {
     private static final int YEAR = 2019;
     private static final int SIZE = 5;
 
-    private static final File ABSTRACTS = new File("src/main/resources/gold-standard/gsheets-abstracts-2019.qrels");
-    private static final File TRIALS = new File("src/main/resources/gold-standard/gsheets-trials-2019.qrels");
+    private static final File ABSTRACTS = new File("src/main/resources/internal/gold-standard/gsheets-abstracts-2019.qrels");
+    private static final File TRIALS = new File("src/main/resources/internal/gold-standard/gsheets-trials-2019.qrels");
 
     public static void main(String[] args) {
         sync(Task.PUBMED);
