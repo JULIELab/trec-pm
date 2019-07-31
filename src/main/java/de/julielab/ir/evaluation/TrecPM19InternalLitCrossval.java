@@ -50,6 +50,8 @@ public class TrecPM19InternalLitCrossval {
 
         int vocabCutoff = 50;
 
+        String xmiTableName = "_data_xmi.documents";
+
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
 
@@ -76,7 +78,7 @@ public class TrecPM19InternalLitCrossval {
             final DocumentList<Topic> testDocs = gs.getQrelDocumentsForQueries(test);
             final DocumentList<Topic> trainDocs = gs.getQrelDocumentsForQueries(train);
 
-            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds()).collect(Collectors.toList());
+            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
             final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
             final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
