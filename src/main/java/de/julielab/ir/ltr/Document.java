@@ -65,21 +65,6 @@ public class Document<Q extends QueryDescription> {
     private CAS cas;
     private String normalizedDocumentText;
 
-    public static void main(String args[]) throws IOException {
-        String text = "A specific human lysophospholipase: cDNA cloning, tissue distribution and kinetic characterization.\n" +
-                "10064899|a|Lysophospholipases are critical enzymes that act on biological membranes to regulate the multifunctional lysophospholipids; increased levels of lysophospholipids are associated with a host of diseases. Herein we report the cDNA cloning of a human brain 25 kDa lysophospholipid-specific lysophospholipase (hLysoPLA). The enzyme (at both mRNA and protein levels) is widely distributed in tissues, but with quite different abundances. The hLysoPLA hydrolyzes lysophosphatidylcholine in both monomeric and micellar forms, and exhibits apparent cooperativity and surface dilution kinetics, but not interfacial activation. Detailed kinetic analysis indicates that the hLysoPLA binds first to the micellar surface and then to the substrate presented on the surface. The kinetic parameters associated with this surface dilution kinetic model are reported, and it is concluded that hLysoPLA has a single substrate binding site and a surface recognition site. The apparent cooperativity observed is likely due to the change of substrate presentation. In contrast to many non-specific lipolytic enzymes that exhibit lysophospholipase activity, hLysoPLA hydrolyzes only lysophospholipids and has no other significant enzymatic activity. Of special interest, hLysoPLA does not act on plasmenylcholine. Of the several inhibitors tested, only methyl arachidonyl fluorophosphonate (MAFP) potently and irreversibly inhibits the enzymatic activity. The inhibition by MAFP is consistent with the catalytic mechanism proposed for the enzyme - a serine hydrolase with a catalytic triad composed of Ser-119, Asp-174 and His-208.";
-        final StandardAnalyzer a = new StandardAnalyzer();
-        final TokenStream ts = a.tokenStream("none", text);
-        final SnowballFilter sbf = new SnowballFilter(ts, "English");
-        sbf.reset();
-        final CharTermAttribute cta = sbf.addAttribute(CharTermAttribute.class);
-        while (sbf.incrementToken()) {
-            final String term = new String(cta.buffer(), 0, cta.length());
-            System.out.println(term);
-
-        }
-    }
-
     public int getStratum() {
         return stratum;
     }

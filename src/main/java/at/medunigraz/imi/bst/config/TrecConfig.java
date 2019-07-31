@@ -20,7 +20,6 @@ public final class TrecConfig {
     public static final String LEXIGRAM_APIKEY = getString("LEXIGRAM_APIKEY");
     public static final String COSTOSYS_CONFIG = getString("COSTOSYS_CONFIG");
     public static final String COSTOSYS_ANNOTATIONS_LIST = getString("COSTOSYS_ANNOTATIONS_LIST");
-    public static final String COSTOSYS_BASEDOCUMENTS = getString("COSTOSYS_BASEDOCUMENTS");
     public static final String UIMA_TYPES_DESCRIPTORNAMES = getString("UIMA_TYPES_DESCRIPTORNAMES");
     public static final boolean CACHE_READ_ONLY = getBoolean("CACHE_READ_ONLY");
     public static final String CACHE_DIR = getString("CACHE_DIR");

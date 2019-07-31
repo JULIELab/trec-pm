@@ -1,15 +1,18 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.costosys.configuration.FieldConfig;
+import de.julielab.costosys.dbconnection.CoStoSysConnection;
+import de.julielab.costosys.dbconnection.DataBaseConnector;
 import de.julielab.ir.cache.CacheAccess;
 import de.julielab.ir.cache.CacheService;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.java.utilities.FileUtilities;
+import de.julielab.xml.JulieXMLConstants;
 import de.julielab.xml.XmiBuilder;
 import de.julielab.xml.XmiSplitConstants;
-import de.julielab.xmlData.dataBase.CoStoSysConnection;
-import de.julielab.xmlData.dataBase.DataBaseConnector;
+import de.julielab.xml.XmiSplitter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.cas.CAS;
@@ -69,16 +72,11 @@ public class OriginalDocumentRetrieval {
      */
     private String[] annotationTypesToRetrieve;
     /**
-     * The set of tables from which we want to retrieve information. That is the table with the base document (document
-     * text plus document meta data and structures) plus any annotation tables we want to use. This array is
+     * The set of columns from which we want to retrieve information, besides the base document column.This list is
      * derived from the annotationTypesToRetrieve array.
      */
-    private String[] tablesToJoin;
-    /**
-     * This is a parallel array to tablesToJoin and lists the database table schemas, as defined in the DBC,
-     * to be used when retrieving data from the respective tables.
-     */
-    private String[] schemaNames;
+    private List<Map<String, String>> columnsToFetch;
+    private FieldConfig tableSchema;
 
     private OriginalDocumentRetrieval() {
 
@@ -121,38 +119,37 @@ public class OriginalDocumentRetrieval {
         } catch (IOException e) {
             log.error("Could not create the OriginalDocumentRetrieval because the DBC configuration could not be read", e);
         }
-        // This looks more complicated as it is. We just:
-        // 1. Add the base document table be the first stream
-        // 2. Add the the annotation tables by converting the Java names of the annotation types into their
-        //    table names and prepend the active Postgres data schema. That the tables will be found there is
-        //    actually just a convention and rather unflexible. Perhaps we will need to make this configurable in
-        //    the future.
-        // 3. Now we have the list of schema-qualified tables to query from the database.
-        tablesToJoin = Stream.concat(Stream.of(TrecConfig.COSTOSYS_BASEDOCUMENTS),
-                Stream.of(annotationTypesToRetrieve)
-                        .map(type -> type.replaceAll("\\.", "_").toLowerCase())
-                        .map(table -> dbc.getActiveDataPGSchema() + "." + table))
-                .toArray(String[]::new);
+
+
+        boolean doGzip = false;
+        boolean useBinaryFormat = false;
+        columnsToFetch = new ArrayList<>();
+        for (String qualifiedAnnotation : annotationTypesToRetrieve) {
+            final String columnName = qualifiedAnnotation.toLowerCase().replace('.', '_').replace(':', '$');
+            final Map<String, String> field = FieldConfig.createField(
+                    JulieXMLConstants.NAME, columnName,
+                    JulieXMLConstants.GZIP, String.valueOf(doGzip),
+                    JulieXMLConstants.RETRIEVE, "true",
+                    JulieXMLConstants.TYPE, doGzip || useBinaryFormat ? "bytea" : "xml"
+            );
+            columnsToFetch.add(field);
+        }
+
+
         final List<Map<String, String>> primaryKeyFields = dbc.getActiveTableFieldConfiguration().getPrimaryKeyFields().collect(Collectors.toList());
         primaryKeyLength = primaryKeyFields.size();
         // The XMI schema has always the same structure: The primary key of the documents plus some fields for the actual XMI data
         // and other stuff. This is why we don't define the XMI schemas manually in costosys.xml but use this method.
         // This is just convenience.
-        final String baseDocumentTableSchema = dbc.addXmiDocumentFieldConfiguration(primaryKeyFields, false).getName();
-        final String annotationTableSchema = dbc.addXmiAnnotationFieldConfiguration(primaryKeyFields, false).getName();
-        schemaNames = new String[tablesToJoin.length];
-        schemaNames[0] = baseDocumentTableSchema;
-        for (int i = 1; i < schemaNames.length; i++) {
-            schemaNames[i] = annotationTableSchema;
-        }
+        tableSchema = dbc.addXmiTextFieldConfiguration(primaryKeyFields, columnsToFetch, true);
         try (CoStoSysConnection ignored = dbc.obtainOrReserveConnection()) {
             namespaceMap = getNamespaceMap();
         }
         xmiBuilder = new XmiBuilder(namespaceMap, annotationTypesToRetrieve);
     }
 
-    public Stream<String> getDocumentText(DocumentList<?> documents) {
-        setXmiCasDataToDocuments(documents);
+    public Stream<String> getDocumentText(DocumentList<?> documents, String table) {
+        setXmiCasDataToDocuments(documents, table);
         return documents.stream().map(d -> {
             String text = documentTextCache.get(d.getId());
             if (text == null) {
@@ -180,10 +177,10 @@ public class OriginalDocumentRetrieval {
      * @param ids The IDs of the documents to retrieve from the database.
      * @return An iterator for the retrieved document data.
      */
-    Iterator<byte[][]> getDocuments(List<Object[]> ids) {
+    private Iterator<byte[][]> getDocuments(List<Object[]> ids, String table) {
         if (dbc == null)
             initializeDatabaseConnection();
-        return dbc.retrieveColumnsByTableSchema(ids, tablesToJoin, schemaNames);
+        return dbc.retrieveColumnsByTableSchema(ids, table, tableSchema.getName());
     }
 
     private Map<String, String> getNamespaceMap() {
@@ -229,13 +226,13 @@ public class OriginalDocumentRetrieval {
      *
      * @param documents The documents to populate with the UIMA XMI CAS data.
      */
-    public void setXmiCasDataToDocuments(DocumentList<?> documents) {
+    public void setXmiCasDataToDocuments(DocumentList<?> documents, String table) {
         final List<Object[]> documentIDs = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).map(d -> new String[]{d.getId()}).collect(Collectors.toList());
 
 
         Map<String, byte[][]> dataByDocId = new HashMap<>();
         if (!documentIDs.isEmpty()) {
-            final Iterator<byte[][]> xmiData = getDocuments(documentIDs);
+            final Iterator<byte[][]> xmiData = getDocuments(documentIDs, table);
             while (xmiData.hasNext()) {
                 byte[][] data = xmiData.next();
                 String id = new String(data[0], StandardCharsets.UTF_8);
@@ -253,15 +250,18 @@ public class OriginalDocumentRetrieval {
                     throw new IllegalStateException("The document with ID " + doc.getId() + " was not returned from the database.");
                 final byte[][] documentData = dataByDocId.get(doc.getId());
                 LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
-                for (int i = 0; i < tablesToJoin.length; i++) {
+                for (int i = 0; i < columnsToFetch.size(); i++) {
                     // Here we need to calculate with the offset of the primary key elements that is contained
                     // in the xmiData byte[][] structure: The first positions of the array are just the primary
                     // key elements.
                     if (documentData[i + primaryKeyLength] == null)
-                        throw new IllegalStateException("There is no data in table " + tablesToJoin[i] + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
-                    dataMap.put(tablesToJoin[i], new ByteArrayInputStream(documentData[i + primaryKeyLength]));
+                        throw new IllegalStateException("There is no data in table " + columnsToFetch.get(i).get(JulieXMLConstants.NAME) + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
+                    String xmiModuleKey = columnsToFetch.get(i).get(JulieXMLConstants.NAME);
+                    if (xmiModuleKey.equals(XmiSplitConstants.BASE_DOC_COLUMN))
+                        xmiModuleKey = XmiSplitter.DOCUMENT_MODULE_LABEL;
+                    dataMap.put(xmiModuleKey, new ByteArrayInputStream(documentData[i + primaryKeyLength]));
                 }
-                final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, TrecConfig.COSTOSYS_BASEDOCUMENTS, cas.getTypeSystem());
+                final ByteArrayOutputStream xmiBaos = xmiBuilder.buildXmi(dataMap, cas.getTypeSystem());
                 docXmiData = xmiBaos.toByteArray();
                 xmiCache.put(doc.getId(), docXmiData);
             }

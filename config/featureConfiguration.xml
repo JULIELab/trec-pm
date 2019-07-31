@@ -2,27 +2,18 @@
     <ltrfeatures>
         <featuregroups>
             <featuregroup name="TFIDF" active="true"/>
+            <featuregroup name="TOPIC_MATCH" active="true">
+                <feature name="MATCH_TOPIC_DISEASE" active="true"/>
+                <feature name="MATCH_TOPIC_GENE" active="true"/>
+                <feature name="MATCH_TOPIC_VARIANT" active="true"/>
+            </featuregroup>
             <featuregroup name="similarity" active="true">
-                <features>
-                    <bm25>
-                        <active>true</active>
-                    </bm25>
-                    <dfr>
-                        <active>true</active>
-                    </dfr>
-                    <dfi>
-                        <active>true</active>
-                    </dfi>
-                    <ib>
-                        <active>true</active>
-                    </ib>
-                    <lmd>
-                        <active>true</active>
-                    </lmd>
-                    <lmjm>
-                        <active>true</active>
-                    </lmjm>
-                </features>
+                <feature name="bm25" active="true"/>
+                <feature name="dfr" active="true"/>
+                <feature name="dfi" active="true"/>
+                <feature name="ib" active="true"/>
+                <feature name="lmd" active="true"/>
+                <feature name="lmjm" active="true"/>
             </featuregroup>
         </featuregroups>
     </ltrfeatures>
