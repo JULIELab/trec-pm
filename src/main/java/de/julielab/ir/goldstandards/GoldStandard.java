@@ -15,7 +15,7 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     String getDatasetId();
 
-    default List<List<Q>> createStratifiedTopicPartitioning(int nPartitions, Function<Q, String> topicProperty) {
+    default List<List<Q>> createStratifiedQueryPartitioning(int nPartitions, Function<Q, String> topicProperty) {
         // We will first group all the topics by the property to be stratified by, e.g. the disease topic field.
         // Then we will iterate through the (initially empty) partitions as long as there are still topics to distribute.
         // For each iteration round we put one topic from each property value into the current partition.
@@ -40,6 +40,25 @@ public interface GoldStandard<Q extends QueryDescription> {
                     deque.removeFirst();
             }
         }
+        return partitioning;
+    }
+
+    default List<List<Q>> createRandomizedQueryPartitioning(int nPartitions, int seed) {
+        final Random random = new Random(seed);
+        List<Q> randomizedQueries = getQueries().collect(Collectors.toList());
+        Collections.shuffle(randomizedQueries, random);
+
+        List<List<Q>> partitioning = new ArrayList<>();
+        for (int i = 0; i < nPartitions; i++)
+            partitioning.add(new ArrayList<>());
+
+        int partitioningIndex = 0;
+        for (int i = 0; i < randomizedQueries.size(); i++) {
+            Q q = randomizedQueries.get(i);
+            partitioning.get(partitioningIndex++).add(q);
+            partitioningIndex %= nPartitions;
+        }
+
         return partitioning;
     }
 

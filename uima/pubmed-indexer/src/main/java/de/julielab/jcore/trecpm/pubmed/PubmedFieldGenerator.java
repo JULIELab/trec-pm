@@ -15,12 +15,15 @@ import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.List;
 
 public class PubmedFieldGenerator extends FieldGenerator {
 
+    private final static Logger log = LoggerFactory.getLogger(PubmedFieldGenerator.class);
 
     public PubmedFieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
@@ -75,15 +78,19 @@ public class PubmedFieldGenerator extends FieldGenerator {
     }
 
     private void addKeywords(JCas jCas, Document document) {
-        final de.julielab.jcore.types.pubmed.ManualDescriptor md = JCasUtil.selectSingle(jCas, de.julielab.jcore.types.pubmed.ManualDescriptor.class);
-        final ArrayFieldValue keywords = new ArrayFieldValue();
-        if (md.getKeywordList() != null) {
-            for (FeatureStructure fs : md.getKeywordList()) {
-                Keyword kw = (Keyword) fs;
-                keywords.add(new RawToken(kw.getName()));
+        try {
+            final de.julielab.jcore.types.pubmed.ManualDescriptor md = JCasUtil.selectSingle(jCas, de.julielab.jcore.types.pubmed.ManualDescriptor.class);
+            final ArrayFieldValue keywords = new ArrayFieldValue();
+            if (md.getKeywordList() != null) {
+                for (FeatureStructure fs : md.getKeywordList()) {
+                    Keyword kw = (Keyword) fs;
+                    keywords.add(new RawToken(kw.getName()));
+                }
             }
+            document.addField("keyword", keywords);
+        } catch (IllegalArgumentException e) {
+            log.debug("Not adding keywords because the document {} does not have a ManualDescriptor.", document.getId());
         }
-        document.addField("keyword", keywords);
     }
 
     private void addNegationScopes(JCas jCas, Document document) {
@@ -161,7 +168,6 @@ public class PubmedFieldGenerator extends FieldGenerator {
         }
         document.addField("genes", genesFieldValue);
     }
-
 
 
     private void addAbstractSections(JCas jCas, Document document) {

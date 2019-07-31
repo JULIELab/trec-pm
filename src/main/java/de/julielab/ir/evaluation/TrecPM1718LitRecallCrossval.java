@@ -40,7 +40,7 @@ public class TrecPM1718LitRecallCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
+        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedQueryPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
 
         runRecallExperiment(retrieval, experimentName, new File("recallResults"), aggregatedGoldStandard, topicPartitioning);

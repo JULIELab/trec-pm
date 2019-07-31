@@ -4,7 +4,7 @@
 <runner>
 <name>CPERunner</name>
 <pipelinepath>.</pipelinepath>
-<numthreads>5</numthreads>
+<numthreads>10</numthreads>
 <heapsize>20G</heapsize>
 </runner>
 </runners>

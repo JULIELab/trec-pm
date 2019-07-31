@@ -74,7 +74,7 @@ public class LtRSmacWrapper extends SmacWrapper {
     @Override
     protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
         FeatureControlCenter.initialize(config.configurationAt(FCConstants.LTRFEATURES));
-        final List<List<Topic>> splits = gs.createStratifiedTopicPartitioning(nPartitions, t -> t.getDisease());
+        final List<List<Topic>> splits = gs.createStratifiedQueryPartitioning(nPartitions, t -> t.getDisease());
         int splitNum = Integer.valueOf(instance.replace("crossval-", ""));
 
         return calculateScoreForSplit(config, splitNum, splits);

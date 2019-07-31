@@ -59,7 +59,7 @@ public class TrecPM1718LitCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedTopicPartitioning(CROSSVAL_SIZE, Topic::getDisease);
+        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedQueryPartitioning(CROSSVAL_SIZE, Topic::getDisease);
 
         final File noClassifierTemplate = new File(
                 TrecPM1718LitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
