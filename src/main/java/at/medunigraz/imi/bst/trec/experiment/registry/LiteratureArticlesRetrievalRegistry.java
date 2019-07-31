@@ -17,6 +17,8 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
     private static final File BOOST_TEMPLATE = new File(
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
+    private static final File JULIE_NONE_TEMPLATE = new File(
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/juliepmnone.json").getFile());
 
     public static TrecPmRetrieval hpipubclass(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubclass")
@@ -55,6 +57,12 @@ public final class LiteratureArticlesRetrievalRegistry {
     public static TrecPmRetrieval boost(int size, String boost) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
                 .withProperties("keyword", boost).withTemplate(BOOST_TEMPLATE).withWordRemoval();
+    }
+
+    public static TrecPmRetrieval juliepmcommon(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("juliepmcommon")
+                .withSubTemplate(JULIE_NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym();
     }
 
 }

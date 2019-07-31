@@ -11,6 +11,8 @@ public final class ClinicalTrialsRetrievalRegistry {
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictboost.json").getFile());
     private static final File PHRASE_TEMPLATE = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
+    private static final File JULIE_PHRASE_TEMPLATE = new File(
+            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/juliectphrase.json").getFile());
 
     public static TrecPmRetrieval hpictall(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("hpictall")
@@ -39,5 +41,11 @@ public final class ClinicalTrialsRetrievalRegistry {
     public static TrecPmRetrieval hpictbase(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("hpictbase")
                 .withSubTemplate(IMPROVED_TEMPLATE);
+    }
+
+    public static TrecPmRetrieval juliectphrase(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("juliectphrase")
+                .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily();
     }
 }

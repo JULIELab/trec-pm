@@ -68,18 +68,10 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.juliepmcommon(SIZE));
                 break;
             case CLINICAL_TRIALS:
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictphrase(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictboost(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictcommon(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictbase(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.juliectphrase(SIZE));
                 break;
             default:
                 throw new IllegalArgumentException("Task not supported");
