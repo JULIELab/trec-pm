@@ -2,6 +2,11 @@
 ltrfeatures.featuregroups.featuregroup@TFIDF categorical {on,off} [on]
 ltrfeatures.featuregroups.featuregroup@similarity categorical {on,off} [on]
 ltrfeatures.featuregroups.featuregroup@similarity@bm25 categorical {on,off} [on]
+ltrfeatures.featuregroups.featuregroup@similarity@dfi categorical {on,off} [on]
+ltrfeatures.featuregroups.featuregroup@similarity@dfr categorical {on,off} [on]
+ltrfeatures.featuregroups.featuregroup@similarity@ib categorical {on,off} [on]
+ltrfeatures.featuregroups.featuregroup@similarity@lmd categorical {on,off} [on]
+ltrfeatures.featuregroups.featuregroup@similarity@lmjm categorical {on,off} [on]
 indexparameters.bm25.k1 real [0.1,1.5] [1.2]
 indexparameters.bm25.b  real [0.1,1] [0.75]
 
