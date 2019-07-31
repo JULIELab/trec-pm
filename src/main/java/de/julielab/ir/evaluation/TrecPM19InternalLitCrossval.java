@@ -12,10 +12,8 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.VocabularyRestrictor;
-import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
-import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
@@ -35,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TrecPM19InternalLitCrossval {
 
@@ -61,7 +58,7 @@ public class TrecPM19InternalLitCrossval {
 
         final File noClassifierTemplate = new File(
                 TrecPM19InternalLitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym();
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();
         List<Metrics> allESMetrics = new ArrayList<>();

@@ -102,7 +102,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             TFIDF trainTfIdf = rankerAndVocabulary.getRight();
 
             File template = new File(config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE)));
-            final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withDiseaseSynonym();
+            final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withUmlsDiseaseSynonym();
             final DocumentList<Topic> result = ranker.rank(testDocs);
 
             retrieval.withExperimentName("pmround" + splitNum + "es");

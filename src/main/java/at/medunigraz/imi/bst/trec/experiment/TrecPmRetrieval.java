@@ -43,6 +43,12 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
     public TrecPmRetrieval withDiseaseSynonym() {
 
+        query = new DiseaseSynonymQueryDecorator(query);
+        return this;
+    }
+
+    public TrecPmRetrieval withUmlsDiseaseSynonym() {
+
         query = new DiseaseUmlsSynonymQueryDecorator(query);
         return this;
     }
@@ -62,6 +68,12 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
     public TrecPmRetrieval withDiseaseHypernym() {
 
         query = new DiseaseHypernymQueryDecorator(query);
+        return this;
+    }
+
+    public TrecPmRetrieval withUmlsDiseaseHypernym() {
+
+        query = new DiseaseUmlsHypernymQueryDecorator(query);
         return this;
     }
 

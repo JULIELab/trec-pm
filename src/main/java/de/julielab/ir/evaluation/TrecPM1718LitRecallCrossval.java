@@ -32,7 +32,7 @@ public class TrecPM1718LitRecallCrossval {
 
         final File noClassifierTemplate = new File(
                 TrecPM1718LitRecallCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withDiseaseSynonym().withResistantDrugs();
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withResistantDrugs();
 
         String experimentName = "Base";
 
