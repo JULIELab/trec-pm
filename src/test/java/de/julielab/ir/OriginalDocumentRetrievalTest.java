@@ -35,7 +35,7 @@ public class OriginalDocumentRetrievalTest {
         document.setId("10065107");
         final DocumentList<QueryDescription> dl = new DocumentList<>();
         dl.add(document);
-        retrieval.setXmiCasDataToDocuments(dl);
+        retrieval.setXmiCasDataToDocuments(dl, "_data_xmi.documents");
         final JCas cas = retrieval.parseXmiDataIntoJCas(document.getFullDocumentData()).getJCas();
         final Header header = JCasUtil.selectSingle(cas, Header.class);
         assertNotNull(header);

@@ -66,7 +66,7 @@ public class FeatureControlCenter {
         return isActive;
     }
 
-    public void createFeatures(DocumentList<? extends QueryDescription> documents, Iterable<Topic> topics, TFIDF tfidf, Set<String> vocabulary) {
+    public void createFeatures(DocumentList<? extends QueryDescription> documents, Iterable<Topic> topics, TFIDF tfidf, Set<String> vocabulary, String xmiTableName) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
@@ -82,7 +82,7 @@ public class FeatureControlCenter {
         final SerialPipes serialPipes = new SerialPipes(featurePipes);
 
         // Fetch the XMI cas information for the documents
-        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents);
+        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(serialPipes);
         for (Document<? extends QueryDescription> document : documents) {

@@ -47,6 +47,8 @@ public class TrecPM1718LitCrossval {
         METRIC trainMetric = METRIC.NDCG;
         int k = TrecConfig.SIZE;
 
+        final String xmiTableName = "_data_xmi.documents";
+
         int vocabCutoff = 50;
 
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
@@ -80,12 +82,12 @@ public class TrecPM1718LitCrossval {
             final DocumentList<Topic> testDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(test);
             final DocumentList<Topic> trainDocs = aggregatedGoldStandard.getQrelDocumentsForQueries(train);
 
-            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds()).collect(Collectors.toList());
+            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
             final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
             final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
-            FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary);
-            FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary);
+            FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);
+            FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, xmiTableName);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
             if (!modelFile.exists()) {
@@ -121,7 +123,7 @@ public class TrecPM1718LitCrossval {
             }
 
             for (DocumentList<Topic> list : lastDocumentLists) {
-                FeatureControlCenter.getInstance().createFeatures(list, Stream.concat(topics2017.getTopics().stream(), topics2018.getTopics().stream()).collect(Collectors.toList()), trainTfIdf, vocabulary);
+                FeatureControlCenter.getInstance().createFeatures(list, Stream.concat(topics2017.getTopics().stream(), topics2018.getTopics().stream()).collect(Collectors.toList()), trainTfIdf, vocabulary, xmiTableName);
                 ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();

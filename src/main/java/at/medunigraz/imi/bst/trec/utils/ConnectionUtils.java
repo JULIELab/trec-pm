@@ -1,8 +1,8 @@
 package at.medunigraz.imi.bst.trec.utils;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import de.julielab.xmlData.config.ConfigReader;
-import de.julielab.xmlData.config.DBConfig;
+import de.julielab.costosys.configuration.ConfigReader;
+import de.julielab.costosys.configuration.DBConfig;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

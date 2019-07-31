@@ -45,6 +45,7 @@ import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 public class LtRSmacWrapper extends SmacWrapper {
     private final static Logger log = LoggerFactory.getLogger(LtRSmacWrapper.class);
     private final TrecQrelGoldStandard<Topic> gs;
+    private final String documentTable;
     int vocabCutoff = 50;
     private int nPartitions = 10;
     private RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
@@ -57,6 +58,7 @@ public class LtRSmacWrapper extends SmacWrapper {
 
     public LtRSmacWrapper() {
         gs = TrecPMGoldStandardFactory.pubmedInternal2019();
+        this.documentTable = "_data_xmi.documents";
     }
 
     private static String getVocabularyId(int fold, String field, String corpusType, int cutoff) {
@@ -122,7 +124,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             }
 
             for (DocumentList<Topic> list : lastDocumentLists) {
-                FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary);
+                FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary, documentTable);
                 ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + splitNum + "ltr.results").toFile();
@@ -148,11 +150,11 @@ public class LtRSmacWrapper extends SmacWrapper {
 
     private Triple<RankLibRanker<Topic>, Set<String>, TFIDF> trainRanker(List<Topic> test, List<Topic> train, String vocabularyId, String tfidfFoldId, File modelFile, DocumentList<Topic> testDocs) throws IOException {
         final DocumentList<Topic> trainDocs = gs.getQrelDocumentsForQueries(train);
-        final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds()).collect(Collectors.toList());
+        final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), documentTable).collect(Collectors.toList());
         final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
         final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
-        FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary);
-        FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary);
+        FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, documentTable);
+        FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, documentTable);
         final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
         if (!modelFile.exists()) {
             long time = System.currentTimeMillis();
