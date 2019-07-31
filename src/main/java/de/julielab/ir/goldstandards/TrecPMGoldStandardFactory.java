@@ -34,7 +34,7 @@ public final class TrecPMGoldStandardFactory {
 
     public static TrecQrelGoldStandard<Topic> pubmedInternal2019() {
         return gs(Task.PUBMED, 2019, GoldStandardType.INTERNAL,
-                new File(TrecPMGoldStandardFactory.class.getResource("/gold-standard/gsheets-abstracts-2019.qrels").getPath()));
+                new File(TrecPMGoldStandardFactory.class.getResource("/internal/gold-standard/gsheets-abstracts-2019.qrels").getPath()));
     }
 
     /**

@@ -185,13 +185,13 @@ public class OriginalDocumentRetrieval {
 
     private Map<String, String> getNamespaceMap() {
         Map<String, String> map = null;
-        if (dbc.tableExists(dbc.getActiveDataPGSchema() + "." + XmiSplitConstants.XMI_NS_TABLE)) {
+        if (dbc.tableExists( "public." + XmiSplitConstants.XMI_NS_TABLE)) {
             try (CoStoSysConnection conn = dbc.obtainOrReserveConnection()) {
                 map = new HashMap<>();
                 conn.setAutoCommit(true);
                 Statement stmt = conn.createStatement();
                 String sql = String.format("SELECT %s,%s FROM %s", XmiSplitConstants.PREFIX, XmiSplitConstants.NS_URI,
-                        dbc.getActiveDataPGSchema() + "." + XmiSplitConstants.XMI_NS_TABLE);
+                        "public." + XmiSplitConstants.XMI_NS_TABLE);
                 ResultSet rs = stmt.executeQuery(String.format(sql));
                 while (rs.next())
                     map.put(rs.getString(1), rs.getString(2));
@@ -250,13 +250,17 @@ public class OriginalDocumentRetrieval {
                     throw new IllegalStateException("The document with ID " + doc.getId() + " was not returned from the database.");
                 final byte[][] documentData = dataByDocId.get(doc.getId());
                 LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
-                for (int i = 0; i < columnsToFetch.size(); i++) {
+                List<String> xmiColumnNames = new ArrayList<>();
+                xmiColumnNames.add(XmiSplitConstants.BASE_DOC_COLUMN);
+                columnsToFetch.stream().map(m -> m.get(JulieXMLConstants.NAME)).forEach(xmiColumnNames::add);
+                for (int i = 0; i < xmiColumnNames.size(); i++) {
+                    String columnName = xmiColumnNames.get(i);
                     // Here we need to calculate with the offset of the primary key elements that is contained
                     // in the xmiData byte[][] structure: The first positions of the array are just the primary
                     // key elements.
                     if (documentData[i + primaryKeyLength] == null)
-                        throw new IllegalStateException("There is no data in table " + columnsToFetch.get(i).get(JulieXMLConstants.NAME) + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
-                    String xmiModuleKey = columnsToFetch.get(i).get(JulieXMLConstants.NAME);
+                        throw new IllegalStateException("There is no data in table " + columnName + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
+                    String xmiModuleKey = columnName;
                     if (xmiModuleKey.equals(XmiSplitConstants.BASE_DOC_COLUMN))
                         xmiModuleKey = XmiSplitter.DOCUMENT_MODULE_LABEL;
                     dataMap.put(xmiModuleKey, new ByteArrayInputStream(documentData[i + primaryKeyLength]));

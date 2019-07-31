@@ -47,3 +47,6 @@ uima/jcore-pmclassifier-ae/src/main/resources/malletPmClassifier*
 
 # May not redistribute
 resources/CosmicResistanceMutations.tsv*
+
+# Internal data
+src/main/resources/internal
