@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[customGeneExpansions]}}",
+    "fields": {{clinical_trials/fields.json}},
+    "tie_breaker": 0.3,
+    "type": "best_fields",
+    "boost": 0.6
+  }
+}

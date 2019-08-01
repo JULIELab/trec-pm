@@ -13,7 +13,8 @@
       },
       {{geneSynonyms:biomedical_articles/gene_synonym.json}},
       {{geneHypernyms:biomedical_articles/gene_hypernym.json}},
-      {{geneDescriptions:biomedical_articles/gene_description.json}}
+      {{geneDescriptions:biomedical_articles/gene_description.json}},
+      {{customGeneExpansions:biomedical_articles/custom_gene.json}}
     ]
   }
 }
