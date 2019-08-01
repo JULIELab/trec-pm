@@ -254,12 +254,126 @@
             <optional>true</optional>
                     
         </externalResourceDependency>
+                
+        <externalResourceDependency>
+                        
+            <key>officialgs2017qrels</key>
+                        
+            <description>Official 2017 PubMed qrels file</description>
+                        
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+                        
+            <optional>true</optional>
+                    
+        </externalResourceDependency>
+                
+        <externalResourceDependency>
+                        
+            <key>officialgs2018qrels</key>
+                        
+            <description>Official 2018 PubMed qrels file</description>
+                        
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+                        
+            <optional>true</optional>
+                    
+        </externalResourceDependency>
+                
+        <externalResourceDependency>
+                        
+            <key>internalgs2019qrels</key>
+                        
+            <description>Internal 2019 PubMed qrels file</description>
+                        
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+                        
+            <optional>true</optional>
+                    
+        </externalResourceDependency>
             
     </externalResourceDependencies>
         
     <resourceManagerConfiguration>
                 
         <externalResources>
+                        
+            <externalResource>
+                                
+                <name>officialqrels2017</name>
+                                
+                <description>The official pubmed qrels 2017 file</description>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:resources/qrels-treceval-abstracts.2017.txt</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name/>
+                                                
+                        <configurationParameters/>
+                                                
+                        <configurationParameterSettings/>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+                            
+            </externalResource>
+                        
+            <externalResource>
+                                
+                <name>officialqrels2018</name>
+                                
+                <description>The official pubmed qrels 2018 file</description>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:resources/qrels-treceval-abstracts.2018.txt</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name/>
+                                                
+                        <configurationParameters/>
+                                                
+                        <configurationParameterSettings/>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+                            
+            </externalResource>
+                        
+            <externalResource>
+                                
+                <name>internalqrels2019</name>
+                                
+                <description>The internal pubmed qrels 2019 file</description>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:resources/gsheets-abstracts-2019.qrels</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name/>
+                                                
+                        <configurationParameters/>
+                                                
+                        <configurationParameterSettings/>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+                            
+            </externalResource>
                         
             <externalResource>
                                 
@@ -324,6 +438,30 @@
                 <key>treatments</key>
                                 
                 <resourceName>Treatments and UMLS Semantic Types</resourceName>
+                            
+            </externalResourceBinding>
+                        
+            <externalResourceBinding>
+                                
+                <key>officialgs2017qrels</key>
+                                
+                <resourceName>officialqrels2017</resourceName>
+                            
+            </externalResourceBinding>
+                        
+            <externalResourceBinding>
+                                
+                <key>officialgs2018qrels</key>
+                                
+                <resourceName>officialqrels2018</resourceName>
+                            
+            </externalResourceBinding>
+                        
+            <externalResourceBinding>
+                                
+                <key>internalgs2019qrels</key>
+                                
+                <resourceName>internalqrels2019</resourceName>
                             
             </externalResourceBinding>
                     

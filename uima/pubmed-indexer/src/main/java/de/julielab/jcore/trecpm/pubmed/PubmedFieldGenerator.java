@@ -36,7 +36,7 @@ public class PubmedFieldGenerator extends FieldGenerator {
     }
 
     @Override
-    public Document addFields(JCas jCas, Document document) throws CASException, FieldGenerationException {
+    public Document addFields(JCas jCas, Document document) {
         addDocId(jCas, document);
         addTitle(jCas, document);
         addAbstract(jCas, document);
@@ -53,7 +53,21 @@ public class PubmedFieldGenerator extends FieldGenerator {
         addKeywords(jCas, document);
         addTreatments(document);
         addNegativeKeywordCounts(jCas, document);
+        addWhetherPartOfGoldStandard(document);
         return document;
+    }
+
+    private void addWhetherPartOfGoldStandard(Document document) {
+        if (filterRegistry != null) {
+            final PubmedFilterBoard fb = filterRegistry.getFilterBoard(PubmedFilterBoard.class);
+            String docId = document.getId();
+            if (fb.officalGs2017Docs.contains(docId))
+                document.addField("inOfficial2017gs", "true");
+            if (fb.officalGs2018Docs.contains(docId))
+                document.addField("inOfficial2018gs", "true");
+            if (fb.internalGs2019Docs.contains(docId))
+                document.addField("inInternal2019gs", "true");
+        }
     }
 
     private void addNegativeKeywordCounts(JCas jCas, Document document) {
@@ -63,9 +77,9 @@ public class PubmedFieldGenerator extends FieldGenerator {
             if (negativeBoosters.contains(token))
                 tokens.add(token);
         }
-        document.addField("negativeBoosters", new ArrayFieldValue(tokens.elementSet().stream().map(RawToken::new).collect(Collectors.toList())));
-        document.addField("numNegativeBoosters",tokens.elementSet().stream().mapToInt(tokens::count).sum());
-        document.addField("numUniqueNegativeBoosters",tokens.elementSet().size());
+        document.addField("negativeBoosters", tokens.elementSet().stream().map(RawToken::new).collect(Collectors.toList()));
+        document.addField("numNegativeBoosters", tokens.elementSet().stream().mapToInt(tokens::count).sum());
+        document.addField("numUniqueNegativeBoosters", tokens.elementSet().size());
     }
 
     private void addTreatments(Document document) {

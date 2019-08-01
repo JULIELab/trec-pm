@@ -10,6 +10,9 @@
 			{{biomedical_articles/cancer.json}},
 			{{biomedical_articles/dna.json}},
 			{{biomedical_articles/positive_boosters.json}},
-		]
+		],
+		"filter": {
+			"match": {"{{gsfilterfield}}": "true"}
+		}
 	}
 }
