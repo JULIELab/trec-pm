@@ -319,7 +319,11 @@
                                 
                 <value>
                                         
-                    <array/>
+                    <array>
+                                                
+                        <string>de.julielab.jcore.types.Token</string>
+                                            
+                    </array>
                                     
                 </value>
                             

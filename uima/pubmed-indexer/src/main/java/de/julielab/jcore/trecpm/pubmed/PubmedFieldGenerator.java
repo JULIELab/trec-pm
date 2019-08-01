@@ -65,34 +65,37 @@ public class PubmedFieldGenerator extends FieldGenerator {
         }
         document.addField("negativeBoosters", new ArrayFieldValue(tokens.elementSet().stream().map(RawToken::new).collect(Collectors.toList())));
         document.addField("numNegativeBoosters",tokens.elementSet().stream().mapToInt(tokens::count).sum());
+        document.addField("numUniqueNegativeBoosters",tokens.elementSet().size());
     }
 
     private void addTreatments(Document document) {
-        final String docId = document.getId();
-        final PubmedFilterBoard fb = filterRegistry.getFilterBoard(PubmedFilterBoard.class);
-        ArrayFieldValue focusedTreatmentCuis = new ArrayFieldValue();
-        ArrayFieldValue focusedTreatmentText = new ArrayFieldValue();
-        ArrayFieldValue broadTreatmentCuis = new ArrayFieldValue();
-        ArrayFieldValue broadTreatmentText = new ArrayFieldValue();
-        if (fb.cuisAndTextByPmid.containsKey(docId)) {
-            final List<Pair<String, String>> cuisAndText = fb.cuisAndTextByPmid.get(docId);
-            for (Pair<String, String> cuiAndText : cuisAndText) {
-                String cui = cuiAndText.getLeft();
-                String text = cuiAndText.getRight();
-                if (fb.focusedTreatmentCuis.contains(cui)) {
-                    focusedTreatmentCuis.add(new RawToken(cui));
-                    focusedTreatmentText.add(new RawToken(text));
-                }
-                if (fb.broadTreatmentCuis.contains(cui)) {
-                    broadTreatmentCuis.add(new RawToken(cui));
-                    broadTreatmentText.add(new RawToken(text));
+        if (filterRegistry != null) {
+            final String docId = document.getId();
+            final PubmedFilterBoard fb = filterRegistry.getFilterBoard(PubmedFilterBoard.class);
+            ArrayFieldValue focusedTreatmentCuis = new ArrayFieldValue();
+            ArrayFieldValue focusedTreatmentText = new ArrayFieldValue();
+            ArrayFieldValue broadTreatmentCuis = new ArrayFieldValue();
+            ArrayFieldValue broadTreatmentText = new ArrayFieldValue();
+            if (fb.cuisAndTextByPmid.containsKey(docId)) {
+                final List<Pair<String, String>> cuisAndText = fb.cuisAndTextByPmid.get(docId);
+                for (Pair<String, String> cuiAndText : cuisAndText) {
+                    String cui = cuiAndText.getLeft();
+                    String text = cuiAndText.getRight();
+                    if (fb.focusedTreatmentCuis.contains(cui)) {
+                        focusedTreatmentCuis.add(new RawToken(cui));
+                        focusedTreatmentText.add(new RawToken(text));
+                    }
+                    if (fb.broadTreatmentCuis.contains(cui)) {
+                        broadTreatmentCuis.add(new RawToken(cui));
+                        broadTreatmentText.add(new RawToken(text));
+                    }
                 }
             }
+            document.addField("focusedTreatmentCuis", focusedTreatmentCuis);
+            document.addField("focusedTreatmentText", focusedTreatmentText);
+            document.addField("broadTreatmentCuis", broadTreatmentCuis);
+            document.addField("broadTreatmentText", broadTreatmentText);
         }
-        document.addField("focusedTreatmentCuis", focusedTreatmentCuis);
-        document.addField("focusedTreatmentText", focusedTreatmentText);
-        document.addField("broadTreatmentCuis", broadTreatmentCuis);
-        document.addField("broadTreatmentText", broadTreatmentText);
     }
 
     private void addKeywords(JCas jCas, Document document) {
@@ -202,9 +205,11 @@ public class PubmedFieldGenerator extends FieldGenerator {
 
     private void addPublicationDate(JCas jCas, Document document) {
         Header header = JCasUtil.selectSingle(jCas, Header.class);
-        PubType pubType = header.getPubTypeList(0);
-        Date pubDate = pubType.getPubDate();
-        document.addField("publicationDate", pubDate.getMonth() + " " + pubDate.getYear());
+        if (header.getPubTypeList() != null) {
+            PubType pubType = header.getPubTypeList(0);
+            Date pubDate = pubType.getPubDate();
+            document.addField("publicationDate", pubDate.getMonth() + " " + pubDate.getYear());
+        }
     }
 
 
