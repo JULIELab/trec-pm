@@ -36,6 +36,12 @@ public class Topic extends QueryDescription {
      */
     public List<String> resistantDrugs = new ArrayList<>();
 
+    /**
+     * Custom, handcrafted, expansions. Normally used for the `SolidTumorQueryDecorator`.
+     */
+    public List<String> customDiseaseExpansions = new ArrayList<>();
+    public List<String> customGeneExpansions = new ArrayList<>();
+
     private String disease = "";
     private String geneField = "";
     private TopicGene[] genes = new TopicGene[0];
@@ -219,12 +225,26 @@ public class Topic extends QueryDescription {
         return this;
     }
 
+    public Topic withCustomDiseaseExpansion(String diseaseExpansion) {
+        this.customDiseaseExpansions.add(diseaseExpansion);
+        return this;
+    }
+
+    public Topic withCustomGeneExpansion(String geneExpansion) {
+        this.customGeneExpansions.add(geneExpansion);
+        return this;
+    }
+
     public int getNumber() {
         return number;
     }
 
     public String getDisease() {
         return disease;
+    }
+
+    public String[] getDiseaseTokens() {
+        return disease.split(" ");
     }
 
     /**
@@ -310,6 +330,14 @@ public class Topic extends QueryDescription {
             ret.put("resistantDrugs" + i, resistantDrugs.get(i));
         }
 
+        for (int i = 0; i < customDiseaseExpansions.size(); i++) {
+            ret.put("customDiseaseExpansions" + i, customDiseaseExpansions.get(i));
+        }
+
+        for (int i = 0; i < customGeneExpansions.size(); i++) {
+            ret.put("customGeneExpansions" + i, customGeneExpansions.get(i));
+        }
+
         return ret;
     }
 
@@ -349,5 +377,13 @@ public class Topic extends QueryDescription {
 
     public List<String> getResistantDrugs() {
         return resistantDrugs;
+    }
+
+    public List<String> getCustomDiseaseExpansions() {
+        return customDiseaseExpansions;
+    }
+
+    public List<String> getCustomGeneExpansions() {
+        return customGeneExpansions;
     }
 }

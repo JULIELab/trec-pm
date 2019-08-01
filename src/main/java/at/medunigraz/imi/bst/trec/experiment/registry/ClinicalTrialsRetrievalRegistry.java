@@ -13,6 +13,8 @@ public final class ClinicalTrialsRetrievalRegistry {
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
     private static final File JULIE_PHRASE_TEMPLATE = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/juliectphrase.json").getFile());
+    private static final File SYNONYMS = new File(
+            ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
 
     public static TrecPmRetrieval hpictall(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("hpictall")
@@ -46,6 +48,6 @@ public final class ClinicalTrialsRetrievalRegistry {
     public static TrecPmRetrieval juliectphrase(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("juliectphrase")
                 .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
-                .withDiseaseSynonym().withGeneSynonym().withGeneFamily();
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
     }
 }
