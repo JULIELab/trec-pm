@@ -1,0 +1,18 @@
+{
+	"bool": {
+		"must": [
+			{{biomedical_articles/disease_noall.json}},
+			{{biomedical_articles/gene.json}}
+		],
+		"should": [
+			{{biomedical_articles/extra.json}},
+			{{biomedical_articles/chemotherapy.json}},
+			{{biomedical_articles/cancer.json}},
+			{{biomedical_articles/dna.json}},
+			{{biomedical_articles/positive_boosters.json}}
+		],
+		"must_not": [
+			{{biomedical_articles/non_melanoma.json}}
+		]
+	}
+}

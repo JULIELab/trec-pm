@@ -20,8 +20,8 @@ public class GoogleSheetsSyncer {
     private static final int YEAR = 2019;
     private static final int SIZE = 5;
 
-    private static final File ABSTRACTS = new File("src/main/resources/gold-standard/gsheets-abstracts-2019.qrels");
-    private static final File TRIALS = new File("src/main/resources/gold-standard/gsheets-trials-2019.qrels");
+    private static final File ABSTRACTS = new File("src/main/resources/internal/gold-standard/gsheets-abstracts-2019.qrels");
+    private static final File TRIALS = new File("src/main/resources/internal/gold-standard/gsheets-trials-2019.qrels");
 
     public static void main(String[] args) {
         sync(Task.PUBMED);
@@ -68,18 +68,10 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubclass(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubnone(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubboost(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubcommon(SIZE));
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.hpipubbase(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.juliepmcommon(SIZE));
                 break;
             case CLINICAL_TRIALS:
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictall(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictphrase(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictboost(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictcommon(SIZE));
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.hpictbase(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.juliectphrase(SIZE));
                 break;
             default:
                 throw new IllegalArgumentException("Task not supported");

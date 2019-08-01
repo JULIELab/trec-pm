@@ -16,27 +16,11 @@ public class LiteratureArticlesExperimenter {
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedInternal2019();
 
     public static void main(String[] args) {
-        // Judging order: 1
-        Experiment hpipubclass = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubclass(TrecConfig.SIZE));
-
-        // Judging order: 2
-        Experiment hpipubnone = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubnone(TrecConfig.SIZE));
-
         // Judging order: 3
-        Experiment hpipubboost = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubboost(TrecConfig.SIZE));
+        Experiment juliepmcommon = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.juliepmcommon(TrecConfig.SIZE));
 
-        // Judging order: 4
-        Experiment hpipubcommon = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubcommon(TrecConfig.SIZE));
-
-        // Judging order: 5
-        Experiment hpipubbase = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.hpipubbase(TrecConfig.SIZE));
-
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(hpipubclass, hpipubnone, hpipubboost, hpipubcommon, hpipubbase));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(juliepmcommon));
         for (Experiment exp : experiments) {
             exp.run();
         }
