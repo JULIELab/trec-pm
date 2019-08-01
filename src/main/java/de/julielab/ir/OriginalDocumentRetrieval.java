@@ -273,4 +273,10 @@ public class OriginalDocumentRetrieval {
         }
         releaseCas(cas);
     }
+
+    public void shutdown() {
+        log.info("Shutting down {}", getClass().getSimpleName());
+        if (dbc != null)
+        dbc.close();
+    }
 }
