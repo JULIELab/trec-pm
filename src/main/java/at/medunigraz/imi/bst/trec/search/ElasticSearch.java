@@ -13,6 +13,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class ElasticSearch implements SearchEngine {
@@ -33,6 +35,10 @@ public class ElasticSearch implements SearchEngine {
     private String index = "_all";
     private SimilarityParameters parameters;
     private String[] types = new String[0];
+    // This was introduced for LtR. There, it is required to obtain IR scores for the exact documents of
+    // the gold dataset. The filter query is meant to restrict the elastic search result set to the given
+    // document IDs.
+    private BoolQueryBuilder filterQuery;
 
     private CacheAccess<String, List<Result>> cache;
 
@@ -52,26 +58,43 @@ public class ElasticSearch implements SearchEngine {
         this.types = types;
     }
 
+    /**
+     * <p>Filters the results for the given collection of values on the given field.</p>
+     * <p>This is realized by a boolean query wrapping the original query in a must clause and the requested
+     * values into a filter clause. Calling this method multiple times will override the old filter.</p>
+     *
+     * @param field  The field to filter on.
+     * @param values The values of which the field must have at least one to be eligible for returning.
+     */
+    public void setFilterOnFieldValues(String field, Collection<String> values) {
+        filterQuery = QueryBuilders.boolQuery().filter(QueryBuilders.termsQuery(field, values));
+    }
+
     public List<Result> query(JSONObject jsonQuery) {
         return query(jsonQuery, TrecConfig.SIZE);
     }
 
     public List<Result> query(JSONObject jsonQuery, int size) {
-            final String json = jsonQuery.toString();
-            String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + json;
-            LOG.debug("Query ID for cache: {}", cacheKey);
-            List<Result> result = cache.get(cacheKey);
-            if (result == null) {
-                if (!(parameters instanceof NoParameters)) {
-    //                ElasticSearchSetup.
-                }
-                QueryBuilder qb = QueryBuilders.wrapperQuery(json);
-                LOG.trace(JsonUtils.prettify(jsonQuery));
-
-                result = query(qb, size);
-                cache.put(cacheKey, result);
+        final String json = jsonQuery.toString();
+        QueryBuilder qb = QueryBuilders.wrapperQuery(json);
+        // Mostly used for LtR: Restrict the result to a set of documents specified with
+        // #setFilterOnFieldValues(String, Collection)
+        if (filterQuery != null) {
+            qb = filterQuery.must(qb);
+        }
+        LOG.trace(JsonUtils.prettify(jsonQuery));
+        String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + qb.toString();
+        LOG.debug("Query ID for cache: {}", cacheKey);
+        List<Result> result = cache.get(cacheKey);
+        if (result == null) {
+            if (!(parameters instanceof NoParameters)) {
+                //                ElasticSearchSetup.
             }
-            return result;
+
+            result = query(qb, size);
+            cache.put(cacheKey, result);
+        }
+        return result;
     }
 
     private List<Result> query(QueryBuilder qb, int size) {

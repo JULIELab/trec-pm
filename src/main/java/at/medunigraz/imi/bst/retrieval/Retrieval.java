@@ -7,7 +7,10 @@ import at.medunigraz.imi.bst.trec.model.ResultList;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.*;
@@ -15,8 +18,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
-
     protected Query query;
+    private Logger log = LogManager.getLogger();
     private ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
     private String experimentName;
@@ -25,19 +28,18 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     public Retrieval(String indexName) {
         this.indexName = indexName;
-        this.query = new ElasticSearchQuery(size, indexName);
+        this.esQuery = new ElasticSearchQuery(size, indexName);
+        this.query = esQuery;
     }
 
     /**
-     *
      * @param indexName
      * @param resultSize
      * @deprecated Use {@link #withSize(int)} instead.
      */
     public Retrieval(String indexName, int resultSize) {
-        this.indexName = indexName;
-        this.esQuery = new ElasticSearchQuery<Q>(resultSize, indexName);
-        this.query = esQuery;
+        this(indexName);
+        esQuery.setSize(resultSize);
     }
 
     public T withExperimentName(String name) {
@@ -107,12 +109,18 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
-    public void setIrScoresToDocuments(DocumentList<Q> documents) {
+    public void setIrScoresToDocuments(DocumentList<Q> documents, String docIdField, IRScore scoreType) {
         final Map<Q, List<Document<Q>>> documentsByQuery = documents.stream().collect(Collectors.groupingBy(Document::getQueryDescription));
         for (Q query : documentsByQuery.keySet()) {
-            List<String> documentIds = documentsByQuery.get(query).stream().map(Document::getId).collect(Collectors.toList());
-
+            Map<String, Document<Q>> documentsById = documentsByQuery.get(query).stream().collect(Collectors.toMap(Document::getId, Function.identity()));
+            esQuery.setTermFilter(docIdField, documentsById.keySet());
+            esQuery.setSize(documentsById.size());
+            final ResultList<Q> resultList = retrieve(Collections.singleton(query)).get(0);
+            if (resultList.getResults().size() != documentsById.size())
+                log.warn("{} documents were requested, {} were returned.", documentsById.size(), resultList.getResults().size());
+            resultList.getResults().forEach(r -> documentsById.get(r.getId()).setScore(scoreType, r.getScore()));
         }
+        esQuery.clearTermFilter();
     }
 
     public String getResultsDir() {
@@ -146,6 +154,16 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
      */
     public List<ResultList<Q>> retrieve(Collection<Q> queryDescriptions, Function<QueryDescription, String> queryIdFunction) {
         return retrieve(queryDescriptions, resultsDir, queryIdFunction);
+    }
+
+    /**
+     * <p>Issues the given queries without writing the results to file.</p>
+     *
+     * @param queryDescriptions The queries to run.
+     * @return The result lists for the queries.
+     */
+    public List<ResultList<Q>> retrieve(Collection<Q> queryDescriptions) {
+        return retrieve(queryDescriptions, null, null);
     }
 
     /**
