@@ -86,7 +86,7 @@ public class NCBIGeneInfo {
         // Gene.Field.SYNONYMS,
         // Gene.Field.OTHER_DESIGNATIONS
 
-        for (Map.Entry<String, Gene> entry : symbolToGene.entrySet()) {
+        for (Map.Entry<String, Gene> entry : NCBIGeneInfo.getInstance().symbolToGene.entrySet()) {
             String symbol = entry.getKey();
             Gene gene = entry.getValue();
 
