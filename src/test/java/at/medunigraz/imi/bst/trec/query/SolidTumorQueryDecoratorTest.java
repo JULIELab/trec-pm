@@ -18,7 +18,7 @@ public class SolidTumorQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String SOLID_DISEASE = "Cholangiocarcinoma";
 	private static final String NON_SOLID_DISEASE = "acute myeloid leukemia";
 
-	private final File template = new File(getClass().getResource("/templates/match-title-hypernym.json").getFile());
+	private final File template = new File(getClass().getResource("/templates/match-title-custom.json").getFile());
 
 	public SolidTumorQueryDecoratorTest() {
 		this.decoratedQuery = new SolidTumorQueryDecorator(
@@ -33,10 +33,10 @@ public class SolidTumorQueryDecoratorTest extends QueryDecoratorTest {
 
 		decorator.query(new Topic().withDisease(SOLID_DISEASE));
 		Map<String, String> actual = dummyQuery.getTopic().getAttributes();
-		Assert.assertThat(actual, Matchers.hasEntry("diseaseHypernyms0", "solid"));
+		Assert.assertThat(actual, Matchers.hasEntry("customDiseaseExpansions0", "solid"));
 
 		decorator.query(new Topic().withDisease(NON_SOLID_DISEASE));
 		actual = dummyQuery.getTopic().getAttributes();
-		Assert.assertThat(actual, not(Matchers.hasEntry("diseaseHypernyms0", "solid")));
+		Assert.assertThat(actual, not(Matchers.hasEntry("customDiseaseExpansions0", "solid")));
 	}
 }
