@@ -14,6 +14,7 @@ import java.util.function.Function;
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     protected Query query;
+    private ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
@@ -24,9 +25,16 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         this.query = new ElasticSearchQuery(size, indexName);
     }
 
+    /**
+     *
+     * @param indexName
+     * @param resultSize
+     * @deprecated Use {@link #withSize(int)} instead.
+     */
     public Retrieval(String indexName, int resultSize) {
         this.indexName = indexName;
-        this.query = new ElasticSearchQuery(resultSize, indexName);
+        this.esQuery = new ElasticSearchQuery<Q>(resultSize, indexName);
+        this.query = esQuery;
     }
 
     public T withExperimentName(String name) {
@@ -46,6 +54,11 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     public T withSubTemplate(File template) {
         query = new SubTemplateQueryDecorator(template, query);
+        return (T) this;
+    }
+
+    public T withSize(int size) {
+        esQuery.setSize(size);
         return (T) this;
     }
 
@@ -165,6 +178,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return resultListSet;
     }
 
+
     public File getOutput() {
         return getOutput(this.resultsDir);
     }
@@ -177,7 +191,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         if (experimentName != null) {
             return experimentName.replace(" ", "_");
         }
-        return String.format("%s_%d_%s", indexName, query.getName().replace(" ", "_"));
+        return String.format("%s_%s", indexName, query.getName().replace(" ", "_"));
     }
 
     public String getExperimentName() {
