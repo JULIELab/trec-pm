@@ -1,5 +1,5 @@
 package de.julielab.ir.ltr.features;
 
 public enum IRScore {
-    BM25, TFIDF, LM_DIRICHLET, DFR, LTR
+    BM25, DFI, DFR, IB, LMD, LMJM, LTR
 }

@@ -5,15 +5,19 @@ import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import de.julielab.ir.goldstandards.GoldStandard;
+import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Experiment<Q extends QueryDescription> {
 
@@ -110,6 +114,19 @@ public class Experiment<Q extends QueryDescription> {
 
     public List<ResultList<Q>> getLastResultListSet() {
         return lastResultListSet;
+    }
+
+    public List<DocumentList<Q>> getLastResultAsDocumentLists() {
+        List<DocumentList<Q>> lastDocumentLists = new ArrayList<>();
+        for (ResultList<Q> list : lastResultListSet) {
+            final DocumentList<Q> documents = DocumentList.fromRetrievalResultList(list);
+            lastDocumentLists.add(documents);
+        }
+        return lastDocumentLists;
+    }
+
+    public DocumentList<Q> getLastResultAsSingleDocumentList() {
+        return lastResultListSet.stream().map(DocumentList::fromRetrievalResultList).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
     }
 
     public Metrics run() {

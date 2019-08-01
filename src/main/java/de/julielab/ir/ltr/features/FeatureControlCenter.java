@@ -11,6 +11,7 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.features.featuregroups.IRSimilarityFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
@@ -73,7 +74,8 @@ public class FeatureControlCenter {
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(topics),
-                new TopicMatchFeatureGroup()
+                new TopicMatchFeatureGroup(),
+                new IRSimilarityFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, true));

@@ -64,4 +64,8 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     public void setSimilarityParameters(SimilarityParameters parameters) {
         this.parameters = parameters;
     }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
 }

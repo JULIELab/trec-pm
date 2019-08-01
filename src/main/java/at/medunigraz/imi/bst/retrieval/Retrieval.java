@@ -5,11 +5,14 @@ import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import de.julielab.ir.es.SimilarityParameters;
+import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
@@ -100,11 +103,16 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     }
 
     public T withSimilarityParameters(SimilarityParameters parameters) {
-        if (query == null || !(query instanceof  ElasticSearchQuery))
-            throw new IllegalStateException("Cannot set similarity parameters to the current query " + query + ". This call must immediately follow a call to the constructor.");
-        ElasticSearchQuery q = (ElasticSearchQuery) query;
-        q.setSimilarityParameters(parameters);
+        esQuery.setSimilarityParameters(parameters);
         return (T) this;
+    }
+
+    public void setIrScoresToDocuments(DocumentList<Q> documents) {
+        final Map<Q, List<Document<Q>>> documentsByQuery = documents.stream().collect(Collectors.groupingBy(Document::getQueryDescription));
+        for (Q query : documentsByQuery.keySet()) {
+            List<String> documentIds = documentsByQuery.get(query).stream().map(Document::getId).collect(Collectors.toList());
+
+        }
     }
 
     public String getResultsDir() {

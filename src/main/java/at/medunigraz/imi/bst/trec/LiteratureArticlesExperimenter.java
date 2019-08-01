@@ -4,9 +4,11 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,5 +26,6 @@ public class LiteratureArticlesExperimenter {
         for (Experiment exp : experiments) {
             exp.run();
         }
+
     }
 }

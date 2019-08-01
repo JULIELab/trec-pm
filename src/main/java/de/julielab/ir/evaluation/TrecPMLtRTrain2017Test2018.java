@@ -25,6 +25,7 @@ import de.julielab.ir.ltr.features.FeatureNormalizationUtils;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -62,7 +63,10 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final File noClassifierTemplate = new File(
                 TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final File noClassifierTemplateTrain = new File(
+                TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone_ltrtrain.json").getFile());
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
+        final TrecPmRetrieval trainRetrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withProperties("gsfilterfield", "inOfficial2017gs").withSubTemplate(noClassifierTemplateTrain).withGeneSynonym().withUmlsDiseaseSynonym();
 
         final String ltrFoldId = getLtrFoldId(0, trecPmLit2017, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());
         final String vocabularyId = getVocabularyId(0, "Alltext", "Pubmed", vocabCutoff);
@@ -77,6 +81,17 @@ public class TrecPMLtRTrain2017Test2018 {
         final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
         final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
+
+        Experiment<Topic> trainFeatureExp = new Experiment<>(trecPmLit2017, trainRetrieval);
+        trainFeatureExp.run();
+        final DocumentList<Topic> list = trainFeatureExp.getLastResultAsSingleDocumentList();
+        for (Document<Topic> d : list) {
+            System.out.println(d.getIrScores());
+        }
+        System.out.println(list.stream().map(Document::getId).collect(Collectors.toSet()).size());
+
+
+
         FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);
         FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, xmiTableName);
 
@@ -108,24 +123,12 @@ public class TrecPMLtRTrain2017Test2018 {
         final Experiment<Topic> experiment = new Experiment(trecPmLit2018, retrieval, new TopicSet(test));
         experiment.run();
 
-        final List<ResultList<Topic>> lastResultListSet = experiment.getLastResultListSet();
-        List<DocumentList<Topic>> lastDocumentLists = new ArrayList<>();
-        for (ResultList<Topic> list : lastResultListSet) {
-            final DocumentList<Topic> documents = new DocumentList<>();
-            for (Result r : list.getResults()) {
-                final Document<Topic> doc = new Document<>();
-                doc.setId(r.getId());
-                doc.setScore(IRScore.BM25, r.getScore());
-                doc.setQueryDescription(list.getTopic());
-                documents.add(doc);
-            }
-            lastDocumentLists.add(documents);
-        }
-
+        List<DocumentList<Topic>> lastDocumentLists = experiment.getLastResultAsDocumentLists();
         log.info("Ranking test documents with the LtR model");
-        for (DocumentList<Topic> list : lastDocumentLists) {
-            FeatureControlCenter.getInstance().createFeatures(list, trecPmLit2018.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
-            ranker.rank(list);
+        for (DocumentList<Topic> list2 : lastDocumentLists) {
+            FeatureControlCenter.getInstance().createFeatures(list2, trecPmLit2018.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
+            ranker.rank(list2);
+            list2.sortByScore(IRScore.LTR);
         }
 
         final DocumentList<Topic> l = lastDocumentLists.get(0);
