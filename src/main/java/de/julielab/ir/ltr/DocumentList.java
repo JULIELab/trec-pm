@@ -2,7 +2,6 @@ package de.julielab.ir.ltr;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 
@@ -12,6 +11,13 @@ import java.util.*;
  * A list of documents they either represent labeled data for training or unlabeled data to be ranked.
  */
 public class DocumentList<Q extends QueryDescription> extends ArrayList<Document<Q>> {
+    public DocumentList(Collection<? extends Document<Q>> c) {
+        super(c);
+    }
+
+    public DocumentList() {
+    }
+
     public static <Q extends QueryDescription> DocumentList<Q> fromRetrievalResultList(ResultList<Q> list) {
         final DocumentList<Q> documents = new DocumentList<>();
         for (Result r : list.getResults()) {

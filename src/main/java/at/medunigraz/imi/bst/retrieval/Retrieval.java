@@ -7,6 +7,7 @@ import at.medunigraz.imi.bst.trec.model.ResultList;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.Ranker;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     private String experimentName;
     private int size = TrecConfig.SIZE;
     private String indexName;
+
 
     public Retrieval(String indexName) {
         this.indexName = indexName;
@@ -203,7 +205,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         }
         return resultListSet;
     }
-
 
     public File getOutput() {
         return getOutput(this.resultsDir);

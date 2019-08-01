@@ -116,8 +116,8 @@ public class Document<Q extends QueryDescription> {
         irScores.put(type, score);
     }
 
-    public Double getIrScore(IRScore score) {
-        return irScores.get(score);
+    public Double getIrScore(IRScore scoreType) {
+        return irScores != null ? irScores.get(scoreType) : null;
     }
 
     public String getId() {
