@@ -7,7 +7,7 @@
                 <feature name="MATCH_TOPIC_GENE" active="true"/>
                 <feature name="MATCH_TOPIC_VARIANT" active="true"/>
             </featuregroup>
-            <featuregroup name="similarity" active="true">
+            <featuregroup name="similarity" active="false">
                 <feature name="bm25" active="true"/>
                 <feature name="dfr" active="true"/>
                 <feature name="dfi" active="true"/>

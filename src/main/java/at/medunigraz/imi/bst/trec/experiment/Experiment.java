@@ -3,12 +3,12 @@ package at.medunigraz.imi.bst.trec.experiment;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
-import at.medunigraz.imi.bst.trec.model.Metrics;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.Ranker;
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Experiment<Q extends QueryDescription> {
@@ -29,6 +31,9 @@ public class Experiment<Q extends QueryDescription> {
     private TopicSet topicSet;
     private int k = TrecConfig.SIZE;
     private List<ResultList<Q>> lastResultListSet;
+    // This ranker will be applied to retrieved results, if it is present.
+    private Ranker<Q> reRanker;
+
 
     /**
      * Build an Experiment using the topics provided by the gold standard.
@@ -42,6 +47,7 @@ public class Experiment<Q extends QueryDescription> {
 
     /**
      * Build an Experiment using the topics provided.
+     *
      * @param goldStandard
      * @param retrieval
      * @param topics
@@ -50,6 +56,15 @@ public class Experiment<Q extends QueryDescription> {
         this.goldStandard = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
+    }
+
+    /**
+     * <p>Sets a ranker to be applied to the retrieved documents.</p>
+     *
+     * @param reRanker The ranker
+     */
+    public void setReRanker(Ranker<Q> reRanker) {
+        this.reRanker = reRanker;
     }
 
     public Retrieval getRetrieval() {
@@ -135,12 +150,11 @@ public class Experiment<Q extends QueryDescription> {
 
         LOG.info("Running collection " + longExperimentId + "...");
 
-        if (retrieval.getResultsDir() == null)
-            retrieval.withResultsDir(this.resultsDir);
+        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics());
+        if (reRanker != null)
+            lastResultListSet = rerank(lastResultListSet);
 
-        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics(), goldStandard.getQueryIdFunction());
-
-        File output = retrieval.getOutput();
+        File output = writeResults(lastResultListSet, experimentId);
         int k = this.k;
         boolean calculateTrecEvalWithMissingResults = isCalculateTrecEvalWithMissingResults();
         String statsDir = this.statsDir;
@@ -152,6 +166,33 @@ public class Experiment<Q extends QueryDescription> {
 
         // TODO Experiment API #53
 //        System.out.println(allMetrics.getInfNDCG() + ";" + longExperimentId);
+    }
+
+    private File writeResults(List<ResultList<Q>> resultLists, String experimentId) {
+        File resultsDir = new File(this.resultsDir);
+        if (!resultsDir.exists())
+            resultsDir.mkdir();
+        File output = new File(resultsDir.getAbsolutePath(), experimentId + ".trec_results");
+        final String runName = experimentId;  // TODO generate from experimentID, but respecting TREC syntax
+        TrecWriter tw = new TrecWriter(output, runName);
+        tw.write(resultLists, goldStandard.getQueryIdFunction());
+        tw.close();
+        return output;
+    }
+
+    private List<ResultList<Q>> rerank(List<ResultList<Q>> resultLists) {
+        if (reRanker == null)
+            return resultLists;
+        List<ResultList<Q>> ret = new ArrayList<>();
+        for (ResultList<Q> resultList : resultLists) {
+            final Map<String, Result> resultsById = resultList.getResults().stream().collect(Collectors.toMap(Result::getId, Function.identity()));
+            final DocumentList<Q> documents = resultList.toDocumentList();
+            final DocumentList<Q> reRankedDocuments = reRanker.rank(documents);
+            ResultList<Q> rl = new ResultList<>(resultList.getTopic());
+            reRankedDocuments.forEach(d -> rl.add(new Result(d.getId(), d.getIrScore(IRScore.BM25))));
+            ret.add(rl);
+        }
+        return ret;
     }
 
     private File getQrelFile() {

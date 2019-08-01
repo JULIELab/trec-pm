@@ -156,6 +156,7 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
                 ret.add(doc);
             }
         }
+
         return ret;
     }
 
