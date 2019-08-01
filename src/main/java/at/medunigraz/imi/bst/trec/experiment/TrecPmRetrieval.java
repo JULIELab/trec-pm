@@ -5,6 +5,8 @@ import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.*;
 
+import java.io.File;
+
 public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
     public TrecPmRetrieval(String indexName) {
@@ -98,6 +100,11 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
     public TrecPmRetrieval withResistantDrugs() {
 
         query = new ResistantDrugsQueryDecorator(query);
+        return this;
+    }
+
+    public TrecPmRetrieval withSynonymList(File synonymList) {
+        query = new FileBasedQueryDecorator(synonymList, query);
         return this;
     }
 }
