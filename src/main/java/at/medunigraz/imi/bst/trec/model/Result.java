@@ -62,4 +62,8 @@ public class Result implements Serializable {
 	public Set<String> getUniqueTreatments() {
 		return new LinkedHashSet<>(getFocusedTreatmentText());
 	}
+
+    public void setScore(double score) {
+        this.score = score;
+    }
 }

@@ -46,7 +46,7 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final String xmiTableName = "_data_xmi.documents";
 
-        int vocabCutoff = 100;
+        int vocabCutoff = 500;
 
         final File noClassifierTemplate = new File(
                 TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
@@ -68,16 +68,11 @@ public class TrecPMLtRTrain2017Test2018 {
         File modelFile = Path.of("rankLibModels", ltrFoldId).toFile();
         List<Topic> test = trecPmLit2018.getQueriesAsList();
         final List<Topic> train = trecPmLit2017.getQueriesAsList();
-        final DocumentList<Topic> testDocs = trecPmLit2018.getQrelDocumentsForQueries(test);
         final DocumentList<Topic> trainDocs = trecPmLit2017.getQrelDocumentsForQueries(train);
 
+        featurePreprocessing.preprocessTrain(trainDocs, "");
+
         final double[] scalingFactors = FeatureNormalizationUtils.scaleFeatures(trainDocs.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
-        testDocs.forEach(d -> FeatureNormalizationUtils.rangeScaleFeatures(d.getFeatureVector(), scalingFactors));
-//        for (Document d : testDocs) {
-//            final FeatureVector fv = d.getFeatureVector();
-//            if (d.getRelevance() == 2)
-//                System.out.println(fv);
-//        }
 
         log.info("Training LtR model");
         final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
@@ -90,19 +85,18 @@ public class TrecPMLtRTrain2017Test2018 {
         } else {
             ranker.load(modelFile);
         }
-        final DocumentList<Topic> result = ranker.rank(testDocs);
 
         retrieval.withExperimentName("pmround" + 0 + "es");
 
         log.info("Retrieving test documents from ElasticSearch");
         final Experiment<Topic> experiment = new Experiment(trecPmLit2018, retrieval, new TopicSet(test));
-       // experiment.setReRanker(new RandomRanker<>());
         experiment.run();
 
         List<DocumentList<Topic>> lastDocumentLists = experiment.getLastResultAsDocumentLists();
         log.info("Ranking test documents with the LtR model");
         for (DocumentList<Topic> list2 : lastDocumentLists) {
             featurePreprocessing.preprocessTest(list2, "");
+            list2.stream().map(Document::getFeatureVector).forEach(fv -> FeatureNormalizationUtils.rangeScaleFeatures(fv, scalingFactors));
             ranker.rank(list2);
         }
 

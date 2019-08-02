@@ -26,12 +26,13 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     private String experimentName;
     private int size = TrecConfig.SIZE;
     private String indexName;
-
+    private List<Retrieval<T, Q>> negativeBoosts;
 
     public Retrieval(String indexName) {
         this.indexName = indexName;
         this.esQuery = new ElasticSearchQuery(size, indexName);
         this.query = esQuery;
+        this.negativeBoosts = new ArrayList<>();
     }
 
     /**
@@ -42,6 +43,10 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     public Retrieval(String indexName, int resultSize) {
         this(indexName);
         esQuery.setSize(resultSize);
+    }
+
+    public void addNegativeBoost(Retrieval<T, Q> negativeBoostRetrieval) {
+        negativeBoosts.add(negativeBoostRetrieval);
     }
 
     public T withExperimentName(String name) {
@@ -205,8 +210,21 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             if (results.isEmpty())
                 throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
 
+
             ResultList<Q> resultList = new ResultList<>(topic);
             resultList.addAll(results);
+            if (negativeBoosts != null) {
+                final Map<String, Result> resultsById = results.stream().collect(Collectors.toMap(Result::getId, Function.identity()));
+                for (Retrieval<T, Q> negativeBoost : negativeBoosts) {
+                    final DocumentList<Q> documents = DocumentList.fromRetrievalResultList(resultList);
+                    negativeBoost.setIrScoresToDocuments(documents, "pubmedId", IRScore.BM25);
+                    documents.stream().filter(d -> resultsById.containsKey(d.getId())).forEach(d -> {
+                                final Result r = resultsById.get(d.getId());
+                                r.setScore(r.getScore() - .00001*d.getIrScore(IRScore.BM25));
+                            }
+                    );
+                }
+            }
             resultListSet.add(resultList);
         }
 

@@ -9,7 +9,7 @@
         ],
         "tie_breaker": 0.3,
         "type": "best_fields",
-        "boost": -1
+        "boost": 1
       }
     }
   }

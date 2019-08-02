@@ -1,7 +1,10 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import com.ximpleware.VTDException;
+import de.julielab.costosys.configuration.DBConfig;
 import de.julielab.costosys.configuration.FieldConfig;
+import de.julielab.costosys.configuration.HiddenConfig;
 import de.julielab.costosys.dbconnection.CoStoSysConnection;
 import de.julielab.costosys.dbconnection.DataBaseConnector;
 import de.julielab.ir.cache.CacheAccess;
@@ -13,6 +16,7 @@ import de.julielab.xml.JulieXMLConstants;
 import de.julielab.xml.XmiBuilder;
 import de.julielab.xml.XmiSplitConstants;
 import de.julielab.xml.XmiSplitter;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.cas.CAS;
@@ -111,7 +115,15 @@ public class OriginalDocumentRetrieval {
     }
 
     public String getDatabaseUrl() {
-        return dbc.getDbURL();
+        try {
+            final DBConfig dbConfig = new DBConfig(IOUtils.toByteArray(new FileInputStream(TrecConfig.COSTOSYS_CONFIG)));
+            return dbConfig.getUrl();
+        } catch (VTDException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private void initializeDatabaseConnection() {
