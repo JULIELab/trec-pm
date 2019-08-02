@@ -26,6 +26,7 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
     private METRIC trainMetric;
     private int k;
     private Normalizer featureNormalizer;
+    private IRScore outputScoreType = IRScore.LTR;
 
     /**
      * <p>Creates an object that has all information to create a RankLib ranker but does not immediately do it.</p>
@@ -152,12 +153,23 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
                 DataPoint dp = rl.get(i);
                 final String docId = dp.getDescription();
                 final Document doc = docsById.get(dp.getID() + docId);
-                doc.setScore(IRScore.LTR, dp.getCached());
+                doc.setScore(outputScoreType, dp.getCached());
                 ret.add(doc);
             }
         }
 
         return ret;
+    }
+
+    @Override
+    public IRScore getOutputScoreType() {
+        return outputScoreType;
+    }
+
+    @Override
+    public void setOutputScoreType(IRScore outputScoreType) {
+
+        this.outputScoreType = outputScoreType;
     }
 
     public ciir.umass.edu.learning.Ranker getRankLibRanker() {

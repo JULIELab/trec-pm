@@ -1,5 +1,6 @@
 package de.julielab.ir.ltr;
 
+import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public interface Ranker<Q extends QueryDescription> {
      * <p>Learns a ranker from the input documents.</p>
      * <p>The input documents are not expected to be in a specific order. All documents of a gold standard, including
      * all different queries, are to be passed here.</p>
+     *
      * @param documents The training documents.
      */
     void train(DocumentList<Q> documents);
@@ -28,9 +30,23 @@ public interface Ranker<Q extends QueryDescription> {
      * merged in the single list.</p>
      * <p>The output list will be grouped by query ID. Within each query ID group, the documents will have the order
      * the ranker produced. The order of the query IDs is not defined.</p>
+     *
      * @param documents The documents to rerank.
      * @return The reranked result list.
      */
     DocumentList<Q> rank(DocumentList<Q> documents);
+
+    /**
+     * Returns the score type that is set on ranked documents.
+     * @return
+     */
+    IRScore getOutputScoreType();
+
+    /**
+     * Specifies the score type that is set on ranked documents.
+     * @param outputScoreType The score enum that should be set on the documents with the ranking score.
+     *                        Can be used to override an existing score.
+     */
+    void setOutputScoreType(IRScore outputScoreType);
 
 }

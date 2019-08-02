@@ -92,7 +92,7 @@ public class TrecPM19InternalLitCrossval {
             } else {
                 ranker.load(modelFile);
             }
-            final DocumentList<Topic> result = ranker.rank(testDocs);
+            final DocumentList<Topic> result = ranker.rank(testDocs, outputScoreType);
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);
 
@@ -117,7 +117,7 @@ public class TrecPM19InternalLitCrossval {
 
             for (DocumentList<Topic> list : lastDocumentLists) {
                 FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
-                ranker.rank(list);
+                ranker.rank(list, outputScoreType);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + i + "ltr")) {

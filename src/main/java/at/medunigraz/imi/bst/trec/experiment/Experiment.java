@@ -185,11 +185,10 @@ public class Experiment<Q extends QueryDescription> {
             return resultLists;
         List<ResultList<Q>> ret = new ArrayList<>();
         for (ResultList<Q> resultList : resultLists) {
-            final Map<String, Result> resultsById = resultList.getResults().stream().collect(Collectors.toMap(Result::getId, Function.identity()));
             final DocumentList<Q> documents = resultList.toDocumentList();
             final DocumentList<Q> reRankedDocuments = reRanker.rank(documents);
             ResultList<Q> rl = new ResultList<>(resultList.getTopic());
-            reRankedDocuments.forEach(d -> rl.add(new Result(d.getId(), d.getIrScore(IRScore.BM25))));
+            reRankedDocuments.forEach(d -> rl.add(new Result(d.getId(), d.getIrScore(reRanker.getOutputScoreType()))));
             ret.add(rl);
         }
         return ret;
