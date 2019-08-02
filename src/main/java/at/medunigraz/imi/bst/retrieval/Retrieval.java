@@ -2,10 +2,7 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.Challenge;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -18,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
@@ -132,6 +130,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             final ResultList<Q> resultList = retrieve(Collections.singleton(query)).get(0);
             if (resultList.getResults().size() != documentsById.size())
                 log.warn("{} documents were requested, {} were returned.", documentsById.size(), resultList.getResults().size());
+
             resultList.getResults().forEach(r -> documentsById.get(r.getId()).setScore(scoreType, r.getScore()));
         }
         esQuery.clearTermFilter();

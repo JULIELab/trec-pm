@@ -1,6 +1,7 @@
 package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
@@ -29,7 +30,9 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,19 +48,19 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final String xmiTableName = "_data_xmi.documents";
 
-        int vocabCutoff = 10;
+        int vocabCutoff = 100;
 
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
 
-        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2018();
+        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2017();
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
 
         final File noClassifierTemplate = new File(
                 TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final File noClassifierTemplateTrain = new File(
-                TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone_ltrtrain.json").getFile());
+        final File matchAllTemplate = new File(
+                TrecPMLtRTrain2017Test2018.class.getResource("/templates/match_all.json").getFile());
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
 
         final String ltrFoldId = getLtrFoldId(0, trecPmLit2017, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());
@@ -74,8 +77,11 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
 
-        //retrieval.setIrScoresToDocuments(trainDocs, "pubmedId", IRScore.BM25);
-        //retrieval.setIrScoresToDocuments(testDocs, "pubmedId", IRScore.BM25);
+        log.info("Setting BM25 scores on test and train data");
+
+        Retrieval matchAllRetrieval = new Retrieval(TrecConfig.ELASTIC_BA_INDEX).withTemplate(matchAllTemplate);
+        matchAllRetrieval.setIrScoresToDocuments(trainDocs, "pubmedId.keyword", IRScore.BM25);
+        matchAllRetrieval.setIrScoresToDocuments(testDocs, "pubmedId.keyword", IRScore.BM25);
 
 
         FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);

@@ -70,7 +70,8 @@ public class FeatureNormalizationUtils {
     public static void rangeScaleFeatures(cc.mallet.types.FeatureVector fv, double[] maxFeatureValues) {
         for (int i = 0; i < fv.numLocations(); i++) {
             int index = fv.getIndices()[i];
-            fv.setValue(index, fv.getValues()[i] / maxFeatureValues[index]);
+            if (index < maxFeatureValues.length)
+                fv.setValue(index, fv.getValues()[i] / maxFeatureValues[index]);
         }
     }
 
