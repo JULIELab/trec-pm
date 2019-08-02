@@ -1,9 +1,7 @@
 package at.medunigraz.imi.bst.trec.model;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Result implements Serializable {
 	private String id;
@@ -56,4 +54,12 @@ public class Result implements Serializable {
             return (List<String>) sourceFields.getOrDefault("broadTreatmentText", Collections.emptyList());
         return Collections.emptyList();
     }
+
+	/**
+	 * Obtains an unique set of treatments. Intended to be called by `TrecWriter`.
+	 * @return
+	 */
+	public Set<String> getUniqueTreatments() {
+		return new LinkedHashSet<>(getFocusedTreatmentText());
+	}
 }

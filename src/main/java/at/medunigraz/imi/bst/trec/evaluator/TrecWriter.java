@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Function;
 
 public class TrecWriter implements Closeable {
@@ -23,6 +24,7 @@ public class TrecWriter implements Closeable {
 	private CSVWriter writer;
 	private String runName;
     private static final Function<QueryDescription, String> defaultQueryIdFunction = q -> String.valueOf(q.getNumber());
+    private static final int MAX_TREATMENTS = 3;
 
 	public TrecWriter(File output, String runName) {
 		if (!checkRunName(runName)) {
@@ -76,20 +78,32 @@ public class TrecWriter implements Closeable {
 	}
 
 	public void write(ResultList<?> resultList, Function<QueryDescription, String> queryIdFunction) {
-		String[] entries = new String[NUM_FIELDS];
-
 		if (queryIdFunction == null)
             queryIdFunction = defaultQueryIdFunction;
-		// Sets fixed fields
-		entries[0] = queryIdFunction.apply(resultList.getTopic());
-		entries[1] = "Q0";
-		entries[5] = runName; // XXX must be 1-12 alphanumeric characters
 		
 		int rank = 1;
 		for (Result result : resultList.getResults()) {
+			Set<String> treatments = result.getUniqueTreatments();
+
+			String[] entries = new String[NUM_FIELDS + Math.min(MAX_TREATMENTS, treatments.size())];
+
+			// 0, 1, and 5 are fixed fields, but we set then here because the array size is unknown beforehand.
+			entries[0] = queryIdFunction.apply(resultList.getTopic());
+			entries[1] = "Q0";
 			entries[2] = String.valueOf(result.getId());
 			entries[3] = String.valueOf(rank++);
 			entries[4] = String.format(Locale.ROOT, "%.6f", result.getScore());
+			entries[5] = runName; // XXX must be 1-12 alphanumeric characters
+
+			// Traditional runs should not set the extra stored fields and therefore will have an empty treatment list
+			int i = 0;
+			for (String treatment : treatments) {
+				entries[6 + i++] = String.format("\"%s\"", treatment);
+				if (i >= MAX_TREATMENTS) {
+					break;
+				}
+			}
+
 			writer.writeNext(entries);
 		}
 	}
