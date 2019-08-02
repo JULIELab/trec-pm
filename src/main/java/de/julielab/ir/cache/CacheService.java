@@ -44,7 +44,7 @@ public class CacheService {
         }
     }
 
-    boolean isDbReadOnly(File file) {
+     boolean isDbReadOnly(File file) {
         try {
             return readOnly.contains(file.getCanonicalPath());
         } catch (IOException e) {

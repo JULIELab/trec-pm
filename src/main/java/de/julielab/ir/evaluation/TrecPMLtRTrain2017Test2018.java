@@ -21,6 +21,7 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.FeatureNormalizationUtils;
+import de.julielab.ir.ltr.features.FeaturePreprocessing;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -30,10 +31,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TrecPMLtRTrain2017Test2018 {
@@ -50,42 +48,28 @@ public class TrecPMLtRTrain2017Test2018 {
 
         int vocabCutoff = 100;
 
+        final File noClassifierTemplate = new File(
+                TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withWordRemoval();
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
+        final FeaturePreprocessing featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
+
+        final Map<IRScore, TrecPmRetrieval> m = new HashMap<>();
+        m.put(IRScore.BM25, retrieval);
+        featurePreprocessing.setRetrievals(m);
 
 
         final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
 
-        final File noClassifierTemplate = new File(
-                TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-        final File matchAllTemplate = new File(
-                TrecPMLtRTrain2017Test2018.class.getResource("/templates/match_all.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withWordRemoval();
 
         final String ltrFoldId = getLtrFoldId(0, trecPmLit2017, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());
-        final String vocabularyId = getVocabularyId(0, "Alltext", "Pubmed", vocabCutoff);
-        final String tfidfFoldId = getTfidfFoldId(0, trecPmLit2017);
         File modelFile = Path.of("rankLibModels", ltrFoldId).toFile();
         List<Topic> test = trecPmLit2018.getQueriesAsList();
         final List<Topic> train = trecPmLit2017.getQueriesAsList();
         final DocumentList<Topic> testDocs = trecPmLit2018.getQrelDocumentsForQueries(test);
         final DocumentList<Topic> trainDocs = trecPmLit2017.getQrelDocumentsForQueries(train);
-
-        final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
-        final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
-
-        final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.FREQUENCY, vocabCutoff);
-
-        log.info("Setting BM25 scores on test and train data");
-
-        Retrieval matchAllRetrieval = new Retrieval(TrecConfig.ELASTIC_BA_INDEX).withTemplate(matchAllTemplate);
-        matchAllRetrieval.setIrScoresToDocuments(trainDocs, "pubmedId.keyword", IRScore.BM25);
-        matchAllRetrieval.setIrScoresToDocuments(testDocs, "pubmedId.keyword", IRScore.BM25);
-
-
-        FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);
-        FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, xmiTableName);
 
         final double[] scalingFactors = FeatureNormalizationUtils.scaleFeatures(trainDocs.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
         testDocs.forEach(d -> FeatureNormalizationUtils.rangeScaleFeatures(d.getFeatureVector(), scalingFactors));
@@ -118,7 +102,7 @@ public class TrecPMLtRTrain2017Test2018 {
         List<DocumentList<Topic>> lastDocumentLists = experiment.getLastResultAsDocumentLists();
         log.info("Ranking test documents with the LtR model");
         for (DocumentList<Topic> list2 : lastDocumentLists) {
-            FeatureControlCenter.getInstance().createFeatures(list2, trecPmLit2018.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
+            featurePreprocessing.preprocessTest(list2, "");
             ranker.rank(list2);
         }
 

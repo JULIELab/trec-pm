@@ -79,8 +79,8 @@ public class TrecPM19InternalLitCrossval {
             final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
             final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
-            FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);
-            FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, xmiTableName);
+            FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf, vocabulary, xmiTableName);
+            FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf, vocabulary, xmiTableName);
 
             final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
             if (!modelFile.exists()) {
@@ -116,7 +116,7 @@ public class TrecPM19InternalLitCrossval {
             }
 
             for (DocumentList<Topic> list : lastDocumentLists) {
-                FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
+                FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf, vocabulary, xmiTableName);
                 ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();

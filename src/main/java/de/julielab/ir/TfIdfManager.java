@@ -42,6 +42,10 @@ public class TfIdfManager {
         return trainAndSetTfIdf(id, trainingData);
     }
 
+    public boolean hasModelForKey(String key) {
+        return tfidfModels.containsKey(key);
+    }
+
     /**
      * <p>Trains a TFIDF model on the given text, stores it in the internal cache and returns it.</p>
      * <p>If the internal cache does already have an entry for the passed ID, it will be overridden.</p>

@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
@@ -54,6 +55,10 @@ public class FeatureControlCenter {
         return singleton != null;
     }
 
+    public boolean isTfIdfActive() {
+        return configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
+    }
+
     public boolean filterActive(FeatureGroup featureGroup) {
         final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
         log.trace("Checking if feature group '{}' is active: {} ", featureGroup.getName(), isActive);
@@ -67,13 +72,13 @@ public class FeatureControlCenter {
         return isActive;
     }
 
-    public void createFeatures(DocumentList<? extends QueryDescription> documents, Iterable<Topic> topics, TFIDF tfidf, Set<String> vocabulary, String xmiTableName) {
+    public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, TFIDF tfidf, Set<String> vocabulary, String xmiTableName) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
-                new RunTopicMatchAnnotatorFeatureGroup(topics),
+                new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup()
         ).filter(this::filterActive)
@@ -87,7 +92,7 @@ public class FeatureControlCenter {
         OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(serialPipes);
-        for (Document<? extends QueryDescription> document : documents) {
+        for (Document<Q> document : documents) {
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
             instanceList.addThruPipe(instance);
             // Within the pipes, the documents need access to their CAS. Since we only have a limited

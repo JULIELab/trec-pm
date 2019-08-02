@@ -47,4 +47,9 @@ public class LocalFileCacheAccess<K, V> extends CacheAccess<K, V> {
         return false;
     }
 
+    @Override
+    public boolean isReadOnly() {
+        return cacheService.isDbReadOnly(cacheFile);
+    }
+
 }

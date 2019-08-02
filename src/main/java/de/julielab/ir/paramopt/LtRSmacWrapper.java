@@ -124,7 +124,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             }
 
             for (DocumentList<Topic> list : lastDocumentLists) {
-                FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary, documentTable);
+                FeatureControlCenter.getInstance().createFeatures(list, trainTfIdf, vocabulary, documentTable);
                 ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + splitNum + "ltr.results").toFile();
@@ -153,8 +153,8 @@ public class LtRSmacWrapper extends SmacWrapper {
         final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), documentTable).collect(Collectors.toList());
         final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
         final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
-        FeatureControlCenter.getInstance().createFeatures(testDocs, test, trainTfIdf, vocabulary, documentTable);
-        FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, documentTable);
+        FeatureControlCenter.getInstance().createFeatures(testDocs,  trainTfIdf, vocabulary, documentTable);
+        FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf, vocabulary, documentTable);
         final RankLibRanker<Topic> ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
         if (!modelFile.exists()) {
             long time = System.currentTimeMillis();

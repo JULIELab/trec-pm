@@ -18,12 +18,17 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class VocabularyRestrictor {
+    public static final String FIELD_VOCABLARIES_DB = "fieldVocablaries.db";
     private static VocabularyRestrictor instance;
     private final CacheAccess<String, Set<String>> cacheAccess;
+    // Only used in case that the file cache is disabled
+    private final Map<String, Set<String>> memCache;
+
     private Set<String> stopwords;
 
     private VocabularyRestrictor() {
-        cacheAccess = CacheService.getInstance().getCacheAccess("fieldVocablaries.db", "FieldVobabularies", "string", "java");
+        cacheAccess = CacheService.getInstance().getCacheAccess(FIELD_VOCABLARIES_DB, "FieldVobabularies", "string", "java");
+        memCache = cacheAccess.isReadOnly() ? new HashMap<>() : Collections.emptyMap();
         try {
             stopwords = new HashSet<>(IOStreamUtilities.getLinesFromInputStream(getClass().getResourceAsStream("/data/stopwords.txt")));
         } catch (IOException e) {
@@ -38,8 +43,8 @@ public class VocabularyRestrictor {
         return instance;
     }
 
-    public Set<String> calculateVocabulary(String field, Stream<String> fieldContents, Restriction restriction, int cutoff) {
-        Set<String> vocabulary = cacheAccess.get(field);
+    public Set<String> calculateVocabulary(String vocabId, Stream<String> fieldContents, Restriction restriction, int cutoff) {
+        Set<String> vocabulary = cacheAccess.get(vocabId);
         if (vocabulary == null) {
             switch (restriction) {
                 case TFIDF:
@@ -49,8 +54,18 @@ public class VocabularyRestrictor {
                     vocabulary = calculateFrequencyVocabulary(fieldContents, cutoff);
                     break;
             }
-            cacheAccess.put(field, vocabulary);
+            if (!cacheAccess.isReadOnly())
+                cacheAccess.put(vocabId, vocabulary);
+            else
+                memCache.put(vocabId, vocabulary);
         }
+        return vocabulary;
+    }
+
+    public Set<String> getVocabulary(String vocabId) {
+        Set<String> vocabulary = cacheAccess.get(vocabId);
+        if (vocabulary == null)
+            vocabulary = memCache.get(vocabId);
         return vocabulary;
     }
 

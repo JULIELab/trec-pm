@@ -71,4 +71,9 @@ public class RemoteCacheAccess<K, V> extends CacheAccess<K, V> {
         }
         return false;
     }
+
+    @Override
+    public boolean isReadOnly() {
+        return false;
+    }
 }

@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
  * However, a stopword file is ready, currently a static one, excluding words found on that list.
  */
 public class TfidfFeatureGroup extends FeatureGroup {
-
+    public static String GROUP_NAME = "TFIDF";
     private Set<String> stopwords;
     private TFIDF tfidf;
     private Set<String> vocabulary;
 
     public TfidfFeatureGroup(TFIDF tfidf, Set<String> vocabulary) {
-        super("TFIDF");
+        super(GROUP_NAME);
         this.tfidf = tfidf;
         this.vocabulary = vocabulary;
         stopwords = IOStreamUtilities.getReaderFromInputStream(getClass().getResourceAsStream("/data/stopwords.txt")).lines().collect(Collectors.toSet());

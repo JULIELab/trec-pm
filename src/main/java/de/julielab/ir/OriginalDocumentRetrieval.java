@@ -110,6 +110,10 @@ public class OriginalDocumentRetrieval {
         return instance;
     }
 
+    public String getDatabaseUrl() {
+        return dbc.getDbURL();
+    }
+
     private void initializeDatabaseConnection() {
         try {
             dbc = new DataBaseConnector(TrecConfig.COSTOSYS_CONFIG);

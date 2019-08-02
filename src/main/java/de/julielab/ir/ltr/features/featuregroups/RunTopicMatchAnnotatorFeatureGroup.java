@@ -6,6 +6,7 @@ import cc.mallet.types.Instance;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.ir.ltr.features.TopicFieldsCasAnnotator;
+import de.julielab.ir.model.QueryDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.slf4j.Logger;
