@@ -10,7 +10,7 @@ public class Result implements Serializable {
 
 	private Map<String, Object> sourceFields;
 
-	private List<String> treatments;
+	private List<String> treatments = Collections.emptyList();
 
 	public Result(String id, double score) {
 		this.id = id;
@@ -31,7 +31,7 @@ public class Result implements Serializable {
 
 	public void setSourceFields(Map<String, Object> sourceFields) {
 		this.sourceFields = sourceFields;
-		this.treatments = getTreatments();
+		this.treatments = getFocusedTreatmentText();
 	}
 
 	public List<String> getFocusedTreatmentCuis() {
@@ -67,7 +67,7 @@ public class Result implements Serializable {
 	}
 
 	public List<String> getTreatments() {
-		return getFocusedTreatmentText();
+		return this.treatments;
 	}
 
 	public void setTreatments(List<String> treatments) {
