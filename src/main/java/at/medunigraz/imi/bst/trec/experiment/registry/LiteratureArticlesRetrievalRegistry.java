@@ -65,7 +65,7 @@ public final class LiteratureArticlesRetrievalRegistry {
     }
 
     public static TrecPmRetrieval juliepmcommon(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("juliepmcommon")
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("juliepmcommo")
                 .withSubTemplate(JULIE_NONE_TEMPLATE)
                 .withStoredFields(StoredFieldsRegistry.getStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019))
                 .withWordRemoval().withGeneSynonym()

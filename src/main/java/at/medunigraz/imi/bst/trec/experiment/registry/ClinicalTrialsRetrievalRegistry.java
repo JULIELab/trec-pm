@@ -46,7 +46,7 @@ public final class ClinicalTrialsRetrievalRegistry {
     }
 
     public static TrecPmRetrieval juliectphrase(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("juliectphrase")
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("juliectphras")
                 .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
                 .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
     }
