@@ -24,6 +24,7 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
             final Document<Q> doc = new Document<>();
             doc.setId(r.getId());
             doc.setScore(IRScore.BM25, r.getScore());
+            doc.setTreatments(r.getTreatments());
             doc.setQueryDescription(list.getTopic());
             documents.add(doc);
         }

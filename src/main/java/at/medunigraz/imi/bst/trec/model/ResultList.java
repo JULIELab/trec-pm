@@ -1,7 +1,5 @@
 package at.medunigraz.imi.bst.trec.model;
 
-import de.julielab.ir.ltr.Document;
-import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.ArrayList;
@@ -32,5 +30,4 @@ public class ResultList<T extends QueryDescription> {
 	public List<Result> getResults() {
 		return results;
 	}
-
 }
