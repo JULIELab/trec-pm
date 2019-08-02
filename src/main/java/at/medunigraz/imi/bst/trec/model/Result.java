@@ -1,11 +1,16 @@
 package at.medunigraz.imi.bst.trec.model;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class Result implements Serializable {
 	private String id;
 
 	private double score;
+
+	private Map<String, Object> sourceFields;
 
 	public Result(String id, double score) {
 		this.id = id;
@@ -19,4 +24,36 @@ public class Result implements Serializable {
 	public double getScore() {
 		return score;
 	}
+
+	public Map<String, Object> getSourceFields() {
+		return sourceFields;
+	}
+
+	public void setSourceFields(Map<String, Object> sourceFields) {
+		this.sourceFields = sourceFields;
+	}
+
+	public List<String> getFocusedTreatmentCuis() {
+		if (sourceFields != null)
+			return (List<String>) sourceFields.getOrDefault("focusedTreatmentCuis", Collections.emptyList());
+		return Collections.emptyList();
+	}
+
+    public List<String> getBroadTreatmentCuis() {
+        if (sourceFields != null)
+            return (List<String>) sourceFields.getOrDefault("broadTreatmentCuis", Collections.emptyList());
+        return Collections.emptyList();
+    }
+
+    public List<String> getFocusedTreatmentText() {
+        if (sourceFields != null)
+            return (List<String>) sourceFields.getOrDefault("focusedTreatmentText", Collections.emptyList());
+        return Collections.emptyList();
+    }
+
+    public List<String> getBroadTreatmentText() {
+        if (sourceFields != null)
+            return (List<String>) sourceFields.getOrDefault("broadTreatmentText", Collections.emptyList());
+        return Collections.emptyList();
+    }
 }

@@ -1,7 +1,10 @@
 package at.medunigraz.imi.bst.trec.experiment.registry;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.StoredFieldsRegistry;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
+import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.Task;
 
 import java.io.File;
 
@@ -63,7 +66,9 @@ public final class LiteratureArticlesRetrievalRegistry {
 
     public static TrecPmRetrieval juliepmcommon(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("juliepmcommon")
-                .withSubTemplate(JULIE_NONE_TEMPLATE).withWordRemoval().withGeneSynonym()
+                .withSubTemplate(JULIE_NONE_TEMPLATE)
+                .withStoredFields(StoredFieldsRegistry.getStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019))
+                .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
     }
 

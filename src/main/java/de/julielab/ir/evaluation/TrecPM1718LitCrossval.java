@@ -99,7 +99,7 @@ public class TrecPM1718LitCrossval {
             } else {
                 ranker.load(modelFile);
             }
-            final DocumentList<Topic> result = ranker.rank(testDocs, outputScoreType);
+            final DocumentList<Topic> result = ranker.rank(testDocs);
             final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
             rankLibScores.add(rankLibScore);
 
@@ -124,7 +124,7 @@ public class TrecPM1718LitCrossval {
 
             for (DocumentList<Topic> list : lastDocumentLists) {
                 FeatureControlCenter.getInstance().createFeatures(list, Stream.concat(topics2017.getTopics().stream(), topics2018.getTopics().stream()).collect(Collectors.toList()), trainTfIdf, vocabulary, xmiTableName);
-                ranker.rank(list, outputScoreType);
+                ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + i + "ltr")) {

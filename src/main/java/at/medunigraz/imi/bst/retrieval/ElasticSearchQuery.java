@@ -18,14 +18,12 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
 
     private String index;
     private SimilarityParameters parameters;
-
+    private String[] storedFields;
     private int size = TrecConfig.SIZE;
-
     // Used to restrict the result set based on a set of values of which the field
     // must include at least one. Required for LtR feature creation.
     private String filterField;
     private Collection<String> filterValues;
-
     public ElasticSearchQuery(int size, String index, String... types) {
         this.size = size;
         this.index = index;
@@ -37,10 +35,15 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         this.types = types;
     }
 
+    public void setStoredFields(String[] storedFields) {
+        this.storedFields = storedFields;
+    }
+
     /**
      * <p>Used for LtR. Causes the retrieval to restrict the result sets to documents that have at least one
      * of the given values appearing in the given field.</p>
-     * @param field The field to filter on.
+     *
+     * @param field  The field to filter on.
      * @param values The filter values.
      */
     public void setTermFilter(String field, Collection<String> values) {
@@ -63,6 +66,9 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
             es = new ElasticSearch(this.index, parameters, this.types);
         } else {
             es = new ElasticSearch(this.index, parameters);
+        }
+        if (storedFields != null) {
+            es.setStoredFields(storedFields);
         }
         if (filterField != null) {
             es.setFilterOnFieldValues(filterField, filterValues);
