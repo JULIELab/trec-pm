@@ -186,7 +186,7 @@ public class Experiment<Q extends QueryDescription> {
         List<ResultList<Q>> ret = new ArrayList<>();
         for (ResultList<Q> resultList : resultLists) {
             final Map<String, Result> resultsById = resultList.getResults().stream().collect(Collectors.toMap(Result::getId, Function.identity()));
-            final DocumentList<Q> documents = resultList.toDocumentList();
+            final DocumentList<Q> documents = DocumentList.fromRetrievalResultList(resultList);
             final DocumentList<Q> reRankedDocuments = reRanker.rank(documents);
             ResultList<Q> rl = new ResultList<>(resultList.getTopic());
             reRankedDocuments.stream().map(d -> {

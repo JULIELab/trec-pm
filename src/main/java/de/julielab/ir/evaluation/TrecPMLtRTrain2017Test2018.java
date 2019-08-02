@@ -42,7 +42,7 @@ public class TrecPMLtRTrain2017Test2018 {
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 
-        RANKER_TYPE rType = RANKER_TYPE.COOR_ASCENT;
+        RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
         METRIC trainMetric = METRIC.NDCG;
         int k = TrecConfig.SIZE;
 
@@ -53,7 +53,7 @@ public class TrecPMLtRTrain2017Test2018 {
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
 
-        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2017();
+        final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
 
@@ -61,7 +61,7 @@ public class TrecPMLtRTrain2017Test2018 {
                 TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
         final File matchAllTemplate = new File(
                 TrecPMLtRTrain2017Test2018.class.getResource("/templates/match_all.json").getFile());
-        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
+        final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withWordRemoval();
 
         final String ltrFoldId = getLtrFoldId(0, trecPmLit2017, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());
         final String vocabularyId = getVocabularyId(0, "Alltext", "Pubmed", vocabCutoff);
@@ -75,7 +75,7 @@ public class TrecPMLtRTrain2017Test2018 {
         final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
         final TFIDF trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(tfidfFoldId, trainDocumentText.stream());
 
-        final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
+        final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.FREQUENCY, vocabCutoff);
 
         log.info("Setting BM25 scores on test and train data");
 

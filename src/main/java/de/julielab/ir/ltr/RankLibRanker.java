@@ -1,5 +1,6 @@
 package de.julielab.ir.ltr;
 
+import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import ciir.umass.edu.features.*;
 import ciir.umass.edu.learning.*;
@@ -9,6 +10,8 @@ import ciir.umass.edu.metric.MetricScorerFactory;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,7 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
-
+private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     private final MetricScorerFactory metricScorerFactory;
     private ciir.umass.edu.learning.Ranker ranker;
     private RANKER_TYPE rType;
@@ -84,6 +87,10 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         final Map<String, RankList> rankLists = convertToRankList(documents);
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
         ranker = new RankerTrainer().train(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));
+        if (!documents.isEmpty()) {
+            final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
+            log.info("LtR features: " + alphabet);
+        }
     }
 
     /**
@@ -147,16 +154,27 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
             throw new IllegalArgumentException("The passed document do not have unique IDs. The input document list has size " + documents + ", its ID map form only " + docsById.size());
 
         final Map<String, RankList> rankLists = convertToRankList(documents);
-        final List<RankList> resultRankLists = ranker.rank(new ArrayList(rankLists.values()));
-        for (RankList rl : resultRankLists) {
+        for (RankList rl : rankLists.values()) {
             for (int i = 0; i < rl.size(); i++) {
-                DataPoint dp = rl.get(i);
+                final DataPoint dp = rl.get(i);
+                final double score = ranker.eval(dp);
                 final String docId = dp.getDescription();
                 final Document doc = docsById.get(dp.getID() + docId);
-                doc.setScore(outputScoreType, dp.getCached());
+                doc.setScore(outputScoreType, score);
                 ret.add(doc);
             }
         }
+
+//        final List<RankList> resultRankLists = ranker.rank(new ArrayList(rankLists.values()));
+//        for (RankList rl : resultRankLists) {
+//            for (int i = 0; i < rl.size(); i++) {
+//                DataPoint dp = rl.get(i);
+//                final String docId = dp.getDescription();
+//                final Document doc = docsById.get(dp.getID() + docId);
+//                doc.setScore(outputScoreType, dp.getCached());
+//                ret.add(doc);
+//            }
+//        }
 
         return ret;
     }

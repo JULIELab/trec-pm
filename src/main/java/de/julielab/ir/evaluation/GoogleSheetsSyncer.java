@@ -83,7 +83,7 @@ public class GoogleSheetsSyncer {
 
             DocumentList<Topic> sheetData = sheet.getQrelDocuments();
             for (ResultList<Topic> resultList : resultsPerTopic) {
-                sheetData.addAll(resultList.toDocumentList());
+                sheetData.addAll(DocumentList.fromRetrievalResultList(resultList));
             }
         }
 

@@ -33,18 +33,4 @@ public class ResultList<T extends QueryDescription> {
 		return results;
 	}
 
-	/**
-	 * Converts this ResultList into a DocumentList object.
-	 * @return
-	 */
-	public DocumentList<T> toDocumentList() {
-		DocumentList<T> documentList = new DocumentList<>();
-		for (Result result : results) {
-			final Document<T> document = new Document<>();
-			document.setQueryDescription(topic);
-			document.setId(result.getId());
-			documentList.add(document);
-		}
-		return documentList;
-	}
 }
