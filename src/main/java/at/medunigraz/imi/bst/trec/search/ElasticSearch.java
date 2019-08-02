@@ -39,7 +39,7 @@ public class ElasticSearch implements SearchEngine {
     // the gold dataset. The filter query is meant to restrict the elastic search result set to the given
     // document IDs.
     private BoolQueryBuilder filterQuery;
-
+    private String[] storedFields;
     private CacheAccess<String, List<Result>> cache;
 
     public ElasticSearch() {
@@ -56,6 +56,10 @@ public class ElasticSearch implements SearchEngine {
     public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
         this(index, parameters);
         this.types = types;
+    }
+
+    public void setStoredFields(String[] storedFields) {
+        this.storedFields = storedFields;
     }
 
     /**
@@ -83,7 +87,7 @@ public class ElasticSearch implements SearchEngine {
             qb = filterQuery.must(qb);
         }
         LOG.trace(JsonUtils.prettify(jsonQuery));
-        String cacheKey = index + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n","" );
+        String cacheKey = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "");
         LOG.debug("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
@@ -101,6 +105,8 @@ public class ElasticSearch implements SearchEngine {
 
         try {
             final SearchSourceBuilder sb = new SearchSourceBuilder().query(qb).size(size).storedField("_id");
+            if (storedFields != null)
+                sb.fetchSource(storedFields, null);
             SearchResponse response = client.search(new SearchRequest(index).source(sb), RequestOptions.DEFAULT);
             //LOG.trace(JsonUtils.prettify(response.toString()));
 
@@ -109,6 +115,7 @@ public class ElasticSearch implements SearchEngine {
             List<Result> ret = new ArrayList<>();
             for (SearchHit hit : results) {
                 Result result = new Result(hit.getId(), hit.getScore());
+                result.setSourceFields(hit.getSourceAsMap());
                 ret.add(result);
             }
 

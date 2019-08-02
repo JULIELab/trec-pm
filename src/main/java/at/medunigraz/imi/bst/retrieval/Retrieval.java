@@ -2,8 +2,10 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
+import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -46,6 +48,16 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
 
     public T withExperimentName(String name) {
         this.experimentName = name;
+        return (T) this;
+    }
+
+    public T withStoredFields(String... fields) {
+        esQuery.setStoredFields(fields);
+        return (T) this;
+    }
+
+    public T withStoredFields(Challenge challenge, Task task, int year) {
+        esQuery.setStoredFields(StoredFieldsRegistry.getStoredFields(challenge, task, year));
         return (T) this;
     }
 

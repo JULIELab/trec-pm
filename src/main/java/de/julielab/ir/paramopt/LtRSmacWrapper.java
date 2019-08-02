@@ -103,7 +103,7 @@ public class LtRSmacWrapper extends SmacWrapper {
 
             File template = new File(config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE)));
             final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withUmlsDiseaseSynonym();
-            final DocumentList<Topic> result = ranker.rank(testDocs, outputScoreType);
+            final DocumentList<Topic> result = ranker.rank(testDocs);
 
             retrieval.withExperimentName("pmround" + splitNum + "es");
 
@@ -125,7 +125,7 @@ public class LtRSmacWrapper extends SmacWrapper {
 
             for (DocumentList<Topic> list : lastDocumentLists) {
                 FeatureControlCenter.getInstance().createFeatures(list, gs.getQueriesAsList(), trainTfIdf, vocabulary, documentTable);
-                ranker.rank(list, outputScoreType);
+                ranker.rank(list);
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + splitNum + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + splitNum + "ltr")) {

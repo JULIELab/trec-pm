@@ -22,7 +22,6 @@ public class LiteratureArticlesExperimenter {
         // Judging order: 3
         Experiment juliepmcommon = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.juliepmcommon(TrecConfig.SIZE));
-//        juliepmcommon.setReRanker(new RandomRanker());
 
         Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(juliepmcommon));
         for (Experiment exp : experiments) {
