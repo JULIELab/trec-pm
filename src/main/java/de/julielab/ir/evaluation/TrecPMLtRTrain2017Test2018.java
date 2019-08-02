@@ -7,39 +7,31 @@ import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
-import cc.mallet.types.FeatureVector;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.VocabularyRestrictor;
-import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.RandomRanker;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.FeatureNormalizationUtils;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TrecPMLtRTrain2017Test2018 {
 
@@ -53,7 +45,7 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final String xmiTableName = "_data_xmi.documents";
 
-        int vocabCutoff = 100;
+        int vocabCutoff = 10;
 
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
 
@@ -82,7 +74,8 @@ public class TrecPMLtRTrain2017Test2018 {
 
         final Set<String> vocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabCutoff);
 
-        retrieval.setIrScoresToDocuments(trainDocs, "pubmedId", IRScore.BM25);
+        //retrieval.setIrScoresToDocuments(trainDocs, "pubmedId", IRScore.BM25);
+        //retrieval.setIrScoresToDocuments(testDocs, "pubmedId", IRScore.BM25);
 
 
         FeatureControlCenter.getInstance().createFeatures(trainDocs, train, trainTfIdf, vocabulary, xmiTableName);
@@ -108,38 +101,36 @@ public class TrecPMLtRTrain2017Test2018 {
             ranker.load(modelFile);
         }
         final DocumentList<Topic> result = ranker.rank(testDocs);
-        final double rankLibScore = ranker.score(result, METRIC.NDCG, 10);
 
         retrieval.withExperimentName("pmround" + 0 + "es");
 
         log.info("Retrieving test documents from ElasticSearch");
         final Experiment<Topic> experiment = new Experiment(trecPmLit2018, retrieval, new TopicSet(test));
-        experiment.setReRanker(new RandomRanker<>());
+       // experiment.setReRanker(new RandomRanker<>());
         experiment.run();
 
         List<DocumentList<Topic>> lastDocumentLists = experiment.getLastResultAsDocumentLists();
         log.info("Ranking test documents with the LtR model");
-//        for (DocumentList<Topic> list2 : lastDocumentLists) {
-//            FeatureControlCenter.getInstance().createFeatures(list2, trecPmLit2018.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
-//            ranker.rank(list2);
-//            list2.sortByScore(IRScore.LTR);
-//        }
+        for (DocumentList<Topic> list2 : lastDocumentLists) {
+            FeatureControlCenter.getInstance().createFeatures(list2, trecPmLit2018.getQueriesAsList(), trainTfIdf, vocabulary, xmiTableName);
+            ranker.rank(list2);
+        }
 
         log.info("Writing results");
         final File output = Path.of("myresultsdir-ltr", "pmround" + 0 + "ltr.results").toFile();
         try (final TrecWriter tw = new TrecWriter(output, "round" + 0 + "ltr")) {
-            tw.writeDocuments(lastDocumentLists, IRScore.BM25, trecPmLit2018.getQueryIdFunction());
+            tw.writeDocuments(lastDocumentLists, ranker.getOutputScoreType(), trecPmLit2018.getQueryIdFunction());
         }
 
         log.info("Writing qrel files for LtR evaluation");
-        final File qRelFile = Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile();
+        final File qRelFile = Path.of("results-ltr", "trecPmLit2018.qrel").toFile();
         trecPmLit2018.writeQrelFile(qRelFile);
-        final File sampleQrelFile = Path.of("aggregatedQrels", "sampleTrecPmLit2017-2018.qrel").toFile();
+        final File sampleQrelFile = Path.of("results-ltr", "sampleTrecPmLit2018.qrel").toFile();
         trecPmLit2018.writeSampleQrelFile(sampleQrelFile);
 
         log.info("Calculating scores.");
         final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + 0 + "ltr", "pmround" + 0 + "ltr", output, qRelFile, TrecConfig.SIZE, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
-        final Metrics metrics = trecMetricsCreator.computeMetrics();
+        trecMetricsCreator.computeMetrics();
 
         log.info("Finished.");
         OriginalDocumentRetrieval.getInstance().shutdown();
