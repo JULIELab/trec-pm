@@ -8,6 +8,8 @@ import ciir.umass.edu.metric.METRIC;
 import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.metric.MetricScorerFactory;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     private METRIC trainMetric;
     private int k;
     private Normalizer featureNormalizer;
-    private IRScore outputScoreType = IRScore.LTR;
+    private IRScoreFeatureKey outputScoreType = new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL);
 
     /**
      * <p>Creates an object that has all information to create a RankLib ranker but does not immediately do it.</p>
@@ -180,12 +182,12 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     }
 
     @Override
-    public IRScore getOutputScoreType() {
+    public IRScoreFeatureKey getOutputScoreType() {
         return outputScoreType;
     }
 
     @Override
-    public void setOutputScoreType(IRScore outputScoreType) {
+    public void setOutputScoreType(IRScoreFeatureKey outputScoreType) {
 
         this.outputScoreType = outputScoreType;
     }

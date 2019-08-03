@@ -17,9 +17,7 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
-import de.julielab.ir.ltr.features.FCConstants;
-import de.julielab.ir.ltr.features.FeatureControlCenter;
-import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.*;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.ImmutableNode;
@@ -116,7 +114,7 @@ public class LtRSmacWrapper extends SmacWrapper {
                 for (Result r : list.getResults()) {
                     final Document<Topic> doc = new Document<>();
                     doc.setId(r.getId());
-                    doc.setScore(IRScore.BM25, r.getScore());
+                    doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
                     doc.setQueryDescription(list.getTopic());
                     documents.add(doc);
                 }
@@ -129,7 +127,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + splitNum + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + splitNum + "ltr")) {
-                tw.writeDocuments(lastDocumentLists, IRScore.LTR, gs.getQueryIdFunction());
+                tw.writeDocuments(lastDocumentLists, new IRScoreFeatureKey(IRScore.LTR, TrecPmQueryPart.FULL), gs.getQueryIdFunction());
             }
 
             final File qRelFile = Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile();

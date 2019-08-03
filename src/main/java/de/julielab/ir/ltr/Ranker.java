@@ -1,6 +1,7 @@
 package de.julielab.ir.ltr;
 
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
@@ -40,13 +41,13 @@ public interface Ranker<Q extends QueryDescription> {
      * Returns the score type that is set on ranked documents.
      * @return
      */
-    IRScore getOutputScoreType();
+    IRScoreFeatureKey getOutputScoreType();
 
     /**
      * Specifies the score type that is set on ranked documents.
      * @param outputScoreType The score enum that should be set on the documents with the ranking score.
      *                        Can be used to override an existing score.
      */
-    void setOutputScoreType(IRScore outputScoreType);
+    void setOutputScoreType(IRScoreFeatureKey outputScoreType);
 
 }
