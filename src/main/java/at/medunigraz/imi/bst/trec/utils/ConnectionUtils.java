@@ -29,7 +29,7 @@ public class ConnectionUtils {
 	}
 
 	public static boolean checkElasticOpenPort() {
-		return ConnectionUtils.checkOpenPort(TrecConfig.ELASTIC_HOSTNAME[0], TrecConfig.ELASTIC_PORT[0]);
+		return ConnectionUtils.checkOpenPort(TrecConfig.ELASTIC_HOSTNAME, TrecConfig.ELASTIC_PORT);
 	}
 
 	public static boolean checkPostgresOpenPort() throws FileNotFoundException, MalformedURLException {

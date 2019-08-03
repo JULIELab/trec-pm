@@ -11,8 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -20,17 +19,17 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class ElasticSearch implements SearchEngine {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private RestHighLevelClient client = ElasticClientFactory.getClient();
+    private Client client = ElasticClientFactory.getClient();
 
     private String index = "_all";
     private SimilarityParameters parameters;
@@ -107,7 +106,7 @@ public class ElasticSearch implements SearchEngine {
             final SearchSourceBuilder sb = new SearchSourceBuilder().query(qb).size(size).storedField("_id");
             if (storedFields != null)
                 sb.fetchSource(storedFields, null);
-            SearchResponse response = client.search(new SearchRequest(index).source(sb), RequestOptions.DEFAULT);
+            SearchResponse response = client.search(new SearchRequest(index).source(sb)).get();
             //LOG.trace(JsonUtils.prettify(response.toString()));
 
             SearchHit[] results = response.getHits().getHits();
@@ -120,7 +119,9 @@ public class ElasticSearch implements SearchEngine {
             }
 
             return ret;
-        } catch (IOException e) {
+        }  catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return null;
