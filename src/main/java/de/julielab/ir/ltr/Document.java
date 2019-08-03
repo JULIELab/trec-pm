@@ -4,16 +4,13 @@ import cc.mallet.types.FeatureVector;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.FeatureUtils;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.snowball.SnowballFilter;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.uima.cas.CAS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,10 +44,10 @@ public class Document<Q extends QueryDescription> {
     /**
      * Scores that this document has for the given query.
      */
-    private Map<IRScore, Double> irScores;
+    private Map<IRScoreFeatureKey, Double> irScores;
     /**
      * The serialized CAS data of this document as retrieved from the database. To be set through
-     * {@link de.julielab.ir.OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList)}.
+     * {@link de.julielab.ir.OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList, String)}.
      */
     private byte[] fullDocumentData;
     /**
@@ -106,18 +103,21 @@ public class Document<Q extends QueryDescription> {
         this.relevance = relevance;
     }
 
-    public Map<IRScore, Double> getIrScores() {
+    public Map<IRScoreFeatureKey, Double> getIrScores() {
         return irScores;
     }
 
-    public void setScore(IRScore type, double score) {
+    public void setScore(IRScoreFeatureKey type, double score) {
         if (irScores == null)
             irScores = new HashMap<>();
         irScores.put(type, score);
     }
 
-    public Double getIrScore(IRScore scoreType) {
+    public Double getIrScore(IRScoreFeatureKey scoreType) {
         return irScores != null ? irScores.get(scoreType) : null;
+    }
+    public Double getIrScore(IRScore scoreType, TrecPmQueryPart queryPart) {
+        return irScores != null ? irScores.get(new IRScoreFeatureKey(scoreType, queryPart)) : null;
     }
 
     public String getId() {

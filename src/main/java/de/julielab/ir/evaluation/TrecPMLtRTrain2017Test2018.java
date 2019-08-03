@@ -1,7 +1,6 @@
 package de.julielab.ir.evaluation;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
@@ -10,19 +9,13 @@ import at.medunigraz.imi.bst.trec.model.*;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
-import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
-import de.julielab.ir.TfIdfManager;
-import de.julielab.ir.VocabularyRestrictor;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
-import de.julielab.ir.ltr.features.FeatureControlCenter;
-import de.julielab.ir.ltr.features.FeatureNormalizationUtils;
-import de.julielab.ir.ltr.features.FeaturePreprocessing;
-import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.*;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
@@ -54,14 +47,16 @@ public class TrecPMLtRTrain2017Test2018 {
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
         final FeaturePreprocessing featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
 
-        final Map<IRScore, TrecPmRetrieval> m = new HashMap<>();
-        m.put(IRScore.BM25, retrieval);
+        final Map<IRScoreFeatureKey, TrecPmRetrieval> m = new HashMap<>();
+        // Scores for the overall query
+        m.put(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), retrieval);
+        // Scores for individual query parts
+        m.putAll(IRFeatureRetrievals.getRetrievals(TrecConfig.ELASTIC_BA_INDEX, EnumSet.allOf(TrecPmQueryPart.class)));
         featurePreprocessing.setRetrievals(m);
 
 
         final TrecQrelGoldStandard<Topic> trecPmLit2017 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
-
 
 
         final String ltrFoldId = getLtrFoldId(0, trecPmLit2017, rType, trainMetric, k, vocabCutoff, FeatureControlCenter.getInstance().getActiveFeatureDescriptionString());

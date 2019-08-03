@@ -62,11 +62,11 @@ public class PubmedFieldGenerator extends FieldGenerator {
             final PubmedFilterBoard fb = filterRegistry.getFilterBoard(PubmedFilterBoard.class);
             String docId = document.getId();
             if (fb.officalGs2017Docs.contains(docId))
-                document.addField("inOfficial2017gs", "true");
+                document.addField("inOfficial2017gs", new RawToken("true"));
             if (fb.officalGs2018Docs.contains(docId))
-                document.addField("inOfficial2018gs", "true");
+                document.addField("inOfficial2018gs", new RawToken("true"));
             if (fb.internalGs2019Docs.contains(docId))
-                document.addField("inInternal2019gs", "true");
+                document.addField("inInternal2019gs", new RawToken("true"));
         }
     }
 

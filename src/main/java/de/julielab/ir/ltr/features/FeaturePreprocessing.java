@@ -19,7 +19,7 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
 
     private String docIdIndexField;
     private int vocabularyCutoff;
-    private Map<IRScore, Retrieval<?, Q>> retrievals;
+    private Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals;
 
     public FeaturePreprocessing(String docIdIndexField, int vocabularyCutoff, String xmiTableName) {
         this.docIdIndexField = docIdIndexField;
@@ -27,13 +27,13 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         this.xmiTableName = xmiTableName;
     }
 
-    public void setRetrievals(Map<IRScore, Retrieval<?, Q>> retrievals) {
+    public void setRetrievals(Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals) {
         this.retrievals = retrievals;
     }
 
     public void preprocessTrain(DocumentList<Q> trainDocs, String runId) {
-        for (IRScore scoreType : retrievals.keySet())
-            retrievals.get(scoreType).setIrScoresToDocuments(trainDocs, docIdIndexField, scoreType);
+        for (IRScoreFeatureKey featureKey : retrievals.keySet())
+            retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
         Set<String> tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
@@ -55,8 +55,8 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     }
 
     public void preprocessTest(DocumentList<Q> testDocs, String runId) {
-        for (IRScore scoreType : retrievals.keySet())
-            retrievals.get(scoreType).setIrScoresToDocuments(testDocs, docIdIndexField, scoreType);
+        for (IRScoreFeatureKey featureKey : retrievals.keySet())
+            retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
 
         Set<String> tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;

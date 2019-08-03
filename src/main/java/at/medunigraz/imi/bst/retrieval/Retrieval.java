@@ -6,8 +6,9 @@ import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.Ranker;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,22 +16,28 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     protected Query query;
     private Logger log = LogManager.getLogger();
     private ElasticSearchQuery<Q> esQuery;
+    private IRScoreFeatureKey featureKey;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
     private String indexName;
     private List<Retrieval<T, Q>> negativeBoosts;
+    private IRScoreFeatureKey scoreKey;
 
     public Retrieval(String indexName) {
+        this(indexName, new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL));
+    }
+
+    public Retrieval(String indexName, IRScoreFeatureKey featureKey) {
         this.indexName = indexName;
         this.esQuery = new ElasticSearchQuery(size, indexName);
+        this.featureKey = featureKey;
         this.query = esQuery;
         this.negativeBoosts = new ArrayList<>();
     }
@@ -126,7 +133,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
-    public void setIrScoresToDocuments(DocumentList<Q> documents, String docIdField, IRScore scoreType) {
+    public void setIrScoresToDocuments(DocumentList<Q> documents, String docIdField, IRScoreFeatureKey scoreType) {
         final Map<Q, List<Document<Q>>> documentsByQuery = documents.stream().collect(Collectors.groupingBy(Document::getQueryDescription));
         for (Q query : documentsByQuery.keySet()) {
             Map<String, Document<Q>> documentsById = documentsByQuery.get(query).stream().collect(Collectors.toMap(Document::getId, Function.identity()));
@@ -217,10 +224,10 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
                 final Map<String, Result> resultsById = results.stream().collect(Collectors.toMap(Result::getId, Function.identity()));
                 for (Retrieval<T, Q> negativeBoost : negativeBoosts) {
                     final DocumentList<Q> documents = DocumentList.fromRetrievalResultList(resultList);
-                    negativeBoost.setIrScoresToDocuments(documents, "pubmedId", IRScore.BM25);
+                    negativeBoost.setIrScoresToDocuments(documents, "pubmedId", scoreKey);
                     documents.stream().filter(d -> resultsById.containsKey(d.getId())).forEach(d -> {
                                 final Result r = resultsById.get(d.getId());
-                                r.setScore(r.getScore() - .00001*d.getIrScore(IRScore.BM25));
+                                r.setScore(r.getScore() - .00001*d.getIrScore(scoreKey));
                             }
                     );
                 }
