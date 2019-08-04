@@ -1,18 +1,17 @@
 package de.julielab.ir.ltr;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
     private static final File STOPLIST_FILE = new File(TreatmentRanker.class.getResource("/treatment-stoplist.txt").getFile());
+
     private List<String> stoplist;
 
     private IRScore outputScoreType = IRScore.TREATMENT;
@@ -50,17 +49,21 @@ public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
             treatments = stoplistFilter(treatments);
 
             // Filter repeated treatments for the same topic
-            // XXX Only 3 will end up, so take that into account
             int topic = document.getQueryDescription().getNumber();
             List<String> previousTreatments = treatmentsByTopic.getOrDefault(topic, new ArrayList<>());
             treatments = repeatedFilter(previousTreatments, treatments);
-            previousTreatments.addAll(treatments);
-            treatmentsByTopic.put(topic, previousTreatments);
+
+            // Prioritize frequent treatments (e.g. "imatinib" and "nilotinib" for 17363509 - Topic 21)
+            treatments = frequencyRanker(treatments);
 
             // Only add documents if there are any remaining treatments
             if (treatments.size() == 0) {
                 continue;
             }
+
+            // Save treatments so they're not repeated
+            previousTreatments.addAll(treatments);
+            treatmentsByTopic.put(topic, previousTreatments);
 
             // Copy BM25 score
             document.setScore(outputScoreType, document.getIrScore(IRScore.BM25));
@@ -94,6 +97,39 @@ public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
                 ret.add(treatment);
             }
         }
+        return ret;
+    }
+
+    /**
+     * Rank treatments based on frequency. Remove duplicates and truncate to MAX_TREATMENTS as a side-effect.
+     *
+     * @param treatments
+     * @return
+     */
+    private List<String> frequencyRanker(List<String> treatments) {
+        // Count treatments
+        Map<String, Integer> treatmentCounts = new LinkedHashMap<>();
+        for (String treatment : treatments) {
+            treatmentCounts.putIfAbsent(treatment, 0);
+            treatmentCounts.compute(treatment, (k, v) -> v + 1);
+        }
+
+        // Keep k treatments in a heap to avoid n*logn sort operation
+        PriorityQueue<Map.Entry<String, Integer>> heap = new PriorityQueue<>(Comparator.comparingInt(Map.Entry::getValue));
+        for (Map.Entry<String, Integer> entry : treatmentCounts.entrySet()) {
+            heap.offer(entry);
+            if (heap.size() > TrecConfig.MAX_TREATMENTS) {
+                heap.poll();
+            }
+        }
+
+        // Re-add treatments in order of increasing frequency
+        List<String> ret = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : heap) {
+            ret.add(entry.getKey());
+        }
+        Collections.reverse(ret);
+
         return ret;
     }
 
