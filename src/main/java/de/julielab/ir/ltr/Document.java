@@ -182,11 +182,11 @@ public class Document<Q extends QueryDescription> {
         return getStratum() != 0;
     }
 
-    public void setTreatments(List<String> treatments) {
-        this.treatments = treatments;
-    }
-
     public List<String> getTreatments() {
         return treatments;
+    }
+
+    public void setTreatments(List<String> treatments) {
+        this.treatments = treatments;
     }
 }
