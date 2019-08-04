@@ -71,6 +71,13 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
     }
 
+    public static TrecPmRetrieval jlpmletor(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmletor")
+                .withSubTemplate(JULIE_COMMON_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
+    }
+
     public static TrecPmRetrieval jlpmtrcommon(int size) {
         // XXX Results should be reranked via TreatmentRanker, see LiteratureArticlesExperimenter.java
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmtrcommon")
