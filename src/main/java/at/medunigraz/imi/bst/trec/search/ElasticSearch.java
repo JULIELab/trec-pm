@@ -80,6 +80,7 @@ public class ElasticSearch implements SearchEngine {
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
+        System.out.println(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
         // #setFilterOnFieldValues(String, Collection)
         if (filterQuery != null) {
