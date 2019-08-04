@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import com.opencsv.CSVWriter;
@@ -24,7 +25,6 @@ public class TrecWriter implements Closeable {
 	private CSVWriter writer;
 	private String runName;
     private static final Function<QueryDescription, String> defaultQueryIdFunction = q -> String.valueOf(q.getNumber());
-    private static final int MAX_TREATMENTS = 3;
 
 	public TrecWriter(File output, String runName) {
 		if (!checkRunName(runName)) {
@@ -85,7 +85,7 @@ public class TrecWriter implements Closeable {
 		for (Result result : resultList.getResults()) {
 			Set<String> treatments = result.getUniqueTreatments();
 
-			String[] entries = new String[NUM_FIELDS + Math.min(MAX_TREATMENTS, treatments.size())];
+			String[] entries = new String[NUM_FIELDS + Math.min(TrecConfig.MAX_TREATMENTS, treatments.size())];
 
 			// 0, 1, and 5 are fixed fields, but we set then here because the array size is unknown beforehand.
 			entries[0] = queryIdFunction.apply(resultList.getTopic());
@@ -99,7 +99,7 @@ public class TrecWriter implements Closeable {
 			int i = 0;
 			for (String treatment : treatments) {
 				entries[6 + i++] = String.format("\"%s\"", treatment);
-				if (i >= MAX_TREATMENTS) {
+				if (i >= TrecConfig.MAX_TREATMENTS) {
 					break;
 				}
 			}

@@ -4,11 +4,13 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.*;
+import at.medunigraz.imi.bst.trec.model.Metrics;
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.Ranker;
-import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -191,7 +193,12 @@ public class Experiment<Q extends QueryDescription> {
             ResultList<Q> rl = new ResultList<>(resultList.getTopic());
             reRankedDocuments.stream().map(d -> {
                 Result newRes = new Result(d.getId(), d.getIrScore(reRanker.getOutputScoreType()));
+
+                // Preserve the original sourceFields, but set eventual treatments optimized by the ranker.
+                // TODO Unify `ResultList` and `DocumentList` (#31)
                 newRes.setSourceFields(resultsById.get(d.getId()).getSourceFields());
+                newRes.setTreatments(d.getTreatments());
+
                 return newRes;
             }).forEach(rl::add);
             ret.add(rl);
