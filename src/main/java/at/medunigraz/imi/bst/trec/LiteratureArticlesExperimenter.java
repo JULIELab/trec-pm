@@ -7,6 +7,8 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
+import de.julielab.ir.ltr.RankLibRanker;
+import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.TreatmentRanker;
 
 import java.io.IOException;
@@ -26,7 +28,7 @@ public class LiteratureArticlesExperimenter {
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         // FIXME @khituras constructor parameters
-        //jlpmletor.setReRanker(new RankLibRanker());
+        jlpmletor.setReRanker(new RankerFromPm1718());
 
         final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));

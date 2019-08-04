@@ -147,8 +147,8 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     }
 
     @Override
-    public DocumentList rank(DocumentList<Q> documents) {
-        final DocumentList<QueryDescription> ret = new DocumentList<>();
+    public DocumentList<Q> rank(DocumentList<Q> documents) {
+        final DocumentList<Q> ret = new DocumentList<>();
 
         Map<String, Document> docsById = documents.stream().collect(Collectors.toMap(d -> d.getQueryDescription().getCrossDatasetId() + d.getId(), Function.identity()));
 
