@@ -27,7 +27,7 @@ public class LiteratureArticlesExperimenter {
                 LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
         jlpmtrcommon.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmtrcommon));
         for (Experiment exp : experiments) {
             exp.run();
         }
