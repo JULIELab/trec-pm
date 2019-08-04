@@ -20,8 +20,8 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
     private static final File BOOST_TEMPLATE = new File(
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
-    private static final File JULIE_NONE_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/juliepmnone.json").getFile());
+    private static final File JULIE_COMMON_TEMPLATE = new File(
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmcommon.json").getFile());
     private static final File SYNONYMS = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
 
@@ -64,16 +64,24 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withProperties("keyword", boost).withTemplate(BOOST_TEMPLATE).withWordRemoval();
     }
 
-    public static TrecPmRetrieval juliepmcommon(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("juliepmcommo")
-                .withSubTemplate(JULIE_NONE_TEMPLATE)
+    public static TrecPmRetrieval jlpmcommon(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon")
+                .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
     }
 
-    public static TrecPmRetrieval jlpmcomtreat(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcomtreat")
-                .withSubTemplate(JULIE_NONE_TEMPLATE)
+    public static TrecPmRetrieval jlpmletor(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmletor")
+                .withSubTemplate(JULIE_COMMON_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
+    }
+
+    public static TrecPmRetrieval jlpmtrcommon(int size) {
+        // XXX Results should be reranked via TreatmentRanker, see LiteratureArticlesExperimenter.java
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmtrcommon")
+                .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withStoredFields(StoredFieldsRegistry.getStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019))
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);

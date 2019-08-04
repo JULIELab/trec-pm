@@ -68,10 +68,10 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.juliepmcommon(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.jlpmcommon(SIZE));
                 break;
             case CLINICAL_TRIALS:
-                retrievalSet.add(ClinicalTrialsRetrievalRegistry.juliectphrase(SIZE));
+                retrievalSet.add(ClinicalTrialsRetrievalRegistry.jlctphrase(SIZE));
                 break;
             default:
                 throw new IllegalArgumentException("Task not supported");

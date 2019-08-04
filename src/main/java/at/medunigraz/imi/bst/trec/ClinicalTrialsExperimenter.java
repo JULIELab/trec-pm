@@ -16,11 +16,16 @@ public final class ClinicalTrialsExperimenter {
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.trialsInternal2019();
 
     public static void main(String[] args) {
-        // Judging order: 2
-        final Experiment juliectphrase = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.juliectphrase(TrecConfig.SIZE));
+        // Judging order: ?
+        final Experiment jlctphrase = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctphrase(TrecConfig.SIZE));
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(juliectphrase));
+        final Experiment jlctletor = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE));
+        // FIXME @khituras constructor parameters
+        //jlctletor.setReRanker(new RankLibRanker());
+
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctphrase, jlctletor));
         for (Experiment exp : experiments) {
             exp.run();
         }

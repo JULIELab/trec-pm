@@ -12,7 +12,7 @@ public final class ClinicalTrialsRetrievalRegistry {
     private static final File PHRASE_TEMPLATE = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
     private static final File JULIE_PHRASE_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/juliectphrase.json").getFile());
+            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctphrase.json").getFile());
     private static final File SYNONYMS = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
 
@@ -45,8 +45,14 @@ public final class ClinicalTrialsRetrievalRegistry {
                 .withSubTemplate(IMPROVED_TEMPLATE);
     }
 
-    public static TrecPmRetrieval juliectphrase(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("juliectphras")
+    public static TrecPmRetrieval jlctphrase(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctphrase")
+                .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
+    }
+
+    public static TrecPmRetrieval jlctletor(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctletor")
                 .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
                 .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
     }
