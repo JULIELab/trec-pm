@@ -32,6 +32,10 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.gene_info</exclude>
+                    <exclude>**/*.gz</exclude>
+                </excludes>
             </resource>
         </resources>
         <plugins>
