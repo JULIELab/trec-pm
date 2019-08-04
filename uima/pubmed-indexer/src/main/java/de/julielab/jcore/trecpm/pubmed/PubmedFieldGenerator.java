@@ -95,13 +95,15 @@ public class PubmedFieldGenerator extends FieldGenerator {
                 for (Pair<String, String> cuiAndText : cuisAndText) {
                     String cui = cuiAndText.getLeft();
                     String text = cuiAndText.getRight();
-                    if (fb.focusedTreatmentCuis.contains(cui)) {
-                        focusedTreatmentCuis.add(new RawToken(cui));
-                        focusedTreatmentText.add(new RawToken(text));
-                    }
-                    if (fb.broadTreatmentCuis.contains(cui)) {
-                        broadTreatmentCuis.add(new RawToken(cui));
-                        broadTreatmentText.add(new RawToken(text));
+                    if (!fb.negativeTreatments.contains(text)) {
+                        if (fb.focusedTreatmentCuis.contains(cui)) {
+                            focusedTreatmentCuis.add(new RawToken(cui));
+                            focusedTreatmentText.add(new RawToken(text));
+                        }
+                        if (fb.broadTreatmentCuis.contains(cui)) {
+                            broadTreatmentCuis.add(new RawToken(cui));
+                            broadTreatmentText.add(new RawToken(text));
+                        }
                     }
                 }
             }
@@ -109,6 +111,10 @@ public class PubmedFieldGenerator extends FieldGenerator {
             document.addField("focusedTreatmentText", focusedTreatmentText);
             document.addField("broadTreatmentCuis", broadTreatmentCuis);
             document.addField("broadTreatmentText", broadTreatmentText);
+            document.addField("numFocusedTreatments", focusedTreatmentCuis.size());
+            document.addField("numBroadTreatments", broadTreatmentCuis.size());
+            document.addField("numUniqueFocusedTreatments", focusedTreatmentCuis.stream().map(RawToken.class::cast).map(RawToken::getTokenValue).distinct().count());
+            document.addField("numUniqueBroadTreatments", broadTreatmentCuis.stream().map(RawToken.class::cast).map(RawToken::getTokenValue).distinct().count());
         }
     }
 

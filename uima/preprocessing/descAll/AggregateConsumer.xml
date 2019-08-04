@@ -18,6 +18,12 @@
             <import location="JCoRe Database Checkpoint Writer.xml"/>
                     
         </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="XMI Database Writer for BANNER Genes">
+                        
+            <import location="XMI Database Writer for BANNER Genes.xml"/>
+                    
+        </delegateAnalysisEngine>
             
     </delegateAnalysisEngineSpecifiers>
         
@@ -36,6 +42,8 @@
                 <node>JCoRe XMI Database Writer</node>
                                 
                 <node>JCoRe Database Checkpoint Writer</node>
+                                
+                <node>XMI Database Writer for BANNER Genes</node>
                             
             </fixedFlow>
                     

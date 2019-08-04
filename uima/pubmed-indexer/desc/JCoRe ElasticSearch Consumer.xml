@@ -195,7 +195,7 @@
                                 
                 <value>
                                         
-                    <string>trecpm18_pm</string>
+                    <string>trecpm19_pm</string>
                                     
                 </value>
                             
@@ -212,6 +212,18 @@
                         <string>http://h5:9201</string>
                                             
                     </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>type</name>
+                                
+                <value>
+                                        
+                    <string>medline</string>
                                     
                 </value>
                             
@@ -286,6 +298,18 @@
             <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
                         
             <optional>true</optional>
+                    
+        </externalResourceDependency>
+                
+        <externalResourceDependency>
+                        
+            <key>treatment-stoplist</key>
+                        
+            <description>List of words not to include into the treatment fields</description>
+                        
+            <interfaceName>de.julielab.jcore.consumer.es.sharedresources.IListProvider</interfaceName>
+                        
+            <optional>false</optional>
                     
         </externalResourceDependency>
             
@@ -426,6 +450,32 @@
                 <implementationName>de.julielab.jcore.trecpm.pubmed.UmlsTreatmentsProvider</implementationName>
                             
             </externalResource>
+                        
+            <externalResource>
+                                
+                <name>treatment-stoplist</name>
+                                
+                <description>List of words not to include into the treatment fields</description>
+                                
+                <configurableDataResourceSpecifier>
+                                        
+                    <url>file:resources/treatment-stoplist.txt</url>
+                                        
+                    <resourceMetaData>
+                                                
+                        <name/>
+                                                
+                        <configurationParameters/>
+                                                
+                        <configurationParameterSettings/>
+                                            
+                    </resourceMetaData>
+                                    
+                </configurableDataResourceSpecifier>
+                                
+                <implementationName>de.julielab.jcore.consumer.es.sharedresources.ListProvider</implementationName>
+                            
+            </externalResource>
                     
         </externalResources>
                 
@@ -460,6 +510,14 @@
                 <key>internalgs2019qrels</key>
                                 
                 <resourceName>internalqrels2019</resourceName>
+                            
+            </externalResourceBinding>
+                        
+            <externalResourceBinding>
+                                
+                <key>treatment-stoplist</key>
+                                
+                <resourceName>treatment-stoplist</resourceName>
                             
             </externalResourceBinding>
                     
