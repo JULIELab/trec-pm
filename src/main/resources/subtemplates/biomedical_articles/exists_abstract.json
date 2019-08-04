@@ -1,0 +1,6 @@
+{
+  "exists": {
+    "field": "abstract",
+    "boost": 2
+  }
+}

@@ -22,10 +22,10 @@ public class WordRemovalQueryDecorator extends QueryDecorator<Topic> {
 		DOMAIN_STOPWORDS.add("tumour");
 		DOMAIN_STOPWORDS.add("primary");
 		DOMAIN_STOPWORDS.add("amplification");
-        	DOMAIN_STOPWORDS.add("of");
-        	DOMAIN_STOPWORDS.add("the");
-        	DOMAIN_STOPWORDS.add("malignant");
-        	DOMAIN_STOPWORDS.add("neoplasm");
+		DOMAIN_STOPWORDS.add("of");
+		DOMAIN_STOPWORDS.add("the");
+		DOMAIN_STOPWORDS.add("malignant");
+		DOMAIN_STOPWORDS.add("neoplasm");
 		DOMAIN_STOPWORDS.add("cell");
 		DOMAIN_STOPWORDS.add("nerve");
 		DOMAIN_STOPWORDS.add("with");
@@ -33,6 +33,19 @@ public class WordRemovalQueryDecorator extends QueryDecorator<Topic> {
 		DOMAIN_STOPWORDS.add("for");
 		DOMAIN_STOPWORDS.add("rearrangement");
 		DOMAIN_STOPWORDS.add("function");
+		DOMAIN_STOPWORDS.add("adenocarcinoma");
+		DOMAIN_STOPWORDS.add("mucosal");
+		DOMAIN_STOPWORDS.add("familial");
+		DOMAIN_STOPWORDS.add("caused");
+		DOMAIN_STOPWORDS.add("by");
+		DOMAIN_STOPWORDS.add("due");
+		DOMAIN_STOPWORDS.add("to");
+		DOMAIN_STOPWORDS.add("disorder");
+		DOMAIN_STOPWORDS.add("defect");
+		DOMAIN_STOPWORDS.add("essential");
+		DOMAIN_STOPWORDS.add("stage");
+		DOMAIN_STOPWORDS.add("microsatellite");
+		DOMAIN_STOPWORDS.add("instability");
 	};
 
 	private static final String TOKEN_SEPARATOR = " ";
