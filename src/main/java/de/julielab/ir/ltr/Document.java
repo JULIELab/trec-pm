@@ -5,16 +5,12 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.FeatureUtils;
 import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.snowball.SnowballFilter;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.uima.cas.CAS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,6 +60,12 @@ public class Document<Q extends QueryDescription> {
      */
     private CAS cas;
     private String normalizedDocumentText;
+
+    /**
+     * Quick-and-dirty approach to have treatments from `Result` here.
+     * @todo Convert into a FeatureVector or unify this class with `Result` (#31)
+     */
+    private List<String> treatments;
 
     public int getStratum() {
         return stratum;
@@ -173,5 +175,13 @@ public class Document<Q extends QueryDescription> {
     public boolean isStratified() {
         // XXX Here we just use the default Java int value. However, maybe one gold standard could have a valid stratum named 0.
         return getStratum() != 0;
+    }
+
+    public void setTreatments(List<String> treatments) {
+        this.treatments = treatments;
+    }
+
+    public List<String> getTreatments() {
+        return treatments;
     }
 }
