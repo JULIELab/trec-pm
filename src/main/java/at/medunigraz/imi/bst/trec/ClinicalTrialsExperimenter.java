@@ -17,10 +17,10 @@ public final class ClinicalTrialsExperimenter {
 
     public static void main(String[] args) {
         // Judging order: 2
-        final Experiment juliectphrase = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.juliectphrase(TrecConfig.SIZE));
+        final Experiment jlctphrase = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctphrase(TrecConfig.SIZE));
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(juliectphrase));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctphrase));
         for (Experiment exp : experiments) {
             exp.run();
         }
