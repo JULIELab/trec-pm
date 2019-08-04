@@ -15,6 +15,9 @@
                 <feature name="lmd" active="true"/>
                 <feature name="lmjm" active="true"/>
             </featuregroup>
+            <featuregroup name="documentEmbeddings" active="true">
+                <feature name="fasttext" active="true"/>
+            </featuregroup>
         </featuregroups>
     </ltrfeatures>
     <indexparameters>

@@ -11,10 +11,7 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.featuregroups.IRSimilarityFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
+import de.julielab.ir.ltr.features.featuregroups.*;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
@@ -80,7 +77,8 @@ public class FeatureControlCenter {
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
                 new TopicMatchFeatureGroup(),
-                new IRSimilarityFeatureGroup()
+                new IRSimilarityFeatureGroup(),
+                new DocumentEmbeddingFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, true));
