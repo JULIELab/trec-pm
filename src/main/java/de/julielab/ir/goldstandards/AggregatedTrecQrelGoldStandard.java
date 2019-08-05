@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,6 +28,10 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     public AggregatedTrecQrelGoldStandard(TrecQrelGoldStandard<Q>... goldStandards) {
         super(log, goldStandards);
 
+    }
+
+    public AggregatedTrecQrelGoldStandard(Collection<TrecQrelGoldStandard<Q>> goldStandards) {
+        super(log, goldStandards.stream().map(AtomicGoldStandard.class::cast).collect(Collectors.toList()));
     }
 
     @Override

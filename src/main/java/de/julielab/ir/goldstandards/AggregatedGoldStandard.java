@@ -30,9 +30,14 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     private List<Q> queryList;
     private Map<Q, DocumentList> documentsByQuery;
 
-    public AggregatedGoldStandard(Logger log, AtomicGoldStandard... goldStandards) {
+    public AggregatedGoldStandard(Logger log, AtomicGoldStandard<Q>... goldStandards) {
         this.log = log;
         this.goldStandards = Stream.of(goldStandards).collect(Collectors.toMap(AtomicGoldStandard::getDatasetId, Function.identity()));
+    }
+
+    public AggregatedGoldStandard(Logger log, Collection<AtomicGoldStandard<Q>> goldStandards) {
+        this.log = log;
+        this.goldStandards = goldStandards.stream().collect(Collectors.toMap(AtomicGoldStandard::getDatasetId, Function.identity()));
     }
 
     @Override

@@ -337,7 +337,7 @@
                                 
                 <value>
                                         
-                    <string>indexing.pm_bm25</string>
+                    <string>indexing.missingdocs_pm</string>
                                     
                 </value>
                             

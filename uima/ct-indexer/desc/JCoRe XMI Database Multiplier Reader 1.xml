@@ -360,6 +360,26 @@
                 </value>
                             
             </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>AnnotationsToLoad</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>banner:de.julielab.jcore.types.Gene</string>
+                                                
+                        <string>de.julielab.jcore.types.PointMutation</string>
+                                                
+                        <string>de.julielab.jcore.types.Scope</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
                     
         </configurationParameterSettings>
                 

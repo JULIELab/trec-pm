@@ -183,7 +183,7 @@
                                 
                 <value>
                                         
-                    <string>trecpm19_ct_bm25</string>
+                    <string>trecpm19_ct</string>
                                     
                 </value>
                             
@@ -197,11 +197,21 @@
                                         
                     <array>
                                                 
-                        <string>http://h5:9200</string>
-                                                
-                        <string>http://h6:9200</string>
+                        <string>http://h5:9201</string>
                                             
                     </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>type</name>
+                                
+                <value>
+                                        
+                    <string>clinicaltrials</string>
                                     
                 </value>
                             
