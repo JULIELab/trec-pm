@@ -3,6 +3,7 @@ package at.medunigraz.imi.bst.retrieval;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.*;
+import bsh.commands.dir;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -143,7 +144,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             if (resultList.getResults().size() != documentsById.size())
                 log.debug("{} documents were requested, {} were returned.", documentsById.size(), resultList.getResults().size());
 
-            resultList.getResults().forEach(r -> documentsById.get(r.getId()).setScore(scoreType, r.getScore()));
+            resultList.getResults().forEach(r -> {
+                final Document<Q> document = documentsById.get(r.getId());
+                document.setScore(scoreType, r.getScore());
+                if (r.getSourceFields() != null)
+                    document.setSourceFields(r.getSourceFields());
+            });
         }
         esQuery.clearTermFilter();
     }
@@ -215,7 +221,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             List<Result> results = query.query(topic);
 
             if (results.isEmpty())
-              //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
+                //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
                 log.error("RESULT EMPTY for {}", getExperimentId());
 
 
@@ -228,7 +234,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
                     negativeBoost.setIrScoresToDocuments(documents, "pubmedId", scoreKey);
                     documents.stream().filter(d -> resultsById.containsKey(d.getId())).forEach(d -> {
                                 final Result r = resultsById.get(d.getId());
-                                r.setScore(r.getScore() - .00001*d.getIrScore(scoreKey));
+                                r.setScore(r.getScore() - .00001 * d.getIrScore(scoreKey));
                             }
                     );
                 }
