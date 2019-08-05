@@ -150,8 +150,8 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         } else throw new IllegalArgumentException("Unsupported task " + task);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
         featurePreprocessing.preprocessTest(documentList, trainDocuments, "");
-        for (Document<Topic> d : documentList)
-            System.out.println(d.getFeatureVector());
+        if (scalingFactors != null)
+            documentList.stream().forEach(d -> FeatureNormalizationUtils.rangeScaleFeatures(d.getFeatureVector(), scalingFactors));
         try {
             if (ranker == null)
                 load(modelFile);
