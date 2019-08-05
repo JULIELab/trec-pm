@@ -22,6 +22,8 @@ public final class LiteratureArticlesRetrievalRegistry {
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
     private static final File JULIE_COMMON_TEMPLATE = new File(
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmcommon.json").getFile());
+    private static final File JULIE_COMMON2_TEMPLATE = new File(
+            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmcommon2.json").getFile());
     private static final File JULIE_BOOST_TEMPLATE = new File(
             LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmboost.json").getFile());
     private static final File SYNONYMS = new File(
@@ -69,6 +71,14 @@ public final class LiteratureArticlesRetrievalRegistry {
     public static TrecPmRetrieval jlpmcommon(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon")
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmcommon2(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
                 .withConditionalCancer();
