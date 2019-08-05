@@ -7,7 +7,6 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
-import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.RankerFromCt1718;
 import de.julielab.ir.ltr.RankerFromInternalCt19;
 
@@ -32,7 +31,13 @@ public final class ClinicalTrialsExperimenter {
                 ClinicalTrialsRetrievalRegistry.jlctltrin(TrecConfig.SIZE));
         jlctltrin.setReRanker(new RankerFromInternalCt19());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctltrin, jlctphrase,jlctletor));
+        final Experiment jlctprec = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctprec(TrecConfig.SIZE));
+
+        final Experiment jlctgenes = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctgenes(TrecConfig.SIZE));
+
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctltrin, jlctphrase, jlctletor, jlctprec, jlctgenes));
         for (Experiment exp : experiments) {
             exp.run();
         }
