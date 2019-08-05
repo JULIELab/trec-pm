@@ -8,7 +8,6 @@ import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
-import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.TreatmentRanker;
@@ -39,7 +38,11 @@ public class LiteratureArticlesExperimenter {
                 LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
         jlpmtrcommon.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmletor,jlpmltrin, jlpmtrcommon));
+        final Experiment jlpmtrboost = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
+        jlpmtrboost.setReRanker(new TreatmentRanker());
+
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmletor,jlpmltrin, jlpmtrcommon, jlpmtrboost));
         for (Experiment exp : experiments) {
             exp.run();
         }
