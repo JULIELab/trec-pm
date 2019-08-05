@@ -42,6 +42,12 @@ public class Topic extends QueryDescription {
     public List<String> customDiseaseExpansions = new ArrayList<>();
     public List<String> customGeneExpansions = new ArrayList<>();
 
+    /**
+     * Custom boosters for cancer topics.
+     */
+    public List<String> cancerBoosters = new ArrayList<>();
+    public List<String> chemotherapyBoosters = new ArrayList<>();
+
     private String disease = "";
     private String geneField = "";
     private TopicGene[] genes = new TopicGene[0];
@@ -235,6 +241,16 @@ public class Topic extends QueryDescription {
         return this;
     }
 
+    public Topic withCancerBooster(String geneExpansion) {
+        this.cancerBoosters.add(geneExpansion);
+        return this;
+    }
+
+    public Topic withChemotherapyBooster(String chemotherapyBooster) {
+        this.chemotherapyBoosters.add(chemotherapyBooster);
+        return this;
+    }
+
     public int getNumber() {
         return number;
     }
@@ -338,6 +354,14 @@ public class Topic extends QueryDescription {
             ret.put("customGeneExpansions" + i, customGeneExpansions.get(i));
         }
 
+        for (int i = 0; i < cancerBoosters.size(); i++) {
+            ret.put("cancerBoosters" + i, cancerBoosters.get(i));
+        }
+
+        for (int i = 0; i < chemotherapyBoosters.size(); i++) {
+            ret.put("chemotherapyBoosters" + i, chemotherapyBoosters.get(i));
+        }
+
         return ret;
     }
 
@@ -385,5 +409,13 @@ public class Topic extends QueryDescription {
 
     public List<String> getCustomGeneExpansions() {
         return customGeneExpansions;
+    }
+
+    public List<String> getCancerBoosters() {
+        return cancerBoosters;
+    }
+
+    public List<String> getChemotherapyDrugs() {
+        return chemotherapyBoosters;
     }
 }
