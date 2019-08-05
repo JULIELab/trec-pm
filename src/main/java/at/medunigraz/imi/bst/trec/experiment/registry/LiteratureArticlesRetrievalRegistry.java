@@ -77,6 +77,16 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmltrin(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmltrin")
+                .withSubTemplate(JULIE_COMMON_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019)
                 .withConditionalCancer();
     }
 

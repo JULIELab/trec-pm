@@ -44,7 +44,8 @@ public class RankerFromCt1718 implements Ranker<Topic> {
         try {
             task = Task.CLINICAL_TRIALS;
             trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.trialsOfficial2017(), TrecPMGoldStandardFactory.trialsOfficial2018());
-            FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
+            if (!FeatureControlCenter.isInitialized())
+                FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("id.keyword", vocabCutoff, xmiTableName);
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
@@ -147,7 +148,7 @@ public class RankerFromCt1718 implements Ranker<Topic> {
             subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
-        featurePreprocessing.preprocessTest(documentList, trainDocuments,"");
+        featurePreprocessing.preprocessTest(documentList, trainDocuments, "");
         try {
             if (ranker == null)
                 load(modelFile);

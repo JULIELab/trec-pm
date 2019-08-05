@@ -44,6 +44,7 @@ public class RankerFromInternalPm19 implements Ranker<Topic> {
         try {
             task = Task.PUBMED;
             trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedInternal2019());
+            if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
             AggregatedTrecQrelGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);

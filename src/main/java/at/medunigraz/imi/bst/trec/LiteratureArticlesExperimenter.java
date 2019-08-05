@@ -32,7 +32,7 @@ public class LiteratureArticlesExperimenter {
         jlpmletor.setReRanker(new RankerFromPm1718());
 
         final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
+                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
         jlpmltrin.setReRanker(new RankerFromInternalPm19());
 
         final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,

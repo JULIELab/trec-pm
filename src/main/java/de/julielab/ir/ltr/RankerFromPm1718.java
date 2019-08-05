@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
@@ -44,7 +45,8 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         try {
             task = Task.PUBMED;
             trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
-            FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
+            if (!FeatureControlCenter.isInitialized())
+                FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
@@ -97,7 +99,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         featurePreprocessing.setRetrievals(m);
         featurePreprocessing.preprocessTrain(documentList, "");
 
-        // scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
+        scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
 
         log.info("Training LtR model");
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
@@ -147,7 +149,9 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
-        featurePreprocessing.preprocessTest(documentList, trainDocuments,"");
+        featurePreprocessing.preprocessTest(documentList, trainDocuments, "");
+        for (Document<Topic> d : documentList)
+            System.out.println(d.getFeatureVector());
         try {
             if (ranker == null)
                 load(modelFile);

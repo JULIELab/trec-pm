@@ -29,7 +29,7 @@ public final class ClinicalTrialsExperimenter {
         jlctletor.setReRanker(new RankerFromCt1718());
 
         final Experiment jlctltrin = new Experiment(GOLD_STANDARD,
-                ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE));
+                ClinicalTrialsRetrievalRegistry.jlctltrin(TrecConfig.SIZE));
         jlctltrin.setReRanker(new RankerFromInternalCt19());
 
         Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctltrin, jlctphrase,jlctletor));

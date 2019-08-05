@@ -58,4 +58,10 @@ public final class ClinicalTrialsRetrievalRegistry {
                 .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS)
                 .withConditionalCancer();
     }
+
+    public static TrecPmRetrieval jlctltrin(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctltrin")
+                .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
+    }
 }
