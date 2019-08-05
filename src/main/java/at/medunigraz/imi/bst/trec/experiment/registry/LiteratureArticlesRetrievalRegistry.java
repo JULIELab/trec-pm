@@ -77,7 +77,7 @@ public final class LiteratureArticlesRetrievalRegistry {
     }
 
     public static TrecPmRetrieval jlpmcommon2(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon")
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
