@@ -1,0 +1,12 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "{{[cancerBoosters]}}",
+        "fields": {{clinical_trials/fields.json}},
+        "tie_breaker": 0.3,
+        "type": "best_fields"
+      }
+    }
+  }
+}

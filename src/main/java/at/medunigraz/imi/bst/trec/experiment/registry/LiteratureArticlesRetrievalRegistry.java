@@ -68,14 +68,16 @@ public final class LiteratureArticlesRetrievalRegistry {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon")
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
-                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
     }
 
     public static TrecPmRetrieval jlpmletor(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmletor")
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
-                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
     }
 
     public static TrecPmRetrieval jlpmtrcommon(int size) {
@@ -84,7 +86,8 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withStoredFields(StoredFieldsRegistry.getStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019))
                 .withWordRemoval().withGeneSynonym()
-                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS);
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
     }
 
 }

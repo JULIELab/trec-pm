@@ -7,7 +7,7 @@
 			{{clinical_trials/gene_noall.json}}
 		],
 		"should": [
-			{{clinical_trials/cancer.json}},
+			{{cancerBoosters:clinical_trials/conditional_cancer.json}},
 			{{clinical_trials/dna.json}},
 			{{clinical_trials/positive_boosters.json}},
 			{{clinical_trials/structured.json}}

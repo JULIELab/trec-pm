@@ -19,7 +19,7 @@ public class FileBasedQueryDecorator extends DynamicQueryDecorator {
     // TODO add support for several expansions inline
     private static final Pattern FORMAT = Pattern.compile("(.+)=>(.+)");
 
-    private Map<String, Set<String>> expansionMap;
+    protected Map<String, Set<String>> expansionMap;
 
     public FileBasedQueryDecorator(File expansions, Query decoratedQuery) {
         super(decoratedQuery);
