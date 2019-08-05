@@ -1,7 +1,7 @@
 {
 	"bool": {
 		"must": [
-			{{biomedical_articles/disease_noall.json}},
+			{{biomedical_articles/disease.json}},
 			{{biomedical_articles/gene.json}}
 		],
 		"should": [
@@ -10,6 +10,7 @@
 			{{cancerBoosters:biomedical_articles/conditional_cancer.json}},
 			{{biomedical_articles/dna.json}},
 			{{biomedical_articles/positive_boosters.json}},
+			{{biomedical_articles/negative_boosters.json}},
 			{{biomedical_articles/exists_abstract.json}},
 			{{biomedical_articles/exists_treatment.json}}
 		],
