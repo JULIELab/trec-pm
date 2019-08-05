@@ -26,6 +26,9 @@ public class LiteratureArticlesExperimenter {
         final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
 
+        final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
+
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         jlpmletor.setReRanker(new RankerFromPm1718());
@@ -42,7 +45,7 @@ public class LiteratureArticlesExperimenter {
                 LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
         jlpmtrboost.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmletor,jlpmltrin, jlpmtrcommon, jlpmtrboost));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmcommon2, jlpmletor,jlpmltrin, jlpmtrcommon, jlpmtrboost));
         for (Experiment exp : experiments) {
             exp.run();
         }
