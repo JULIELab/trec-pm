@@ -367,15 +367,7 @@
                                 
                 <value>
                                         
-                    <array>
-                                                
-                        <string>banner:de.julielab.jcore.types.Gene</string>
-                                                
-                        <string>de.julielab.jcore.types.PointMutation</string>
-                                                
-                        <string>de.julielab.jcore.types.Scope</string>
-                                            
-                    </array>
+                    <array/>
                                     
                 </value>
                             

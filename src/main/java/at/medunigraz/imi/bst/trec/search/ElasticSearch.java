@@ -108,7 +108,6 @@ public class ElasticSearch implements SearchEngine {
                 sb.fetchSource(storedFields, null);
             SearchResponse response = client.search(new SearchRequest(index).source(sb)).get();
             //LOG.trace(JsonUtils.prettify(response.toString()));
-
             SearchHit[] results = response.getHits().getHits();
 
             List<Result> ret = new ArrayList<>();

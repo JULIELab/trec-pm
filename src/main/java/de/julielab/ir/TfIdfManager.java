@@ -65,7 +65,7 @@ public class TfIdfManager {
     public TFIDF getTrainedTfIdf(String id) {
         final TFIDF tfidf = tfidfModels.get(id);
         if (tfidf == null)
-            throw new IllegalArgumentException("There is no TFIDF model training with ID " + id);
+            throw new IllegalArgumentException("There is no TFIDF model trained with ID " + id);
         return tfidf;
     }
 }

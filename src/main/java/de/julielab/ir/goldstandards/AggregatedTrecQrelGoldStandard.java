@@ -31,7 +31,7 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     }
 
     public AggregatedTrecQrelGoldStandard(Collection<TrecQrelGoldStandard<Q>> goldStandards) {
-        super(log, goldStandards.stream().map(AtomicGoldStandard.class::cast).collect(Collectors.toList()));
+        super(log, goldStandards.stream().map(gs -> (AtomicGoldStandard<Q>)gs).collect(Collectors.toList()));
     }
 
     @Override

@@ -4,3 +4,5 @@
 de.julielab.jcore.types.jcore-document-meta-pubmed-types
 de.julielab.jcore.types.jcore-document-structure-pubmed-types
 de.julielab.jcore.types.jcore-semantics-biology-types
+de.julielab.jcore.types.jcore-document-meta-clinicaltrial-types
+de.julielab.jcore.types.jcore-document-structure-clinicaltrial-types

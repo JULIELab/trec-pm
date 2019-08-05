@@ -1,1 +1,0 @@
-de.julielab.jcore.types.Gene

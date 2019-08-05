@@ -25,9 +25,9 @@ import java.util.*;
 
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
-public class RankerFromPm1718 implements Ranker<Topic> {
+public class RankerFromCt1718 implements Ranker<Topic> {
     private static final Logger log = LogManager.getLogger();
-    private final String xmiTableName = "_data_xmi.documents";
+    private final String xmiTableName = "_data_xmi.documents_ct";
     private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
     private METRIC trainMetric = METRIC.NDCG;
     private int k = TrecConfig.SIZE;
@@ -40,15 +40,15 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     private DocumentList<Topic> trainDocuments;
     private File modelFile;
 
-    public RankerFromPm1718() {
+    public RankerFromCt1718() {
         try {
-            task = Task.PUBMED;
-            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
+            task = Task.CLINICAL_TRIALS;
+            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.trialsOfficial2017(), TrecPMGoldStandardFactory.trialsOfficial2018());
             FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
-            featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
+            featurePreprocessing = new FeaturePreprocessing("id.keyword", vocabCutoff, xmiTableName);
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
-            modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
+            modelFile = new File("rankLibModels/ct1718-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         }
@@ -60,8 +60,8 @@ public class RankerFromPm1718 implements Ranker<Topic> {
      * @param args
      */
     public static void main(String args[]) {
-        final RankerFromPm1718 rankerFromPm1718 = new RankerFromPm1718();
-        rankerFromPm1718.trainModel();
+        final RankerFromCt1718 ranker = new RankerFromCt1718();
+        ranker.trainModel();
 
     }
 
@@ -87,7 +87,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         } else if (task == Task.CLINICAL_TRIALS) {
             fullRetrieval = ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE);
             index = TrecConfig.ELASTIC_CT_INDEX;
-            subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
+            subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
         final Map<IRScoreFeatureKey, TrecPmRetrieval> m = new HashMap<>();
         // Scores for the overall query

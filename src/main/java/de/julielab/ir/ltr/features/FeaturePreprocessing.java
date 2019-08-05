@@ -20,6 +20,7 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     private String docIdIndexField;
     private int vocabularyCutoff;
     private Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals;
+    private Set<String> tfIdfVocabulary;
 
     public FeaturePreprocessing(String docIdIndexField, int vocabularyCutoff, String xmiTableName) {
         this.docIdIndexField = docIdIndexField;
@@ -34,16 +35,23 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     public void preprocessTrain(DocumentList<Q> trainDocs, String runId) {
         for (IRScoreFeatureKey featureKey : retrievals.keySet())
             retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
-        Set<String> tfIdfVocabulary = null;
+        tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
-            final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
-            String vocabularyId = getTfIdfId(runId);
-            tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabularyCutoff);
-            if (!TfIdfManager.getInstance().hasModelForKey(vocabularyId))
-                trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(vocabularyId, trainDocumentText.stream());
+            trainTfIdf = learnTfidf(trainDocs, runId);
         }
         FeatureControlCenter.getInstance().createFeatures(trainDocs, trainTfIdf, tfIdfVocabulary, xmiTableName);
+    }
+
+    private TFIDF learnTfidf(DocumentList<Q> trainDocs, String runId) {
+        TFIDF trainTfIdf;
+        final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
+        String vocabularyId = getTfIdfId(runId);
+        tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabularyCutoff);
+        if (!TfIdfManager.getInstance().hasModelForKey(vocabularyId))
+            trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(vocabularyId, trainDocumentText.stream());
+        else trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(vocabularyId);
+        return trainTfIdf;
     }
 
     @NotNull
@@ -54,7 +62,7 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         return vocabularyId;
     }
 
-    public void preprocessTest(DocumentList<Q> testDocs, String runId) {
+    public void preprocessTest(DocumentList<Q> testDocs, DocumentList<Q> trainDocs, String runId) {
         for (IRScoreFeatureKey featureKey : retrievals.keySet())
             retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
 
@@ -63,7 +71,10 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
             final String tfIdfId = getTfIdfId(runId);
             tfIdfVocabulary = VocabularyRestrictor.getInstance().getVocabulary(tfIdfId);
-            trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(tfIdfId);
+            if (TfIdfManager.getInstance().hasModelForKey(tfIdfId))
+                trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(tfIdfId);
+            else
+                trainTfIdf = learnTfidf(trainDocs, runId);
         }
         FeatureControlCenter.getInstance().createFeatures(testDocs, trainTfIdf, tfIdfVocabulary, xmiTableName);
     }

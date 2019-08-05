@@ -32,23 +32,27 @@ public class DocumentShapeFeatureGroup extends FeatureGroup {
         });
         addFeature(FOCUSED_TREATMENTS, inst -> {
             Document doc = (Document) inst.getSource();
-            final List<String> treatments = (List<String>) doc.getSourceFields().get(FOCUSED_TREATMENTS);
-            if (treatments != null) {
-                final Token token = (Token) inst.getData();
-                token.setFeatureValue(NUM_FOCUSED_TREATMENTS, treatments.size());
-                for (String treatment : treatments) {
-                    token.setFeatureValue("focusedTreatment-"+treatment, 1);
+            if (doc.getSourceFields() != null) {
+                final List<String> treatments = (List<String>) doc.getSourceFields().get(FOCUSED_TREATMENTS);
+                if (treatments != null) {
+                    final Token token = (Token) inst.getData();
+                    token.setFeatureValue(NUM_FOCUSED_TREATMENTS, treatments.size());
+                    for (String treatment : treatments) {
+                        token.setFeatureValue("focusedTreatment-" + treatment, 1);
+                    }
                 }
             }
         });
         addFeature(BROAD_TREATMENTS, inst -> {
             Document doc = (Document) inst.getSource();
-            final List<String> treatments = (List<String>) doc.getSourceFields().get(BROAD_TREATMENTS);
-            if (treatments != null) {
-                final Token token = (Token) inst.getData();
-                token.setFeatureValue(NUM_BROAD_TREATMENTS, treatments.size());
-                for (String treatment : treatments) {
-                    token.setFeatureValue("broadTreatment-"+treatment, 1);
+            if (doc.getSourceFields() != null) {
+                final List<String> treatments = (List<String>) doc.getSourceFields().get(BROAD_TREATMENTS);
+                if (treatments != null) {
+                    final Token token = (Token) inst.getData();
+                    token.setFeatureValue(NUM_BROAD_TREATMENTS, treatments.size());
+                    for (String treatment : treatments) {
+                        token.setFeatureValue("broadTreatment-" + treatment, 1);
+                    }
                 }
             }
         });

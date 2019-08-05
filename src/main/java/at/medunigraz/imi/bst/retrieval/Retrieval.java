@@ -215,7 +215,8 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             List<Result> results = query.query(topic);
 
             if (results.isEmpty())
-                throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
+              //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
+                log.error("RESULT EMPTY for {}", getExperimentId());
 
 
             ResultList<Q> resultList = new ResultList<>(topic);

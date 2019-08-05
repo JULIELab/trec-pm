@@ -25,7 +25,7 @@ import java.util.*;
 
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
-public class RankerFromPm1718 implements Ranker<Topic> {
+public class RankerFromInternalPm19 implements Ranker<Topic> {
     private static final Logger log = LogManager.getLogger();
     private final String xmiTableName = "_data_xmi.documents";
     private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
@@ -40,15 +40,15 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     private DocumentList<Topic> trainDocuments;
     private File modelFile;
 
-    public RankerFromPm1718() {
+    public RankerFromInternalPm19() {
         try {
             task = Task.PUBMED;
-            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
+            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedInternal2019());
             FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
-            AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
-            trainDocuments = gs1718.getQrelDocuments();
-            modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
+            AggregatedTrecQrelGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
+            trainDocuments = gs.getQrelDocuments();
+            modelFile = new File("rankLibModels/internalPm19-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         }
@@ -60,8 +60,8 @@ public class RankerFromPm1718 implements Ranker<Topic> {
      * @param args
      */
     public static void main(String args[]) {
-        final RankerFromPm1718 rankerFromPm1718 = new RankerFromPm1718();
-        rankerFromPm1718.trainModel();
+        final RankerFromInternalPm19 ranker = new RankerFromInternalPm19();
+        ranker.trainModel();
 
     }
 

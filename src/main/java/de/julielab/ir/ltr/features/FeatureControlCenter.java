@@ -33,6 +33,7 @@ public class FeatureControlCenter {
     private static final Logger log = LogManager.getLogger();
     private static FeatureControlCenter singleton;
     private HierarchicalConfiguration<ImmutableNode> configuration;
+    private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;
 
     private FeatureControlCenter(HierarchicalConfiguration<ImmutableNode> configuration) {
         this.configuration = configuration;
@@ -75,12 +76,14 @@ public class FeatureControlCenter {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
+        if (documentEmbeddingFeatureGroup == null)
+            documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup(),
-                new DocumentEmbeddingFeatureGroup(),
+                documentEmbeddingFeatureGroup,
                 new DocumentShapeFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);
