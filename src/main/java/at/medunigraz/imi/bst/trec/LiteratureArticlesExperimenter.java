@@ -27,7 +27,6 @@ public class LiteratureArticlesExperimenter {
 
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
-        // FIXME @khituras constructor parameters
         jlpmletor.setReRanker(new RankerFromPm1718());
 
         final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,

@@ -51,7 +51,7 @@ public class TrecPMLtRTrain2017Test2018 {
         // Scores for the overall query
         m.put(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), retrieval);
         // Scores for individual query parts
-        m.putAll(IRFeatureRetrievals.getRetrievals(TrecConfig.ELASTIC_BA_INDEX, EnumSet.allOf(TrecPmQueryPart.class)));
+        m.putAll(IRFeaturePMRetrievals.getRetrievals(TrecConfig.ELASTIC_BA_INDEX, EnumSet.allOf(TrecPmQueryPart.class)));
         featurePreprocessing.setRetrievals(m);
 
 

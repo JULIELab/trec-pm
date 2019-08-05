@@ -78,7 +78,8 @@ public class FeatureControlCenter {
                 new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup(),
-                new DocumentEmbeddingFeatureGroup()
+                new DocumentEmbeddingFeatureGroup(),
+                new DocumentShapeFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, true));

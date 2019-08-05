@@ -23,6 +23,11 @@ public class RandomRanker<Q extends QueryDescription> implements Ranker<Q> {
     }
 
     @Override
+    public void train(DocumentList<Q> documents, boolean doValidation, float fraction, int randomSeed) {
+
+    }
+
+    @Override
     public void load(File modelFile) {
         throw new UnsupportedOperationException();
     }

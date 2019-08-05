@@ -14,6 +14,8 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
@@ -21,13 +23,14 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     public static final String FT_FEATURE_NAME = "fasttext";
     private static Deque<StdioBridge<byte[]>> activeBridges = new ArrayDeque<>();
     private final StdioBridge<byte[]> bridge;
+    private Pattern tokenization = Pattern.compile("([.\\!?,'/()])");
 
     public FastTextEmbeddingFeatures() {
         super(FT_FEATURE_NAME);
         Options<byte[]> options = new Options(byte[].class);
         options.setExecutable("python");
         options.setExternalProgramTerminationSignal("exit");
-        options.setExternalProgramReadySignal("Script is ready!");
+        options.setExternalProgramReadySignal("Script is ready");
         bridge = new StdioBridge(options, "-u", "src/main/resources/python/getFastTextEmbeddingScript.py", "resources/dim300.bin");
         try {
             bridge.start();
@@ -62,7 +65,10 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     @Override
     protected double[] getDocumentEmbedding(String documentText) {
         try {
-            Stream<byte[]> response = bridge.sendAndReceive(documentText);
+            // Do some simple normalization, actually inspired by some sed and tr command example from the FastText text classification tutorial
+            String tokenizedDocumentText = tokenization.matcher(documentText).replaceAll(" $1 ");
+            tokenizedDocumentText = tokenizedDocumentText.toLowerCase();
+            Stream<byte[]> response = bridge.sendAndReceive(tokenizedDocumentText);
             byte[] bytes = response.findAny().get();
             DoubleBuffer db = ByteBuffer.wrap(bytes).asDoubleBuffer();
             double[] array = new double[db.capacity()];

@@ -80,7 +80,6 @@ public class ElasticSearch implements SearchEngine {
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
-        System.out.println(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
         // #setFilterOnFieldValues(String, Collection)
         if (filterQuery != null) {
@@ -88,7 +87,7 @@ public class ElasticSearch implements SearchEngine {
         }
         LOG.trace(JsonUtils.prettify(jsonQuery));
         String cacheKey = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "");
-        LOG.debug("Query ID for cache: {}", cacheKey);
+        LOG.trace("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
             if (!(parameters instanceof NoParameters)) {

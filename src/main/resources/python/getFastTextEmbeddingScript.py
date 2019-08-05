@@ -20,6 +20,7 @@ stdbuffer = sys.stdin.buffer
 print("Script is ready")
 while True:
     line = decodeString(stdbuffer)
+    line = line.replace("\n", " ")
     if line.strip() == "exit":
         sys.exit(0)
     docVector = model.get_sentence_vector(line)

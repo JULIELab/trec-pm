@@ -141,7 +141,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
             esQuery.setSize(documentsById.size());
             final ResultList<Q> resultList = retrieve(Collections.singleton(query)).get(0);
             if (resultList.getResults().size() != documentsById.size())
-                log.warn("{} documents were requested, {} were returned.", documentsById.size(), resultList.getResults().size());
+                log.debug("{} documents were requested, {} were returned.", documentsById.size(), resultList.getResults().size());
 
             resultList.getResults().forEach(r -> documentsById.get(r.getId()).setScore(scoreType, r.getScore()));
         }
