@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
@@ -98,7 +99,7 @@ public class RankerFromCt1718 implements Ranker<Topic> {
         featurePreprocessing.setRetrievals(m);
         featurePreprocessing.preprocessTrain(documentList, "");
 
-        // scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
+        scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
 
         log.info("Training LtR model");
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
