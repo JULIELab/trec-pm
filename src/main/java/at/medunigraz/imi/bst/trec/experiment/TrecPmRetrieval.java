@@ -107,4 +107,9 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         query = new FileBasedQueryDecorator(synonymList, query);
         return this;
     }
+
+    public TrecPmRetrieval withConditionalCancer() {
+        query = new ConditionalCancerQueryDecorator(query);
+        return this;
+    }
 }

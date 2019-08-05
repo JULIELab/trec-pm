@@ -1,0 +1,6 @@
+{
+  "exists": {
+    "field": "focusedTreatmentText",
+    "boost": 1
+  }
+}
