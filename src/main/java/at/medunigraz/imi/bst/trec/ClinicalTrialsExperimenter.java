@@ -9,6 +9,7 @@ import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.RankerFromCt1718;
+import de.julielab.ir.ltr.RankerFromInternalCt19;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -20,14 +21,18 @@ public final class ClinicalTrialsExperimenter {
 
     public static void main(String[] args) {
         // Judging order: ?
-//        final Experiment jlctphrase = new Experiment(GOLD_STANDARD,
-//                ClinicalTrialsRetrievalRegistry.jlctphrase(TrecConfig.SIZE));
+        final Experiment jlctphrase = new Experiment(GOLD_STANDARD,
+               ClinicalTrialsRetrievalRegistry.jlctphrase(TrecConfig.SIZE));
 
         final Experiment jlctletor = new Experiment(GOLD_STANDARD,
                 ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE));
         jlctletor.setReRanker(new RankerFromCt1718());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlctletor));
+        final Experiment jlctltrin = new Experiment(GOLD_STANDARD,
+                ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE));
+        jlctltrin.setReRanker(new RankerFromInternalCt19());
+
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlctltrin, jlctphrase,jlctletor));
         for (Experiment exp : experiments) {
             exp.run();
         }

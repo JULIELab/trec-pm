@@ -9,6 +9,7 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.RankLibRanker;
+import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.TreatmentRanker;
 
@@ -23,19 +24,22 @@ public class LiteratureArticlesExperimenter {
 
     public static void main(String[] args) throws IOException {
         // Judging order: ?
-//        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
-//                LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
+        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
 
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         jlpmletor.setReRanker(new RankerFromPm1718());
 
-//        final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
-//                LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
-//        jlpmtrcommon.setReRanker(new TreatmentRanker());
+        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
+        jlpmltrin.setReRanker(new RankerFromInternalPm19());
 
-        //Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmletor, jlpmtrcommon));
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlpmletor));
+        final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
+        jlpmtrcommon.setReRanker(new TreatmentRanker());
+
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmletor,jlpmltrin, jlpmtrcommon));
         for (Experiment exp : experiments) {
             exp.run();
         }
