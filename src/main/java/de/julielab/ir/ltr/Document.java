@@ -15,6 +15,7 @@ import org.apache.uima.jcas.JCas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class Document<Q extends QueryDescription> {
     private Map<IRScoreFeatureKey, Double> irScores;
     /**
      * The serialized CAS data of this document as retrieved from the database. To be set through
-     * {@link de.julielab.ir.OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList, String)}.
+     * {@link OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList, String)}.
      */
     private byte[] fullDocumentData;
     /**
@@ -60,7 +61,7 @@ public class Document<Q extends QueryDescription> {
      */
     private FeatureVector fv;
     /**
-     * The deserialized version of fullDocumentData. To be created by {@link de.julielab.ir.OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[])}.
+     * The deserialized version of fullDocumentData. To be created by {@link OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[])}.
      * This field will mostly be null because it is very expansive to keep a lot of CAS instances around.
      * Thus, this field will be populated on request.
      */
@@ -73,6 +74,7 @@ public class Document<Q extends QueryDescription> {
      * @todo Convert into a FeatureVector or unify this class with `Result` (#31)
      */
     private List<String> treatments;
+    private Map<String, Object> sourceFields = Collections.emptyMap();
 
     public int getStratum() {
         return stratum;
@@ -240,5 +242,13 @@ public class Document<Q extends QueryDescription> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public Map<String, Object> getSourceFields() {
+        return sourceFields;
+    }
+
+    public void setSourceFields(Map<String, Object> sourceFields) {
+        this.sourceFields = sourceFields;
     }
 }

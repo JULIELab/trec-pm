@@ -13,6 +13,8 @@ import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.features.featuregroups.*;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.java.utilities.ConfigurationUtilities;
+import org.apache.commons.configuration2.ConfigurationUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
@@ -53,18 +55,18 @@ public class FeatureControlCenter {
     }
 
     public boolean isTfIdfActive() {
-        return configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
+        return configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
     }
 
     public boolean filterActive(FeatureGroup featureGroup) {
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
+        final boolean isActive = configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
         log.trace("Checking if feature group '{}' is active: {} ", featureGroup.getName(), isActive);
         return isActive;
     }
 
     public boolean filterActive(FeatureGroup featureGroup, Feature feature) {
         // featuregroups/featuregroup[@name='fgname']/feature[@name='fname' and @active='true']
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
+        final boolean isActive = configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
         log.trace("Checking if feature '{}' is active: {} ", slash(featureGroup.getName(), feature.getName()), isActive);
         return isActive;
     }

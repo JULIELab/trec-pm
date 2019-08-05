@@ -26,6 +26,7 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
             final Document<Q> doc = new Document<>();
             doc.setId(r.getId());
             doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
+            doc.setSourceFields(r.getSourceFields());
             doc.setTreatments(r.getTreatments());
             doc.setQueryDescription(list.getTopic());
             documents.add(doc);

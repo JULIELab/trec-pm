@@ -93,19 +93,22 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
         else
             log.info("Training on {} documents where a fraction of {} is used for training and the rest for validation. The split is done randomly with a seed of {}.", documents.size(), fraction, randomSeed);
         final Map<String, RankList> rankLists = convertToRankList(documents);
-        final Pair<Map<String, RankList>, Map<String, RankList>> trainValData = makeValidationSplit(rankLists, doValidation, fraction, randomSeed);
+        if (featureNormalizer != null)
+            rankLists.values().forEach(featureNormalizer::normalize);
+        final Pair<Map<String, RankList>, Map<String, RankList>> trainValData = makeValidationSplit(rankLists, fraction, randomSeed);
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
         ranker = new RankerTrainer().train(rType, new ArrayList(trainValData.getLeft().values()), new ArrayList<>(trainValData.getRight().values()), features, metricScorerFactory.createScorer(trainMetric, k));
         if (!documents.isEmpty()) {
             final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
-            log.info("LtR features: " + alphabet);
+            log.trace("LtR features: " + alphabet);
         }
     }
 
-    private Pair<Map<String, RankList>, Map<String, RankList>> makeValidationSplit(Map<String, RankList> allData, boolean doValidation, float fraction, int randomSeed) {
+    private Pair<Map<String, RankList>, Map<String, RankList>> makeValidationSplit(Map<String, RankList> allData, float fraction, int randomSeed) {
         if (fraction < 0 || fraction >= 1)
             throw new IllegalArgumentException("The fraction to be taken from the training data for validation is specified as " + fraction + " but it must be in [0, 1).");
-        int size = (int) fraction * allData.size();
+        int size = (int) (fraction * allData.size());
+        log.info("Splitting into training size of {} and validation size of {} queries", size, allData.size()-size);
         final List<RankList> shuffledData = new ArrayList<>(allData.values());
         Collections.shuffle(shuffledData, new Random(randomSeed));
         Map<String, RankList> train = new HashMap<>();
@@ -178,6 +181,8 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             throw new IllegalArgumentException("The passed document do not have unique IDs. The input document list has size " + documents + ", its ID map form only " + docsById.size());
 
         final Map<String, RankList> rankLists = convertToRankList(documents);
+        if (featureNormalizer != null)
+            rankLists.values().forEach(featureNormalizer::normalize);
         for (RankList rl : rankLists.values()) {
             for (int i = 0; i < rl.size(); i++) {
                 final DataPoint dp = rl.get(i);

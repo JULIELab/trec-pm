@@ -39,7 +39,7 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
             final List<String> trainDocumentText = OriginalDocumentRetrieval.getInstance().getDocumentText(trainDocs.getSubsetWithUniqueDocumentIds(), xmiTableName).collect(Collectors.toList());
             String vocabularyId = getTfIdfId(runId);
-            tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.FREQUENCY, vocabularyCutoff);
+            tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabularyCutoff);
             if (!TfIdfManager.getInstance().hasModelForKey(vocabularyId))
                 trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(vocabularyId, trainDocumentText.stream());
         }

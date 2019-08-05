@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
@@ -20,7 +21,6 @@ import java.io.*;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class RankerFromPm1718 implements Ranker<Topic> {
     private static final Logger log = LogManager.getLogger();
@@ -56,9 +56,10 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     public void trainModel() {
         AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
         train(gs1718.getQrelDocuments());
-        save(new File("rankLibModels/pm1718-val10pct.mod"));
+        save(new File("rankLibModels/pm1718-val20pct.mod"));
         FastTextEmbeddingFeatures.shutdown();
         OriginalDocumentRetrieval.getInstance().shutdown();
+        ElasticClientFactory.getClient().close();
     }
 
     @Override
@@ -72,12 +73,12 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         featurePreprocessing.setRetrievals(m);
         featurePreprocessing.preprocessTrain(documentList, "");
 
-        scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
+       // scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
 
         log.info("Training LtR model");
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
         long time = System.currentTimeMillis();
-        ranker.train(documentList, true, 0.1f, 1);
+        ranker.train(documentList, true, 0.8f, 1);
         time = System.currentTimeMillis() - time;
         log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, documentList.size(), time, time / 1000 / 60);
     }
