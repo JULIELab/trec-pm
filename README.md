@@ -53,6 +53,14 @@ the file at this location.
 - `wc -c umlsSynsets.txt` = 338449057
 - `gzip resources/umlsSynsets.txt`
 
+### FastText Embeddings for LtR
+
+`FastText` embeddings are used to create document embeddings for LtR features. Note that their performance impact seemed to be minor in experiments on the TREC-PM 17/18 data and probably can be left out without great performance penalties. However, this can't be said for sure before evaluation on the 2019 gold standard.
+The emebeddings can be recreated by:
+1. Run the BANNER gene tagger from [jcore-projects](https://github.com/JULIELab/jcore-projects/tree/master/jcore-jnet-ae-biomedical-english), version>=2.4 on the Medline/PubMed 2019 baseline.
+2. Extract the document text from those document with at least one tagged gene in them. This should be around 8 million documents. The text is the title plus abstract text (e.g. by using the [JCoRe PubMed reader](https://github.com/JULIELab/jcore-projects/tree/master/jcore-pubmed-reader) and the [JCoRe To TXT consumer](https://github.com/JULIELab/jcore-base/tree/master/jcore-txt-consumer) in the `DOCUMENT` mode). No postprocessing (which should be done for better models but hasn't been done on the used embeddings).
+3. Create `FastText` word embeddings with a dimension of 300. We used the `.bin` output for LtR features.
+
 ## Some Examples on How to Run Experiments
 
 ```
@@ -80,6 +88,23 @@ mvn clean install
 mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.KeywordExperimenter" > out.txt &
 cat out.txt | grep -e "\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)" | sed -r "s/"\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)"/\1 \2 \4/" > results.txt
 ```
+# How to Create the Document Database and the ElasticSearch Index
+
+The databases can be re-created using the the components in the `uima` subdirectory.
+All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](https://github.com/JULIELab/jcore-pipeline-modules) in version `0.4.0`. Note that all pipelines require their libraries in the `lib/` directory which does not exist at first. It is automatically created and populated by opening the pipeline with the `JCoRe Pipeline Builder CLI` under the above link. Opening the pipeline should be enough. If this das not create and populate the `lib/` directory, try opening and saving the pipeline.
+
+1. Install `ElasticSearch 5.4` and `Postgres >= 9.6`. Used for the experiments was `Postgres 9.6.13`.
+1. Change into the `uima` directory on the command line and execute `./gradlew install-uima-components`. this must successfully run through in order to complete the following steps. Note that Gradle is only used for scripting, the projects are all build with Maven. Thus, check the Maven output for success or failure messages. Gradle may report success despite Maven failing.
+1. Run the `pm-to-xmi-db-pipeline` and the `ct-to-xmi-db-pipeline` with the `JCoRE Pipeline Runner`. Before you actually run those, check the `pipelinerunner.xml` configuration files in both projects for the number threads being used. Adapt them to the capabilities of your system, if necessary.
+1. Configure the `preprocessing` and `preprocessing_ct` with the `JCoRe Pipeline Builder` to active nearly all (explained in a second) components. Some are deactivated in this release. Note that there are some components specific to `BANNER` gene tagging and `FLAIR` gene tagging. Use the `BANNER` components, Flair hasn't been used in our submitted runs. You might also leave the `LingScope` and `MutationFinder` components off because those haven't been used either. Configure the `uima/costosys.xml` file in all pipelines to point to your Postgres database. Run the components. They will write the annotation data into the Postgres database. We used multiple machines for this, employing the SLURM scheduler (not required). All in all we had 96 CPU cores available. Processing time was in the hours, much less than a day for PubMed. The processing will accordingly take longer or shorter depending on the resources at your disposal.
+1. Configure the `pubmed-indexer` and `ct-indexer` projects to work with your ElasticSearch index using the `JCoRe Pipeline Builder`. Execute `mvn package` in both pipeline directories to build the indexing code, which is packaged as a `jar` and automatically put into the `lib` directory of the pipelines. Run the components.
+
+If all steps have been performed successfully, the indices should now be present in your ElasticSearch instance. To run the experiments, also configure the `<repository root>/config/costosys.xml`  file to point to your database. Then run the `at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter´ and `at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter` classes.
+
+## Q&A
+**Q: Do I really need to store all the documents into the database? Wouldn't it be quicker just to index everything directly from the source data?**
+
+*A: Directly indexing from the source data is very well possible by combining the respective parts of the three steps (reading, preprocessing, indexing). Note however, that the LtR feature generation makes use of the document stored in the database. Thus, LtR wouldn't work this way.*
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2b63c0e0c69140318323c9eb1cd19f32)](https://www.codacy.com/app/michelole/trec-pm)
 [![Build Status](https://travis-ci.com/JULIELab/trec-pm.svg?branch=master)](https://travis-ci.com/JULIELab/trec-pm)
