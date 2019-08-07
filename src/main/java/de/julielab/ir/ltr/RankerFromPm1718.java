@@ -93,7 +93,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         } else throw new IllegalArgumentException("Unsupported task " + task);
         final Map<IRScoreFeatureKey, TrecPmRetrieval> m = new HashMap<>();
         // Scores for the overall query
-        m.put(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), fullRetrieval);
+        m.put(new IRScoreFeatureKey(IRScore.BM25, FULL), fullRetrieval);
         // Scores for individual query parts
         m.putAll(subClauseRetrievals);
         featurePreprocessing.setRetrievals(m);
