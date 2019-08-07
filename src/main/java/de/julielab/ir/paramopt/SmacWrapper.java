@@ -8,12 +8,8 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.julielab.ir.ltr.features.FCConstants.ACTIVE_ATTR;
-import static de.julielab.ir.ltr.features.FCConstants.FEATURE;
-import static de.julielab.ir.ltr.features.FCConstants.NAME_ATTR;
-import static de.julielab.java.utilities.ConfigurationUtilities.last;
-import static de.julielab.java.utilities.ConfigurationUtilities.slash;
-import static de.julielab.java.utilities.ConfigurationUtilities.ws;
+import static de.julielab.ir.ltr.features.FCConstants.*;
+import static de.julielab.java.utilities.ConfigurationUtilities.*;
 
 abstract public class SmacWrapper {
     private final static Logger log = LoggerFactory.getLogger(SmacWrapper.class);

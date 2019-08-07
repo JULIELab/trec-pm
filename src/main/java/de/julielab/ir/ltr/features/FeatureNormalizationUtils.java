@@ -1,12 +1,9 @@
 package de.julielab.ir.ltr.features;
 
-import cc.mallet.types.AugmentableFeatureVector;
-import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class FeatureNormalizationUtils {

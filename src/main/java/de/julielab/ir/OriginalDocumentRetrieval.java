@@ -4,7 +4,6 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import com.ximpleware.VTDException;
 import de.julielab.costosys.configuration.DBConfig;
 import de.julielab.costosys.configuration.FieldConfig;
-import de.julielab.costosys.configuration.HiddenConfig;
 import de.julielab.costosys.dbconnection.CoStoSysConnection;
 import de.julielab.costosys.dbconnection.DataBaseConnector;
 import de.julielab.ir.cache.CacheAccess;

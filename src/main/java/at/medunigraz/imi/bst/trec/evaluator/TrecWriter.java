@@ -6,7 +6,6 @@ import at.medunigraz.imi.bst.trec.model.ResultList;
 import com.opencsv.CSVWriter;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
 

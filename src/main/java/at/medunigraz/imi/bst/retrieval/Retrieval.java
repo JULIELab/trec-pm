@@ -2,8 +2,10 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.*;
-import bsh.commands.dir;
+import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.Result;
+import at.medunigraz.imi.bst.trec.model.ResultList;
+import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;

@@ -3,7 +3,9 @@ package de.julielab.ir.ltr.features;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 
 import java.io.File;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IRFeaturePMRetrievals {
     private static final File DISEASE = ft("/subtemplates/biomedical_articles/disease.json");

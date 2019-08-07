@@ -1,4 +1,3 @@
-import os
 import fasttext
 
 import sys

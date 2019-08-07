@@ -1,6 +1,5 @@
 package de.julielab.ir.ltr;
 
-import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
 

@@ -13,8 +13,6 @@ import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.features.featuregroups.*;
 import de.julielab.ir.model.QueryDescription;
-import de.julielab.java.utilities.ConfigurationUtilities;
-import org.apache.commons.configuration2.ConfigurationUtils;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;

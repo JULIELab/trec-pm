@@ -5,7 +5,9 @@ import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecMetricsCreator;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
-import at.medunigraz.imi.bst.trec.model.*;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
+import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
@@ -24,7 +26,10 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TrecPMLtRTrain2017Test2018 {

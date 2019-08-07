@@ -1,6 +1,5 @@
 package de.julielab.ir.paramopt;
 
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.junit.Test;
 
 public class SmacWrapperTest {
