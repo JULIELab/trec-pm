@@ -18,39 +18,72 @@ import java.util.Set;
 public class QueryExpansionExperimenter {
     private static final File EMBEDDINGS = new File(SolidTumorQueryDecorator.class.getResource("/synonyms/embeddings.txt").getFile());
 
-    private static final File TEMPLATE = new File(
+    private static final File BA_TEMPLATE = new File(
             QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba.json").getFile());
+    private static final File CT_TEMPLATE = new File(
+            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct.json").getFile());
 
     private static final GoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
 
     public static void main(String[] args) {
-        TrecPmRetrieval baseline = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
-                .withExperimentName("baseline")
-                .withSubTemplate(TEMPLATE)
+        // Biomedical Articles
+        TrecPmRetrieval baBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ba-baseline")
+                .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval();
 
-        TrecPmRetrieval embeddings = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
-                .withExperimentName("embeddings")
-                .withSubTemplate(TEMPLATE)
+        TrecPmRetrieval baEmbeddings = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ba-embeddings")
+                .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withSynonymList(EMBEDDINGS);
 
-        TrecPmRetrieval terminologies = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
-                .withExperimentName("terminologies")
-                .withSubTemplate(TEMPLATE)
+        TrecPmRetrieval baTerminologies = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ba-terminologies")
+                .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withGeneSynonym()
                 .withDiseasePreferredTerm()
                 .withDiseaseSynonym();
 
-        TrecPmRetrieval rules = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
-                .withExperimentName("rules")
-                .withSubTemplate(TEMPLATE)
+        TrecPmRetrieval baRules = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ba-rules")
+                .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withSolidTumor()
                 .withGeneFamily();
 
-        Set<TrecPmRetrieval> retrievalSet = new LinkedHashSet<>(Arrays.asList(baseline, terminologies, embeddings, rules));
+        // Clinical Trials
+        TrecPmRetrieval ctBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ct-baseline")
+                .withSubTemplate(CT_TEMPLATE)
+                .withWordRemoval();
+
+        TrecPmRetrieval ctEmbeddings = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ct-embeddings")
+                .withSubTemplate(CT_TEMPLATE)
+                .withWordRemoval()
+                .withSynonymList(EMBEDDINGS);
+
+        TrecPmRetrieval ctTerminologies = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ct-terminologies")
+                .withSubTemplate(CT_TEMPLATE)
+                .withWordRemoval()
+                .withGeneSynonym()
+                .withDiseasePreferredTerm()
+                .withDiseaseSynonym();
+
+        TrecPmRetrieval ctRules = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ct-rules")
+                .withSubTemplate(CT_TEMPLATE)
+                .withWordRemoval()
+                .withSolidTumor()
+                .withGeneFamily();
+
+        Set<TrecPmRetrieval> retrievalSet = new LinkedHashSet<>(Arrays.asList(
+                baBaseline, baEmbeddings, baTerminologies, baRules,
+                ctBaseline, ctEmbeddings, ctTerminologies, ctRules));
+
         for (TrecPmRetrieval retrieval : retrievalSet) {
             new Experiment<>(GOLD_STANDARD, retrieval).run();
         }

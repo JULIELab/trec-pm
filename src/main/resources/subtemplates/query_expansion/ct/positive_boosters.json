@@ -1,0 +1,12 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "surgery therapy treatment prognosis prognostic survival patient resistance recurrence targets malignancy study therapeutical outcome",
+        "fields": {{clinical_trials/fields.json}},
+        "tie_breaker": 0.3,
+        "type": "best_fields"
+      }
+    }
+  }
+}
