@@ -68,7 +68,7 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.jlpmcommon(SIZE));
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.jlpmcommon2(SIZE));
                 break;
             case CLINICAL_TRIALS:
                 retrievalSet.add(ClinicalTrialsRetrievalRegistry.jlctphrase(SIZE));
