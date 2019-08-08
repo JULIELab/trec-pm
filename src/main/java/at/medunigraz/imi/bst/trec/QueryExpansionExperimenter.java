@@ -18,6 +18,8 @@ import java.util.Set;
 public class QueryExpansionExperimenter {
     private static final File EMBEDDINGS = new File(SolidTumorQueryDecorator.class.getResource("/synonyms/embeddings.txt").getFile());
 
+    private static final String BOOST = "0.5";
+
     private static final File BA_TEMPLATE = new File(
             QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba.json").getFile());
     private static final File CT_TEMPLATE = new File(
@@ -29,17 +31,20 @@ public class QueryExpansionExperimenter {
         // Biomedical Articles
         TrecPmRetrieval baBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-baseline")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval();
 
         TrecPmRetrieval baEmbeddings = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-embeddings")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withSynonymList(EMBEDDINGS);
 
         TrecPmRetrieval baTerminologies = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-terminologies")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withGeneSynonym()
@@ -48,6 +53,7 @@ public class QueryExpansionExperimenter {
 
         TrecPmRetrieval baRules = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-rules")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval()
                 .withSolidTumor()
@@ -56,17 +62,20 @@ public class QueryExpansionExperimenter {
         // Clinical Trials
         TrecPmRetrieval ctBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-baseline")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(CT_TEMPLATE)
                 .withWordRemoval();
 
         TrecPmRetrieval ctEmbeddings = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-embeddings")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(CT_TEMPLATE)
                 .withWordRemoval()
                 .withSynonymList(EMBEDDINGS);
 
         TrecPmRetrieval ctTerminologies = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-terminologies")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(CT_TEMPLATE)
                 .withWordRemoval()
                 .withGeneSynonym()
@@ -75,6 +84,7 @@ public class QueryExpansionExperimenter {
 
         TrecPmRetrieval ctRules = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-rules")
+                .withProperties("boost", BOOST)
                 .withSubTemplate(CT_TEMPLATE)
                 .withWordRemoval()
                 .withSolidTumor()

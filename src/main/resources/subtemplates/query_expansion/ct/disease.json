@@ -17,7 +17,7 @@
           "fields": {{clinical_trials/fields.json}},
           "tie_breaker": 0.3,
           "type": "phrase",
-          "boost": 0.5
+          "boost": {{boost}}
         }
       },
       {{diseaseSynonyms:query_expansion/ct/disease_synonym.json}},
