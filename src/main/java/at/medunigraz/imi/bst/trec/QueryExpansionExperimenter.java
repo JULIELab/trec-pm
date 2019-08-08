@@ -25,7 +25,8 @@ public class QueryExpansionExperimenter {
     private static final File CT_TEMPLATE = new File(
             QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct.json").getFile());
 
-    private static final GoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
+    private static final GoldStandard<Topic> BA_GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
+    private static final GoldStandard<Topic> CT_GOLD_STANDARD = TrecPMGoldStandardFactory.trialsOfficialAggregated();
 
     public static void main(String[] args) {
         // Biomedical Articles
@@ -59,6 +60,12 @@ public class QueryExpansionExperimenter {
                 .withSolidTumor()
                 .withGeneFamily();
 
+        Set<TrecPmRetrieval> retrievalSet = new LinkedHashSet<>(Arrays.asList(
+                baBaseline, baEmbeddings, baTerminologies, baRules));
+        for (TrecPmRetrieval retrieval : retrievalSet) {
+            new Experiment<>(BA_GOLD_STANDARD, retrieval).run();
+        }
+
         // Clinical Trials
         TrecPmRetrieval ctBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-baseline")
@@ -90,12 +97,10 @@ public class QueryExpansionExperimenter {
                 .withSolidTumor()
                 .withGeneFamily();
 
-        Set<TrecPmRetrieval> retrievalSet = new LinkedHashSet<>(Arrays.asList(
-                baBaseline, baEmbeddings, baTerminologies, baRules,
+        retrievalSet = new LinkedHashSet<>(Arrays.asList(
                 ctBaseline, ctEmbeddings, ctTerminologies, ctRules));
-
         for (TrecPmRetrieval retrieval : retrievalSet) {
-            new Experiment<>(GOLD_STANDARD, retrieval).run();
+            new Experiment<>(CT_GOLD_STANDARD, retrieval).run();
         }
 
         ElasticClientFactory.getClient().close();
