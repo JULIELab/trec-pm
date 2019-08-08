@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[geneDescriptions]}}",
+    "fields": {{biomedical_articles/gene_fields.json}},
+    "tie_breaker": 0.3,
+    "type": "phrase",
+    "boost": 0.5
+  }
+}

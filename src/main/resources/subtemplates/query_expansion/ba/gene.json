@@ -1,0 +1,20 @@
+ {
+  "dis_max": {
+    "boost": 1.5,
+    "queries": [
+      {
+        "multi_match": {
+          "query": "{{gene}}",
+          "fields": {{biomedical_articles/gene_fields.json}},
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {{geneSynonyms:query_expansion/ba/gene_synonym.json}},
+      {{geneHypernyms:query_expansion/ba/gene_hypernym.json}},
+      {{geneDescriptions:query_expansion/ba/gene_description.json}},
+      {{customGeneExpansions:query_expansion/ba/custom_gene.json}}
+    ]
+  }
+}
