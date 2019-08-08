@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --mem 40g
-#SBATCH --cpus-per-task 20 
+#SBATCH --cpus-per-task 24 
 #SBATCH -J trecpreproc 
 
 # This library causes a conflict

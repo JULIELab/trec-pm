@@ -11,10 +11,7 @@ import com.wcohen.ss.TFIDF;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.featuregroups.IRSimilarityFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
-import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
+import de.julielab.ir.ltr.features.featuregroups.*;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
@@ -34,6 +31,7 @@ public class FeatureControlCenter {
     private static final Logger log = LogManager.getLogger();
     private static FeatureControlCenter singleton;
     private HierarchicalConfiguration<ImmutableNode> configuration;
+    private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;
 
     private FeatureControlCenter(HierarchicalConfiguration<ImmutableNode> configuration) {
         this.configuration = configuration;
@@ -56,18 +54,18 @@ public class FeatureControlCenter {
     }
 
     public boolean isTfIdfActive() {
-        return configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
+        return configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
     }
 
     public boolean filterActive(FeatureGroup featureGroup) {
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
+        final boolean isActive = configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), ACTIVE_ATTR), true);
         log.trace("Checking if feature group '{}' is active: {} ", featureGroup.getName(), isActive);
         return isActive;
     }
 
     public boolean filterActive(FeatureGroup featureGroup, Feature feature) {
         // featuregroups/featuregroup[@name='fgname']/feature[@name='fname' and @active='true']
-        final boolean isActive = configuration.getBoolean(slash(FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
+        final boolean isActive = configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
         log.trace("Checking if feature '{}' is active: {} ", slash(featureGroup.getName(), feature.getName()), isActive);
         return isActive;
     }
@@ -76,11 +74,15 @@ public class FeatureControlCenter {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
+        if (documentEmbeddingFeatureGroup == null)
+            documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
                 new TopicMatchFeatureGroup(),
-                new IRSimilarityFeatureGroup()
+                new IRSimilarityFeatureGroup(),
+                documentEmbeddingFeatureGroup,
+                new DocumentShapeFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);
         featurePipes.add(new Token2FeatureVector(false, true));

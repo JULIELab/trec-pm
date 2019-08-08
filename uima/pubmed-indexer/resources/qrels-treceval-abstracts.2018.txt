@@ -1,0 +1,1 @@
+../../../src/main/resources/gold-standard/qrels-treceval-abstracts.2018.txt

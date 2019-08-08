@@ -4,11 +4,18 @@ import cc.mallet.types.FeatureVector;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.FeatureUtils;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.jcore.types.AbstractText;
+import de.julielab.jcore.types.Title;
 import org.apache.uima.cas.CAS;
+import org.apache.uima.cas.CASException;
+import org.apache.uima.jcas.JCas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +50,10 @@ public class Document<Q extends QueryDescription> {
     /**
      * Scores that this document has for the given query.
      */
-    private Map<IRScore, Double> irScores;
+    private Map<IRScoreFeatureKey, Double> irScores;
     /**
      * The serialized CAS data of this document as retrieved from the database. To be set through
-     * {@link de.julielab.ir.OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList)}.
+     * {@link OriginalDocumentRetrieval#setXmiCasDataToDocuments(DocumentList, String)}.
      */
     private byte[] fullDocumentData;
     /**
@@ -54,7 +61,7 @@ public class Document<Q extends QueryDescription> {
      */
     private FeatureVector fv;
     /**
-     * The deserialized version of fullDocumentData. To be created by {@link de.julielab.ir.OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[])}.
+     * The deserialized version of fullDocumentData. To be created by {@link OriginalDocumentRetrieval#parseXmiDataIntoJCas(byte[])}.
      * This field will mostly be null because it is very expansive to keep a lot of CAS instances around.
      * Thus, this field will be populated on request.
      */
@@ -63,9 +70,11 @@ public class Document<Q extends QueryDescription> {
 
     /**
      * Quick-and-dirty approach to have treatments from `Result` here.
+     *
      * @todo Convert into a FeatureVector or unify this class with `Result` (#31)
      */
     private List<String> treatments;
+    private Map<String, Object> sourceFields = Collections.emptyMap();
 
     public int getStratum() {
         return stratum;
@@ -108,18 +117,22 @@ public class Document<Q extends QueryDescription> {
         this.relevance = relevance;
     }
 
-    public Map<IRScore, Double> getIrScores() {
+    public Map<IRScoreFeatureKey, Double> getIrScores() {
         return irScores;
     }
 
-    public void setScore(IRScore type, double score) {
+    public void setScore(IRScoreFeatureKey type, double score) {
         if (irScores == null)
             irScores = new HashMap<>();
         irScores.put(type, score);
     }
 
-    public Double getIrScore(IRScore scoreType) {
+    public Double getIrScore(IRScoreFeatureKey scoreType) {
         return irScores != null ? irScores.get(scoreType) : null;
+    }
+
+    public Double getIrScore(IRScore scoreType, TrecPmQueryPart queryPart) {
+        return irScores != null ? irScores.get(new IRScoreFeatureKey(scoreType, queryPart)) : null;
     }
 
     public String getId() {
@@ -177,11 +190,65 @@ public class Document<Q extends QueryDescription> {
         return getStratum() != 0;
     }
 
+    public List<String> getTreatments() {
+        return treatments;
+    }
+
     public void setTreatments(List<String> treatments) {
         this.treatments = treatments;
     }
 
-    public List<String> getTreatments() {
-        return treatments;
+    public String getTitle() {
+        final Title title = getTitleAnnotation();
+        return title != null ? title.getCoveredText() : "";
+    }
+
+    private Title getTitleAnnotation() {
+        try {
+            final JCas jCas = getCas().getJCas();
+            for (Title t : jCas.<Title>getAnnotationIndex(Title.type)) {
+                if (t.getTitleType() == null || t.getTitleType().equals("document"))
+                    return t;
+            }
+        } catch (CASException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public int getTitelLength() {
+        final Title t = getTitleAnnotation();
+        return t != null ? t.getEnd() - t.getBegin() : 0;
+    }
+
+    public int getAbstractLength() {
+        final AbstractText a = getAbstractAnnotation();
+        return a != null ? a.getEnd() - a.getBegin() : 0;
+    }
+
+    public String getAbstract() {
+        final AbstractText a = getAbstractAnnotation();
+        return a != null ? a.getCoveredText() : null;
+
+    }
+
+    private AbstractText getAbstractAnnotation() {
+        try {
+            final JCas jCas = getCas().getJCas();
+            for (AbstractText a : jCas.<AbstractText>getAnnotationIndex(AbstractText.type)) {
+                return a;
+            }
+        } catch (CASException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Map<String, Object> getSourceFields() {
+        return sourceFields;
+    }
+
+    public void setSourceFields(Map<String, Object> sourceFields) {
+        this.sourceFields = sourceFields;
     }
 }

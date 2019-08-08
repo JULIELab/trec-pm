@@ -24,6 +24,8 @@ public class PubmedFilterBoard extends FilterBoard {
     public List<String> officialgs2018;
     @ExternalResource(key = "internalgs2019qrels")
     public List<String> internalgs2019;
+    @ExternalResource(key = "treatment-stoplist")
+    public Set<String> negativeTreatments;
     public Set<String> officalGs2017Docs;
     public Set<String> officalGs2018Docs;
     public Set<String> internalGs2019Docs;

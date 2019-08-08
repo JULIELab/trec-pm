@@ -54,6 +54,12 @@
             <import location="JCoRe Mutation Annotator.xml"/>
                     
         </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Flair Named Entity Recognizer">
+                        
+            <import location="JCoRe Flair Named Entity Recognizer.xml"/>
+                    
+        </delegateAnalysisEngine>
             
     </delegateAnalysisEngineSpecifiers>
         
@@ -84,6 +90,8 @@
                 <node>JCoRe BANNER AE for Biomedical English</node>
                                 
                 <node>JCoRe Mutation Annotator</node>
+                                
+                <node>JCoRe Flair Named Entity Recognizer</node>
                             
             </fixedFlow>
                     

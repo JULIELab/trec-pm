@@ -13,6 +13,10 @@ public final class ClinicalTrialsRetrievalRegistry {
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
     private static final File JULIE_PHRASE_TEMPLATE = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctphrase.json").getFile());
+    private static final File JULIE_PREC_TEMPLATE = new File(
+            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctprec.json").getFile());
+    private static final File JULIE_GENES_TEMPLATE = new File(
+            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctgenes.json").getFile());
     private static final File SYNONYMS = new File(
             ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
 
@@ -55,6 +59,26 @@ public final class ClinicalTrialsRetrievalRegistry {
     public static TrecPmRetrieval jlctletor(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctletor")
                 .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlctltrin(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctltrin")
+                .withSubTemplate(JULIE_PHRASE_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS);
+    }
+
+    public static TrecPmRetrieval jlctprec(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctprec")
+                .withSubTemplate(JULIE_PREC_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlctgenes(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctgenes")
+                .withSubTemplate(JULIE_GENES_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
                 .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS)
                 .withConditionalCancer();
     }

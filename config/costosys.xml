@@ -12,7 +12,7 @@
         </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-        <activeDBConnection>trecpm</activeDBConnection>
+        <activeDBConnection>trecpm19</activeDBConnection>
         <DBConnections>
             <DBConnection name="trecpm19" url="jdbc:postgresql://localhost:5432/trecpm2019"/>
             <DBConnection name="trecpm" url="jdbc:postgresql://localhost:5432/trecpm"/>

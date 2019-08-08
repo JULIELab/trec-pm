@@ -7,15 +7,21 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe XMI Database Writer">
+        <delegateAnalysisEngine key="XMI Database Writer for all with BANNER genes">
                         
-            <import location="JCoRe XMI Database Writer.xml"/>
+            <import location="XMI Database Writer for all with BANNER genes.xml"/>
                     
         </delegateAnalysisEngine>
                 
         <delegateAnalysisEngine key="JCoRe Database Checkpoint Writer">
                         
             <import location="JCoRe Database Checkpoint Writer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="XMI Database Writer for FLAIR Genes">
+                        
+            <import location="XMI Database Writer for FLAIR Genes.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -33,9 +39,11 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe XMI Database Writer</node>
+                <node>XMI Database Writer for all with BANNER genes</node>
                                 
                 <node>JCoRe Database Checkpoint Writer</node>
+                                
+                <node>XMI Database Writer for FLAIR Genes</node>
                             
             </fixedFlow>
                     

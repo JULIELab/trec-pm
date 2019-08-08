@@ -21,7 +21,9 @@
         }
       },
       {{diseaseSynonyms:biomedical_articles/disease_synonym.json}},
-      {{diseaseHypernyms:biomedical_articles/disease_hypernym.json}}
+      {{diseaseHypernyms:biomedical_articles/disease_hypernym.json}},
+      {{customDiseaseExpansions:biomedical_articles/custom_disease.json}},
+      {{match_all.json}}
     ]
   }
 }

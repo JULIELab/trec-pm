@@ -6,7 +6,7 @@ import at.medunigraz.imi.bst.trec.model.ResultList;
 import com.opencsv.CSVWriter;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.Closeable;
@@ -59,7 +59,7 @@ public class TrecWriter implements Closeable {
 		}
 	}
 
-	public <T extends QueryDescription> void writeDocuments(List<DocumentList<T>> documents, IRScore scoreToWrite, Function<QueryDescription, String> queryIdFunction) {
+	public <T extends QueryDescription> void writeDocuments(List<DocumentList<T>> documents, IRScoreFeatureKey scoreToWrite, Function<QueryDescription, String> queryIdFunction) {
         List<ResultList<T>> resultLists = new ArrayList<>();
         for (DocumentList<T> documentList : documents) {
             final ResultList<T> resultList = new ResultList<>(documentList.get(0).getQueryDescription());

@@ -2,6 +2,7 @@ package de.julielab.ir.ltr;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.io.FileUtils;
 
@@ -9,12 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+import static de.julielab.ir.ltr.features.TrecPmQueryPart.FULL;
+
 public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
     private static final File STOPLIST_FILE = new File(TreatmentRanker.class.getResource("/treatment-stoplist.txt").getFile());
 
     private List<String> stoplist;
 
-    private IRScore outputScoreType = IRScore.TREATMENT;
+    private IRScoreFeatureKey outputScoreType = new IRScoreFeatureKey(IRScore.TREATMENT, FULL);
 
     private static List<String> loadStoplist(File file) {
         try {
@@ -26,6 +29,11 @@ public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
 
     @Override
     public void train(DocumentList<Q> documents) {
+        // NOOP
+    }
+
+    @Override
+    public void train(DocumentList<Q> documents, boolean doValidation, float fraction, int randomSeed) {
         // NOOP
     }
 
@@ -66,7 +74,7 @@ public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
             treatmentsByTopic.put(topic, previousTreatments);
 
             // Copy BM25 score
-            document.setScore(outputScoreType, document.getIrScore(IRScore.BM25));
+            document.setScore(outputScoreType, document.getIrScore(new IRScoreFeatureKey(IRScore.BM25, FULL)));
             document.setTreatments(treatments);
 
             ret.add(document);
@@ -134,13 +142,13 @@ public class TreatmentRanker<Q extends QueryDescription> implements Ranker<Q> {
     }
 
     @Override
-    public IRScore getOutputScoreType() {
+    public IRScoreFeatureKey getOutputScoreType() {
         // TODO pull up
         return outputScoreType;
     }
 
     @Override
-    public void setOutputScoreType(IRScore outputScoreType) {
+    public void setOutputScoreType(IRScoreFeatureKey outputScoreType) {
         // TODO pull up
         this.outputScoreType = outputScoreType;
     }

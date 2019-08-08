@@ -20,6 +20,8 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class TrecPM1718LitCrossval {
 
@@ -115,7 +116,7 @@ public class TrecPM1718LitCrossval {
                 for (Result r : list.getResults()) {
                     final Document<Topic> doc = new Document<>();
                     doc.setId(r.getId());
-                    doc.setScore(IRScore.BM25, r.getScore());
+                    doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
                     doc.setQueryDescription(list.getTopic());
                     documents.add(doc);
                 }
@@ -128,7 +129,7 @@ public class TrecPM1718LitCrossval {
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + i + "ltr")) {
-                tw.writeDocuments(lastDocumentLists, IRScore.LTR, aggregatedGoldStandard.getQueryIdFunction());
+                tw.writeDocuments(lastDocumentLists, new IRScoreFeatureKey(IRScore.LTR, TrecPmQueryPart.FULL), aggregatedGoldStandard.getQueryIdFunction());
             }
 
             final File qRelFile = Path.of("aggregatedQrels", "trecPmLit2017-2018.qrel").toFile();

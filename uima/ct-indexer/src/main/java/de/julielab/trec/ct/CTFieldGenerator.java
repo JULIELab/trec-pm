@@ -98,11 +98,21 @@ public class CTFieldGenerator extends FieldGenerator {
             addDocumentClasses(jCas, document);
             addNegationScopes(jCas, document);
             addMutations(jCas, document);
+            addGenes(jCas, document);
         } catch (Throwable t) {
             log.error("Error while indexing document {}", header.getDocId(), t);
             throw t;
         }
         return document;
+    }
+
+    private void addGenes(JCas jCas, Document document) {
+        Collection<Gene> genes = JCasUtil.select(jCas, Gene.class);
+        ArrayFieldValue genesFieldValue = new ArrayFieldValue();
+        for (Gene gene : genes) {
+            genesFieldValue.add(new RawToken(gene.getCoveredText()));
+        }
+        document.addField("genes", genesFieldValue);
     }
 
     private List<String> annos2CoveredStringList(Collection<? extends Annotation> annos) {

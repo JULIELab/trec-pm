@@ -1,6 +1,8 @@
 package de.julielab.ir.ltr;
 
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
@@ -13,11 +15,16 @@ import java.util.Random;
  * @param <Q>
  */
 public class RandomRanker<Q extends QueryDescription> implements Ranker<Q> {
-    private IRScore outputScoreType = IRScore.RANDOM;
+    private IRScoreFeatureKey outputScoreType = new IRScoreFeatureKey(IRScore.RANDOM, TrecPmQueryPart.FULL);
 
     @Override
     public void train(DocumentList<Q> documents) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void train(DocumentList<Q> documents, boolean doValidation, float fraction, int randomSeed) {
+
     }
 
     @Override
@@ -41,12 +48,12 @@ public class RandomRanker<Q extends QueryDescription> implements Ranker<Q> {
     }
 
     @Override
-    public IRScore getOutputScoreType() {
+    public IRScoreFeatureKey getOutputScoreType() {
         return outputScoreType;
     }
 
     @Override
-    public void setOutputScoreType(IRScore outputScoreType) {
+    public void setOutputScoreType(IRScoreFeatureKey outputScoreType) {
 
         this.outputScoreType = outputScoreType;
     }

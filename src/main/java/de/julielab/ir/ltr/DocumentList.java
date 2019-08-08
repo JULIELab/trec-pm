@@ -3,6 +3,8 @@ package de.julielab.ir.ltr;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.*;
@@ -23,7 +25,8 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
         for (Result r : list.getResults()) {
             final Document<Q> doc = new Document<>();
             doc.setId(r.getId());
-            doc.setScore(IRScore.BM25, r.getScore());
+            doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
+            doc.setSourceFields(r.getSourceFields());
             doc.setTreatments(r.getTreatments());
             doc.setQueryDescription(list.getTopic());
             documents.add(doc);
@@ -52,7 +55,7 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
         return ret;
     }
 
-    public void sortByScore(IRScore score) {
+    public void sortByScore(IRScoreFeatureKey score) {
         Collections.sort(this, (d1, d2) -> Double.compare(d2.getIrScore(score), d1.getIrScore(score)));
     }
 }

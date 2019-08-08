@@ -8,8 +8,12 @@ import ciir.umass.edu.metric.METRIC;
 import ciir.umass.edu.metric.MetricScorer;
 import ciir.umass.edu.metric.MetricScorerFactory;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +33,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     private METRIC trainMetric;
     private int k;
     private Normalizer featureNormalizer;
-    private IRScore outputScoreType = IRScore.LTR;
+    private IRScoreFeatureKey outputScoreType = new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL);
 
     /**
      * <p>Creates an object that has all information to create a RankLib ranker but does not immediately do it.</p>
@@ -72,18 +76,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
 
     @Override
     public void train(DocumentList<Q> documents) {
-//        for(int j = 0; j < 20; j++) {
-//            System.out.println(documents.get(j).getId());
-//            final FeatureVector fv = documents.get(j).getFeatureVector();
-//            System.out.println(fv.toString(true));
-//            for (int i = 0; i < fv.numLocations(); i++) {
-//                final int index = fv.indexAtLocation(i);
-//                final double v = fv.value(index);
-//                System.out.print(index + ":" + v + " ");
-//            }
-//            System.out.println("\n");
-//        }
-        //documents.stream().map(d -> d.getId() + d.getFeatureVector().)
+        log.info("Training on {} documents without validation set.", documents.size());
         final Map<String, RankList> rankLists = convertToRankList(documents);
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
         ranker = new RankerTrainer().train(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));
@@ -91,6 +84,40 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
             log.info("LtR features: " + alphabet);
         }
+    }
+
+    @Override
+    public void train(DocumentList<Q> documents, boolean doValidation, float fraction, int randomSeed) {
+        if (!doValidation)
+        log.info("Training on {} documents without validation set.", documents.size());
+        else
+            log.info("Training on {} documents where a fraction of {} is used for training and the rest for validation. The split is done randomly with a seed of {}.", documents.size(), fraction, randomSeed);
+        final Map<String, RankList> rankLists = convertToRankList(documents);
+        if (featureNormalizer != null)
+            rankLists.values().forEach(featureNormalizer::normalize);
+        final Pair<Map<String, RankList>, Map<String, RankList>> trainValData = makeValidationSplit(rankLists, fraction, randomSeed);
+        this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
+        ranker = new RankerTrainer().train(rType, new ArrayList(trainValData.getLeft().values()), new ArrayList<>(trainValData.getRight().values()), features, metricScorerFactory.createScorer(trainMetric, k));
+        if (!documents.isEmpty()) {
+            final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
+            log.trace("LtR features: " + alphabet);
+        }
+    }
+
+    private Pair<Map<String, RankList>, Map<String, RankList>> makeValidationSplit(Map<String, RankList> allData, float fraction, int randomSeed) {
+        if (fraction < 0 || fraction >= 1)
+            throw new IllegalArgumentException("The fraction to be taken from the training data for validation is specified as " + fraction + " but it must be in [0, 1).");
+        int size = (int) (fraction * allData.size());
+        log.info("Splitting into training size of {} and validation size of {} queries", size, allData.size()-size);
+        final List<RankList> shuffledData = new ArrayList<>(allData.values());
+        Collections.shuffle(shuffledData, new Random(randomSeed));
+        Map<String, RankList> train = new HashMap<>();
+        Map<String, RankList> val = new HashMap<>();
+        for (int i = 0; i < size; i++)
+            train.put(shuffledData.get(i).getID(), shuffledData.get(i));
+        for (int i = size; i < shuffledData.size(); i++)
+            val.put(shuffledData.get(i).getID(), shuffledData.get(i));
+        return new ImmutablePair<>(train, val);
     }
 
     /**
@@ -145,8 +172,8 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     }
 
     @Override
-    public DocumentList rank(DocumentList<Q> documents) {
-        final DocumentList<QueryDescription> ret = new DocumentList<>();
+    public DocumentList<Q> rank(DocumentList<Q> documents) {
+        final DocumentList<Q> ret = new DocumentList<>();
 
         Map<String, Document> docsById = documents.stream().collect(Collectors.toMap(d -> d.getQueryDescription().getCrossDatasetId() + d.getId(), Function.identity()));
 
@@ -154,6 +181,8 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             throw new IllegalArgumentException("The passed document do not have unique IDs. The input document list has size " + documents + ", its ID map form only " + docsById.size());
 
         final Map<String, RankList> rankLists = convertToRankList(documents);
+        if (featureNormalizer != null)
+            rankLists.values().forEach(featureNormalizer::normalize);
         for (RankList rl : rankLists.values()) {
             for (int i = 0; i < rl.size(); i++) {
                 final DataPoint dp = rl.get(i);
@@ -180,12 +209,12 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     }
 
     @Override
-    public IRScore getOutputScoreType() {
+    public IRScoreFeatureKey getOutputScoreType() {
         return outputScoreType;
     }
 
     @Override
-    public void setOutputScoreType(IRScore outputScoreType) {
+    public void setOutputScoreType(IRScoreFeatureKey outputScoreType) {
 
         this.outputScoreType = outputScoreType;
     }

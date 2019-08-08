@@ -1,6 +1,5 @@
 package at.medunigraz.imi.bst.config;
 
-import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public final class TrecConfig {
@@ -14,8 +13,8 @@ public final class TrecConfig {
     public static final String ELASTIC_BA_EXTRA_TYPE = getString("ELASTIC_BA_EXTRA_TYPE");
     public static final String ELASTIC_CT_INDEX = getString("ELASTIC_CT_INDEX");
     public static final String ELASTIC_CT_TYPE = getString("ELASTIC_CT_TYPE");
-    public static final String[] ELASTIC_HOSTNAME = getString("ELASTIC_HOSTNAME").split(",");
-    public static final int[] ELASTIC_PORT = Arrays.stream(getString("ELASTIC_PORT").split(",")).mapToInt(Integer::valueOf).toArray();
+    public static final String ELASTIC_HOSTNAME = getString("ELASTIC_HOSTNAME");
+    public static final int ELASTIC_PORT = getInteger("ELASTIC_PORT");
     public static final String ELASTIC_CLUSTER = getString("ELASTIC_CLUSTER");
     public static final String LEXIGRAM_APIKEY = getString("LEXIGRAM_APIKEY");
     public static final String COSTOSYS_CONFIG = getString("COSTOSYS_CONFIG");

@@ -19,6 +19,8 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.RankLibRanker;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.IRScore;
+import de.julielab.ir.ltr.features.IRScoreFeatureKey;
+import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
@@ -108,7 +110,7 @@ public class TrecPM19InternalLitCrossval {
                 for (Result r : list.getResults()) {
                     final Document<Topic> doc = new Document<>();
                     doc.setId(r.getId());
-                    doc.setScore(IRScore.BM25, r.getScore());
+                    doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
                     doc.setQueryDescription(list.getTopic());
                     documents.add(doc);
                 }
@@ -121,7 +123,7 @@ public class TrecPM19InternalLitCrossval {
             }
             final File output = Path.of("myresultsdir-ltr", "pmround" + i + "ltr.results").toFile();
             try (final TrecWriter tw = new TrecWriter(output, "round" + i + "ltr")) {
-                tw.writeDocuments(lastDocumentLists, IRScore.LTR, gs.getQueryIdFunction());
+                tw.writeDocuments(lastDocumentLists, new IRScoreFeatureKey(IRScore.LTR, TrecPmQueryPart.FULL), gs.getQueryIdFunction());
             }
 
 
@@ -148,7 +150,7 @@ public class TrecPM19InternalLitCrossval {
     }
 
     private static String getLtrFoldId(int fold, de.julielab.ir.goldstandards.GoldStandard<?> goldStandard, RANKER_TYPE rType, METRIC trainMetric, int k, int cutoff, String featureConfig) {
-        return "Ltr-Fold:" + fold + "-Goldstandard:" + goldStandard.getDatasetId() + "-Rankertype:" + rType + "-Trainmetric:" + trainMetric + "MetricK:" + k + "-Cutoff:"+cutoff+"-Features:"+featureConfig;
+        return "Ltr-Fold:" + fold + "-Goldstandard:" + goldStandard.getDatasetId() + "-Rankertype:" + rType + "-Trainmetric:" + trainMetric + "MetricK:" + k + "-Cutoff:" + cutoff + "-Features:" + featureConfig;
     }
 
     private static String getTfidfFoldId(int fold, de.julielab.ir.goldstandards.GoldStandard<?> goldStandard) {

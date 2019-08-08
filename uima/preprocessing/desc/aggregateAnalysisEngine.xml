@@ -19,51 +19,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe AcronymAnnotator">
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
                         
-            <import location="JCoRe AcronymAnnotator.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
-                        
-            <import location="JCoRe OpenNLP POS Tagger.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="BioLemmatizer">
-                        
-            <import location="BioLemmatizer.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
-                        
-            <import location="JCore LINNAEUS Species AE.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
-                        
-            <import location="JCoRe Mutation Annotator.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
-                        
-            <import location="JCoRe Lingscope Negation AE.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="PM Classifier 2017">
-                        
-            <import location="PM Classifier 2017.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="PM Classifier 2018">
-                        
-            <import location="PM Classifier 2018.xml"/>
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -87,21 +45,7 @@
                                 
                 <node>JCoRe Token Annotator</node>
                                 
-                <node>JCoRe AcronymAnnotator</node>
-                                
-                <node>JCoRe OpenNLP POS Tagger</node>
-                                
-                <node>BioLemmatizer</node>
-                                
-                <node>JCore LINNAEUS Species AE</node>
-                                
-                <node>JCoRe Mutation Annotator</node>
-                                
-                <node>JCoRe Lingscope Negation AE</node>
-                                
-                <node>PM Classifier 2017</node>
-                                
-                <node>PM Classifier 2018</node>
+                <node>JCoRe BANNER AE for Biomedical English</node>
                             
             </fixedFlow>
                     

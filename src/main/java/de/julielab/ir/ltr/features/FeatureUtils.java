@@ -41,6 +41,8 @@ public class FeatureUtils {
      * @throws IOException If the stopwords cannot be read.
      */
     public String normalizeString(String input)  {
+        if (null == input || input.isBlank())
+            return "";
         try {
             final TokenStream ts = standardAnalyzer.tokenStream("none", input);
             final SnowballFilter sbf = new SnowballFilter(ts, "English");

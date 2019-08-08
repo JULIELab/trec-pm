@@ -104,7 +104,7 @@ public class CTFieldGenerator extends FieldGenerator {
     }
 
     private void addGenes(JCas jCas, Document document) {
-        Collection<Gene> genes = JCasUtil.select(jCas, Gene.class);
+        Collection<Gene> genes = select(jCas, Gene.class);
         ArrayFieldValue genesFieldValue = new ArrayFieldValue();
         for (Gene gene : genes) {
             genesFieldValue.add(new RawToken(gene.getCoveredText()));
@@ -113,7 +113,7 @@ public class CTFieldGenerator extends FieldGenerator {
     }
 
     private void addOrganisms(JCas jCas, Document document) {
-        Collection<Organism> organisms = JCasUtil.select(jCas, Organism.class);
+        Collection<Organism> organisms = select(jCas, Organism.class);
         ArrayFieldValue fieldValue = new ArrayFieldValue();
         for (Organism o : organisms) {
             FSArray resourceEntryList = o.getResourceEntryList();
