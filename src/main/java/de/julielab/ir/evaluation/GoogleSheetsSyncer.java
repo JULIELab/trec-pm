@@ -8,6 +8,7 @@ import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoogleSheetsGoldStandard;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.DocumentList;
+import de.julielab.ir.ltr.TreatmentRanker;
 
 import java.io.File;
 import java.util.LinkedHashSet;
@@ -68,7 +69,8 @@ public class GoogleSheetsSyncer {
         Set<Retrieval> retrievalSet = new LinkedHashSet<>();
         switch (sheet.getTask()) {
             case PUBMED:
-                retrievalSet.add(LiteratureArticlesRetrievalRegistry.jlpmcommon2(SIZE));
+                // Get 10x more docs for treatment ranker
+                retrievalSet.add(LiteratureArticlesRetrievalRegistry.jlpmtrboost(SIZE * 10));
                 break;
             case CLINICAL_TRIALS:
                 retrievalSet.add(ClinicalTrialsRetrievalRegistry.jlctphrase(SIZE));
@@ -83,7 +85,15 @@ public class GoogleSheetsSyncer {
 
             DocumentList<Topic> sheetData = sheet.getQrelDocuments();
             for (ResultList<Topic> resultList : resultsPerTopic) {
-                sheetData.addAll(DocumentList.fromRetrievalResultList(resultList));
+                DocumentList<Topic> retrieved = DocumentList.fromRetrievalResultList(resultList);
+                DocumentList<Topic> ranked = new TreatmentRanker().rank(retrieved);
+                // Limit ourselves to SIZE docs per topic
+                for (int i = 0; i < SIZE; i++) {
+                    sheetData.add(retrieved.get(i));
+                    if (i < ranked.size()) {
+                        sheetData.add(ranked.get(i));
+                    }
+                }
             }
         }
 
