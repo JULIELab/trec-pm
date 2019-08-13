@@ -36,7 +36,7 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 - gcc (for `trec_eval` tool)
 - perl (for `sample_eval` tool)
 - Elasticsearch 5.4.0+
-- python3 (to parse UMLS)
+- python3 (to parse UMLS, get fasttext embeddings)
 
 ## How to Create the Resources for the Experiments
 
