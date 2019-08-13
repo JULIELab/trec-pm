@@ -18,7 +18,7 @@ import java.util.Set;
 public class QueryExpansionExperimenter {
     private static final File EMBEDDINGS = new File(SolidTumorQueryDecorator.class.getResource("/synonyms/embeddings.txt").getFile());
 
-    private static final String BOOST = "0.1";
+    private static final String BOOST = "0.01";
 
     private static final File BA_TEMPLATE = new File(
             QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba.json").getFile());

@@ -14,8 +14,7 @@
       {{geneSynonyms:query_expansion/ct/gene_synonym.json}},
       {{geneHypernyms:query_expansion/ct/gene_hypernym.json}},
       {{geneDescriptions:query_expansion/ct/gene_description.json}},
-      {{customGeneExpansions:query_expansion/ct/custom_gene.json}},
-      {{match_all.json}}
+      {{customGeneExpansions:query_expansion/ct/custom_gene.json}}
     ]
   }
 }
