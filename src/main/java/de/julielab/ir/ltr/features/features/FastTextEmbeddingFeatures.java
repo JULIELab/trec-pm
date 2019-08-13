@@ -31,7 +31,7 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     public FastTextEmbeddingFeatures() {
         super(FT_FEATURE_NAME);
         Options<byte[]> options = new Options(byte[].class);
-        options.setExecutable("python");
+        options.setExecutable("python3");
         options.setExternalProgramTerminationSignal("exit");
         options.setExternalProgramReadySignal("Script is ready");
         bridge = new StdioBridge(options, "-u", "src/main/resources/python/getFastTextEmbeddingScript.py", EMBEDDING_PATH);
