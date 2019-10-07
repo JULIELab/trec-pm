@@ -1,0 +1,29 @@
+{
+  "dis_max": {
+    "boost": 2,
+    "queries": [
+      {
+        "multi_match": {
+          "query": "{{disease}}",
+          "fields": {{clinical_trials/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "phrase",
+          "boost": 1
+        }
+      },
+      {
+        "multi_match": {
+          "query": "{{diseasePreferredTerm}}",
+          "fields": {{clinical_trials/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "phrase",
+          "boost": {{boost}}
+        }
+      },
+      {{diseaseSynonyms:query_expansion/ct/disease_synonym.json}},
+      {{diseaseHypernyms:query_expansion/ct/disease_hypernym.json}},
+      {{customDiseaseExpansions:query_expansion/ct/custom_disease.json}},
+      {{match_all.json}}
+    ]
+  }
+}

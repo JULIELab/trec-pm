@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[geneSynonyms]}}",
+    "fields": {{clinical_trials/fields.json}},
+    "tie_breaker": 0.3,
+    "type": "phrase",
+    "boost": {{boost}}
+  }
+}

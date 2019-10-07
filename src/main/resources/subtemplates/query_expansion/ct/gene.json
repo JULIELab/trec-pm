@@ -1,0 +1,20 @@
+{
+  "dis_max": {
+    "boost": 2,
+    "queries": [
+      {
+        "multi_match": {
+          "query": "{{gene}}",
+          "fields": {{clinical_trials/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {{geneSynonyms:query_expansion/ct/gene_synonym.json}},
+      {{geneHypernyms:query_expansion/ct/gene_hypernym.json}},
+      {{geneDescriptions:query_expansion/ct/gene_description.json}},
+      {{customGeneExpansions:query_expansion/ct/custom_gene.json}}
+    ]
+  }
+}
