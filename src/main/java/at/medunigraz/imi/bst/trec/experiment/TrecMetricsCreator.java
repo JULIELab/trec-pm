@@ -16,7 +16,7 @@ public class TrecMetricsCreator {
     private static final Logger LOG = LogManager.getLogger();
     private String experimentId;
     private String longExperimentId;
-    private File output;
+    private File results;
     private File goldStandard;
     private int k;
     private boolean calculateTrecEvalWithMissingResults;
@@ -25,10 +25,10 @@ public class TrecMetricsCreator {
     private File sampleGoldStandard;
     private Metrics metrics;
 
-    public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File output, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
+    public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File results, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
         this.experimentId = shortExperimentId;
         this.longExperimentId = longExperimentId;
-        this.output = output;
+        this.results = results;
         this.goldStandard = goldStandard;
         this.k = k;
         this.calculateTrecEvalWithMissingResults = calculateTrecEvalWithMissingResults;
@@ -38,18 +38,21 @@ public class TrecMetricsCreator {
     }
 
     public Metrics computeMetrics() {
-        TrecEval te = new TrecEval(goldStandard, output, k, calculateTrecEvalWithMissingResults);
+        final String filename = goldStandardType + "_" + experimentId;
+        final File trecEvalOutput = new File(statsDir, filename + ".trec_eval");
+        TrecEval te = new TrecEval(goldStandard, results, trecEvalOutput, k, calculateTrecEvalWithMissingResults);
         Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
         if (sampleGoldStandard != null) {
-            SampleEval se = new SampleEval(sampleGoldStandard, output);
+            final File samplevalOutput = new File(statsDir, filename + ".sampleval");
+            SampleEval se = new SampleEval(sampleGoldStandard, results, samplevalOutput);
 
             // TODO Refactor into MetricSet
             Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
             for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
                 String topic = entry.getKey();
                 if (topic == null)
-                    throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + output.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
+                    throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + results.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
                 entry.getValue().merge(sampleEvalMetrics.get(topic));
             }
         }
@@ -58,11 +61,11 @@ public class TrecMetricsCreator {
         if (!statsDirFile.exists())
             statsDirFile.mkdir();
 
-        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + goldStandardType + "_" + experimentId + ".xml"));
+        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + filename + ".xml"));
         xsw.write(metricsPerTopic);
         xsw.close();
 
-        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + goldStandardType + "_" + experimentId + ".csv"));
+        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + filename + ".csv"));
         csw.write(metricsPerTopic);
         csw.close();
 

@@ -12,6 +12,7 @@ public class SampleEvalTest {
 
     private static final String GOLD = "/gold-standard/test-sample.qrels";
     private static final String RESULTS = "/results/test.trec_results";
+    private static final String OUTPUT = "/stats/test.sampleval";
 
     @Before
     public void setUp() {
@@ -22,8 +23,9 @@ public class SampleEvalTest {
     public void evaluate() {
         File goldStandard = new File(getClass().getResource(GOLD).getFile());
         File results = new File(getClass().getResource(RESULTS).getFile());
+        File output = new File(getClass().getResource(OUTPUT).getFile());
 
-        SampleEval t = new SampleEval(goldStandard, results);
+        SampleEval t = new SampleEval(goldStandard, results, output);
         assertEquals(0.6309, t.getInfNDCG(), 0.00001);
         assertEquals(0.5, t.getInfAP(), 0.00001);
     }

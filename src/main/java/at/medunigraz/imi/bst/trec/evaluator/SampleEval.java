@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.trec.evaluator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SampleEval extends AbstractEvaluator {
@@ -12,11 +13,10 @@ public class SampleEval extends AbstractEvaluator {
      * $ perl sample_eval.pl
      * Usage:  sample_eval.pl [-q] <qrel_file> <trec_file>
      */
-    private static final String COMMAND = "perl " + SCRIPT + " -q";
+    private static final List<String> COMMAND = Arrays.asList("perl", SCRIPT, "-q");
 
-    public SampleEval(File goldStandard, File results) {
-        super.goldStandard = goldStandard;
-        super.results = results;
+    public SampleEval(File goldStandard, File results, File output) {
+        super(goldStandard, results, output);
         evaluate();
     }
 
@@ -25,8 +25,7 @@ public class SampleEval extends AbstractEvaluator {
     }
 
     public List<String> getFullCommand() {
-        List<String> fullCommand = new ArrayList<>();
-        fullCommand.add(COMMAND);
+        List<String> fullCommand = new ArrayList<>(COMMAND);
         fullCommand.add(goldStandard.getAbsolutePath());
         fullCommand.add(results.getAbsolutePath());
         return fullCommand;

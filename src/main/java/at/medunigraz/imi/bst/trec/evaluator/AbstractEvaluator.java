@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.trec.evaluator;
 
 import at.medunigraz.imi.bst.trec.model.Metrics;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,9 +22,15 @@ public abstract class AbstractEvaluator implements Evaluator {
 
     protected Map<String, Metrics> metricsPerTopic = new TreeMap<>();
 
-    protected File goldStandard, results;
+    protected File goldStandard, results, output;
 
     private static final String TARGET = "all";
+
+    public AbstractEvaluator(File goldStandard, File results, File output) {
+        this.goldStandard = goldStandard;
+        this.results = results;
+        this.output = output;
+    }
 
     protected String[] collectStream(InputStream is) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -74,15 +81,17 @@ public abstract class AbstractEvaluator implements Evaluator {
         String command = String.join(" ", getFullCommand());
         LOG.debug(command);
 
+        ProcessBuilder pb = new ProcessBuilder(getFullCommand());
+        pb.redirectOutput(output);
+
         Process proc = null;
         String[] error = null;
-        String[] output = null;
+        String[] output = new String[0];
         try {
-            proc = Runtime.getRuntime().exec(command);
-            // XXX caveat: error output buffer might be full first and induce deadlock
-            output = collectStream(proc.getInputStream());
+            proc = pb.start();
             error = collectStream(proc.getErrorStream());
             proc.waitFor(10, TimeUnit.SECONDS);
+            output = FileUtils.readLines(this.output, "UTF-8").toArray(output);
         } catch (Exception e) {
             e.printStackTrace();
         }
