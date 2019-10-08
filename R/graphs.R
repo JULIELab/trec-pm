@@ -65,98 +65,106 @@ results$run <- factor(results$run, levels=run_ids)
 
 
 ### Boxplots ###
-plots <- list()
-for (i in metrics) {
-  test <- results %>%
-    filter(measure==i,topic!='all') %>%
-    mutate(value = as.numeric(value))
-
-  means <- aggregate(value ~ run, test, mean)
-
-  g <- ggplot(test, aes(x=run, y=value, fill=run)) +
-    geom_boxplot(alpha=0.8) +
-    # scale_fill_manual(values=tug_colors) +
-    xlab("") +
-    ylab(i) +
-    theme_linedraw() +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
-          plot.background = element_blank(),
-          panel.background = element_blank()) +
-
-    stat_summary(fun.y=mean, color=extra_color, geom="point", shape=18, size=2,show.legend = FALSE) +
-    #geom_text(data = means, aes(label = round(value,4), y = value + 0.04)) +
-    guides(fill=FALSE) + scale_y_continuous(breaks=seq(0,1,0.1), limits=c(0,1))
-
-  if (exists("stats")) {
-    g <- g + geom_hline(yintercept=metrics_best[i], linetype="dashed", color = extra_color)
-    # + geom_text(aes(0.6,metrics_best[i],label="best", vjust = 1), color=extra_color)
-
-    g <- g + geom_hline(yintercept=metrics_median[i], linetype="dashed", color = extra_color)
-    # + geom_text(aes(0.7,metrics_median[i],label="median", vjust = 1), color=extra_color)
-
-    # g <- g + geom_hline(yintercept=metrics_worst[i], linetype="dashed", color = extra_color)
-    # + geom_text(aes(0.7,metrics_worst[i],label="worst", vjust = 1), color=extra_color)
+boxplots <- function(results) {
+  plots <- list()
+  for (i in metrics) {
+    test <- results %>%
+      filter(measure==i,topic!='all') %>%
+      mutate(value = as.numeric(value))
+  
+    means <- aggregate(value ~ run, test, mean)
+  
+    g <- ggplot(test, aes(x=run, y=value, fill=run)) +
+      geom_boxplot(alpha=0.8) +
+      # scale_fill_manual(values=tug_colors) +
+      xlab("") +
+      ylab(i) +
+      theme_linedraw() +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+            plot.background = element_blank(),
+            panel.background = element_blank()) +
+  
+      stat_summary(fun.y=mean, color=extra_color, geom="point", shape=18, size=2,show.legend = FALSE) +
+      #geom_text(data = means, aes(label = round(value,4), y = value + 0.04)) +
+      guides(fill=FALSE) + scale_y_continuous(breaks=seq(0,1,0.1), limits=c(0,1))
+  
+    if (exists("stats")) {
+      g <- g + geom_hline(yintercept=metrics_best[i], linetype="dashed", color = extra_color)
+      # + geom_text(aes(0.6,metrics_best[i],label="best", vjust = 1), color=extra_color)
+  
+      g <- g + geom_hline(yintercept=metrics_median[i], linetype="dashed", color = extra_color)
+      # + geom_text(aes(0.7,metrics_median[i],label="median", vjust = 1), color=extra_color)
+  
+      # g <- g + geom_hline(yintercept=metrics_worst[i], linetype="dashed", color = extra_color)
+      # + geom_text(aes(0.7,metrics_worst[i],label="worst", vjust = 1), color=extra_color)
+    }
+  
+    plots <- append(plots, list(g))
+    #g
   }
-
-  plots <- append(plots, list(g))
-  #g
+  
+  pdf(file = "boxplots.pdf", width = 7, height = 3.5)
+  grid.arrange(grobs = plots, nrow = 1, ncol = length(metrics))
+  dev.off()
 }
-
-pdf(file = "boxplots.pdf", width = 7, height = 3.5)
-grid.arrange(grobs = plots, nrow = 1, ncol = length(metrics))
-dev.off()
-
+boxplots(results)
 
 ### Graphs per Topic ###
-for (metric in metrics) {
-  results_per_topic <- results %>%
-    filter(measure==metric,topic!='all') %>%
-    mutate(value = as.numeric(value)) %>%
-    mutate(topic = factor(topic, levels=unique(sort(as.numeric(topic))))) # Sort topics
-
-  g <- ggplot(data=results_per_topic, aes(x=topic, y=value, group=run)) +
-    geom_line(aes(color=run, linetype=run)) +
-    xlab("Topic") +
-    ylab(metric) +
-    theme_linedraw() +
-    scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL, limits=c(0,1.05)) +  # infNDCG can be higher than 1.00
-    theme(axis.text.x = element_text(angle = 90, hjust = 1),
-          plot.background = element_blank(),
-          panel.background = element_blank(),
-          legend.position = "bottom",
-          legend.title = element_blank())
-
-  if (exists("stats")) {
-    g <- g + geom_line(data=stats,
-                       aes(x=stats[,1], y=stats[,i*3-1], group=NULL),  # Best
-                       size=0.5,
-                       color=extra_color) +
-      geom_line(data=stats,
-                aes(x=stats[,1], y=stats[,i*3], group=NULL),      # Median
-                size=0.5,
-                color=extra_color)
+topic_plots <- function(results) {
+  for (metric in metrics) {
+    results_per_topic <- results %>%
+      filter(measure==metric,topic!='all') %>%
+      mutate(value = as.numeric(value)) %>%
+      mutate(topic = factor(topic, levels=unique(sort(as.numeric(topic))))) # Sort topics
+  
+    g <- ggplot(data=results_per_topic, aes(x=topic, y=value, group=run)) +
+      geom_line(aes(color=run, linetype=run)) +
+      xlab("Topic") +
+      ylab(metric) +
+      theme_linedraw() +
+      scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL, limits=c(0,1.05)) +  # infNDCG can be higher than 1.00
+      theme(axis.text.x = element_text(angle = 90, hjust = 1),
+            plot.background = element_blank(),
+            panel.background = element_blank(),
+            legend.position = "bottom",
+            legend.title = element_blank())
+  
+    if (exists("stats")) {
+      g <- g + geom_line(data=stats,
+                         aes(x=stats[,1], y=stats[,i*3-1], group=NULL),  # Best
+                         size=0.5,
+                         color=extra_color) +
+        geom_line(data=stats,
+                  aes(x=stats[,1], y=stats[,i*3], group=NULL),      # Median
+                  size=0.5,
+                  color=extra_color)
+    }
+  
+    pdf(file = paste(metric, ".pdf", sep=""), width = 7, height = 3.5)
+    print(g)
+    dev.off()
   }
+}
+topic_plots(results)
 
-  pdf(file = paste(metric, ".pdf", sep=""), width = 7, height = 3.5)
+### Precision - Recall Graphs ###
+precision_recall <- function(results) {
+  ircl <- results %>%
+    filter(str_detect(measure, iprec_at_recall),topic=='all') %>%    # Filter only interpolated recall data
+    mutate(measure=str_replace(measure, iprec_at_recall, "")) %>%   # Remove prefix
+    mutate(measure=str_trunc(measure, 3, ellipsis="")) %>%       # Remove second decimal place
+    mutate(value = as.numeric(value))
+  
+  pdf(file = paste("precision-recall.pdf", sep=""), width = 7, height = 3.5)
+  g <- ggplot(data=ircl, aes(x=measure, y=value, group=run)) +
+    geom_line(aes(color=run, linetype=run)) +
+    geom_point(size=0.5) +
+    scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL,limits=c(0,1)) +
+    xlab("Recall") +
+    ylab("Precision") +
+    theme_linedraw() +
+    theme(plot.background = element_blank(), panel.background = element_blank(), legend.title = element_blank())
   print(g)
   dev.off()
 }
-
-
-### Precision - Recall Graphs ###
-ircl <- results %>%
-  filter(str_detect(measure, iprec_at_recall),topic=='all') %>%    # Filter only interpolated recall data
-  mutate(measure=str_replace(measure, iprec_at_recall, "")) %>%   # Remove prefix
-  mutate(measure=str_trunc(measure, 3, ellipsis="")) %>%       # Remove second decimal place
-  mutate(value = as.numeric(value))
-
-pdf(file = paste("precision-recall.pdf", sep=""), width = 7, height = 3.5)
-ggplot(data=ircl, aes(x=measure, y=value, group=run)) +
-  geom_line(aes(color=run, linetype=run)) +
-  geom_point(size=0.5) +
-  scale_y_continuous(breaks=seq(0,1,0.1), minor_breaks=NULL,limits=c(0,1)) +
-  xlab("Recall") +
-  ylab("Precision") +
-  theme_linedraw() +
-  theme(plot.background = element_blank(), panel.background = element_blank(), legend.title = element_blank())
-dev.off()
+precision_recall(results)
