@@ -13,16 +13,15 @@ extra_color <- "darkred"
 # tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, hpipubclass=tug_magenta, hpipubcommon=tug_orange,
 #                     hpictboost=tug_red, hpictphrase=tug_blue, hpictbase=tug_green, hpictall=tug_magenta, hpictcommon=tug_orange)
 
-# XXX Set metrics
+
+# XXX Set metrics (using trec_eval 9.0+ names)
 # Note that official metrics are generated with an older version of trec_eval that uses different names for metrics.
-# TODO normalize all metrics to 9.0 format
+# They're automatically converted by this script.
 # trec_eval 8.1: "P10", "R-prec", "ircl_prn."
 # trec_eval 9.0+: "P_10", "Rprec", "iprec_at_recall_"
-# metrics <- c("P5", "P10", "P15")
+# metrics <- c("P_5", "P_10", "P_15")
 metrics <- c("infNDCG", "P_10", "Rprec")      # Default metrics
 # metrics <- c("ndcg", "P_10", "set_recall")  # Michel's thesis
-# iprec_at_recall <- "ircl_prn."
-iprec_at_recall <- "iprec_at_recall_"
 
 # XXX Set input folder
 # input_folder <- "docs/2017/final-results/clinical-trials"
@@ -64,7 +63,7 @@ collect_stats <- function() {
     file_stats <- file_stats %>%
       mutate(task = task) %>%
       mutate(year = year) %>%
-      mutate(yeartopic = paste0(year, sprintf("%1d", topic))) # FIXME %02d
+      mutate(yeartopic = paste0(year, sprintf("%02d", topic)))
     
     stats <- stats %>% bind_rows(file_stats)
   }
@@ -101,6 +100,27 @@ collect_results <- function(run_ids) {
   }
   # Fix as factors for printing correctly
   results$run <- factor(results$run, levels=run_ids)
+  
+  # Normalize topic and year
+  if (nchar(results[1,2]) >= 5) {
+    # Topic contains year
+    results <- results %>%
+      rename(yeartopic = topic) %>%
+      mutate(year = if_else(yeartopic == "all", "all", substr(yeartopic, 0, 4))) %>%
+      mutate(topic = if_else(yeartopic == "all", "all", substr(yeartopic, 5, nchar(yeartopic))))
+  } else {
+    # Topic does not contain year
+    results <- results %>%
+      mutate(year = year) %>%
+      mutate(yeartopic = if_else(topic == "all", "all", paste0(year, sprintf("%02s", topic))))
+  }
+  
+  # Normalize variable names
+  results$measure <- gsub("gm_ap", "gm_map", results$measure)
+  results$measure <- gsub("R-prec", "Rprec", results$measure)
+  results$measure <- gsub("^P([0-9]{1,4})$", "P_\\1", results$measure)
+  results$measure <- gsub("^ircl_prn.([0-9].[0-9]{2})$", "iprec_at_recall_\\1", results$measure)
+  
   return(results)
 }
 results <- collect_results(run_ids)
@@ -162,14 +182,14 @@ topic_plots <- function(results) {
     results_per_topic <- results %>%
       filter(measure==metric,topic!='all') %>%
       mutate(value = as.numeric(value)) %>%
-      mutate(topic = factor(topic, levels=unique(sort(as.numeric(topic))))) # Sort topics
+      mutate(yeartopic = factor(yeartopic, levels=unique(sort(as.numeric(yeartopic))))) # Sort topics
     
     # Skip metric if data is not available (e.g. infNDCG for CT 2017)
     if (nrow(results_per_topic) == 0) {
       next
     }
   
-    g <- ggplot(data=results_per_topic, aes(x=topic, y=value, group=run)) +
+    g <- ggplot(data=results_per_topic, aes(x=yeartopic, y=value, group=run)) +
       geom_line(aes(color=run, linetype=run)) +
       xlab("Topic") +
       ylab(metric) +
@@ -187,6 +207,7 @@ topic_plots <- function(results) {
       g <- g + geom_line(data=task_stats,
                          aes(x=yeartopic, y=!!best_column, group="best"),  # Best
                          size=0.5,
+                         linetype="dashed",
                          color=extra_color)
     }
     
@@ -196,6 +217,7 @@ topic_plots <- function(results) {
       g <- g + geom_line(data=task_stats,
                                  aes(x=yeartopic, y=!!median_column, group="median"),      # Median
                                  size=0.5,
+                                 linetype="dashed",
                                  color=extra_color)
     }
     
@@ -214,8 +236,8 @@ topic_plots(results)
 ### Precision - Recall Graphs ###
 precision_recall <- function(results) {
   ircl <- results %>%
-    filter(str_detect(measure, iprec_at_recall),topic=='all') %>%    # Filter only interpolated recall data
-    mutate(measure=str_replace(measure, iprec_at_recall, "")) %>%   # Remove prefix
+    filter(str_detect(measure, "iprec_at_recall_"),topic=='all') %>%    # Filter only interpolated recall data
+    mutate(measure=str_replace(measure, "iprec_at_recall_", "")) %>%   # Remove prefix
     mutate(measure=str_trunc(measure, 3, ellipsis="")) %>%       # Remove second decimal place
     mutate(value = as.numeric(value))
   
