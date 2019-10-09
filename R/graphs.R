@@ -23,7 +23,7 @@ setwd("stats")
 # trec_eval 9.0+: "P_10", "Rprec", "iprec_at_recall_"
 # metrics <- c("P5", "P10", "P15")
 # metrics <- c("infNDCG", "P10", "R-prec")
-metrics <- c("infNDCG", "P_10", "Rprec", "set_recall")
+metrics <- c("ndcg", "P_10", "set_recall")
 # iprec_at_recall <- "ircl_prn."
 iprec_at_recall <- "iprec_at_recall_"
 
@@ -111,6 +111,7 @@ boxplots(results)
 
 ### Graphs per Topic ###
 topic_plots <- function(results) {
+  plots <- list()
   for (metric in metrics) {
     results_per_topic <- results %>%
       filter(measure==metric,topic!='all') %>%
@@ -126,7 +127,7 @@ topic_plots <- function(results) {
       theme(axis.text.x = element_text(angle = 90, hjust = 1),
             plot.background = element_blank(),
             panel.background = element_blank(),
-            legend.position = "bottom",
+            legend.position = "none",
             legend.title = element_blank())
   
     if (exists("stats")) {
@@ -139,11 +140,16 @@ topic_plots <- function(results) {
                   size=0.5,
                   color=extra_color)
     }
-  
-    pdf(file = paste(metric, ".pdf", sep=""), width = 7, height = 3.5)
-    print(g)
-    dev.off()
+    
+    plots <- append(plots, list(g))
   }
+  
+  # Add legend only to the last plot to save space
+  plots[length(plots)][[1]] <- plots[length(plots)][[1]] + theme(legend.position = "bottom")
+  
+  pdf(file = "topics.pdf", width = 10, height = 14)
+  grid.arrange(grobs = plots, nrow = length(metrics), ncol = 1)
+  dev.off()
 }
 topic_plots(results)
 
