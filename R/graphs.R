@@ -13,10 +13,7 @@ extra_color <- "darkred"
 # tug_colors <- c(hpipubboost=tug_red, hpipubnone=tug_blue, hpipubbase=tug_green, hpipubclass=tug_magenta, hpipubcommon=tug_orange,
 #                     hpictboost=tug_red, hpictphrase=tug_blue, hpictbase=tug_green, hpictall=tug_magenta, hpictcommon=tug_orange)
 
-# Input folder
-# setwd("docs/2017/final-results/clinical-trials")
-# setwd("docs/2018/final-results/biomedical-articles")
-setwd("stats")
+
 
 # Note that official metrics are generated with an older version of trec_eval that uses different names for metrics.
 # trec_eval 8.1: "P10", "R-prec", "ircl_prn."
@@ -41,28 +38,34 @@ if (file.exists(stats_file)) {
   metrics_worst <- c(colMeans(stats)[4], colMeans(stats)[7], colMeans(stats)[10])
 }
 
-results <- data.frame()
+# Input folder
+# setwd("docs/2017/final-results/clinical-trials")
+# setwd("docs/2018/final-results/biomedical-articles")
+setwd("stats")
 
-for(run_id in run_ids) {
-  tmp <- read.table(paste(run_id, ".trec_eval", sep=""), header = FALSE, colClasses = "character")
-  tmp <- tmp %>% mutate(run_id)
-  names(tmp) <- c('measure', 'topic', 'value', 'run')
-  results <- results %>%  bind_rows(tmp)
-  remove(tmp)
-
-  sample_file <- paste(run_id, ".sampleval", sep="")
-  if (file.exists(sample_file)) {
-    tmp <- read.table(paste(run_id, ".sampleval", sep=""), header = FALSE, colClasses = "character")
+collect_results <- function(run_ids) {
+  results <- data.frame()
+  for(run_id in run_ids) {
+    tmp <- read.table(paste(run_id, ".trec_eval", sep=""), header = FALSE, colClasses = "character")
     tmp <- tmp %>% mutate(run_id)
     names(tmp) <- c('measure', 'topic', 'value', 'run')
     results <- results %>%  bind_rows(tmp)
     remove(tmp)
+  
+    sample_file <- paste(run_id, ".sampleval", sep="")
+    if (file.exists(sample_file)) {
+      tmp <- read.table(paste(run_id, ".sampleval", sep=""), header = FALSE, colClasses = "character")
+      tmp <- tmp %>% mutate(run_id)
+      names(tmp) <- c('measure', 'topic', 'value', 'run')
+      results <- results %>%  bind_rows(tmp)
+      remove(tmp)
+    }
   }
+  # Fix as factors for printing correctly
+  results$run <- factor(results$run, levels=run_ids)
+  return(results)
 }
-
-# Fix as factors for printing correctly
-results$run <- factor(results$run, levels=run_ids)
-
+results <- collect_results(run_ids)
 
 ### Boxplots ###
 boxplots <- function(results) {
