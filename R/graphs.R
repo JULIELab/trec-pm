@@ -125,6 +125,9 @@ collect_results <- function(run_ids) {
 }
 results <- collect_results(run_ids)
 
+# Only add stats for the years present in the data
+task_stats <- filter(task_stats, year %in% unique(results$year))
+
 ### Boxplots ###
 boxplots <- function(results) {
   plots <- list()
