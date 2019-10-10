@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import com.opencsv.CSVWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -7,6 +8,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class TopicSet {
@@ -47,16 +50,31 @@ public class TopicSet {
 	}
 
 	/**
-	 * Auxiliary main method to dump topics into a different format.
+	 * Auxiliary main method to dump topics into different formats.
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		toCSV(TrecPMTopicSetFactory.topics2017(), new File("topics2017.tsv"));
+		toCSV(TrecPMTopicSetFactory.topics2018(), new File("topics2018.tsv"));
+		toCSV(TrecPMTopicSetFactory.topics2019(), new File("topics2019.tsv"));
+
 		TopicSet topicSet = TrecPMTopicSetFactory.topics2019();
 		List<String> diseases = uniqueDiseases(topicSet);
 		List<String> genes = uniqueGenes(topicSet);
 
 		System.out.println(String.join(System.lineSeparator(), diseases));
 		System.out.println(String.join(System.lineSeparator(), genes));
+	}
+
+	private static void toCSV(TopicSet topicSet, File output) throws IOException {
+		CSVWriter writer = new CSVWriter(new FileWriter(output), '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\', System.getProperty("line.separator"));
+		for (Topic topic : topicSet.getTopics()) {
+			String disease = topic.getDisease();
+			String gene = topic.getGeneField();
+			String demo = topic.getDemographic();
+			writer.writeNext(new String[]{disease, gene, demo});
+		}
+		writer.close();
 	}
 
 	private static List<String> uniqueDiseases(TopicSet topicSet) {
