@@ -69,10 +69,11 @@ public class TopicSet {
 	private static void toCSV(TopicSet topicSet, File output) throws IOException {
 		CSVWriter writer = new CSVWriter(new FileWriter(output), '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\', System.getProperty("line.separator"));
 		for (Topic topic : topicSet.getTopics()) {
+			String id = String.valueOf(topic.getNumber());
 			String disease = topic.getDisease();
 			String gene = topic.getGeneField();
 			String demo = topic.getDemographic();
-			writer.writeNext(new String[]{disease, gene, demo});
+			writer.writeNext(new String[]{id, disease, gene, demo});
 		}
 		writer.close();
 	}
