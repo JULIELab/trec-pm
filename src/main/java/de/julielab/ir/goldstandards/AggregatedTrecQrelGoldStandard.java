@@ -19,7 +19,11 @@ import java.util.stream.Stream;
  */
 public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends AggregatedGoldStandard<Q> {
 
-    public static final Function<QueryDescription, String> CROSS_DATASET_QUERY_ID_FUNCTION = q -> q.getYear() + "" + q.getNumber();
+    /**
+     * A function that provides an unique query id across datasets. Note that ideally this should provide a sortable
+     * representation to be later used by, e.g., R scripts for plotting.
+     */
+    public static final Function<QueryDescription, String> CROSS_DATASET_QUERY_ID_FUNCTION = q -> q.getYear() + "" + String.format("%02d", q.getNumber());
 
     private final static Logger log = LogManager.getLogger();
     private static Function<Document, String> qrelRecordFunction = gsDoc -> Stream.of(CROSS_DATASET_QUERY_ID_FUNCTION.apply(gsDoc.getQueryDescription()), "Q0", gsDoc.getId(), String.valueOf(gsDoc.getRelevance())).collect(Collectors.joining("\t"));
@@ -64,7 +68,7 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
-        return q -> q.getYear() + "" + q.getNumber();
+        return CROSS_DATASET_QUERY_ID_FUNCTION;
     }
 
     /**
