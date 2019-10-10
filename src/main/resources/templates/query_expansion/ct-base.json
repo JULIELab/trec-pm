@@ -1,0 +1,13 @@
+{
+	"bool": {
+		"must": [
+			{{clinical_trials/age.json}},
+			{{clinical_trials/sex.json}},
+			{{query_expansion/ct/disease.json}},
+			{{query_expansion/ct/gene.json}}
+		],
+		"must_not": [
+			{{clinical_trials/non_melanoma.json}}
+		]
+	}
+}

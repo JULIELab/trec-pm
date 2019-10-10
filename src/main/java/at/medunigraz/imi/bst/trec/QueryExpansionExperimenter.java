@@ -25,6 +25,11 @@ public class QueryExpansionExperimenter {
     private static final File CT_TEMPLATE = new File(
             QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct.json").getFile());
 
+    private static final File BA_BASE_TEMPLATE = new File(
+            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba-base.json").getFile());
+    private static final File CT_BASE_TEMPLATE = new File(
+            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct-base.json").getFile());
+
     private static final GoldStandard<Topic> BA_GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
     private static final GoldStandard<Topic> CT_GOLD_STANDARD = TrecPMGoldStandardFactory.trialsOfficialAggregated();
 
@@ -32,6 +37,12 @@ public class QueryExpansionExperimenter {
         // Biomedical Articles
         TrecPmRetrieval baBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-baseline")
+                .withProperties("boost", BOOST)
+                .withSubTemplate(BA_BASE_TEMPLATE)
+                .withWordRemoval();
+
+        TrecPmRetrieval baBoost = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ba-boost")
                 .withProperties("boost", BOOST)
                 .withSubTemplate(BA_TEMPLATE)
                 .withWordRemoval();
@@ -61,7 +72,7 @@ public class QueryExpansionExperimenter {
                 .withGeneFamily();
 
         Set<TrecPmRetrieval> retrievalSet = new LinkedHashSet<>(Arrays.asList(
-                baBaseline, baEmbeddings, baTerminologies, baRules));
+                baBaseline, baBoost, baEmbeddings, baTerminologies, baRules));
         for (TrecPmRetrieval retrieval : retrievalSet) {
             new Experiment<>(BA_GOLD_STANDARD, retrieval).run();
         }
@@ -69,6 +80,12 @@ public class QueryExpansionExperimenter {
         // Clinical Trials
         TrecPmRetrieval ctBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ct-baseline")
+                .withProperties("boost", BOOST)
+                .withSubTemplate(CT_BASE_TEMPLATE)
+                .withWordRemoval();
+
+        TrecPmRetrieval ctBoost = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, TrecConfig.SIZE)
+                .withExperimentName("ct-boost")
                 .withProperties("boost", BOOST)
                 .withSubTemplate(CT_TEMPLATE)
                 .withWordRemoval();
@@ -98,7 +115,7 @@ public class QueryExpansionExperimenter {
                 .withGeneFamily();
 
         retrievalSet = new LinkedHashSet<>(Arrays.asList(
-                ctBaseline, ctEmbeddings, ctTerminologies, ctRules));
+                ctBaseline, ctBoost, ctEmbeddings, ctTerminologies, ctRules));
         for (TrecPmRetrieval retrieval : retrievalSet) {
             new Experiment<>(CT_GOLD_STANDARD, retrieval).run();
         }

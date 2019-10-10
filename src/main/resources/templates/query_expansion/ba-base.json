@@ -1,0 +1,11 @@
+{
+	"bool": {
+		"must": [
+			{{query_expansion/ba/disease.json}},
+			{{query_expansion/ba/gene.json}}
+		],
+		"must_not": [
+			{{biomedical_articles/non_melanoma.json}}
+		]
+	}
+}
