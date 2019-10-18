@@ -205,7 +205,7 @@ topic_plots <- function(results) {
             legend.title = element_blank())
   
     best_column <- paste0(metric, ".best")
-    if (best_column %in% colnames(task_stats)) {
+    if (nrow(task_stats) > 0 && best_column %in% colnames(task_stats)) {
       best_column <- sym(best_column)
       g <- g + geom_line(data=task_stats,
                          aes(x=yeartopic, y=!!best_column, group="best"),  # Best
@@ -213,9 +213,9 @@ topic_plots <- function(results) {
                          linetype="dashed",
                          color=extra_color)
     }
-    
+
     median_column <- paste0(metric, ".median")
-    if (median_column %in% colnames(task_stats)) {
+    if (nrow(task_stats) > 0 && median_column %in% colnames(task_stats)) {
       median_column <- sym(median_column)
       g <- g + geom_line(data=task_stats,
                                  aes(x=yeartopic, y=!!median_column, group="median"),      # Median
