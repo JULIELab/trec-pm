@@ -38,10 +38,8 @@
              verbose="false" usetimestamp="false"/>
     </target>
     <target name="get.gene.info" unless="gene.info.available">
-        <get src="http://mirrors.vbi.vt.edu/mirrors/ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz"
-             dest="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info.gz"
-             verbose="false" usetimestamp="true"/>
-        <gunzip src="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info.gz"/>
+        <gunzip src="${basedir}/resources/Homo_sapiens.gene_info.gz"
+                dest="${basedir}/src/main/resources/genes/Homo_sapiens.gene_info"/>
     </target>
 
     <target name="go"
