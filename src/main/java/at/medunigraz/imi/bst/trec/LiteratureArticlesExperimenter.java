@@ -6,6 +6,7 @@ import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrieva
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.OriginalDocumentRetrieval;
+import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.RankerFromInternalPm19;
@@ -24,8 +25,7 @@ public class LiteratureArticlesExperimenter {
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2019();
 
     public static void main(String[] args) throws IOException {
-        //new CacheConfiguration(CacheTy)
-        //CacheService.initialize();
+        CacheService.initialize(new TrecCacheConfiguration());
 
 //        // Judging order: ?
 //        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
@@ -56,5 +56,6 @@ public class LiteratureArticlesExperimenter {
         }
         ElasticClientFactory.getClient().close();
         OriginalDocumentRetrieval.getInstance().shutdown();
+        CacheService.getInstance().commitAllCaches();
     }
 }

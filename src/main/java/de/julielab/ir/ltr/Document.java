@@ -17,6 +17,8 @@ import org.apache.uima.jcas.JCas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +71,25 @@ public class Document<Q extends QueryDescription> {
      */
     private CAS cas;
     private String normalizedDocumentText;
+    private File fulltextDbConfiguration;
+
+    /**
+     * <p>The CoStoSys configuration file configured to the database containing this document.</p>
+     * @return
+     */
+    public File getFulltextDbConfiguration() {
+        return fulltextDbConfiguration;
+    }
+
+    /**
+     * <p>Sets the given file path to the CoStoSys configuration file for retrieval of this document.</p>
+     * <p>Uses {@link File#getCanonicalFile()} to normalize the path, thus the method throws an <code>IOException</code>.</p>
+     * @param fulltextDbConfiguration The CoStoSys configuration file that allows to retrieve this document's contents from a database.
+     * @throws IOException If the canonical File cannot be retrieved from the configuration file path.
+     */
+    public void setFulltextDbConfiguration(File fulltextDbConfiguration) throws IOException {
+        this.fulltextDbConfiguration = fulltextDbConfiguration.getCanonicalFile();
+    }
 
     /**
      * Quick-and-dirty approach to have treatments from `Result` here.

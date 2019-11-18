@@ -75,9 +75,10 @@ public class OriginalDocumentRetrieval {
     private CasPool casPool;
     private Logger log = LogManager.getLogger();
     /**
-     * The object that offers convenience methods to retrieve documents from a Postgres database.
+     * We use DatabaseConnector objects to communicate with the document database. We have one DatabaseConnector
+     * for each document database configuration file.
      */
-    private DataBaseConnector dbc;
+    private Map<File, DataBaseConnector> dbcs = new HashMap<>();
     /**
      * This list contains fully qualified Java names of the UIMA types. For those types we want to retrieve
      * annotations from the database. This list is read from a configuration file.
@@ -91,10 +92,7 @@ public class OriginalDocumentRetrieval {
     private FieldConfig tableSchema;
     private String xmiMetaSchema = "public";
     private BinaryJeDISNodeDecoder binaryJeDISNodeDecoder;
-    private Map<String, Boolean> featuresToMapBinaryFromDb;
-    private Map<Integer, String> reverseBinaryMappingFromDb;
-    private boolean doGzip;
-    private boolean useBinaryFormat;
+    private Map<File, DocumentDatabaseSettings> documentDatabaseSettings = new HashMap<>();
 
     private OriginalDocumentRetrieval() {
 
@@ -115,7 +113,6 @@ public class OriginalDocumentRetrieval {
         } catch (IOException e) {
             log.error("The CAS pool could not be created because the file with the UIMA types to load could not be read", e);
         }
-
 
         documentTextCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasDocumentTextCache", CacheAccess.STRING, CacheAccess.STRING);
         xmiCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasXMICache", CacheAccess.STRING, CacheAccess.BYTEARRAY);
@@ -141,48 +138,53 @@ public class OriginalDocumentRetrieval {
         return null;
     }
 
-    private void initializeDatabaseConnection(String table) throws SQLException {
+    private void initializeDatabaseConnection(File costosysConfig, String table) throws SQLException {
+        DataBaseConnector dbc;
         try {
-            dbc = new DataBaseConnector(TrecConfig.COSTOSYS_CONFIG);
+            dbc = new DataBaseConnector(costosysConfig.getAbsolutePath());
             try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.COSTOSYS_ANNOTATIONS_LIST))) {
                 annotationTypesToRetrieve = br.lines().filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
             }
+            DocumentDatabaseSettings documentDatabaseSettings = determineDataFormat(costosysConfig, table);
+
+            boolean doGzip = documentDatabaseSettings.isDoGzip();
+            boolean useBinaryFormat = documentDatabaseSettings.isUseBinaryFormat();
+
+            columnsToFetch = new ArrayList<>();
+            for (String qualifiedAnnotation : annotationTypesToRetrieve) {
+                final String columnName = qualifiedAnnotation.toLowerCase().replace('.', '_').replace(':', '$');
+                final Map<String, String> field = FieldConfig.createField(
+                        JulieXMLConstants.NAME, columnName,
+                        JulieXMLConstants.GZIP, String.valueOf(doGzip),
+                        JulieXMLConstants.RETRIEVE, "true",
+                        JulieXMLConstants.TYPE, doGzip || documentDatabaseSettings.isUseBinaryFormat() ? "bytea" : "xml"
+                );
+                columnsToFetch.add(field);
+            }
+
+
+            final List<Map<String, String>> primaryKeyFields = dbc.getActiveTableFieldConfiguration().getPrimaryKeyFields().collect(Collectors.toList());
+            primaryKeyLength = primaryKeyFields.size();
+            // The XMI schema has always the same structure: The primary key of the documents plus some fields for the actual XMI data
+            // and other stuff. This is why we don't define the XMI schemas manually in costosys.xml but use this method.
+            // This is just convenience.
+            tableSchema = dbc.addXmiTextFieldConfiguration(primaryKeyFields, columnsToFetch, true);
+            try (CoStoSysConnection ignored = dbc.obtainOrReserveConnection()) {
+                namespaceMap = getNamespaceMap(dbc);
+            }
+            if (!useBinaryFormat)
+                xmiBuilder = new XmiBuilder(namespaceMap, annotationTypesToRetrieve);
+            if (useBinaryFormat) {
+                binaryJeDISNodeDecoder = new BinaryJeDISNodeDecoder(Arrays.stream(annotationTypesToRetrieve).collect(Collectors.toSet()), false);
+                binaryXmiBuilder = new BinaryXmiBuilder(namespaceMap);
+                documentDatabaseSettings.setFeaturesToMapBinaryFromDb(getFeaturesToMapBinaryFromDb(dbc));
+                documentDatabaseSettings.setReverseBinaryMappingFromDb(getReverseBinaryMappingFromDb(dbc));
+            }
+            dbcs.put(costosysConfig, dbc);
         } catch (IOException e) {
-            log.error("Could not create the OriginalDocumentRetrieval because the DBC configuration could not be read", e);
+            log.error("Could not create the OriginalDocumentRetrieval because the DBC configuration {} could not be read", costosysConfig, e);
         }
 
-        determineDataFormat(table);
-
-        columnsToFetch = new ArrayList<>();
-        for (String qualifiedAnnotation : annotationTypesToRetrieve) {
-            final String columnName = qualifiedAnnotation.toLowerCase().replace('.', '_').replace(':', '$');
-            final Map<String, String> field = FieldConfig.createField(
-                    JulieXMLConstants.NAME, columnName,
-                    JulieXMLConstants.GZIP, String.valueOf(doGzip),
-                    JulieXMLConstants.RETRIEVE, "true",
-                    JulieXMLConstants.TYPE, doGzip ? "bytea" : "xml"
-            );
-            columnsToFetch.add(field);
-        }
-
-
-        final List<Map<String, String>> primaryKeyFields = dbc.getActiveTableFieldConfiguration().getPrimaryKeyFields().collect(Collectors.toList());
-        primaryKeyLength = primaryKeyFields.size();
-        // The XMI schema has always the same structure: The primary key of the documents plus some fields for the actual XMI data
-        // and other stuff. This is why we don't define the XMI schemas manually in costosys.xml but use this method.
-        // This is just convenience.
-        tableSchema = dbc.addXmiTextFieldConfiguration(primaryKeyFields, columnsToFetch, true);
-        try (CoStoSysConnection ignored = dbc.obtainOrReserveConnection()) {
-            namespaceMap = getNamespaceMap();
-        }
-        if (!useBinaryFormat)
-            xmiBuilder = new XmiBuilder(namespaceMap, annotationTypesToRetrieve);
-        if (useBinaryFormat) {
-            binaryJeDISNodeDecoder = new BinaryJeDISNodeDecoder(Arrays.stream(annotationTypesToRetrieve).collect(Collectors.toSet()), false);
-            binaryXmiBuilder = new BinaryXmiBuilder(namespaceMap);
-            featuresToMapBinaryFromDb = getFeaturesToMapBinaryFromDb();
-            reverseBinaryMappingFromDb = getReverseBinaryMappingFromDb();
-        }
     }
 
     public Stream<String> getDocumentText(DocumentList<?> documents, String table) {
@@ -214,18 +216,19 @@ public class OriginalDocumentRetrieval {
      * @param ids The IDs of the documents to retrieve from the database.
      * @return An iterator for the retrieved document data.
      */
-    private Iterator<byte[][]> retrieveXmiDataFromDB(List<Object[]> ids, String table) throws SQLException {
+    private Iterator<byte[][]> retrieveXmiDataFromDB(File costosysConfig, List<Object[]> ids, String table) throws SQLException {
+        DataBaseConnector dbc = dbcs.get(costosysConfig);
         if (dbc == null)
-            initializeDatabaseConnection(table);
+            initializeDatabaseConnection(costosysConfig, table);
         try {
-            log.debug("Requesting {} documents from the database", ids.size());
+            log.debug("Requesting {} documents from the database configured in the configuration file at {}", ids.size(), costosysConfig);
             return dbc.retrieveColumnsByTableSchema(ids, table, tableSchema.getName());
         } finally {
             log.debug("Returned iterator to database documents.");
         }
     }
 
-    private Map<String, String> getNamespaceMap() {
+    private Map<String, String> getNamespaceMap(DataBaseConnector dbc) {
         Map<String, String> map = null;
         if (dbc.tableExists(xmiMetaSchema + "." + XmiSplitConstants.XMI_NS_TABLE)) {
             try (CoStoSysConnection conn = dbc.obtainOrReserveConnection()) {
@@ -251,7 +254,7 @@ public class OriginalDocumentRetrieval {
         return map;
     }
 
-    private Map<Integer, String> getReverseBinaryMappingFromDb() {
+    private Map<Integer, String> getReverseBinaryMappingFromDb(DataBaseConnector dbc) {
         Map<Integer, String> map = null;
         final String mappingTableName = xmiMetaSchema + "." + XmiSplitConstants.BINARY_MAPPING_TABLE;
         if (dbc.tableExists(mappingTableName)) {
@@ -278,7 +281,7 @@ public class OriginalDocumentRetrieval {
         return map;
     }
 
-    private Map<String, Boolean> getFeaturesToMapBinaryFromDb() {
+    private Map<String, Boolean> getFeaturesToMapBinaryFromDb(DataBaseConnector dbc) {
         Map<String, Boolean> map = null;
         final String mappingTableName = xmiMetaSchema + "." + XmiSplitConstants.BINARY_FEATURES_TO_MAP_TABLE;
         if (dbc.tableExists(mappingTableName)) {
@@ -327,100 +330,106 @@ public class OriginalDocumentRetrieval {
      * @param documents The documents to populate with the UIMA XMI CAS data.
      */
     public void setXmiCasDataToDocuments(DocumentList<?> documents, String table) {
-        final List<Object[]> docIdsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).map(d -> new String[]{d.getId()}).collect(Collectors.toList());
-
-        log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the databse.", docIdsWithoutXmiData.size());
-        Map<String, byte[][]> dataByDocId = new HashMap<>();
-        Iterator<Object[]> it = docIdsWithoutXmiData.iterator();
-        while (it.hasNext()) {
-            Object[] key = it.next();
-            String id = (String) key[0];
-            byte[][] bytes = dbDataCache.get(id);
-            if (bytes != null) {
-                dataByDocId.put(id, bytes);
-                it.remove();
-            }
-        }
-        try {
-            if (!docIdsWithoutXmiData.isEmpty()) {
-                final Iterator<byte[][]> xmiData = retrieveXmiDataFromDB(docIdsWithoutXmiData, table);
-                int i = 0;
-                while (xmiData.hasNext()) {
-                    byte[][] data = xmiData.next();
-                    System.out.println(i);
-                    String id = new String(data[0], UTF_8);
-                    dataByDocId.put(id, data);
-                    dbDataCache.put(id, data);
-                    ++i;
-                    double reportFraction = 0.1;
-                    if (i % (docIdsWithoutXmiData.size() * reportFraction) == 0)
-                        log.debug("Retrieved {}% of the documents from the database.", i / (docIdsWithoutXmiData.size() * reportFraction) * 10);
+        // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
+        // from one database batch-wise.
+        Map<File, List<Document<?>>> collect = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).collect(Collectors.groupingBy(Document::getFulltextDbConfiguration));
+        for (File costosysConfig : collect.keySet()) {
+            List<Object[]> docIdsWithoutXmiData = collect.get(costosysConfig).stream().map(d -> new Object[]{d.getId()}).collect(Collectors.toList());
+            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the databse.", docIdsWithoutXmiData.size());
+            Map<String, byte[][]> dataByDocId = new HashMap<>();
+            Iterator<Object[]> it = docIdsWithoutXmiData.iterator();
+            while (it.hasNext()) {
+                Object[] key = it.next();
+                String id = (String) key[0];
+                byte[][] bytes = dbDataCache.get(id);
+                if (bytes != null) {
+                    dataByDocId.put(id, bytes);
+                    it.remove();
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        final CAS cas = casPool.getCas(300000);
-        try {
-            final Iterator<? extends Document<?>> docsIt = documents.stream().filter(d -> d.getFullDocumentData() == null).iterator();
-            log.debug("Assembling the actual XMI documents from the database data.");
-            while (docsIt.hasNext()) {
-                final Document doc = docsIt.next();
-                byte[] docXmiData = xmiCache.get(doc.getId());
-                if (docXmiData == null) {
-                    if (!dataByDocId.containsKey(doc.getId())) {
-                        String requested = documents.stream().map(Document::getId).collect(Collectors.toSet()).contains(doc.getId()) ? "" : "not ";
-                        log.warn("The document with ID " + doc.getId() + " is not contained in the cache and was not returned from the database. It was " + requested + "requested from the database " + dbc.getDbURL() + ".");
-                        continue;
+            try {
+                if (!docIdsWithoutXmiData.isEmpty()) {
+                    final Iterator<byte[][]> xmiData = retrieveXmiDataFromDB(costosysConfig, docIdsWithoutXmiData, table);
+                    int i = 0;
+                    while (xmiData.hasNext()) {
+                        byte[][] data = xmiData.next();
+                        String id = new String(data[0], UTF_8);
+                        dataByDocId.put(id, data);
+                        dbDataCache.put(id, data);
+                        ++i;
+                        double reportFraction = 0.1;
+                        if (i % (docIdsWithoutXmiData.size() * reportFraction) == 0)
+                            log.debug("Retrieved {}% of the documents from the database.", i / (docIdsWithoutXmiData.size() * reportFraction) * 10);
                     }
-                    final byte[][] documentData = dataByDocId.get(doc.getId());
-                    LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
-                    List<String> xmiColumnNames = new ArrayList<>();
-                    xmiColumnNames.add(XmiSplitConstants.BASE_DOC_COLUMN);
-                    columnsToFetch.stream().map(m -> m.get(JulieXMLConstants.NAME)).forEach(xmiColumnNames::add);
-                    for (int i = 0; i < xmiColumnNames.size(); i++) {
-                        String columnName = xmiColumnNames.get(i);
-                        // Here we need to calculate with the offset of the primary key elements that is contained
-                        // in the xmiData byte[][] structure: The first positions of the array are just the primary
-                        // key elements.
-                        if (documentData[i + primaryKeyLength] == null)
-                            throw new IllegalStateException("There is no data in table " + columnName + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
-                        String xmiModuleKey = columnName;
-                        if (xmiModuleKey.equals(XmiSplitConstants.BASE_DOC_COLUMN))
-                            xmiModuleKey = XmiSplitter.DOCUMENT_MODULE_LABEL;
-                        dataMap.put(xmiModuleKey, new ByteArrayInputStream(documentData[i + primaryKeyLength]));
-                    }
-                    ByteArrayOutputStream xmiBaos;
-                    if (useBinaryFormat) {
-                        BinaryDecodingResult decode = binaryJeDISNodeDecoder.decode(dataMap, cas.getTypeSystem(), reverseBinaryMappingFromDb, featuresToMapBinaryFromDb, namespaceMap);
-                        xmiBaos = binaryXmiBuilder.buildXmi(decode);
-                    } else {
-                        xmiBaos = xmiBuilder.buildXmi(dataMap, cas.getTypeSystem());
-                    }
-                    docXmiData = xmiBaos.toByteArray();
-                    xmiCache.put(doc.getId(), docXmiData);
                 }
-                doc.setFullDocumentData(docXmiData);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (XMIBuilderException e) {
-            e.printStackTrace();
+
+            final CAS cas = casPool.getCas(300000);
+            try {
+                final Iterator<? extends Document<?>> docsIt = documents.stream().filter(d -> d.getFullDocumentData() == null).iterator();
+                log.debug("Assembling the actual XMI documents from the database data.");
+                while (docsIt.hasNext()) {
+                    final Document doc = docsIt.next();
+                    byte[] docXmiData = xmiCache.get(doc.getId());
+                    if (docXmiData == null) {
+                        if (!dataByDocId.containsKey(doc.getId())) {
+                            String requested = documents.stream().map(Document::getId).collect(Collectors.toSet()).contains(doc.getId()) ? "" : "not ";
+                            log.warn("The document with ID " + doc.getId() + " is not contained in the cache and was not returned from the database. It was " + requested + "requested from the database " + dbcs.get(costosysConfig).getDbURL() + ".");
+                            continue;
+                        }
+                        final byte[][] documentData = dataByDocId.get(doc.getId());
+                        LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
+                        List<String> xmiColumnNames = new ArrayList<>();
+                        xmiColumnNames.add(XmiSplitConstants.BASE_DOC_COLUMN);
+                        columnsToFetch.stream().map(m -> m.get(JulieXMLConstants.NAME)).forEach(xmiColumnNames::add);
+                        for (int i = 0; i < xmiColumnNames.size(); i++) {
+                            String columnName = xmiColumnNames.get(i);
+                            // Here we need to calculate with the offset of the primary key elements that is contained
+                            // in the xmiData byte[][] structure: The first positions of the array are just the primary
+                            // key elements.
+                            if (documentData[i + primaryKeyLength] == null)
+                                throw new IllegalStateException("There is no data in table " + columnName + " for document with ID " + doc.getId() + ". In the current version of the framework, all documents should have data in all tables.");
+                            String xmiModuleKey = columnName;
+                            if (xmiModuleKey.equals(XmiSplitConstants.BASE_DOC_COLUMN))
+                                xmiModuleKey = XmiSplitter.DOCUMENT_MODULE_LABEL;
+                            dataMap.put(xmiModuleKey, new ByteArrayInputStream(documentData[i + primaryKeyLength]));
+                        }
+                        ByteArrayOutputStream xmiBaos;
+                        DocumentDatabaseSettings documentDatabaseSettings = this.documentDatabaseSettings.get(costosysConfig);
+                        if (documentDatabaseSettings.isUseBinaryFormat()) {
+                            BinaryDecodingResult decode = binaryJeDISNodeDecoder.decode(dataMap, cas.getTypeSystem(), documentDatabaseSettings.getReverseBinaryMappingFromDb(), documentDatabaseSettings.getFeaturesToMapBinaryFromDb(), namespaceMap);
+                            xmiBaos = binaryXmiBuilder.buildXmi(decode);
+                        } else {
+                            xmiBaos = xmiBuilder.buildXmi(dataMap, cas.getTypeSystem());
+                        }
+                        docXmiData = xmiBaos.toByteArray();
+                        xmiCache.put(doc.getId(), docXmiData);
+                    }
+                    doc.setFullDocumentData(docXmiData);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XMIBuilderException e) {
+                e.printStackTrace();
+            }
+            log.debug("Setting the XMI data to {} documents has been finished.", docIdsWithoutXmiData.size());
+            releaseCas(cas);
         }
-        log.debug("Setting the XMI data to {} documents has been finished.", docIdsWithoutXmiData.size());
-        releaseCas(cas);
     }
 
     public void shutdown() {
         log.info("Shutting down {}", getClass().getSimpleName());
-        if (dbc != null)
+        for (DataBaseConnector dbc : dbcs.values())
             dbc.close();
     }
 
-    private void determineDataFormat(String table) throws SQLException {
-        doGzip = true;
+    private DocumentDatabaseSettings determineDataFormat(File costosysConfig, String table) throws SQLException {
+        boolean doGzip = true;
+        boolean useBinaryFormat = false;
         log.debug("Fetching a single row from data table {} in order to determine whether data is in GZIP format", table);
+        DataBaseConnector dbc = dbcs.get(costosysConfig);
         try (CoStoSysConnection conn = dbc.obtainOrReserveConnection()) {
             final String documentColumnName = XmiSplitConstants.BASE_DOC_COLUMN;
             ResultSet rs = conn.createStatement().executeQuery(String.format("SELECT %s FROM %s LIMIT 1", documentColumnName, table));
@@ -436,6 +445,9 @@ public class OriginalDocumentRetrieval {
                     useBinaryFormat = checkForJeDISBinaryFormat(xmiData);
                 }
             }
+            DocumentDatabaseSettings settings = new DocumentDatabaseSettings(doGzip, useBinaryFormat);
+            documentDatabaseSettings.put(costosysConfig, settings);
+            return settings;
         } catch (SQLException e) {
             if (e.getMessage().contains("does not exist"))
                 log.error("An exception occurred when trying to read the xmi column of the data table \"{}\". It seems the table does not contain XMI data and this is invalid to use with this reader.", table);
@@ -453,5 +465,41 @@ public class OriginalDocumentRetrieval {
             log.debug("Is data encoded in JeDIS binary format: true");
         }
         return useBinaryFormat;
+    }
+
+    private class DocumentDatabaseSettings {
+        private boolean doGzip;
+        private boolean useBinaryFormat;
+        private Map<String, Boolean> featuresToMapBinaryFromDb;
+        private Map<Integer, String> reverseBinaryMappingFromDb;
+
+        public DocumentDatabaseSettings(boolean doGzip, boolean useBinaryFormat) {
+            this.doGzip = doGzip;
+            this.useBinaryFormat = useBinaryFormat;
+        }
+
+        public Map<String, Boolean> getFeaturesToMapBinaryFromDb() {
+            return featuresToMapBinaryFromDb;
+        }
+
+        public void setFeaturesToMapBinaryFromDb(Map<String, Boolean> featuresToMapBinaryFromDb) {
+            this.featuresToMapBinaryFromDb = featuresToMapBinaryFromDb;
+        }
+
+        public Map<Integer, String> getReverseBinaryMappingFromDb() {
+            return reverseBinaryMappingFromDb;
+        }
+
+        public void setReverseBinaryMappingFromDb(Map<Integer, String> reverseBinaryMappingFromDb) {
+            this.reverseBinaryMappingFromDb = reverseBinaryMappingFromDb;
+        }
+
+        public boolean isDoGzip() {
+            return doGzip;
+        }
+
+        public boolean isUseBinaryFormat() {
+            return useBinaryFormat;
+        }
     }
 }
