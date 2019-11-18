@@ -70,6 +70,42 @@ public class FeatureControlCenter {
         return isActive;
     }
 
+    /**
+     * <p>Used given an already trained model.</p>
+     * @param documents
+     * @param trainPipe
+     * @param xmiTableName
+     * @param <Q>
+     */
+    public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, Pipe trainPipe, String xmiTableName) {
+        // We here use the MALLET facilities to create feature vectors.
+
+        // Fetch the XMI cas information for the documents
+        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
+
+        final InstanceList instanceList = new InstanceList(trainPipe);
+        log.debug("Creating features for {} documents for ranking.", documents.size());
+        for (Document<Q> document : documents) {
+            final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
+            instanceList.addThruPipe(instance);
+            document.setFeaturePipes(trainPipe);
+            // Within the pipes, the documents need access to their CAS. Since we only have a limited
+            // amount of those for performance and scalability considerations, we need to release
+            // the CASes back to the CAS pool after usage. The CAS pool is managed by the
+            // OriginalDocumentRetrieval class.
+            document.releaseJCas();
+        }
+        log.debug("Done creating features for documents to be ranked.");
+    }
+
+    /**
+     * Used to train a model.
+     * @param documents
+     * @param tfidf
+     * @param vocabulary
+     * @param xmiTableName
+     * @param <Q>
+     */
     public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, TFIDF tfidf, Set<String> vocabulary, String xmiTableName) {
         // We here use the MALLET facilities to create feature vectors.
         List<Pipe> featurePipes = new ArrayList<>();
@@ -78,7 +114,7 @@ public class FeatureControlCenter {
             documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
-                new RunTopicMatchAnnotatorFeatureGroup(documents.stream().map(Document::getQueryDescription).map(Topic.class::cast).collect(Collectors.toList())),
+                new RunTopicMatchAnnotatorFeatureGroup(),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup(),
                 documentEmbeddingFeatureGroup,
@@ -94,22 +130,18 @@ public class FeatureControlCenter {
         OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(serialPipes);
+        log.debug("Creating features for {} training documents.", documents.size());
         for (Document<Q> document : documents) {
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
             instanceList.addThruPipe(instance);
+            document.setFeaturePipes(serialPipes);
             // Within the pipes, the documents need access to their CAS. Since we only have a limited
             // amount of those for performance and scalability considerations, we need to release
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
             // OriginalDocumentRetrieval class.
             document.releaseJCas();
         }
-
-        for (Instance instance : instanceList) {
-            final FeatureVector fv = (FeatureVector) instance.getData();
-
-            // TODO continue
-            // TODO EF July 4th, 2019: but - continue what? I forgot what I wanted to do here XD
-        }
+        log.debug("Finished train document feature creation.");
     }
 
     public String getActiveFeatureDescriptionString() {

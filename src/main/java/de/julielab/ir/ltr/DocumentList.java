@@ -34,6 +34,13 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
         return documents;
     }
 
+    /**
+     * <p>Returns each text document of this list exactly once.</p>
+     * <p>Since a {@link Document} foremost represents a query-document pair, an original text document might
+     * appear for multiple queries. This method serves to get a list of documents such that each text document
+     * ID present in this list appears exactly once in the return value.</p>
+     * @return A reduced <code>DocumentList</code> such that each underlying text document is represented exactly once.
+     */
     public DocumentList<Q> getSubsetWithUniqueDocumentIds() {
         Set<String> seenIds = new LinkedHashSet<>();
         final DocumentList<Q> ret = new DocumentList<>();

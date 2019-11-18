@@ -5,12 +5,15 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import cc.mallet.types.Instance;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
+import de.julielab.ir.ltr.features.FeatureValueAssigner;
 import de.julielab.ir.ltr.features.TopicFieldsCasAnnotator;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.function.Consumer;
 
 /**
@@ -22,20 +25,21 @@ import java.util.function.Consumer;
  * run the annotator.</p>
  */
 public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
+    public static final long serialVersionUID = -4602232149056363215L;
     private final static Logger log = LoggerFactory.getLogger(RunTopicMatchAnnotatorFeatureGroup.class);
     private TopicFieldsCasAnnotator topicFieldsAnnotator;
 
-    public RunTopicMatchAnnotatorFeatureGroup(Iterable<Topic> topics) {
+    public RunTopicMatchAnnotatorFeatureGroup() {
         // This pipe should only run when it is actually required. So let it belong to
         // the same group as the pipe that will eventually use the annotations
         super(TopicMatchFeatureGroup.GROUP_NAME);
-        topicFieldsAnnotator = new TopicFieldsCasAnnotator(topics);
+        topicFieldsAnnotator = new TopicFieldsCasAnnotator();
     }
 
 
     @Override
     protected void addFeatures() {
-        Consumer<Instance> annotation = inst -> {
+       FeatureValueAssigner annotation = inst -> {
             final Document document = (Document) inst.getSource();
             final CAS cas = document.getCas();
             try {

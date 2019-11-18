@@ -149,7 +149,8 @@ public class RankerFromInternalPm19 implements Ranker<Topic> {
             subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
-        featurePreprocessing.preprocessTest(documentList, trainDocuments,"");
+        // TODO FIX!
+        //featurePreprocessing.preprocessTest(documentList, trainDocuments,"");
         try {
             if (ranker == null)
                 load(modelFile);

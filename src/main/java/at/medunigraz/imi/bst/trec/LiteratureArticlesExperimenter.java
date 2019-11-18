@@ -11,6 +11,8 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.TreatmentRanker;
+import de.julielab.java.utilities.cache.CacheConfiguration;
+import de.julielab.java.utilities.cache.CacheService;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,33 +21,36 @@ import java.util.Set;
 
 public class LiteratureArticlesExperimenter {
 
-    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedInternal2019();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2019();
 
     public static void main(String[] args) throws IOException {
-        // Judging order: ?
-        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
+        //new CacheConfiguration(CacheTy)
+        //CacheService.initialize();
 
-        final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
+//        // Judging order: ?
+//        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
+//
+//        final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
 
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         jlpmletor.setReRanker(new RankerFromPm1718());
+//
+//        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
+//        jlpmltrin.setReRanker(new RankerFromInternalPm19());
+//
+//        final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
+//        jlpmtrcommon.setReRanker(new TreatmentRanker());
+//
+//        final Experiment jlpmtrboost = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
+//        jlpmtrboost.setReRanker(new TreatmentRanker());
 
-        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
-        jlpmltrin.setReRanker(new RankerFromInternalPm19());
-
-        final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
-        jlpmtrcommon.setReRanker(new TreatmentRanker());
-
-        final Experiment jlpmtrboost = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
-        jlpmtrboost.setReRanker(new TreatmentRanker());
-
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(jlpmcommon, jlpmcommon2, jlpmletor,jlpmltrin, jlpmtrcommon, jlpmtrboost));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlpmletor));
         for (Experiment exp : experiments) {
             exp.run();
         }

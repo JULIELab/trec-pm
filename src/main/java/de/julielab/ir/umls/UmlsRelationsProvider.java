@@ -1,8 +1,8 @@
 package de.julielab.ir.umls;
 
-import de.julielab.ir.cache.CacheAccess;
-import de.julielab.ir.cache.CacheService;
 import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

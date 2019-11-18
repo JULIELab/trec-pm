@@ -36,6 +36,11 @@ public final class TrecPMGoldStandardFactory {
                 new File(TrecPMGoldStandardFactory.class.getResource("/gold-standard/qrels-sample-abstracts.2018.txt").getPath()));
     }
 
+    public static TrecQrelGoldStandard<Topic> pubmedOfficial2019() {
+        return gs(Task.PUBMED, 2019, GoldStandardType.OFFICIAL,
+                new File(TrecPMGoldStandardFactory.class.getResource("/gold-standard/qrels-sampleval-abstracts.2019.txt").getPath()));
+    }
+
     public static AggregatedTrecQrelGoldStandard<Topic> pubmedOfficialAggregated() {
         return new AggregatedTrecQrelGoldStandard<>(pubmedOfficial2017(), pubmedOfficial2018());
     }

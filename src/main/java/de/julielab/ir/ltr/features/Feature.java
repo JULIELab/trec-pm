@@ -2,6 +2,7 @@ package de.julielab.ir.ltr.features;
 
 import cc.mallet.types.Instance;
 
+import java.io.Serializable;
 import java.util.function.Consumer;
 
 /**
@@ -13,14 +14,14 @@ import java.util.function.Consumer;
  * may add an arbitrary number of actual feature values into the feature vector) which can be (de-)activated
  * via the {@link FeatureControlCenter} for experimental purposes.</p>
  */
-public class Feature {
+public class Feature implements Serializable {
     protected String name;
     /**
      * This consumer takes a MALLET token and sets a feature value to it.
      */
     private Consumer<Instance> valueAssigner;
 
-    public Feature(String name, Consumer<Instance> valueAssigner) {
+    public Feature(String name, FeatureValueAssigner valueAssigner) {
         this.name = name;
         this.valueAssigner = valueAssigner;
     }

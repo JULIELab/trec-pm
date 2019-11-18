@@ -7,6 +7,7 @@ import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrieva
 import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
+import cc.mallet.pipe.Pipe;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
@@ -40,6 +41,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     private Task task;
     private DocumentList<Topic> trainDocuments;
     private File modelFile;
+    private Pipe pipe;
 
     public RankerFromPm1718() {
         try {
@@ -68,13 +70,10 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     }
 
     public void trainModel() {
-
         train(trainDocuments);
 
         save(modelFile);
-        FastTextEmbeddingFeatures.shutdown();
-        OriginalDocumentRetrieval.getInstance().shutdown();
-        ElasticClientFactory.getClient().close();
+
     }
 
     @Override
@@ -96,10 +95,19 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         m.put(new IRScoreFeatureKey(IRScore.BM25, FULL), fullRetrieval);
         // Scores for individual query parts
         m.putAll(subClauseRetrievals);
+        log.info("Creating features");
         featurePreprocessing.setRetrievals(m);
         featurePreprocessing.preprocessTrain(documentList, "");
 
+        // Early closing the services we needed for feature creation. This removes the respective
+        // background threads which can throw annoying error messages not relevant for us when the connection
+        // to the databases isn't stable.
+        FastTextEmbeddingFeatures.shutdown();
+        OriginalDocumentRetrieval.getInstance().shutdown();
+        ElasticClientFactory.getClient().close();
+
         scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
+        pipe = trainDocuments.stream().findFirst().get().getFeaturePipes();
 
         log.info("Training LtR model");
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
@@ -118,8 +126,10 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     public void load(File modelFile) throws IOException {
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
         ranker.load(modelFile);
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
+             ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".pipes.bin"))) {
             scalingFactors = (double[]) ois.readObject();
+            pipe = (Pipe) ois2.readObject();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -127,9 +137,14 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 
     @Override
     public void save(File modelFile) {
+        log.info("Saving the ranker itself");
         ranker.save(modelFile);
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
+             ObjectOutputStream oos2 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".pipes.bin"))) {
+            log.info("Saving the feature scaling factors");
             oos.writeObject(scalingFactors);
+            log.info("Saving the feature pipe");
+            oos2.writeObject(pipe);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -139,6 +154,13 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 
     @Override
     public DocumentList rank(DocumentList<Topic> documentList) {
+        try {
+            if (ranker == null)
+                load(modelFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
         String index;
         final Map<IRScoreFeatureKey, TrecPmRetrieval> subClauseRetrievals;
         if (task == Task.PUBMED) {
@@ -149,18 +171,11 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
-        featurePreprocessing.preprocessTest(documentList, trainDocuments, "");
+        featurePreprocessing.preprocessTest(documentList, pipe, trainDocuments, "");
         if (scalingFactors != null)
             documentList.stream().forEach(d -> FeatureNormalizationUtils.rangeScaleFeatures(d.getFeatureVector(), scalingFactors));
-        try {
-            if (ranker == null)
-                load(modelFile);
-            final DocumentList<Topic> rankedList = ranker.rank(documentList);
-            return rankedList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        final DocumentList<Topic> rankedList = ranker.rank(documentList);
+        return rankedList;
     }
 
     @Override

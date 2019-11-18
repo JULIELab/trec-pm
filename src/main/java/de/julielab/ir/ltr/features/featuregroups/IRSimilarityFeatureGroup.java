@@ -3,10 +3,7 @@ package de.julielab.ir.ltr.features.featuregroups;
 import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import de.julielab.ir.ltr.Document;
-import de.julielab.ir.ltr.features.FeatureGroup;
-import de.julielab.ir.ltr.features.IRScore;
-import de.julielab.ir.ltr.features.IRScoreFeatureKey;
-import de.julielab.ir.ltr.features.TrecPmQueryPart;
+import de.julielab.ir.ltr.features.*;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -25,7 +22,7 @@ public class IRSimilarityFeatureGroup extends FeatureGroup {
 
     @Override
     protected void addFeatures() {
-        BiFunction<String, IRScoreFeatureKey, Consumer<Instance>> assignerFactory = (fName, scoreType) -> inst -> {
+        BiFunction<String, IRScoreFeatureKey, FeatureValueAssigner> assignerFactory = (fName, scoreType) -> inst -> {
             Token t = (Token) inst.getData();
             Document<?> d = (Document<?>) inst.getSource();
             final Double irScore = d.getIrScore(scoreType);

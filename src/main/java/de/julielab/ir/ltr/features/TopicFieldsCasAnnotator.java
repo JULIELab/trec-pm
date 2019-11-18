@@ -12,26 +12,16 @@ import org.apache.uima.jcas.JCas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * <p>This class takes a UIMA CAS and a {@link Topic} and finds different kinds of topic field occurrences in the document for subsequent feature generation.</p>
  * <p>Note that this class is not a proper UIMA annotator which would extend one of UIMA's annotator classes. We just use the CAS structure for annotation.</p>
  */
-public class TopicFieldsCasAnnotator {
+public class TopicFieldsCasAnnotator implements Serializable {
     private final static Logger log = LoggerFactory.getLogger(TopicFieldsCasAnnotator.class);
-    private final StringMap<Map<String, TopicMatch>> matcher;
-    private Set<String> knownTopicNumbers = new HashSet<>();
 
-    public TopicFieldsCasAnnotator(Iterable<Topic> topics) {
-        Map<String, Map<String, TopicMatch>> dictionary = new LinkedHashMap<>();
-        for (Topic topic : topics) {
-            addDiseaseToDictionary(topic, dictionary);
-            addTopicGenesToDictionary(topic, dictionary);
-            knownTopicNumbers.add(topic.getCrossDatasetId());
-        }
-        matcher = new WholeWordLongestMatchMap<>(dictionary.keySet(), dictionary.values(), false);
-    }
 
     /**
      * <p>Initialization. Adds the disease name, its synonyms and hypernyms to the dictionary.</p>
@@ -107,8 +97,10 @@ public class TopicFieldsCasAnnotator {
     public void annotate(JCas jCas, Topic topic) {
         if (topic == null)
             throw new IllegalArgumentException("The passed topic is null");
-        if (!knownTopicNumbers.contains(topic.getCrossDatasetId()))
-            throw new IllegalStateException("The topic " + topic.getCrossDatasetId() + " should be matched to a document but this class was not initialized with this topic.");
+        Map<String, Map<String, TopicMatch>> dictionary = new LinkedHashMap<>();
+        addDiseaseToDictionary(topic, dictionary);
+        addTopicGenesToDictionary(topic, dictionary);
+        StringMap<Map<String, TopicMatch>> matcher = new WholeWordLongestMatchMap<>(dictionary.keySet(), dictionary.values(), false);
         List<TopicMatch> matches = new ArrayList<>();
         final String haystack = FeatureUtils.getInstance().normalizeString(jCas.getDocumentText());
         matcher.match(haystack, (key, start, end, value) -> {

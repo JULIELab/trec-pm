@@ -50,7 +50,7 @@ public abstract class FeatureGroup extends Pipe {
 
     protected abstract void addFeatures();
 
-    protected void addFeature(String name, Consumer<Instance> valueAssinger) {
+    protected void addFeature(String name, FeatureValueAssigner valueAssinger) {
         features.add(new Feature(name, valueAssinger));
     }
     /**

@@ -1,5 +1,7 @@
 package de.julielab.ir.ltr;
 
+import cc.mallet.pipe.Pipe;
+import cc.mallet.pipe.SerialPipes;
 import cc.mallet.types.FeatureVector;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.FeatureUtils;
@@ -75,6 +77,7 @@ public class Document<Q extends QueryDescription> {
      */
     private List<String> treatments;
     private Map<String, Object> sourceFields = Collections.emptyMap();
+    private Pipe featurePipes;
 
     public int getStratum() {
         return stratum;
@@ -101,10 +104,13 @@ public class Document<Q extends QueryDescription> {
      * @return The UIMA CAS of this document.
      */
     public CAS getCas() {
-        if (cas == null && fullDocumentData == null)
-            throw new IllegalStateException("Cannot create a CAS because the XMI data has not been set to this document.");
-        if (cas == null)
+        if (fullDocumentData == null || fullDocumentData.length == 0) {
+            log.warn("Cannot populate the CAS for document {} because its XMI data is not set. Features related to the document itself cannot be created.", id);
+            throw new IllegalArgumentException();
+        }
+        if (cas == null) {
             cas = OriginalDocumentRetrieval.getInstance().parseXmiDataIntoJCas(fullDocumentData);
+        }
         return cas;
     }
 
@@ -216,7 +222,7 @@ public class Document<Q extends QueryDescription> {
         return null;
     }
 
-    public int getTitelLength() {
+    public int getTitleLength() {
         final Title t = getTitleAnnotation();
         return t != null ? t.getEnd() - t.getBegin() : 0;
     }
@@ -250,5 +256,13 @@ public class Document<Q extends QueryDescription> {
 
     public void setSourceFields(Map<String, Object> sourceFields) {
         this.sourceFields = sourceFields;
+    }
+
+    public Pipe getFeaturePipes() {
+        return featurePipes;
+    }
+
+    public void setFeaturePipes(Pipe featurePipes) {
+        this.featurePipes = featurePipes;
     }
 }

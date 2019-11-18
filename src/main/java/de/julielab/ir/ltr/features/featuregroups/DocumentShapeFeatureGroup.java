@@ -23,7 +23,7 @@ public class DocumentShapeFeatureGroup extends FeatureGroup {
         addFeature(TITLE_LENGTH, inst -> {
             Document doc = (Document) inst.getSource();
             final Token token = (Token) inst.getData();
-            token.setFeatureValue(TITLE_LENGTH, doc.getTitelLength());
+            token.setFeatureValue(TITLE_LENGTH, doc.getTitleLength());
         });
         addFeature(ABSTRACT_LENGTH, inst -> {
             Document doc = (Document) inst.getSource();

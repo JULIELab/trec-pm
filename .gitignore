@@ -47,6 +47,7 @@ uima/jcore-pmclassifier-ae/src/main/resources/malletPmClassifier*
 
 # May not redistribute
 resources/CosmicResistanceMutations.tsv*
+src/main/resources/gold-standard/*2019*
 
 # Internal data
 src/main/resources/internal

@@ -3,10 +3,10 @@ package at.medunigraz.imi.bst.trec.search;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
-import de.julielab.ir.cache.CacheAccess;
-import de.julielab.ir.cache.CacheService;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
+import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequest;
@@ -29,7 +29,7 @@ public class ElasticSearch implements SearchEngine {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private Client client = ElasticClientFactory.getClient();
+    private Client client;
 
     private String index = "_all";
     private SimilarityParameters parameters;
@@ -90,18 +90,22 @@ public class ElasticSearch implements SearchEngine {
         LOG.trace("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
+            LOG.debug("Query is not in cache, getting from ES");
             if (!(parameters instanceof NoParameters)) {
                 //                ElasticSearchSetup.
             }
 
             result = query(qb, size);
             cache.put(cacheKey, result);
+        } else {
+            LOG.debug("Got query result of size {} from cache", result.size());
         }
         return result;
     }
 
     private List<Result> query(QueryBuilder qb, int size) {
-
+        if (client == null)
+            client = ElasticClientFactory.getClient();
         try {
             final SearchSourceBuilder sb = new SearchSourceBuilder().query(qb).size(size).storedField("_id");
             if (storedFields != null)
@@ -118,7 +122,7 @@ public class ElasticSearch implements SearchEngine {
             }
 
             return ret;
-        }  catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();

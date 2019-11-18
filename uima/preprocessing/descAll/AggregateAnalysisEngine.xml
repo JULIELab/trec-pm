@@ -84,6 +84,12 @@
             <import location="JCoRe Annotation Adder 1.xml"/>
                     
         </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder 2">
+                        
+            <import location="JCoRe Annotation Adder 2.xml"/>
+                    
+        </delegateAnalysisEngine>
             
     </delegateAnalysisEngineSpecifiers>
         
@@ -124,6 +130,8 @@
                 <node>JCoRe Annotation Adder</node>
                                 
                 <node>JCoRe Annotation Adder 1</node>
+                                
+                <node>JCoRe Annotation Adder 2</node>
                             
             </fixedFlow>
                     

@@ -19,9 +19,45 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
+        <delegateAnalysisEngine key="JCoRe AcronymAnnotator">
                         
-            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
+            <import location="JCoRe AcronymAnnotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
+                        
+            <import location="JCoRe OpenNLP POS Tagger.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="BioLemmatizer">
+                        
+            <import location="BioLemmatizer.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
+                        
+            <import location="JCore LINNAEUS Species AE.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
+                        
+            <import location="JCoRe Mutation Annotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
+                        
+            <import location="JCoRe Lingscope Negation AE.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Annotation Adder 2">
+                        
+            <import location="JCoRe Annotation Adder 2.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -45,7 +81,19 @@
                                 
                 <node>JCoRe Token Annotator</node>
                                 
-                <node>JCoRe BANNER AE for Biomedical English</node>
+                <node>JCoRe AcronymAnnotator</node>
+                                
+                <node>JCoRe OpenNLP POS Tagger</node>
+                                
+                <node>BioLemmatizer</node>
+                                
+                <node>JCore LINNAEUS Species AE</node>
+                                
+                <node>JCoRe Mutation Annotator</node>
+                                
+                <node>JCoRe Lingscope Negation AE</node>
+                                
+                <node>JCoRe Annotation Adder 2</node>
                             
             </fixedFlow>
                     

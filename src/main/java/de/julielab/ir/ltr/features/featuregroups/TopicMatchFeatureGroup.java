@@ -8,6 +8,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
+import de.julielab.ir.ltr.features.FeatureValueAssigner;
 import de.julielab.ir.ltr.features.TopicFieldsCasAnnotator;
 import de.julielab.jcore.types.Disease;
 import de.julielab.jcore.types.Gene;
@@ -42,7 +43,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     }
 
     private void addMatchGeneVariant() {
-        Consumer<Instance> featureValueAssigner = instance -> {
+        FeatureValueAssigner featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
             final Document<Topic> document = (Document<Topic>) instance.getSource();
             final Set<String> topicVariants = Arrays.stream(document.getQueryDescription().getGenes()).map(TopicGene::getMutation).collect(Collectors.toSet());
@@ -66,7 +67,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
 
 
     private void addMatchTopicGene() {
-        Consumer<Instance> featureValueAssigner = instance -> {
+        FeatureValueAssigner featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
             final Document<Topic> document = (Document<Topic>) instance.getSource();
             try {
@@ -89,7 +90,7 @@ public class TopicMatchFeatureGroup extends FeatureGroup {
     }
 
     private void addMatchTopicDisease() {
-        Consumer<Instance> featureValueAssigner = instance -> {
+        FeatureValueAssigner featureValueAssigner = instance -> {
             final Token token = (Token) instance.getData();
             final Document<Topic> document = (Document<Topic>) instance.getSource();
             try {

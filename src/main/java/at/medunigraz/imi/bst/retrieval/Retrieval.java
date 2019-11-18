@@ -25,7 +25,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     protected Query query;
     private Logger log = LogManager.getLogger();
     private ElasticSearchQuery<Q> esQuery;
-    private IRScoreFeatureKey featureKey;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
@@ -40,7 +39,6 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     public Retrieval(String indexName, IRScoreFeatureKey featureKey) {
         this.indexName = indexName;
         this.esQuery = new ElasticSearchQuery(size, indexName);
-        this.featureKey = featureKey;
         this.query = esQuery;
         this.negativeBoosts = new ArrayList<>();
     }

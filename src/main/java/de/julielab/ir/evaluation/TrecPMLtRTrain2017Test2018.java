@@ -95,7 +95,8 @@ public class TrecPMLtRTrain2017Test2018 {
         List<DocumentList<Topic>> lastDocumentLists = experiment.getLastResultAsDocumentLists();
         log.info("Ranking test documents with the LtR model");
         for (DocumentList<Topic> list2 : lastDocumentLists) {
-            featurePreprocessing.preprocessTest(list2,trainDocs, "");
+            // TODO FIX!
+            //featurePreprocessing.preprocessTest(list2,trainDocs, "");
             list2.stream().map(Document::getFeatureVector).forEach(fv -> FeatureNormalizationUtils.rangeScaleFeatures(fv, scalingFactors));
             ranker.rank(list2);
         }

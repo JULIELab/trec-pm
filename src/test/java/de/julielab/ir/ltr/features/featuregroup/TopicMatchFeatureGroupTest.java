@@ -51,7 +51,7 @@ public class TopicMatchFeatureGroupTest {
 
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe());
-        featurePipes.add(new RunTopicMatchAnnotatorFeatureGroup(topicSet.getTopics()));
+        featurePipes.add(new RunTopicMatchAnnotatorFeatureGroup());
         featurePipes.add(new TopicMatchFeatureGroup());
         featurePipes.add(new Token2FeatureVector(false, false));
         featurePipes.add(new SetFeatureVectorPipe());

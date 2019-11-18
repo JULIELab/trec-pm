@@ -5,9 +5,9 @@ import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
 import com.wcohen.ss.api.Token;
 import com.wcohen.ss.tokens.SimpleTokenizer;
-import de.julielab.ir.cache.CacheAccess;
-import de.julielab.ir.cache.CacheService;
 import de.julielab.java.utilities.IOStreamUtilities;
+import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 

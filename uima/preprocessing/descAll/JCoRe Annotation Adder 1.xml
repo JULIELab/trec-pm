@@ -9,7 +9,7 @@
         
     <analysisEngineMetaData>
                 
-        <name>JCoRe Annotation Adder</name>
+        <name>JCoRe Annotation Adder 1</name>
                 
         <description>This component helps to import annotations made on the exact CAS document text by an external process back into the CAS. To this end, the component is prepared to read several data formats. Currently, simple offset-based annotations are supported with configurable UIMA types. The component supports character and token based offsets.</description>
                 

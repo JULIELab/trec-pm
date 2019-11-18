@@ -4,14 +4,15 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import de.julielab.ipc.javabridge.Options;
 import de.julielab.ipc.javabridge.StdioBridge;
-import de.julielab.ir.cache.CacheAccess;
-import de.julielab.ir.cache.CacheService;
 import de.julielab.ir.ltr.Document;
+import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.uima.cas.CAS;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.util.ArrayDeque;
@@ -23,13 +24,17 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     public static final String FT_FEATURE_NAME = "fasttext";
     private static final Logger log = LogManager.getLogger();
     private static Deque<StdioBridge<byte[]>> activeBridges = new ArrayDeque<>();
-    private final StdioBridge<byte[]> bridge;
-    private Pattern tokenization = Pattern.compile("([.\\!?,'/()])");
-    private String EMBEDDING_PATH = "resources/dim300.bin";
-    private CacheAccess<String, double[]> cache;
+    private final String EMBEDDING_PATH = "resources/dim300.bin";
+    private transient StdioBridge<byte[]> bridge;
+    private transient Pattern tokenization = Pattern.compile("([.\\!?,'/()])");
+    private transient CacheAccess<String, double[]> cache;
 
     public FastTextEmbeddingFeatures() {
         super(FT_FEATURE_NAME);
+        init();
+    }
+
+    private void init() {
         Options<byte[]> options = new Options(byte[].class);
         options.setExecutable("python3");
         options.setExternalProgramTerminationSignal("exit");
@@ -89,5 +94,10 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        init();
     }
 }

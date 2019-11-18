@@ -11,10 +11,11 @@
         </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-	    <activeDBConnection>trecpm2019</activeDBConnection>
+	    <activeDBConnection>pubmed2019</activeDBConnection>
 	<maxActiveDBConnections>6</maxActiveDBConnections>
 	<DBConnections>
-        <DBConnection name="trecpm2019_lh" url="jdbc:postgresql://localhost:5432/trecpm2019"/>
+        	<DBConnection name="pubmed2019" url="jdbc:postgresql://192.168.1.15:5432/pubmed2019"/>
+        	<DBConnection name="trecpm2019_lh" url="jdbc:postgresql://localhost:5432/trecpm2019"/>
 		<DBConnection name="trecpm2019" url="jdbc:postgresql://h4:5432/trecpm2019"/>
 		<DBConnection name="trecpm" url="jdbc:postgresql://h4:5432/trecpm"/>
 	</DBConnections>

@@ -1,8 +1,9 @@
 package de.julielab.ir.ltr.features;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class IRScoreFeatureKey {
+public class IRScoreFeatureKey implements Serializable {
     private IRScore scoreType;
     private TrecPmQueryPart queryPart;
 
