@@ -145,6 +145,7 @@ public class OriginalDocumentRetrieval {
             try (BufferedReader br = FileUtilities.getReaderFromFile(new File(TrecConfig.COSTOSYS_ANNOTATIONS_LIST))) {
                 annotationTypesToRetrieve = br.lines().filter(Predicate.not(String::isBlank)).map(String::trim).toArray(String[]::new);
             }
+            dbcs.put(costosysConfig, dbc);
             DocumentDatabaseSettings documentDatabaseSettings = determineDataFormat(costosysConfig, table);
 
             boolean doGzip = documentDatabaseSettings.isDoGzip();
@@ -180,7 +181,6 @@ public class OriginalDocumentRetrieval {
                 documentDatabaseSettings.setFeaturesToMapBinaryFromDb(getFeaturesToMapBinaryFromDb(dbc));
                 documentDatabaseSettings.setReverseBinaryMappingFromDb(getReverseBinaryMappingFromDb(dbc));
             }
-            dbcs.put(costosysConfig, dbc);
         } catch (IOException e) {
             log.error("Could not create the OriginalDocumentRetrieval because the DBC configuration {} could not be read", costosysConfig, e);
         }
@@ -217,9 +217,9 @@ public class OriginalDocumentRetrieval {
      * @return An iterator for the retrieved document data.
      */
     private Iterator<byte[][]> retrieveXmiDataFromDB(File costosysConfig, List<Object[]> ids, String table) throws SQLException {
-        DataBaseConnector dbc = dbcs.get(costosysConfig);
-        if (dbc == null)
+        if (!dbcs.containsKey(costosysConfig))
             initializeDatabaseConnection(costosysConfig, table);
+        DataBaseConnector dbc = dbcs.get(costosysConfig);
         try {
             log.debug("Requesting {} documents from the database configured in the configuration file at {}", ids.size(), costosysConfig);
             return dbc.retrieveColumnsByTableSchema(ids, table, tableSchema.getName());
@@ -332,10 +332,14 @@ public class OriginalDocumentRetrieval {
     public void setXmiCasDataToDocuments(DocumentList<?> documents, String table) {
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.
-        Map<File, List<Document<?>>> collect = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).collect(Collectors.groupingBy(Document::getFulltextDbConfiguration));
+        Map<File, List<Document<?>>> collect = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).collect(Collectors.groupingBy(d -> {
+            if (d.getDocumentDbConfiguration() == null)
+                throw new IllegalStateException("The XMI data for document with ID " + d.getId() + " should be fetched but it specifies no document database connection configuration.");
+            return d.getDocumentDbConfiguration();
+        }));
         for (File costosysConfig : collect.keySet()) {
             List<Object[]> docIdsWithoutXmiData = collect.get(costosysConfig).stream().map(d -> new Object[]{d.getId()}).collect(Collectors.toList());
-            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the databse.", docIdsWithoutXmiData.size());
+            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the database.", docIdsWithoutXmiData.size());
             Map<String, byte[][]> dataByDocId = new HashMap<>();
             Iterator<Object[]> it = docIdsWithoutXmiData.iterator();
             while (it.hasNext()) {

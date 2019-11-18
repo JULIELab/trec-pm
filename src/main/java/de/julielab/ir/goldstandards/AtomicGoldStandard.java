@@ -8,6 +8,7 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -33,6 +34,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     protected Task task;
     protected int year;
     protected GoldStandardType type;
+    protected File documentDatabaseConfiguration;
 
     /**
      * The documents in {@link #qrelDocuments} grouped by query.
@@ -98,8 +100,13 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         return qrelDocuments;
     }
 
+    public void setQrelDocuments(DocumentList qrelDocuments) {
+        this.qrelDocuments = qrelDocuments;
+    }
+
     /**
      * Converts a given DocumentList to a non-stratified list.
+     *
      * @param sampleQrelDocuments
      * @return
      */
@@ -116,10 +123,6 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     @Override
     public DocumentList<Q> getSampleQrelDocuments() {
         return qrelDocuments;
-    }
-
-    public void setQrelDocuments(DocumentList qrelDocuments) {
-        this.qrelDocuments = qrelDocuments;
     }
 
     public Stream<Q> getQueries() {
@@ -142,5 +145,15 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     @Override
     public GoldStandardType getType() {
         return type;
+    }
+
+    public File getDocumentDatabaseConfiguration() {
+        return documentDatabaseConfiguration;
+    }
+
+    public void setDocumentDatabaseConfiguration(File documentDbConfiguration) throws IOException {
+        this.documentDatabaseConfiguration = documentDbConfiguration;
+        for (Document<Q> d : qrelDocuments)
+            d.setDocumentDbConfiguration(documentDbConfiguration);
     }
 }

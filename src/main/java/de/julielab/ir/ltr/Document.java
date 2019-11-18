@@ -1,7 +1,6 @@
 package de.julielab.ir.ltr;
 
 import cc.mallet.pipe.Pipe;
-import cc.mallet.pipe.SerialPipes;
 import cc.mallet.types.FeatureVector;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.features.FeatureUtils;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -71,24 +71,26 @@ public class Document<Q extends QueryDescription> {
      */
     private CAS cas;
     private String normalizedDocumentText;
-    private File fulltextDbConfiguration;
+    private File documentDbConfiguration;
 
     /**
      * <p>The CoStoSys configuration file configured to the database containing this document.</p>
      * @return
      */
-    public File getFulltextDbConfiguration() {
-        return fulltextDbConfiguration;
+    public File getDocumentDbConfiguration() {
+        return documentDbConfiguration;
     }
 
     /**
      * <p>Sets the given file path to the CoStoSys configuration file for retrieval of this document.</p>
      * <p>Uses {@link File#getCanonicalFile()} to normalize the path, thus the method throws an <code>IOException</code>.</p>
-     * @param fulltextDbConfiguration The CoStoSys configuration file that allows to retrieve this document's contents from a database.
+     * @param documentDbConfiguration The CoStoSys configuration file that allows to retrieve this document's contents from a database.
      * @throws IOException If the canonical File cannot be retrieved from the configuration file path.
      */
-    public void setFulltextDbConfiguration(File fulltextDbConfiguration) throws IOException {
-        this.fulltextDbConfiguration = fulltextDbConfiguration.getCanonicalFile();
+    public void setDocumentDbConfiguration(File documentDbConfiguration) throws IOException {
+        this.documentDbConfiguration = documentDbConfiguration.getCanonicalFile();
+        if (!documentDbConfiguration.exists())
+            throw new FileNotFoundException("The CoStoSys document database configuration file at " + documentDbConfiguration.getCanonicalPath() + " could not be found. It is required to exist in order to be used to fetch the document contents.");
     }
 
     /**
