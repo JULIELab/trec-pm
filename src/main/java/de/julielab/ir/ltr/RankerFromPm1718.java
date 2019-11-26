@@ -12,6 +12,7 @@ import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
+import de.julielab.ir.goldstandards.AtomicGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.features.*;
@@ -50,10 +51,14 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             if (!FeatureControlCenter.isInitialized())
                 FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
+            // Set the DB connection to get the test documents from (the train documents are retrieved from trainGoldStandards).
+            featurePreprocessing.setCanonicalDbConnectionFiles(Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile()));
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
             modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

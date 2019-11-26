@@ -1,6 +1,7 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import com.google.common.base.Functions;
 import com.ximpleware.VTDException;
 import de.julielab.costosys.configuration.DBConfig;
 import de.julielab.costosys.configuration.FieldConfig;
@@ -50,7 +51,7 @@ public class OriginalDocumentRetrieval {
     private static OriginalDocumentRetrieval instance;
     private final CacheAccess<String, String> documentTextCache;
     private final CacheAccess<String, byte[]> xmiCache;
-    private final CacheAccess<String, byte[][]> dbDataCache;
+    // private final CacheAccess<String, byte[][]> dbDataCache;
     /**
      * This map contains the XMI namespace definitions required to rebuild valid XMI documents from the
      * XMI elements we will retrieve from the database. The base document and the annotations are all stored
@@ -116,7 +117,7 @@ public class OriginalDocumentRetrieval {
 
         documentTextCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasDocumentTextCache", CacheAccess.STRING, CacheAccess.STRING);
         xmiCache = CacheService.getInstance().getCacheAccess("uimaDocText.db", "UIMACasXMICache", CacheAccess.STRING, CacheAccess.BYTEARRAY);
-        dbDataCache = CacheService.getInstance().getCacheAccess("uimaDBData.db", "XmiBytesCache", CacheAccess.STRING, CacheAccess.JAVA);
+        // dbDataCache = CacheService.getInstance().getCacheAccess("uimaDBData.db", "XmiBytesCache", CacheAccess.STRING, CacheAccess.JAVA);
     }
 
     public static OriginalDocumentRetrieval getInstance() {
@@ -126,6 +127,11 @@ public class OriginalDocumentRetrieval {
         return instance;
     }
 
+    /**
+     * @return
+     * @deprecated We no longer use a single DB connection but multiple. This is required by the fact that we train
+     * on some document sets to rank another which may very well reside in different DBs.
+     */
     public String getDatabaseUrl() {
         try {
             final DBConfig dbConfig = new DBConfig(IOUtils.toByteArray(new FileInputStream(TrecConfig.COSTOSYS_CONFIG)));
@@ -188,7 +194,7 @@ public class OriginalDocumentRetrieval {
     }
 
     public Stream<String> getDocumentText(DocumentList<?> documents, String table) {
-        setXmiCasDataToDocuments(documents, table);
+        setXmiCasDataToDocuments(documents, null, table);
         return documents.stream().map(d -> {
             String text = documentTextCache.get(d.getId());
             if (text == null) {
@@ -327,60 +333,89 @@ public class OriginalDocumentRetrieval {
      * Retrieves the XMI data from the database for the document IDs of the passed documents. This methods skips
      * documents that already have their full document data set.
      *
-     * @param documents The documents to populate with the UIMA XMI CAS data.
+     * @param documents     The documents to populate with the UIMA XMI CAS data.
+     * @param dbConnections The canonical file paths pointing to the available database connections to get the
+     *                      XMI data of the <code>documents</code> from.
+     * @param table         The JeDIS data table name containing the document data. Must be the same table for all
+     *                      database connections specified in <code>dbConnections</code>.
      */
-    public void setXmiCasDataToDocuments(DocumentList<?> documents, String table) {
+    public void setXmiCasDataToDocuments(DocumentList<?> documents, List<File> dbConnections, String table) {
+        List<? extends Document<?>> docsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).collect(Collectors.toList());
+        Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream()
+                .filter(d -> xmiCache.get(d.getId()) == null)
+                .collect(Collectors.toSet());
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.
-        Map<File, List<Document<?>>> collect = documents.stream().filter(d -> d.getFullDocumentData() == null).filter(d -> xmiCache.get(d.getId()) == null).collect(Collectors.groupingBy(d -> {
-            if (d.getDocumentDbConfiguration() == null)
-                throw new IllegalStateException("The XMI data for document with ID " + d.getId() + " should be fetched but it specifies no document database connection configuration.");
-            return d.getDocumentDbConfiguration();
-        }));
-        for (File costosysConfig : collect.keySet()) {
-            List<Object[]> docIdsWithoutXmiData = collect.get(costosysConfig).stream().map(d -> new Object[]{d.getId()}).collect(Collectors.toList());
-            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the database.", docIdsWithoutXmiData.size());
-            Map<String, byte[][]> dataByDocId = new HashMap<>();
-            Iterator<Object[]> it = docIdsWithoutXmiData.iterator();
-            while (it.hasNext()) {
-                Object[] key = it.next();
-                String id = (String) key[0];
-                byte[][] bytes = dbDataCache.get(id);
-                if (bytes != null) {
-                    dataByDocId.put(id, bytes);
-                    it.remove();
-                }
+        Map<File, List<Document<?>>> docsByDbConfig = docsWithoutXmiDataNotInCache.stream()
+                .filter(d -> d.getDocumentDbConfiguration() != null)
+                .collect(Collectors.groupingBy(Document::getDocumentDbConfiguration));
+//                .docsByDbConfig(Collectors.groupingBy(d -> {
+//            if (d.getDocumentDbConfiguration() == null && (dbConnections.isEmpty() || dbConnections == null))
+//                throw new IllegalStateException("The XMI data for document with ID " + d.getId() + " should be fetched but it specifies no document database connection configuration and no database connection files have been passed to this method.");
+//            return d.getDocumentDbConfiguration();
+//        }));
+
+        List<Document<?>> docsWithoutDbConfig = docsWithoutXmiDataNotInCache.stream()
+                .filter(d -> d.getDocumentDbConfiguration() == null)
+                .collect(Collectors.toList());
+
+        if (!docsWithoutDbConfig.isEmpty() && (dbConnections == null || dbConnections.isEmpty())) {
+            throw new IllegalStateException("The XMI data for " + docsWithoutDbConfig.size() + " documents must be fetched from a database but the respective " +
+                    "documents do not specify a database connection and no DB connections are passed to the method as " +
+                    "an argument.");
+        } else if (dbConnections != null && !dbConnections.isEmpty()) {
+            for (File dbConnectionFile : dbConnections) {
+                docsByDbConfig.put(dbConnectionFile, docsWithoutDbConfig);
             }
+        }
+
+        for (File costosysConfig : docsByDbConfig.keySet()) {
+            List<Object[]> docsForCurrentDbConfig = docsByDbConfig.get(costosysConfig).stream().map(d -> new Object[]{d.getId()}).distinct().collect(Collectors.toList());
+//            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the database.", docsForCurrentDbConfig.size());
+//            Iterator<Object[]> it = docsForCurrentDbConfig.iterator();
+//            while (it.hasNext()) {
+//                Object[] key = it.next();
+//                String id = (String) key[0];
+//                byte[][] bytes = dbDataCache.get(id);
+//                if (bytes != null) {
+//                    dataByDocId.put(id, bytes);
+//                    it.remove();
+//                }
+//            }
+            Map<String, byte[][]> dataByDocId = new HashMap<>();
             try {
-                if (!docIdsWithoutXmiData.isEmpty()) {
-                    final Iterator<byte[][]> xmiData = retrieveXmiDataFromDB(costosysConfig, docIdsWithoutXmiData, table);
+                if (!docsForCurrentDbConfig.isEmpty()) {
+                    final Iterator<byte[][]> xmiData = retrieveXmiDataFromDB(costosysConfig, docsForCurrentDbConfig, table);
                     int i = 0;
                     while (xmiData.hasNext()) {
                         byte[][] data = xmiData.next();
                         String id = new String(data[0], UTF_8);
                         dataByDocId.put(id, data);
-                        dbDataCache.put(id, data);
+                        // dbDataCache.put(id, data);
                         ++i;
                         double reportFraction = 0.1;
-                        if (i % (docIdsWithoutXmiData.size() * reportFraction) == 0)
-                            log.debug("Retrieved {}% of the documents from the database.", i / (docIdsWithoutXmiData.size() * reportFraction) * 10);
+                        if (i % (docsForCurrentDbConfig.size() * reportFraction) == 0)
+                            log.debug("Retrieved {}% of the documents from the database.", i / (docsForCurrentDbConfig.size() * reportFraction) * 10);
                     }
+                    log.debug("Retrieved {} documents from the database", i);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
 
+
             final CAS cas = casPool.getCas(300000);
             try {
-                final Iterator<? extends Document<?>> docsIt = documents.stream().filter(d -> d.getFullDocumentData() == null).iterator();
+                Iterator<? extends Document<?>> docsWithoutXmiDataIt = docsWithoutXmiData.iterator();
                 log.debug("Assembling the actual XMI documents from the database data.");
-                while (docsIt.hasNext()) {
-                    final Document doc = docsIt.next();
+                while (docsWithoutXmiDataIt.hasNext()) {
+                    final Document<?> doc = docsWithoutXmiDataIt.next();
+                    docsWithoutXmiDataIt.remove();
                     byte[] docXmiData = xmiCache.get(doc.getId());
                     if (docXmiData == null) {
                         if (!dataByDocId.containsKey(doc.getId())) {
                             String requested = documents.stream().map(Document::getId).collect(Collectors.toSet()).contains(doc.getId()) ? "" : "not ";
-                            log.warn("The document with ID " + doc.getId() + " is not contained in the cache and was not returned from the database. It was " + requested + "requested from the database " + dbcs.get(costosysConfig).getDbURL() + ".");
+                           // log.warn("The document with ID " + doc.getId() + " is not contained in the cache and was not returned from a database.");
                             continue;
                         }
                         final byte[][] documentData = dataByDocId.get(doc.getId());
@@ -418,8 +453,12 @@ public class OriginalDocumentRetrieval {
             } catch (XMIBuilderException e) {
                 e.printStackTrace();
             }
-            log.debug("Setting the XMI data to {} documents has been finished.", docIdsWithoutXmiData.size());
+            log.debug("Setting the XMI data to {} documents has been finished.", docsForCurrentDbConfig.size());
             releaseCas(cas);
+        }
+        for (Document<?> d : documents) {
+            if (d.getFullDocumentData() == null)
+                log.warn("Document with ID {} did not get its XMI data set.", d.getId());
         }
     }
 

@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,8 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     private String docIdIndexField;
     private int vocabularyCutoff;
     private Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals;
+
+    private List<File> canonicalDbConnectionFiles;
 
     public FeaturePreprocessing(String docIdIndexField, int vocabularyCutoff, String xmiTableName) {
         this.docIdIndexField = docIdIndexField;
@@ -92,6 +95,10 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
             else
                 ((TfidfFeatureGroup)tfIdfFgOpt.get()).setTfidf(trainTfIdf);
         }
-        FeatureControlCenter.getInstance().createFeatures(testDocs, trainPipe, xmiTableName);
+        FeatureControlCenter.getInstance().createFeatures(testDocs, trainPipe, canonicalDbConnectionFiles, xmiTableName);
+    }
+
+    public void setCanonicalDbConnectionFiles(List<File> canonicalDbConnectionFiles) {
+        this.canonicalDbConnectionFiles = canonicalDbConnectionFiles;
     }
 }

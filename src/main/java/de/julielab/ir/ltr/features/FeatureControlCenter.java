@@ -18,6 +18,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -77,11 +78,11 @@ public class FeatureControlCenter {
      * @param xmiTableName
      * @param <Q>
      */
-    public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, Pipe trainPipe, String xmiTableName) {
+    public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, Pipe trainPipe, List<File> canonicalDbConnectionFiles, String xmiTableName) {
         // We here use the MALLET facilities to create feature vectors.
 
         // Fetch the XMI cas information for the documents
-        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
+        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, canonicalDbConnectionFiles, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(trainPipe);
         log.debug("Creating features for {} documents for ranking.", documents.size());
@@ -127,7 +128,7 @@ public class FeatureControlCenter {
         final SerialPipes serialPipes = new SerialPipes(featurePipes);
 
         // Fetch the XMI cas information for the documents
-        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, xmiTableName);
+        OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, null, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(serialPipes);
         log.debug("Creating features for {} training documents.", documents.size());
