@@ -37,9 +37,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
+        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
                         
-            <import location="JCore LINNAEUS Species AE.xml"/>
+            <import location="JCoRe Mutation Annotator.xml"/>
                     
         </delegateAnalysisEngine>
                 
@@ -49,45 +49,9 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Mutation Annotator">
-                        
-            <import location="JCoRe Mutation Annotator.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
         <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
                         
             <import location="JCoRe Lingscope Negation AE.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="PM Classifier 2017">
-                        
-            <import location="PM Classifier 2017.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="PM Classifier 2018">
-                        
-            <import location="PM Classifier 2018.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe Annotation Adder">
-                        
-            <import location="JCoRe Annotation Adder.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe Annotation Adder 1">
-                        
-            <import location="JCoRe Annotation Adder 1.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
-        <delegateAnalysisEngine key="JCoRe Annotation Adder 2">
-                        
-            <import location="JCoRe Annotation Adder 2.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -115,23 +79,11 @@
                                 
                 <node>BioLemmatizer</node>
                                 
-                <node>JCore LINNAEUS Species AE</node>
+                <node>JCoRe Mutation Annotator</node>
                                 
                 <node>JCoRe BANNER AE for Biomedical English</node>
                                 
-                <node>JCoRe Mutation Annotator</node>
-                                
                 <node>JCoRe Lingscope Negation AE</node>
-                                
-                <node>PM Classifier 2017</node>
-                                
-                <node>PM Classifier 2018</node>
-                                
-                <node>JCoRe Annotation Adder</node>
-                                
-                <node>JCoRe Annotation Adder 1</node>
-                                
-                <node>JCoRe Annotation Adder 2</node>
                             
             </fixedFlow>
                     

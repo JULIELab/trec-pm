@@ -37,27 +37,21 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCore LINNAEUS Species AE">
-                        
-            <import location="JCore LINNAEUS Species AE.xml"/>
-                    
-        </delegateAnalysisEngine>
-                
         <delegateAnalysisEngine key="JCoRe Mutation Annotator">
                         
             <import location="JCoRe Mutation Annotator.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
                         
-            <import location="JCoRe Lingscope Negation AE.xml"/>
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Annotation Adder 2">
+        <delegateAnalysisEngine key="JCoRe Lingscope Negation AE">
                         
-            <import location="JCoRe Annotation Adder 2.xml"/>
+            <import location="JCoRe Lingscope Negation AE.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -87,13 +81,11 @@
                                 
                 <node>BioLemmatizer</node>
                                 
-                <node>JCore LINNAEUS Species AE</node>
-                                
                 <node>JCoRe Mutation Annotator</node>
                                 
-                <node>JCoRe Lingscope Negation AE</node>
+                <node>JCoRe BANNER AE for Biomedical English</node>
                                 
-                <node>JCoRe Annotation Adder 2</node>
+                <node>JCoRe Lingscope Negation AE</node>
                             
             </fixedFlow>
                     

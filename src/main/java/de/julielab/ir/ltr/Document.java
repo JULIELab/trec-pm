@@ -129,7 +129,7 @@ public class Document<Q extends QueryDescription> {
     public CAS getCas() {
         if (fullDocumentData == null || fullDocumentData.length == 0) {
             log.warn("Cannot populate the CAS for document {} because its XMI data is not set. Features related to the document itself cannot be created.", id);
-            throw new IllegalArgumentException();
+            //throw new IllegalArgumentException();
         }
         if (cas == null) {
             cas = OriginalDocumentRetrieval.getInstance().parseXmiDataIntoJCas(fullDocumentData);

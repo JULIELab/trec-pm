@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<databaseConnectorConfiguration>
+    <DBSchemaInformation>
+        <activePostgresSchema>trecpm</activePostgresSchema>
+        <activeTableSchema>medline_2016</activeTableSchema>
+        <activeDataPostgresSchema>_data</activeDataPostgresSchema>
+        <tableSchemas>
+            <tableSchema forEach="." name="xmi_anno_view">
+                <field name="pmid" primaryKey="true" retrieve="true" type="text" xpath="PMID"/>
+                <field gzip="true" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
+            </tableSchema>
+        </tableSchemas>
+    </DBSchemaInformation>
+    <DBConnectionInformation>
+        <activeDBConnection>trecpm2019ltr</activeDBConnection>
+        <DBConnections>
+            <DBConnection name="trecpm2019ltr" url="jdbc:postgresql://localhost:5432/trecpm2019ltr"/>
+            <DBConnection name="trecpm2018ltr" url="jdbc:postgresql://localhost:5432/trecpm2018ltr"/>
+            <DBConnection name="pubmed2019" url="jdbc:postgresql://localhost:5432/pubmed2019"/>
+            <DBConnection name="trecpm19" url="jdbc:postgresql://localhost:5432/trecpm2019"/>
+            <DBConnection name="trecpm" url="jdbc:postgresql://localhost:5432/trecpm"/>
+        </DBConnections>
+    </DBConnectionInformation>
+</databaseConnectorConfiguration>

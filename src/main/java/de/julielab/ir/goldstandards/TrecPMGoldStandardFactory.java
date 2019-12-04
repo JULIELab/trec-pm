@@ -18,6 +18,11 @@ public final class TrecPMGoldStandardFactory {
                 new File(TrecPMGoldStandardFactory.class.getResource("/gold-standard/qrels-sample-ct.2018.txt").getPath()), new File("config", "costosys-ct1718.xml"));
     }
 
+    public static TrecQrelGoldStandard<Topic> trialsOfficial2019() {
+        return gs(Task.CLINICAL_TRIALS, 2019, GoldStandardType.OFFICIAL,
+                new File(TrecPMGoldStandardFactory.class.getResource("/gold-standard/qrels-sampleval-trials.2019.txt").getPath()), new File("config", "costosys-ct1718.xml"));
+    }
+
     public static AggregatedTrecQrelGoldStandard<Topic> trialsOfficialAggregated() {
         return new AggregatedTrecQrelGoldStandard<>(trialsOfficial2017(), trialsOfficial2018());
     }

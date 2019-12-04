@@ -254,10 +254,46 @@
                 <mandatory>false</mandatory>
                             
             </configurationParameter>
+                        
+            <configurationParameter>
+                                
+                <name>BinaryFeaturesBlacklist</name>
+                                
+                <description>A blacklist of full UIMA feature names. The listed features will be excluded from binary value mapping. This makes sense for features with a lot of different values that still come up as being mapping from the automatic features-to-map selection algorithm.It also makes sense for features that only consist of strings of length around 4 characters length or shorter. Then, the replacement with an integer of 4 bytes won't probably make much sense (unless the strings mainly consist of characters that require more than 1 byte, of course).</description>
+                                
+                <type>String</type>
+                                
+                <multiValued>true</multiValued>
+                                
+                <mandatory>false</mandatory>
+                            
+            </configurationParameter>
                     
         </configurationParameters>
                 
         <configurationParameterSettings>
+                        
+            <nameValuePair>
+                                
+                <name>BaseDocumentAnnotationTypes</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>de.julielab.jcore.types.AbstractText</string>
+                                                
+                        <string>de.julielab.jcore.types.Title</string>
+                                                
+                        <string>de.julielab.jcore.types.pubmed.Header</string>
+                                                
+                        <string>de.julielab.jcore.types.pubmed.ManualDescriptor</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
                         
             <nameValuePair>
                                 
@@ -290,30 +326,6 @@
                 <value>
                                         
                     <string>public</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>BaseDocumentAnnotationTypes</name>
-                                
-                <value>
-                                        
-                    <array>
-                                                
-                        <string>de.julielab.jcore.types.AbstractText</string>
-                                                
-                        <string>de.julielab.jcore.types.Title</string>
-                                                
-                        <string>de.julielab.jcore.types.Header</string>
-                                                
-                        <string>de.julielab.jcore.types.pubmed.Header</string>
-                                                
-                        <string>de.julielab.jcore.types.pubmed.ManualDescriptor</string>
-                                            
-                    </array>
                                     
                 </value>
                             
@@ -357,23 +369,11 @@
                         
             <nameValuePair>
                                 
-                <name>CostosysConfigFile</name>
+                <name>PerformGZIP</name>
                                 
                 <value>
                                         
-                    <string>../costosys.xml</string>
-                                    
-                </value>
-                            
-            </nameValuePair>
-                        
-            <nameValuePair>
-                                
-                <name>StoreEntireXmiData</name>
-                                
-                <value>
-                                        
-                    <boolean>false</boolean>
+                    <boolean>true</boolean>
                                     
                 </value>
                             
@@ -393,11 +393,35 @@
                         
             <nameValuePair>
                                 
+                <name>StoreEntireXmiData</name>
+                                
+                <value>
+                                        
+                    <boolean>false</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
                 <name>StoreRecursively</name>
                                 
                 <value>
                                         
                     <boolean>true</boolean>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>CostosysConfigFile</name>
+                                
+                <value>
+                                        
+                    <string>../costosys.xml</string>
                                     
                 </value>
                             
@@ -417,11 +441,11 @@
                         
             <nameValuePair>
                                 
-                <name>PerformGZIP</name>
+                <name>DocumentTable</name>
                                 
                 <value>
                                         
-                    <boolean>true</boolean>
+                    <string>_data_xmi.documents</string>
                                     
                 </value>
                             
@@ -429,11 +453,35 @@
                         
             <nameValuePair>
                                 
-                <name>DocumentTable</name>
+                <name>BinaryFeaturesBlacklist</name>
                                 
                 <value>
                                         
-                    <string>_data_xmi.documents</string>
+                    <array>
+                                                
+                        <string>de.julielab.jcore.types.Lemma:value</string>
+                                                
+                        <string>de.julielab.jcore.types.POSTag:value</string>
+                                                
+                        <string>de.julielab.jcore.types.Annotation:confidence</string>
+                                                
+                        <string>de.julielab.jcore.types.Annotation:id</string>
+                                                
+                        <string>de.julielab.jcore.types.AuthorInfo:lastName</string>
+                                                
+                        <string>de.julielab.jcore.types.AuthorInfo:initials</string>
+                                                
+                        <string>de.julielab.jcore.types.AuthorInfo:foreName</string>
+                                                
+                        <string>de.julielab.jcore.types.Journal:issue</string>
+                                                
+                        <string>de.julielab.jcore.types.Journal:volume</string>
+                                                
+                        <string>de.julielab.jcore.types.AuthorInfo:affiliation</string>
+                                                
+                        <string>de.julielab.jcore.types.Abbreviation:expan</string>
+                                            
+                    </array>
                                     
                 </value>
                             
