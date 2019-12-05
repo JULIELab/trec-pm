@@ -1,7 +1,6 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -14,9 +13,8 @@ import static org.junit.Assert.*;
 public class GoldStandardTest {
 
     @Test
-    @Ignore
     public void testRandomizedQueryPartitioning() throws InterruptedException {
-        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedInternal2019();
+        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2019();
         final List<List<Topic>> split = gs.createRandomizedQueryPartitioning(10, 1);
         assertEquals(10, split.size());
         assertEquals(40, split.stream().flatMap(Collection::stream).collect(Collectors.toList()).size());
@@ -43,9 +41,8 @@ public class GoldStandardTest {
     }
 
     @Test
-    @Ignore
     public void testEqualSplitSize() {
-        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedInternal2019();
+        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2019();
         final List<List<Topic>> split = gs.createRandomizedQueryPartitioning(7, 1);
         assertEquals(7, split.size());
         assertEquals(40, split.stream().flatMap(Collection::stream).collect(Collectors.toList()).size());
