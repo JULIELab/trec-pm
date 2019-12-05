@@ -15,7 +15,7 @@ import java.util.Map;
 import static org.hamcrest.Matchers.not;
 
 public class GeneFamilyQueryDecoratorTest extends QueryDecoratorTest {
-    private final String template ="/templates/match-title-gene-hypernym.json";
+    private final String template ="/test-templates/match-title-gene-hypernym.json";
 
     public GeneFamilyQueryDecoratorTest() {
         this.decoratedQuery = new GeneFamilyQueryDecorator(

@@ -101,6 +101,14 @@ All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](
 
 If all steps have been performed successfully, the indices should now be present in your ElasticSearch instance. To run the experiments, also configure the `<repository root>/config/costosys.xml`  file to point to your database. Then run the `at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter´ and `at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter` classes.
 
+# Important Java System Properties in this Framework
+
+There are few settings that are configured via Java System properties. Such settings do not count as
+regular configuration settings but change basic behaviour of the system, often used for tests.
+
+* `at.medunigraz.imi.bst.retrieval.subtemplates.folder` - sets the folder where the subtemplates are expected (default: `/subtemplates/`)
+* `de.julielab.java.utilities.cache.enabled` - if set to `false`, the caching library is deactivated. The caching code is still there but the `CacheAccess` objects always return `null` when retrieving cached objects.
+
 ## Q&A
 **Q: Do I really need to store all the documents into the database? Wouldn't it be quicker just to index everything directly from the source data?**
 

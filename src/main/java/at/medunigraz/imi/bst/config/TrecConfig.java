@@ -28,6 +28,7 @@ public final class TrecConfig {
     public static final String GSHEETS_SHEETID = getString("GSHEETS_SHEETID");
     public static final int SIZE = 1000;
     public static final int MAX_TREATMENTS = 3;
+    public static String SUBTEMPLATES_FOLDER = getString("SUBTEMPLATES_FOLDER");
 
     public static String getString(String key) {
         return PROPERTIES.getString(key);

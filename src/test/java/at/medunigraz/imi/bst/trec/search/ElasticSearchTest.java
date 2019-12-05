@@ -23,7 +23,7 @@ public class ElasticSearchTest {
 	public void testJsonQuery() throws Exception {
 		ElasticSearch es = new ElasticSearch();
 
-		File simple = new File(getClass().getResource("/templates/match-title-thyroid.json").getFile());
+		File simple = new File(getClass().getResource("/test-templates/match-title-thyroid.json").getFile());
 		String jsonQuery = FileUtils.readFileToString(simple, "UTF-8");
 
 		List<Result> results = es.query(new JSONObject(jsonQuery));

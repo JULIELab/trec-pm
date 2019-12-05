@@ -35,6 +35,7 @@ public class TrecPm2019PerformanceCheck {
 
     @Test
     public void testJlPmCommon2() {
+        TrecConfig.SUBTEMPLATES_FOLDER = "/subtemplates/";
         TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2(1000);
         Experiment exp = new Experiment(GOLD_STANDARD, trecPmRetrieval);
         Metrics metrics = exp.run();

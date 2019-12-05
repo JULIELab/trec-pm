@@ -6,6 +6,7 @@ import at.medunigraz.imi.bst.trec.model.ResultList;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import de.julielab.java.utilities.cache.CacheService;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -21,6 +22,8 @@ public class RetrievalTest {
     public RetrievalTest() {
         // There must be an available server
         Assume.assumeTrue(ConnectionUtils.checkElasticOpenPort());
+        // Disable caching for the tests.
+        System.setProperty(CacheService.CACHING_ENABLED_PROP, "false");
     }
 
     @Test

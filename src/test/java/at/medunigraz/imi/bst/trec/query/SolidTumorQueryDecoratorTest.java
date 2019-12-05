@@ -18,7 +18,7 @@ public class SolidTumorQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String SOLID_DISEASE = "Cholangiocarcinoma";
 	private static final String NON_SOLID_DISEASE = "acute myeloid leukemia";
 
-	private final String template ="/templates/match-title-custom.json";
+	private final String template ="/test-templates/match-title-custom.json";
 
 	public SolidTumorQueryDecoratorTest() {
 		this.decoratedQuery = new SolidTumorQueryDecorator(

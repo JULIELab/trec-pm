@@ -18,7 +18,7 @@ public class StaticMapQueryDecoratorTest extends QueryDecoratorTest {
 	
 	private static final String KEYWORD = "cancer";
 
-	private final String template = "/templates/match-keyword.json";
+	private final String template = "/test-templates/match-keyword.json";
 
 	private static Map<String, String> keymap = new HashMap<>();
 

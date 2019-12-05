@@ -10,7 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +72,10 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	protected static String readTemplate(String template) {
 		String ret = "";
 		try {
-			ret = IOStreamUtilities.getStringFromInputStream(FileUtilities.findResource(template));
+			InputStream resource = FileUtilities.findResource(template);
+			if (resource == null)
+				throw new FileNotFoundException("Did not find resource " + template + " as file or as classpath resource.");
+			ret = IOStreamUtilities.getStringFromInputStream(resource);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

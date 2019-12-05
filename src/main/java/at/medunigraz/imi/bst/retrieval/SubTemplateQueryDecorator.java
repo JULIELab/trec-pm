@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.retrieval;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.model.QueryDescription;
 import joptsimple.internal.Strings;
@@ -12,7 +13,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SubTemplateQueryDecorator<T extends QueryDescription> extends TemplateQueryDecorator<T> {
-
+    /**
+     * <p>This Java system property allows to alter the classpath location where the subtemplates
+     * are expected. The default location is <code>/subtemplates/</code>.</p>
+     * <p>This is currently used in our unit tests.</p>
+     */
+    public static final String SUBTEMPLATES_FOLDER_PROP = "at.medunigraz.imi.bst.retrieval.subtemplates.folder";
     /**
      * Matches and captures regular filenames enclosed in double curly braces, e.g.
      * "{{positive_boosters.json}}" or
@@ -26,8 +32,6 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
      * Matches e.g. "{{[diseaseSynonyms]}}"
      */
     private static final Pattern DYNAMIC_TEMPLATE_PATTERN = Pattern.compile("\\{\\{(\\[\\w+\\])\\}\\}");
-
-    private static final File SUBTEMPLATES_FOLDER = new File(SubTemplateQueryDecorator.class.getResource("/subtemplates/").getFile());
 
     private static final String FIELD_SEPARATOR = ", ";
 
@@ -50,7 +54,7 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
             String field = matcher.group(1);
             String filename = matcher.group(2);
 
-            String subTemplate = recursiveLoadTemplate(topic, SUBTEMPLATES_FOLDER +"/"+ filename);
+            String subTemplate = recursiveLoadTemplate(topic, TrecConfig.SUBTEMPLATES_FOLDER + filename);
 
             // Handle dynamic expansions, e.g. {{diseaseSynonyms:disease_synonym.json}}
             // TODO consider DRY and simplify syntax: check only the existence of DYNAMIC_TEMPLATE_PATTERN
