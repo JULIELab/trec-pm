@@ -7,7 +7,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 
 import java.io.File;
 
-public class ConfigWriterSmacWrapper extends SmacWrapper {
+public class ConfigWriterSmacWrapper extends SmacWrapperBase {
 
     public static void main(String args[]) throws ConfigurationException {
         final ConfigWriterSmacWrapper wrapper = new ConfigWriterSmacWrapper();

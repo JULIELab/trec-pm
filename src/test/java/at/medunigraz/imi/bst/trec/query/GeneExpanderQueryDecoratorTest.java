@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class GeneExpanderQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String GENE = "TP53";
 
-	private final File template = new File(getClass().getResource("/templates/match-title-gene.json").getFile());
+	private final String template ="/templates/match-title-gene.json";
 
 	private static final Gene.Field[] EXPAND_TO = { Gene.Field.SYMBOL, Gene.Field.SYNONYMS };
 

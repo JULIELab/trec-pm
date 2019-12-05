@@ -46,8 +46,7 @@ public class TrecPMLtRTrain2017Test2018 {
 
         int vocabCutoff = 500;
 
-        final File noClassifierTemplate = new File(
-                TrecPMLtRTrain2017Test2018.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withWordRemoval();
         FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
         final FeaturePreprocessing featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);

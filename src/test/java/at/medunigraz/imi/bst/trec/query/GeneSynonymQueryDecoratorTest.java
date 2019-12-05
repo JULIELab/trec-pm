@@ -15,7 +15,7 @@ import java.util.Map;
 public class GeneSynonymQueryDecoratorTest extends QueryDecoratorTest {
     private static final String GENE = "TP53";
 
-    private final File template = new File(getClass().getResource("/templates/match-title-gene-expansion.json").getFile());
+    private final String template = "/templates/match-title-gene-expansion.json";
 
     public GeneSynonymQueryDecoratorTest() {
         this.decoratedQuery = new GeneSynonymQueryDecorator(

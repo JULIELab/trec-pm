@@ -15,7 +15,7 @@ public class WordRemovalQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String DISEASE = "Thyroid cancer";
 	private static final String FILTERED_DISEASE = "Thyroid";
 
-	private final File template = new File(getClass().getResource("/templates/match-title.json").getFile());
+	private final String template ="/templates/match-title.json";
 
 	public WordRemovalQueryDecoratorTest() {
 		this.decoratedQuery = new WordRemovalQueryDecorator(

@@ -3,5 +3,5 @@ runObj = QUALITY
 cutoffTime = 300
 wallclock-limit = 172800
 deterministic = 0
-instance_file = example_scenarios/spear/instances-train.txt
-algo = de.julielab.ir.paramopt.RecallSmacWrapper
+instance_file = config/smac/noltr/instances.txt
+algo = mvn exec:java -Dexec.main=de.julielab.ir.paramopt.RecallSmacWrapper

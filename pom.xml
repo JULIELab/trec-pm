@@ -102,6 +102,60 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter
+                                        </Main-Class>
+                                        <!-- This solves an issue where log4j2 cannot find some class when running from the shaded jar -->
+                                        <Multi-Release>true</Multi-Release>
+                                    </manifestEntries>
+                                </transformer>
+                                <!--                                <transformer-->
+                                <!--                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">-->
+                                <!--                                    <resource>META-INF/services/org.neo4j.kernel.extension.KernelExtensionFactory</resource>-->
+                                <!--                                </transformer>-->
+                                <!--                                <transformer-->
+                                <!--                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">-->
+                                <!--                                    <resource>META-INF/services/org.apache.lucene.codecs.PostingsFormat</resource>-->
+                                <!--                                </transformer>-->
+                                <!--                                <transformer-->
+                                <!--                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">-->
+                                <!--                                    <resource>META-INF/services/org.apache.lucene.codecs.Codec</resource>-->
+                                <!--                                </transformer>-->
+                                <!--                                <transformer-->
+                                <!--                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">-->
+                                <!--                                    <resource>META-INF/services/org.apache.lucene.codecs.DocValuesFormat</resource>-->
+                                <!--                                </transformer>-->
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -141,11 +195,11 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>ch.qos.logback</groupId>-->
+        <!--            <artifactId>logback-classic</artifactId>-->
+        <!--            <version>1.2.3</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.wcohen</groupId>
             <artifactId>com.wcohen.secondstring</artifactId>
@@ -180,12 +234,18 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.11.0</version>
+            <version>2.12.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.11.0</version>
+            <version>2.12.1</version>
+        </dependency>
+        <dependency>
+            <!-- This dependency lets libraries using slf4j log to log4j2 (https://logging.apache.org/log4j/2.0/log4j-slf4j-impl/index.html) -->
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.12.1</version>
         </dependency>
         <dependency>
             <groupId>org.elasticsearch</groupId>

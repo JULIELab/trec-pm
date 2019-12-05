@@ -2,12 +2,15 @@ package at.medunigraz.imi.bst.trec.query;
 
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,12 +24,12 @@ public class FileBasedQueryDecorator extends DynamicQueryDecorator {
 
     protected Map<String, Set<String>> expansionMap;
 
-    public FileBasedQueryDecorator(File expansions, Query decoratedQuery) {
+    public FileBasedQueryDecorator(String expansions, Query decoratedQuery) {
         super(decoratedQuery);
         try {
             this.expansionMap = loadExpansionsFromFile(expansions);
         } catch (IOException e) {
-            throw new IllegalArgumentException("Could not read from file " + expansions.getName());
+            throw new IllegalArgumentException("Could not read from resource location " + expansions);
         }
     }
 
@@ -50,10 +53,11 @@ public class FileBasedQueryDecorator extends DynamicQueryDecorator {
         return topic;
     }
 
-    private static Map<String, Set<String>> loadExpansionsFromFile(File expansions) throws IOException {
+    private static Map<String, Set<String>> loadExpansionsFromFile(String expansions) throws IOException {
         Map<String, Set<String>> ret = new HashMap<>();
 
-        List<String> lines = FileUtils.readLines(expansions, "UTF-8");
+        InputStream resource = FileUtilities.findResource(expansions);
+        List<String> lines = IOStreamUtilities.getLinesFromInputStream(resource);
 
         for (String line : lines) {
             Matcher matcher = FORMAT.matcher(line);

@@ -7,18 +7,12 @@ import java.io.File;
 
 public final class ClinicalTrialsRetrievalRegistry {
 
-    private static final File IMPROVED_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictboost.json").getFile());
-    private static final File PHRASE_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/hpictphrase.json").getFile());
-    private static final File JULIE_PHRASE_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctphrase.json").getFile());
-    private static final File JULIE_PREC_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctprec.json").getFile());
-    private static final File JULIE_GENES_TEMPLATE = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/templates/clinical_trials/jlctgenes.json").getFile());
-    private static final File SYNONYMS = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
+    private static final String IMPROVED_TEMPLATE ="/templates/clinical_trials/hpictboost.json";
+    private static final String PHRASE_TEMPLATE = "/templates/clinical_trials/hpictphrase.json";
+    private static final String JULIE_PHRASE_TEMPLATE = "/templates/clinical_trials/jlctphrase.json";
+    private static final String JULIE_PREC_TEMPLATE = "/templates/clinical_trials/jlctprec.json";
+    private static final String JULIE_GENES_TEMPLATE = "/templates/clinical_trials/jlctgenes.json";
+    private static final String SYNONYMS ="/synonyms/trec-synonyms.txt";
 
     public static TrecPmRetrieval hpictall(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("hpictall")

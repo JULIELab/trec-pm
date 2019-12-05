@@ -2,19 +2,18 @@ package de.julielab.ir.ltr.features;
 
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 
-import java.io.File;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IRFeaturePMRetrievals {
-    private static final File DISEASE = ft("/subtemplates/biomedical_articles/disease.json");
-    private static final File GENE = ft("/subtemplates/biomedical_articles/gene.json");
-    private static final File NEGATIVE = ft("/subtemplates/biomedical_articles/negative_boosters.json");
-    private static final File POSITIVE = ft("/subtemplates/biomedical_articles/positive_boosters.json");
-    private static final File DNA = ft("/subtemplates/biomedical_articles/dna.json");
-    private static final File CHEMO = ft("/subtemplates/biomedical_articles/chemotherapy.json");
-    private static final File CANCER = ft("/subtemplates/biomedical_articles/cancer.json");
+    private static final String DISEASE = "/subtemplates/biomedical_articles/disease.json";
+    private static final String GENE = "/subtemplates/biomedical_articles/gene.json";
+    private static final String NEGATIVE = "/subtemplates/biomedical_articles/negative_boosters.json";
+    private static final String POSITIVE = "/subtemplates/biomedical_articles/positive_boosters.json";
+    private static final String DNA = "/subtemplates/biomedical_articles/dna.json";
+    private static final String CHEMO = "/subtemplates/biomedical_articles/chemotherapy.json";
+    private static final String CANCER = "/subtemplates/biomedical_articles/cancer.json";
 
     public static Map<IRScoreFeatureKey, TrecPmRetrieval> getRetrievals(String index, EnumSet<TrecPmQueryPart> retrievalTypes) {
         Map<IRScoreFeatureKey, TrecPmRetrieval> ret = new HashMap<>();
@@ -35,8 +34,5 @@ public class IRFeaturePMRetrievals {
         return ret;
     }
 
-    private static File ft(String templatePath) {
-        return new File(IRFeatureCTRetrievals.class.getResource(templatePath).getFile());
-    }
-
+    
 }

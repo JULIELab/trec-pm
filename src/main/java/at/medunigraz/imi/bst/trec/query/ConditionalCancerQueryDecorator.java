@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ConditionalCancerQueryDecorator extends FileBasedQueryDecorator {
 
-    private static final File CANCER = new File(ConditionalCancerQueryDecorator.class.getResource("/synonyms/cancer.txt").getFile());
+    private static final String CANCER ="/synonyms/cancer.txt";
 
     private static final String CANCER_BOOSTER = "cancer carcinoma tumor";
     private static final String CHEMOTHERAPY_BOOSTER = "*mab *nib *cin *one *ate *mus *lin";

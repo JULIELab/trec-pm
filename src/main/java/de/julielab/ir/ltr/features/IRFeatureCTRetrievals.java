@@ -2,21 +2,20 @@ package de.julielab.ir.ltr.features;
 
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 
-import java.io.File;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IRFeatureCTRetrievals {
-    private static final File DISEASE = ft("/subtemplates/clinical_trials/disease_phrase.json");
-    private static final File GENE = ft("/subtemplates/clinical_trials/gene.json");
-    private static final File AGE = ft("/subtemplates/clinical_trials/age.json");
-    private static final File SEX = ft("/subtemplates/clinical_trials/sex.json");
-    private static final File POSITIVE = ft("/subtemplates/clinical_trials/positive_boosters.json");
-    private static final File DNA = ft("/subtemplates/clinical_trials/dna.json");
-    private static final File CANCER = ft("/subtemplates/clinical_trials/cancer.json");
-    private static final File OTHER = ft("/subtemplates/clinical_trials/other.json");
-    private static final File STRUCTURED = ft("/subtemplates/clinical_trials/structured.json");
+    private static final String DISEASE = "/subtemplates/clinical_trials/disease_phrase.json";
+    private static final String GENE = "/subtemplates/clinical_trials/gene.json";
+    private static final String AGE = "/subtemplates/clinical_trials/age.json";
+    private static final String SEX = "/subtemplates/clinical_trials/sex.json";
+    private static final String POSITIVE = "/subtemplates/clinical_trials/positive_boosters.json";
+    private static final String DNA = "/subtemplates/clinical_trials/dna.json";
+    private static final String CANCER = "/subtemplates/clinical_trials/cancer.json";
+    private static final String OTHER = "/subtemplates/clinical_trials/other.json";
+    private static final String STRUCTURED = "/subtemplates/clinical_trials/structured.json";
 
     public static Map<IRScoreFeatureKey, TrecPmRetrieval> getRetrievals(String index, EnumSet<TrecPmQueryPart> retrievalTypes) {
         Map<IRScoreFeatureKey, TrecPmRetrieval> ret = new HashMap<>();
@@ -41,7 +40,4 @@ public class IRFeatureCTRetrievals {
         return ret;
     }
 
-    private static File ft(String templatePath) {
-        return new File(IRFeaturePMRetrievals.class.getResource(templatePath).getFile());
-    }
 }

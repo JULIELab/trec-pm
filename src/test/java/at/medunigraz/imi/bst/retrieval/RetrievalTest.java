@@ -16,9 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class RetrievalTest {
 
-    private static final File TOPICS = new File(RetrievalTest.class.getResource("/topics/topics2019.xml").getPath());
-
-    private static final File TEMPLATE = new File(RetrievalTest.class.getResource("/templates/match-title-thyroid.json").getFile());
+    private static final String TEMPLATE = "/test-templates/match-title-thyroid.json";
 
     public RetrievalTest() {
         // There must be an available server

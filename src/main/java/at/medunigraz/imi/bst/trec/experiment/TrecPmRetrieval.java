@@ -103,7 +103,7 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         return this;
     }
 
-    public TrecPmRetrieval withSynonymList(File synonymList) {
+    public TrecPmRetrieval withSynonymList(String synonymList) {
         query = new FileBasedQueryDecorator(synonymList, query);
         return this;
     }

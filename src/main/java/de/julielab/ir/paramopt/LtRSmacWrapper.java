@@ -40,7 +40,7 @@ import static de.julielab.ir.paramopt.RCConstants.RETRIEVAL_PARAMETERS;
 import static de.julielab.ir.paramopt.RCConstants.TEMPLATE;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
-public class LtRSmacWrapper extends SmacWrapper {
+public class LtRSmacWrapper extends SmacWrapperBase {
     private final static Logger log = LoggerFactory.getLogger(LtRSmacWrapper.class);
     private final TrecQrelGoldStandard<Topic> gs;
     private final String documentTable;
@@ -51,7 +51,7 @@ public class LtRSmacWrapper extends SmacWrapper {
     private int k = TrecConfig.SIZE;
 
     public static void main(String args[]) throws ConfigurationException {
-        new LtRSmacWrapper().runConfiguration(args);
+        new LtRSmacWrapper().parseAndRunConfiguration(args);
     }
 
     public LtRSmacWrapper() {
@@ -99,7 +99,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             Set<String> vocabulary = rankerAndVocabulary.getMiddle();
             TFIDF trainTfIdf = rankerAndVocabulary.getRight();
 
-            File template = new File(config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE)));
+            String template = config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE));
             final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withUmlsDiseaseSynonym();
             final DocumentList<Topic> result = ranker.rank(testDocs);
 

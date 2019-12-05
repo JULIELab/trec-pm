@@ -2,6 +2,8 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class TemplateQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
 	private static final Logger LOG = LogManager.getLogger();
-	protected File template;
+	protected String template;
 
 	/**
 	 * Matches double+ commas with any whitespace in between (this happens when two dynamic subtemplates are not expanded).
@@ -31,7 +33,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	 *                 curly braces to be correctly filled with the desired values.
 	 * @param decoratedQuery The query to be decorated
 	 */
-	public TemplateQueryDecorator(File template, Query decoratedQuery) {
+	public TemplateQueryDecorator(String template, Query decoratedQuery) {
 		super(decoratedQuery);
 		if (template == null)
             throw new IllegalArgumentException("The passed template is null");
@@ -65,10 +67,10 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 			throw new IllegalStateException("The following template properties have not been set: " + missingTemplates);
 	}
 
-	protected static String readTemplate(File template) {
+	protected static String readTemplate(String template) {
 		String ret = "";
 		try {
-			ret = FileUtils.readFileToString(template, "UTF-8");
+			ret = IOStreamUtilities.getStringFromInputStream(FileUtilities.findResource(template));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,7 +87,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	
 	@Override
 	protected String getMyName() {
-		return getSimpleClassName() + "(" + template.getName() + ")";
+		return getSimpleClassName() + "(" + template + ")";
 	}
 
 }

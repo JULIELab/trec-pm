@@ -104,16 +104,16 @@ public class ElasticSearchSetup {
     }
 
     public static void createPubmedIndices() {
-        File esConfigTemplate = Path.of("es-mappings", "cikm19-pubmed-template.json").toFile();
+        String esConfigTemplate = Path.of("es-mappings", "cikm19-pubmed-template.json").toFile().getAbsolutePath();
         createIndices(TrecConfig.ELASTIC_BA_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
     }
 
     public static void createCtIndices() {
-        File esConfigTemplate = Path.of("es-mappings", "cikm19-ct-template.json").toFile();
+        String esConfigTemplate = Path.of("es-mappings", "cikm19-ct-template.json").toFile().getAbsolutePath();
         createIndices(TrecConfig.ELASTIC_CT_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_CT_TYPE);
     }
 
-    public static void createIndices(String indexBasename, File configurationTemplateFile, Map<String, String> properties, String esType) {
+    public static void createIndices(String indexBasename, String configurationTemplateFile, Map<String, String> properties, String esType) {
         Map<String, String> parameters = new HashMap<>(properties);
         for (String similarity : allSimilarities) {
             parameters.put("similarity", "my_" + similarity);
@@ -131,7 +131,7 @@ public class ElasticSearchSetup {
     }
 
     public static void configureSimilarity(String indexBasename, SimilarityParameters parameters, String esType) {
-        File esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile();
+        String esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile().getAbsolutePath();
         final ObjectMapper om = new ObjectMapper();
         final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
         final Map<String, String> parameterMap = new HashMap<>(defaultProperties);

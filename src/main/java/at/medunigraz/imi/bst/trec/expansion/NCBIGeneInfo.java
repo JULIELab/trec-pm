@@ -9,10 +9,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.util.*;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class NCBIGeneInfo {
     private static final Logger LOG = LogManager.getLogger();
 
-    private static final File GENE_INFO_FILE = new File(NCBIGeneInfo.class.getResource("/genes/Homo_sapiens.gene_info").getFile());
+    private static final String GENE_INFO_FILE = "/genes/Homo_sapiens.gene_info";
 
     private static Map<String, Gene> symbolToGene = new HashMap<>();
 
@@ -56,7 +58,7 @@ public class NCBIGeneInfo {
     private void readGenes() {
         LOG.info("Reading genes...");
 
-        try (CSVReader reader = new CSVReader(new FileReader(GENE_INFO_FILE), '\t', CSVWriter.NO_QUOTE_CHARACTER)) {
+        try (CSVReader reader = new CSVReader(new InputStreamReader(NCBIGeneInfo.class.getResourceAsStream(GENE_INFO_FILE), UTF_8), '\t', CSVWriter.NO_QUOTE_CHARACTER)) {
             String[] line;
             while ((line = reader.readNext()) != null) {
                 Gene gene = Gene.fromArray(line);

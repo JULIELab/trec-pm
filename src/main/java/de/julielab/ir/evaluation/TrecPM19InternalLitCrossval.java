@@ -58,8 +58,7 @@ public class TrecPM19InternalLitCrossval {
 
         final List<List<Topic>> topicPartitioning = gs.createRandomizedQueryPartitioning(CROSSVAL_SIZE, 1);
 
-        final File noClassifierTemplate = new File(
-                TrecPM19InternalLitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();

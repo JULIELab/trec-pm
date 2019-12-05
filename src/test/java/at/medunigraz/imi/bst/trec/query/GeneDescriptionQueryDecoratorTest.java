@@ -15,7 +15,7 @@ import java.util.Map;
 public class GeneDescriptionQueryDecoratorTest extends QueryDecoratorTest {
     private static final String GENE = "TP53";
 
-    private final File template = new File(getClass().getResource("/templates/match-title-gene-description.json").getFile());
+    private final String template ="/templates/match-title-gene-description.json";
 
     public GeneDescriptionQueryDecoratorTest() {
         this.decoratedQuery = new GeneDescriptionQueryDecorator(

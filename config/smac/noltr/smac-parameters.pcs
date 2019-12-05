@@ -2,8 +2,8 @@
 indexparameters.bm25.k1 real [0.1,1.5] [1.2]
 indexparameters.bm25.b  real [0.1,1] [0.75]
 
-esqueryparameters.template categorial {hpipubnone.json} [hpipubnone.json]
-esqueryparameters.templateparameters.gene_match_type categorial {best_fields, most_fields, phrase} [best_fields]
+esqueryparameters.template categorical {hpipubnone.json} [hpipubnone.json]
+esqueryparameters.templateparameters.gene_match_type categorical {best_fields, most_fields, phrase} [best_fields]
 esqueryparameters.templateparameters.gene_boost real [0.1,2] [1]
-esqueryparameters.templateparameters.disease_match_type categorial {best_fields, most_fields, phrase} [best_fields]
+esqueryparameters.templateparameters.disease_match_type categorical {best_fields, most_fields, phrase} [best_fields]
 esqueryparameters.templateparameters.disease_boost real [0.1,2] [1]

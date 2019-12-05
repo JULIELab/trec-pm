@@ -77,12 +77,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
-    public T withTemplate(File template) {
+    public T withTemplate(String template) {
         query = new TemplateQueryDecorator(template, query);
         return (T) this;
     }
 
-    public T withSubTemplate(File template) {
+    public T withSubTemplate(String template) {
         query = new SubTemplateQueryDecorator(template, query);
         return (T) this;
     }

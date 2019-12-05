@@ -6,28 +6,17 @@ import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Task;
 
-import java.io.File;
-
 public final class LiteratureArticlesRetrievalRegistry {
 
-    private static final File IMPROVED_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubboost.json").getFile());
-    private static final File NONE_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
-    private static final File EXTRA_BOOST_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/hpipubclass.json").getFile());
-    private static final File KEYWORD_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/keyword.json").getFile());
-    private static final File BOOST_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/boost.json").getFile());
-    private static final File JULIE_COMMON_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmcommon.json").getFile());
-    private static final File JULIE_COMMON2_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmcommon2.json").getFile());
-    private static final File JULIE_BOOST_TEMPLATE = new File(
-            LiteratureArticlesRetrievalRegistry.class.getResource("/templates/biomedical_articles/jlpmboost.json").getFile());
-    private static final File SYNONYMS = new File(
-            ClinicalTrialsRetrievalRegistry.class.getResource("/synonyms/trec-synonyms.txt").getFile());
+    private static final String IMPROVED_TEMPLATE ="/templates/biomedical_articles/hpipubboost.json";
+    private static final String NONE_TEMPLATE ="/templates/biomedical_articles/hpipubnone.json";
+    private static final String EXTRA_BOOST_TEMPLATE ="/templates/biomedical_articles/hpipubclass.json";
+    private static final String KEYWORD_TEMPLATE ="/templates/biomedical_articles/keyword.json";
+    private static final String BOOST_TEMPLATE ="/templates/biomedical_articles/boost.json";
+    private static final String JULIE_COMMON_TEMPLATE ="/templates/biomedical_articles/jlpmcommon.json";
+    private static final String JULIE_COMMON2_TEMPLATE ="/templates/biomedical_articles/jlpmcommon2.json";
+    private static final String JULIE_BOOST_TEMPLATE ="/templates/biomedical_articles/jlpmboost.json";
+    private static final String SYNONYMS = "/synonyms/trec-synonyms.txt";
 
     public static TrecPmRetrieval hpipubclass(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("hpipubclass")
@@ -117,6 +106,19 @@ public final class LiteratureArticlesRetrievalRegistry {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmtrboost")
                 .withSubTemplate(JULIE_BOOST_TEMPLATE)
                 .withStoredFields(StoredFieldsRegistry.getStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019))
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
+                .withConditionalCancer();
+    }
+
+    /**
+     * Uses heavily parametrized templates for use with parameter optimization.
+     * @param size
+     * @return
+     */
+    public static TrecPmRetrieval jlpmcommon2Generic(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS)
                 .withConditionalCancer();

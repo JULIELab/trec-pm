@@ -19,7 +19,7 @@ public class SubTemplateQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String DISEASE_1 = "thyroid";
 	private static final String DISEASE_2 = "breast";
 
-	private final File template = new File(getClass().getResource("/templates/match.json").getFile());
+	private final String template = "/templates/match.json";
 
 	public SubTemplateQueryDecoratorTest() {
 		this.decoratedQuery = new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX));
@@ -45,7 +45,7 @@ public class SubTemplateQueryDecoratorTest extends QueryDecoratorTest {
 
 	@Test
 	public void testUseTopicNumberInTemplate() {
-		File template = new File(getClass().getResource("/templates/topicnumber-template.json").getFile());
+		String template = "/templates/topicnumber-template.json";
 		Query decoratedQuery = new SubTemplateQueryDecorator(template, new DummyElasticSearchQuery());
 
 		topic.withNumber(42);
@@ -57,7 +57,7 @@ public class SubTemplateQueryDecoratorTest extends QueryDecoratorTest {
 
 	@Test
 	public void testTemplateProperties() {
-		File template = new File(getClass().getResource("/templates/template-properties.json").getFile());
+		String template = "/templates/template-properties.json";
 		Map<String, String> properties = new HashMap<>();
 		properties.put("prop1", "value1");
 		properties.put("prop2", "value2");

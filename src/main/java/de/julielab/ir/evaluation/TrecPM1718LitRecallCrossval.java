@@ -30,8 +30,7 @@ public class TrecPM1718LitRecallCrossval {
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 
-        final File noClassifierTemplate = new File(
-                TrecPM1718LitRecallCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withResistantDrugs();
 
         String experimentName = "Base";

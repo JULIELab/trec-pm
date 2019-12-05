@@ -31,7 +31,7 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
 
     private static final String FIELD_SEPARATOR = ", ";
 
-    public SubTemplateQueryDecorator(File template, Query decoratedQuery) {
+    public SubTemplateQueryDecorator(String template, Query decoratedQuery) {
         super(template, decoratedQuery);
     }
 
@@ -40,7 +40,7 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
         setJSONQuery(recursiveLoadTemplate(topic, template));
     }
 
-    private String recursiveLoadTemplate(T topic, File file) {
+    private String recursiveLoadTemplate(T topic, String file) {
         String templateString = readTemplate(file);
 
         StringBuffer sb = new StringBuffer();
@@ -50,7 +50,7 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
             String field = matcher.group(1);
             String filename = matcher.group(2);
 
-            String subTemplate = recursiveLoadTemplate(topic, new File(SUBTEMPLATES_FOLDER, filename));
+            String subTemplate = recursiveLoadTemplate(topic, SUBTEMPLATES_FOLDER +"/"+ filename);
 
             // Handle dynamic expansions, e.g. {{diseaseSynonyms:disease_synonym.json}}
             // TODO consider DRY and simplify syntax: check only the existence of DYNAMIC_TEMPLATE_PATTERN

@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
 import static de.julielab.ir.ltr.features.FCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.*;
 
-abstract public class SmacWrapper {
-    private final static Logger log = LoggerFactory.getLogger(SmacWrapper.class);
+abstract public class SmacWrapperBase {
+    private final static Logger log = LoggerFactory.getLogger(SmacWrapperBase.class);
 
     protected abstract double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed);
 
-    public void runConfiguration(String[] args) throws ConfigurationException {
+    public void parseAndRunConfiguration(String[] args) throws ConfigurationException {
         HierarchicalConfiguration<ImmutableNode> config = parseConfiguration(args);
         String instance = args[0];
         int seed = Integer.valueOf(args[4]);

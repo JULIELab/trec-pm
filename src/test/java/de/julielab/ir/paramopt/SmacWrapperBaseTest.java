@@ -2,7 +2,7 @@ package de.julielab.ir.paramopt;
 
 import org.junit.Test;
 
-public class SmacWrapperTest {
+public class SmacWrapperBaseTest {
     @Test
     public void test() throws Exception {
         String[] params = {"-ltrfeatures.featuregroups.featuregroup.TFIDF.active", "true",
@@ -12,6 +12,6 @@ public class SmacWrapperTest {
         "-esqueryparameters.template", "hpipubnone.json",
         "-esqueryparameters.templateparameters.gene_match_type", "best_field"};
 
-       // SmacWrapper.main(params);
+       ConfigWriterSmacWrapper.main(params);
     }
 }
