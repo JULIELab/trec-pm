@@ -6,6 +6,7 @@ import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.StaticMapQueryDecorator;
 import at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,6 +21,11 @@ public class SubTemplateQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String DISEASE_2 = "breast";
 
 	private final String template = "/test-templates/match.json";
+
+	@BeforeClass
+	public static void before() {
+		TrecConfig.SUBTEMPLATES_FOLDER = "/test-subtemplates/";
+	}
 
 	public SubTemplateQueryDecoratorTest() {
 		this.decoratedQuery = new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX));
