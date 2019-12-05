@@ -45,7 +45,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, File qrelsFile, BiFunction<File, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, String qrelsFile, BiFunction<String, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
         this.challenge = challenge;
         this.task = task;
         this.year = year;

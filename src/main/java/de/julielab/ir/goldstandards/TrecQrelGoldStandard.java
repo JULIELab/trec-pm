@@ -22,7 +22,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     private static final Logger log = LogManager.getLogger();
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, File qrels) {
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, String qrels) {
         super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
     }
 
@@ -30,10 +30,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
     }
 
-    private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
+    private static <Q extends QueryDescription> DocumentList readQrels(String qrels, Map<Integer, Q> queriesByNumber) {
         final DocumentList<Q> documents = new DocumentList();
         try {
-            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(FileUtilities.getInputStreamFromFile(qrels));
+            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(FileUtilities.findResource(qrels));
             for (String line : lines) {
                 final String[] record = line.split("\\s+");
                 if (record.length < 4 || record.length > 5)
