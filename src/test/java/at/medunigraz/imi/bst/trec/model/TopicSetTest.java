@@ -12,7 +12,7 @@ public class TopicSetTest {
 
 	@Test
 	public void testFromXML() {
-		File topicsFile = new File(getClass().getResource("/topics/topics2017.xml").getPath());
+		String topicsFile ="/topics/topics2017.xml";
 		List<Topic> topics = (new TopicSet(topicsFile, Challenge.TREC_PM, 2017)).getTopics();
 		
 		assertEquals(30, topics.size());

@@ -1,7 +1,5 @@
 package at.medunigraz.imi.bst.trec.model;
 
-import java.io.File;
-
 public final class TrecPMTopicSetFactory {
 
     public static TopicSet topics2017() {
@@ -17,7 +15,7 @@ public final class TrecPMTopicSetFactory {
     }
 
     public static TopicSet topics(int year) {
-        final File topics = new File(TrecPMTopicSetFactory.class.getResource(String.format("/topics/topics%d.xml", year)).getPath());
+        final String topics = String.format("/topics/topics%d.xml", year);
         return new TopicSet(topics, Challenge.TREC_PM, year);
     }
 }

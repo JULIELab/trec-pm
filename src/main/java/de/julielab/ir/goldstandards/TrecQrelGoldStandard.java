@@ -13,7 +13,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,7 +35,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     private static <Q extends QueryDescription> DocumentList readQrels(String qrels, Map<Integer, Q> queriesByNumber) {
         final DocumentList<Q> documents = new DocumentList();
         try {
-            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(FileUtilities.findResource(qrels));
+            InputStream qrelStream = FileUtilities.findResource(qrels);
+            if (qrelStream == null)
+                throw new FileNotFoundException("Could not find the qrel file " + qrels + " as classpath resource or regular file.");
+            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(qrelStream);
             for (String line : lines) {
                 final String[] record = line.split("\\s+");
                 if (record.length < 4 || record.length > 5)
