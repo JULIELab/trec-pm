@@ -1,9 +1,14 @@
 # Parameter ranges
-indexparameters.bm25.k1 real [0.1,1.5] [1.2]
-indexparameters.bm25.b  real [0.1,1] [0.75]
+retrievalparameters.template categorical {/templates/biomedical_articles_generic/jlpmcommon2generic.json} [/templates/biomedical_articles_generic/jlpmcommon2generic.json]
 
-esqueryparameters.template categorical {hpipubnone.json} [hpipubnone.json]
-esqueryparameters.templateparameters.gene_match_type categorical {best_fields, most_fields, phrase} [best_fields]
-esqueryparameters.templateparameters.gene_boost real [0.1,2] [1]
-esqueryparameters.templateparameters.disease_match_type categorical {best_fields, most_fields, phrase} [best_fields]
-esqueryparameters.templateparameters.disease_boost real [0.1,2] [1]
+retrievalparameters.queryfiltering categorical {true,false} [true]
+
+retrievalparameters.diseaseexpansion.preferredterm categorical {true,false} [true]
+retrievalparameters.diseaseexpansion.synonyms categorical {true,false} [true]
+
+retrievalparameters.geneexpansion.preferredterm categorical {true,false} [true]
+retrievalparameters.geneexpansion.synonyms categorical {true,false} [true]
+
+retrievalparameters.synonymlist categorical {true,false} [true]
+
+retrievalparameters.keywords.cancer categorical {true,false} [true]

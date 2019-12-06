@@ -458,7 +458,9 @@ public class OriginalDocumentRetrieval {
         }
         for (Document<?> d : documents) {
             if (d.getFullDocumentData() == null)
-                log.warn("Document with ID {} did not get its XMI data set.", d.getId());
+                log.warn("Document with ID {} did not get its XMI data set. The document specified the following " +
+                        "database connection: {}. If it is null, the following database connections are passed to search " +
+                        "for the document: {}. In none of those the document was found.", d.getId(), d.getDocumentDbConfiguration(), dbConnections);
         }
     }
 

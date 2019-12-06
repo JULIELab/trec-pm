@@ -55,6 +55,23 @@
         <template>
             hpipubnone.json
         </template>
+        <queryfiltering>true</queryfiltering>
+        <diseaseexpansion>
+            <preferredterm>true</preferredterm>
+            <synonyms>true</synonyms>
+        </diseaseexpansion>
+        <geneexpansion>
+            <synonyms>true</synonyms>
+            <description>true</description>
+        </geneexpansion>
+        <synonymlist>true</synonymlist>
+        <keywords>
+            <chemotherapy></chemotherapy>
+            <cancer>
+                <cancer>true</cancer>
+            </cancer>
+            <generalpm></generalpm>
+        </keywords>
         <templateparameters>
             <gene_match_type>best_fields</gene_match_type>
             <gene_boost>1</gene_boost>

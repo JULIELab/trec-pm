@@ -31,12 +31,12 @@ public class LiteratureArticlesExperimenter {
 //        final Experiment jlpmcommon = new Experiment(GOLD_STANDARD,
 //                LiteratureArticlesRetrievalRegistry.jlpmcommon(TrecConfig.SIZE));
 //
-        final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
-                LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
+//        final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
+//                LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
 
-//        final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
-//                LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
-//        jlpmletor.setReRanker(new RankerFromPm1718());
+        final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
+        jlpmletor.setReRanker(new RankerFromPm1718());
 ////
 //        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
 //                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
@@ -50,7 +50,7 @@ public class LiteratureArticlesExperimenter {
 //                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
 //        jlpmtrboost.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlpmcommon2));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlpmletor));
         for (Experiment exp : experiments) {
             exp.run();
         }

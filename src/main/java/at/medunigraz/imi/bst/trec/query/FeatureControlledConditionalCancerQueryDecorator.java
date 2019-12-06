@@ -5,23 +5,21 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.julielab.ir.ltr.features.FCConstants.*;
+import static de.julielab.ir.ltr.features.PMFCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
-public class ConditionalCancerQueryDecorator extends FileBasedQueryDecorator {
+public class FeatureControlledConditionalCancerQueryDecorator extends FileBasedQueryDecorator {
 
     private static final String CANCER ="/synonyms/cancer.txt";
 
-    private static final String CANCER_BOOSTER = "cancer carcinoma tumor";
-    private static final String CHEMOTHERAPY_BOOSTER = "*mab *nib *cin *one *ate *mus *lin";
-
-    public ConditionalCancerQueryDecorator(Query decoratedQuery) {
+    public FeatureControlledConditionalCancerQueryDecorator(Query decoratedQuery) {
         super(CANCER, decoratedQuery);
     }
 
@@ -35,11 +33,17 @@ public class ConditionalCancerQueryDecorator extends FileBasedQueryDecorator {
             // We use the key only to detect cancer and expand a fixed best_fields query,
             // as it has been usual in previous years. We do not create duplicates.
             if (disease.contains(concept) && topic.getCancerBoosters().size() == 0) {
-                topic.withCancerBooster(CANCER_BOOSTER);
-                topic.withChemotherapyBooster(CHEMOTHERAPY_BOOSTER);    // TODO test if needed
+                HierarchicalConfiguration<ImmutableNode> config = FeatureControlCenter.getInstance().getFeatureConfiguration();
+                String cancerKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CANCER));
+                topic.withCancerBooster(cancerKeywords);
+
+                String chemoKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CHEMOTHERAPY));
+                topic.withChemotherapyBooster(chemoKeywords);
             }
         }
 
         return topic;
     }
+
+
 }

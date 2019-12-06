@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static de.julielab.ir.paramopt.RCConstants.RETRIEVAL_PARAMETERS;
-import static de.julielab.ir.paramopt.RCConstants.TEMPLATE;
+import static de.julielab.ir.ltr.features.FCConstants.RETRIEVALPARAMETERS;
+import static de.julielab.ir.ltr.features.FCConstants.TEMPLATE;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
 public class LtRSmacWrapper extends SmacWrapperBase {
@@ -99,7 +99,7 @@ public class LtRSmacWrapper extends SmacWrapperBase {
             Set<String> vocabulary = rankerAndVocabulary.getMiddle();
             TFIDF trainTfIdf = rankerAndVocabulary.getRight();
 
-            String template = config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE));
+            String template = config.getString(slash(RETRIEVALPARAMETERS, TEMPLATE));
             final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withUmlsDiseaseSynonym();
             final DocumentList<Topic> result = ranker.rank(testDocs);
 

@@ -17,9 +17,11 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,6 +71,49 @@ public class FeatureControlCenter {
         final boolean isActive = configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, featureGroup.getName()), FEATURE + attrEqMultiPred("and", NAME_ATTR, feature.getName(), ACTIVE_ATTR, "true")), true);
         log.trace("Checking if feature '{}' is active: {} ", slash(featureGroup.getName(), feature.getName()), isActive);
         return isActive;
+    }
+
+    /**
+     * <p>Extracts a string listing the active keywords in the feature configuration at the given path.</p>
+     * <p>
+     *     The feature configuration has substructures like this:
+     *     <samp>
+     *         <pre>
+     *             &lt;retrievalparameters&gt;
+     *                 &lt;keywords&gt;
+     *                      &lt;chemotherapy&gt;
+     *                          &lt;*mab&gt;true&lt;/*mab&gt;
+     *                          &lt;*nib&gt;false&lt;/*nib&gt;
+     *                          &lt;*cin&gt;true&lt;*cin&gt;
+     *                      &lt;/chemotherapy&gt;
+     *                 &lt;/keywords&gt;
+     *             &lt;/retrievalparameters&gt;
+     *         </pre>
+     *     </samp>
+     *     To automatically create the list of active keywords - <tt>"*mab *cin"</tt> - the configuration path
+     *     <tt>retrievalparameter/keyword/chemotherapy</tt> is passed. By convention, the path must show to
+     *     a list of elements exactly named after the keywords with the text value <tt>true</tt> or <tt>false</tt>
+     *     for activation or omission. The list is automatically parsed from the configuration and pasted into
+     *     a single string where the keywords are whitespace-separated.
+     * </p>
+     * @param config The feature configuration.
+     * @param keywordConfigurationPath The path leading to the keyword list within the configuration.
+     * @return A string containing the activated keywords in the feature configuration, whitespace-separated.
+     */
+    @NotNull
+    public static String getKeywordStringFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String keywordConfigurationPath) {
+        StringBuilder sb = new StringBuilder();
+        List<HierarchicalConfiguration<ImmutableNode>> cancerConfigs = config.configurationsAt(keywordConfigurationPath);
+        for (HierarchicalConfiguration<ImmutableNode> cconfig : cancerConfigs) {
+            Iterator<String> keys = cconfig.getKeys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if(cconfig.getBoolean(key))
+                    sb.append(key).append(" ");
+            }
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
 
     /**
@@ -171,5 +216,9 @@ public class FeatureControlCenter {
             }
         }
         return sb.toString();
+    }
+
+    public HierarchicalConfiguration<ImmutableNode> getFeatureConfiguration() {
+        return configuration;
     }
 }

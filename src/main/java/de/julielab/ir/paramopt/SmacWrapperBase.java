@@ -8,6 +8,8 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 import static de.julielab.ir.ltr.features.FCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.*;
 
@@ -56,5 +58,10 @@ abstract public class SmacWrapperBase {
         }
         log.info("Configuration parsed from SMAC input: {}", ConfigurationUtils.toString(config));
         return config;
+    }
+
+    protected double harmonicMean(double... values) {
+        double denominator = Arrays.stream(values).map(d -> 1 / d).sum();
+        return values.length / denominator;
     }
 }

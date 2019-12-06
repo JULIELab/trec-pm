@@ -10,5 +10,14 @@ public class FCConstants {
     public static final String FEATURE = "feature";
     public static final String ACTIVE_ATTR = "@active";
     public static final String NAME_ATTR = "@name";
+    public static final String RETRIEVALPARAMETERS = "retrievalparameters";
+    public static final String TEMPLATE = "template";
+    public static final String QUERYFILTERING = "queryfiltering";
+    public static final String SYNONYMS = "synonyms";
+    public static final String KEYWORDS = "keywords";
+
+    // cannot be instantiated
+    protected FCConstants() {
+    }
 
 }

@@ -4,4 +4,4 @@ cutoffTime = 300
 wallclock-limit = 172800
 deterministic = 0
 instance_file = config/smac/noltr/instances.txt
-algo = mvn exec:java -Dexec.main=de.julielab.ir.paramopt.RecallSmacWrapper
+algo =  java -jar target/trec-pm-3.0.0-SNAPSHOT-shaded.jar
