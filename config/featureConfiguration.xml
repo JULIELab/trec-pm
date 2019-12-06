@@ -72,6 +72,7 @@
             </cancer>
             <generalpm></generalpm>
         </keywords>
+        <extraboost>true</extraboost>
         <templateparameters>
             <gene_match_type>best_fields</gene_match_type>
             <gene_boost>1</gene_boost>

@@ -8,6 +8,7 @@
 			{{biomedical_articles/extra.json}},
 			{{chemotherapyBoosters:biomedical_articles/conditional_chemotherapy.json}},
 			{{cancerBoosters:biomedical_articles/conditional_cancer.json}},
+			{{positiveBoosters:biomedical_articles_generic/positive_pm_boosters.json}},
 			{{biomedical_articles/dna.json}},
 			{{biomedical_articles/positive_boosters.json}},
 			{{biomedical_articles/negative_boosters.json}},
