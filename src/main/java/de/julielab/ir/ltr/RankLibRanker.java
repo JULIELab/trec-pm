@@ -25,7 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
-private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
+    private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     private final MetricScorerFactory metricScorerFactory;
     private ciir.umass.edu.learning.Ranker ranker;
     private RANKER_TYPE rType;
@@ -89,15 +89,25 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
     @Override
     public void train(DocumentList<Q> documents, boolean doValidation, float fraction, int randomSeed) {
         if (!doValidation)
-        log.info("Training on {} documents without validation set.", documents.size());
+            log.info("Training on {} documents without validation set.", documents.size());
         else
             log.info("Training on {} documents where a fraction of {} is used for training and the rest for validation. The split is done randomly with a seed of {}.", documents.size(), fraction, randomSeed);
         final Map<String, RankList> rankLists = convertToRankList(documents);
         if (featureNormalizer != null)
             rankLists.values().forEach(featureNormalizer::normalize);
-        final Pair<Map<String, RankList>, Map<String, RankList>> trainValData = makeValidationSplit(rankLists, fraction, randomSeed);
+        List<RankList> train;
+        List<RankList> validation;
+        if (doValidation) {
+            final Pair<Map<String, RankList>, Map<String, RankList>> trainValData = makeValidationSplit(rankLists, fraction, randomSeed);
+            train = new ArrayList(trainValData.getLeft().values());
+            validation = new ArrayList<>(trainValData.getRight().values());
+        } else {
+            train = new ArrayList<>(rankLists.values());
+            validation = Collections.emptyList();
+        }
+
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
-        ranker = new RankerTrainer().train(rType, new ArrayList(trainValData.getLeft().values()), new ArrayList<>(trainValData.getRight().values()), features, metricScorerFactory.createScorer(trainMetric, k));
+        ranker = new RankerTrainer().train(rType, train, validation, features, metricScorerFactory.createScorer(trainMetric, k));
         if (!documents.isEmpty()) {
             final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
             log.trace("LtR features: " + alphabet);
@@ -108,7 +118,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
         if (fraction < 0 || fraction >= 1)
             throw new IllegalArgumentException("The fraction to be taken from the training data for validation is specified as " + fraction + " but it must be in [0, 1).");
         int size = (int) (fraction * allData.size());
-        log.info("Splitting into training size of {} and validation size of {} queries", size, allData.size()-size);
+        log.info("Splitting into training size of {} and validation size of {} queries", size, allData.size() - size);
         final List<RankList> shuffledData = new ArrayList<>(allData.values());
         Collections.shuffle(shuffledData, new Random(randomSeed));
         Map<String, RankList> train = new HashMap<>();
@@ -145,7 +155,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             }
             for (int i = 0; i < fv.numLocations(); i++)
                 // RankLib indices start counting at 1, MALLET at 0
-                ranklibIndices[i] = indices[i]+1;
+                ranklibIndices[i] = indices[i] + 1;
             String queryId = d.getQueryDescription() != null ? d.getQueryDescription().getCrossDatasetId() : "<NoQueryDescriptionGiven>";
             DataPoint dp = new SparseDataPoint(ranklibValues, ranklibIndices, queryId, d.getRelevance());
             // The description field of the DataPoint is used to store the document ID
@@ -195,7 +205,7 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             }
         }
 
-        Collections.sort(ret,Comparator.<Document<Q>>comparingDouble(d -> d.getIrScore(outputScoreType)).reversed());
+        Collections.sort(ret, Comparator.<Document<Q>>comparingDouble(d -> d.getIrScore(outputScoreType)).reversed());
 
 //        final List<RankList> resultRankLists = ranker.rank(new ArrayList(rankLists.values()));
 //        for (RankList rl : resultRankLists) {

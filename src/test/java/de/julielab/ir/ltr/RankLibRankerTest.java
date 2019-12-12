@@ -100,6 +100,9 @@ public class RankLibRankerTest {
         DocumentList<Topic> dl = new DocumentList<>(Arrays.asList(d1, d2, d3));
 
         RankLibRanker<Topic> ranker = new RankLibRanker<>(RANKER_TYPE.LAMBDAMART, null, METRIC.NDCG, 10, null);
-        ranker.train(dl, false, 0, 1);
+        ranker.train(dl, false, 1, 1);
+
+        double score = ranker.score(dl, METRIC.NDCG, 10);
+        assertEquals(1.0, score, 0);
     }
 }
