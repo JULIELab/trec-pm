@@ -128,8 +128,10 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         time = System.currentTimeMillis() - time;
         log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, documentList.size(), time, time / 1000 / 60);
 
-        if (log.isDebugEnabled())
-            log.debug(METRIC.NDCG + "@1000 score of the newly trained ranker on the whole training data: {}", ranker.score(trainDocuments, METRIC.NDCG, 1000));
+        if (log.isDebugEnabled()) {
+            DocumentList<Topic> rankedDocuments = ranker.rank(trainDocuments);
+            log.debug(METRIC.NDCG + "@1000 score of the newly trained ranker on the whole training data: {}", ranker.score(rankedDocuments, trainMetric, k));
+        }
 
 //        log.info("Applying the learned ranker directly to the gold standard corpus for validation");
 //        Experiment<Topic> exp = new Experiment<>(TrecPMGoldStandardFactory.pubmedOfficial2018(), fullRetrieval);
@@ -173,7 +175,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     }
 
     @Override
-    public DocumentList rank(DocumentList<Topic> documentList) {
+    public DocumentList<Topic> rank(DocumentList<Topic> documentList) {
         try {
             if (ranker == null)
                 load(modelFile);
@@ -182,14 +184,19 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             return null;
         }
         String index;
+        final TrecPmRetrieval fullRetrieval;
         final Map<IRScoreFeatureKey, TrecPmRetrieval> subClauseRetrievals;
         if (task == Task.PUBMED) {
+            fullRetrieval = LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE);
             index = TrecConfig.ELASTIC_BA_INDEX;
             subClauseRetrievals = IRFeaturePMRetrievals.getRetrievals(index, EnumSet.of(DISEASE, GENE, DNA, CANCER, CHEMO, NEG_BOOSTS, POS_BOOSTS));
         } else if (task == Task.CLINICAL_TRIALS) {
+            fullRetrieval = ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE);
             index = TrecConfig.ELASTIC_CT_INDEX;
             subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
         } else throw new IllegalArgumentException("Unsupported task " + task);
+        // Scores for the overall query
+        subClauseRetrievals.put(new IRScoreFeatureKey(IRScore.BM25, FULL), fullRetrieval);
         featurePreprocessing.setRetrievals(subClauseRetrievals);
         featurePreprocessing.preprocessTest(documentList, pipe, trainDocuments, "");
         if (scalingFactors != null)
@@ -206,5 +213,9 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     @Override
     public void setOutputScoreType(IRScoreFeatureKey outputScoreType) {
         ranker.setOutputScoreType(outputScoreType);
+    }
+
+    public RankLibRanker<Topic> getRankLibRanker() {
+        return ranker;
     }
 }
