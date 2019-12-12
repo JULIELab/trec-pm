@@ -1,6 +1,7 @@
 package de.julielab.ir.ltr;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
@@ -11,6 +12,7 @@ import cc.mallet.pipe.Pipe;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
+import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
@@ -18,6 +20,7 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.features.*;
 import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 import de.julielab.java.utilities.ConfigurationUtilities;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,7 +50,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     public RankerFromPm1718() {
         try {
             task = Task.PUBMED;
-            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
+            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2018());
             if (!FeatureControlCenter.isInitialized())
                 FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
@@ -55,7 +58,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             featurePreprocessing.setCanonicalDbConnectionFiles(Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile()));
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
-            modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
+            modelFile = new File("rankLibModels/pm18-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -69,9 +72,13 @@ public class RankerFromPm1718 implements Ranker<Topic> {
      * @param args
      */
     public static void main(String args[]) {
+        CacheService.initialize(new TrecCacheConfiguration());
         final RankerFromPm1718 rankerFromPm1718 = new RankerFromPm1718();
         rankerFromPm1718.trainModel();
-
+        CacheService.getInstance().commitAllCaches();
+        ElasticClientFactory.getClient().close();
+        OriginalDocumentRetrieval.getInstance().shutdown();
+        FastTextEmbeddingFeatures.shutdown();
     }
 
     public void trainModel() {
@@ -107,9 +114,9 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         // Early closing the services we needed for feature creation. This removes the respective
         // background threads which can throw annoying error messages not relevant for us when the connection
         // to the databases isn't stable.
-        FastTextEmbeddingFeatures.shutdown();
-        OriginalDocumentRetrieval.getInstance().shutdown();
-        ElasticClientFactory.getClient().close();
+//        FastTextEmbeddingFeatures.shutdown();
+//        OriginalDocumentRetrieval.getInstance().shutdown();
+//        ElasticClientFactory.getClient().close();
 
         scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
         pipe = trainDocuments.stream().findFirst().get().getFeaturePipes();
@@ -120,6 +127,14 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         ranker.train(documentList, true, 0.8f, 1);
         time = System.currentTimeMillis() - time;
         log.info("Training of ranker {} on {} documents took {}ms ({}minutes)", rType, documentList.size(), time, time / 1000 / 60);
+
+        if (log.isDebugEnabled())
+            log.debug(METRIC.NDCG + "@1000 score of the newly trained ranker on the whole training data: {}", ranker.score(trainDocuments, METRIC.NDCG, 1000));
+
+//        log.info("Applying the learned ranker directly to the gold standard corpus for validation");
+//        Experiment<Topic> exp = new Experiment<>(TrecPMGoldStandardFactory.pubmedOfficial2018(), fullRetrieval);
+//        exp.setReRanker(this);
+//        exp.run();
     }
 
     @Override

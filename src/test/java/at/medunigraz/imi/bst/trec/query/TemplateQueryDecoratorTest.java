@@ -70,4 +70,5 @@ public class TemplateQueryDecoratorTest extends QueryDecoratorTest {
         assertEquals(expected, actual);
     }
 
+
 }

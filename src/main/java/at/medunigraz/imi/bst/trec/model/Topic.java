@@ -306,7 +306,9 @@ public class Topic extends QueryDescription {
     public Map<String, String> getAttributes() {
         Map<String, String> ret = new HashMap<>();
 
-        // TODO use reflection
+        // TODO use reflection to read the fields of this class and put this code into QueryDescription
+        // itself. It will also be a good idea to create an annotation like "QueryAttribute" for the fields
+        // that should actually go into this.
         ret.put("number", String.valueOf(number));
         ret.put("disease", disease);
         ret.put("gene", geneField);

@@ -1,0 +1,16 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "dna tumor cell mouse model tissue development specific staining pathogenesis case",
+        "fields": [
+          "title^2",
+          "abstract"
+        ],
+        "tie_breaker": 0.3,
+        "type": "best_fields",
+        "boost": {{neg_keywords_boost}}
+      }
+    }
+  }
+}

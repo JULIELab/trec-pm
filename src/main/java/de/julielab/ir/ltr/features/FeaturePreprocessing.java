@@ -64,7 +64,8 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         Set<String> tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabularyCutoff);
         if (!TfIdfManager.getInstance().hasModelForKey(vocabularyId))
             trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(vocabularyId, trainDocumentText.stream());
-        else trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(vocabularyId);
+        else
+            trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(vocabularyId);
         return new ImmutablePair<>(trainTfIdf, tfIdfVocabulary);
     }
 
@@ -83,17 +84,17 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         TFIDF trainTfIdf;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
             final String tfIdfId = getTfIdfId(runId);
-            log.debug("Training TFIDF from training documents");
-            Pair<TFIDF, Set<String>> tfidfSetPair = learnTfidf(trainDocs, runId);
             if (TfIdfManager.getInstance().hasModelForKey(tfIdfId))
                 trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(tfIdfId);
-            else
-                trainTfIdf = tfidfSetPair.getLeft();
+            else {
+                log.debug("Training TFIDF from training documents");
+                trainTfIdf = learnTfidf(trainDocs, runId).getLeft();
+            }
             Optional<Pipe> tfIdfFgOpt = ((SerialPipes) trainPipe).pipes().stream().filter(TfidfFeatureGroup.class::isInstance).findAny();
             if (!tfIdfFgOpt.isPresent())
                 throw new IllegalStateException("TFIDF vocabulary feature is active but the given training pipe does not contain the TfidfFeatureGroup.");
             else
-                ((TfidfFeatureGroup)tfIdfFgOpt.get()).setTfidf(trainTfIdf);
+                ((TfidfFeatureGroup) tfIdfFgOpt.get()).setTfidf(trainTfIdf);
         }
         FeatureControlCenter.getInstance().createFeatures(testDocs, trainPipe, canonicalDbConnectionFiles, xmiTableName);
     }

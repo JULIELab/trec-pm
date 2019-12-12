@@ -70,6 +70,22 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
         return sb.toString();
     }
 
+    /**
+     * <p>Repeats the <tt>subtemplate</tt> for each value in the field <tt>fieldName</tt> in the query object <tt>topic</tt>.</p>
+     * <p>This may seem counter-intuitive when multiple values should go into a single template instance, for example
+     * for a multi word phrase query. For such cases, the query object field should hold a single value which is
+     * a collection of the values that should go into the template instance. Note that this case is currently not
+     * used, however, and might not be properly implemented right now, causing errors on try.</p>
+     * <p>The good thing on the copy strategy is that it also allows for 0 values in which case the whole subtemplate
+     * will be omitted from the final query.</p>
+     * <p>Does not actually replace the templates with the target values but just adds numbered references to them for
+     * use in {@link MapQueryDecorator#map(java.util.Map)}.</p>
+     *
+     * @param topic       The query object that must have a field named <tt>fieldName</tt> to get the replacement values from,
+     * @param fieldName   The name of the field to get values for from <tt>topic</tt>.
+     * @param subtemplate The JSON template in which the replacement value should be injected.
+     * @return The subtemplates with numbered references to the values in the query object field.
+     */
     private String handleDynamicExpansion(T topic, String fieldName, String subtemplate) {
         Matcher matcher = DYNAMIC_TEMPLATE_PATTERN.matcher(subtemplate);
 

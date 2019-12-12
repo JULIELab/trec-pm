@@ -12,4 +12,7 @@ public class PMFCConstants extends FCConstants {
     public static final String CANCER = "cancer";
     public static final String CHEMOTHERAPY = "chemotherapy";
     public static final String EXTRABOOST = "extraboost";
+    public static final String TEMPLATEPARAMETERS = "templateparameters";
+    public static final String MATCH_ALL_BOOST = "match_all_boost";
+    public static final String NEG_KEYWORDS_BOOST = "neg_keywords_boost";
 }

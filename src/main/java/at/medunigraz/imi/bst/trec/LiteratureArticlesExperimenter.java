@@ -12,6 +12,7 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.TreatmentRanker;
+import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 import de.julielab.java.utilities.cache.CacheConfiguration;
 import de.julielab.java.utilities.cache.CacheService;
 
@@ -22,7 +23,7 @@ import java.util.Set;
 
 public class LiteratureArticlesExperimenter {
 
-    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2019();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2018();
 
     public static void main(String[] args) throws IOException {
         CacheService.initialize(new TrecCacheConfiguration());
@@ -37,7 +38,7 @@ public class LiteratureArticlesExperimenter {
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         jlpmletor.setReRanker(new RankerFromPm1718());
-////
+//
 //        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
 //                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
 //        jlpmltrin.setReRanker(new RankerFromInternalPm19());
@@ -54,8 +55,9 @@ public class LiteratureArticlesExperimenter {
         for (Experiment exp : experiments) {
             exp.run();
         }
+        CacheService.getInstance().commitAllCaches();
         ElasticClientFactory.getClient().close();
         OriginalDocumentRetrieval.getInstance().shutdown();
-        CacheService.getInstance().commitAllCaches();
+        FastTextEmbeddingFeatures.shutdown();
     }
 }

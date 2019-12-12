@@ -26,28 +26,11 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     private static Deque<StdioBridge<byte[]>> activeBridges = new ArrayDeque<>();
     private final String EMBEDDING_PATH = "resources/dim300.bin";
     private transient StdioBridge<byte[]> bridge;
-    private transient Pattern tokenization = Pattern.compile("([.\\!?,'/()])");
+    private transient Pattern tokenization;
     private transient CacheAccess<String, double[]> cache;
 
     public FastTextEmbeddingFeatures() {
         super(FT_FEATURE_NAME);
-        init();
-    }
-
-    private void init() {
-        Options<byte[]> options = new Options(byte[].class);
-        options.setExecutable("python3");
-        options.setExternalProgramTerminationSignal("exit");
-        options.setExternalProgramReadySignal("Script is ready");
-        bridge = new StdioBridge(options, "-u", "src/main/resources/python/getFastTextEmbeddingScript.py", EMBEDDING_PATH);
-        try {
-            bridge.start();
-            activeBridges.add(bridge);
-            log.info("Starting a bridge to a python instance. This bridge will be open until FastTextEmbeddingFeatures#shutdown() will be called. The application will not terminate otherwise.");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        cache = CacheService.getInstance().getCacheAccess("Embeddings", "FastTextDocs", CacheAccess.STRING, CacheAccess.DOUBLEARRAY);
     }
 
     public static void shutdown() {
@@ -62,12 +45,38 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
         }
     }
 
+    private void init() {
+        if (tokenization == null) {
+            Options<byte[]> options = new Options(byte[].class);
+            options.setExecutable("python3");
+            options.setExternalProgramTerminationSignal("exit");
+            options.setExternalProgramReadySignal("Script is ready");
+            bridge = new StdioBridge(options, "-u", "src/main/resources/python/getFastTextEmbeddingScript.py", EMBEDDING_PATH);
+            try {
+                bridge.start();
+                activeBridges.add(bridge);
+                log.info("Starting a bridge to a python instance. This bridge will be open until FastTextEmbeddingFeatures#shutdown() will be called. The application will not terminate otherwise.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            initCache();
+            tokenization = Pattern.compile("([.\\!?,'/()])");
+        }
+    }
+
+    private void initCache() {
+        if (cache == null)
+            cache = CacheService.getInstance().getCacheAccess("Embeddings", "FastTextDocs", CacheAccess.STRING, CacheAccess.DOUBLEARRAY);
+    }
+
     @Override
     protected void assignDocumentEmbeddingFeatures(Instance inst) {
+        initCache();
         final Document document = (Document) inst.getSource();
         final String cachekey = EMBEDDING_PATH + "-" + document.getId();
         double[] embedding = cache.get(cachekey);
         if (embedding == null) {
+            init();
             final CAS cas = document.getCas();
             final String documentText = cas.getDocumentText();
             embedding = getDocumentEmbedding(documentText);
@@ -79,6 +88,7 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
 
     @Override
     protected double[] getDocumentEmbedding(String documentText) {
+        init();
         try {
             // Do some simple normalization, actually inspired by some sed and tr command example from the FastText text classification tutorial
             String tokenizedDocumentText = tokenization.matcher(documentText).replaceAll(" $1 ");
@@ -98,6 +108,5 @@ public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        init();
     }
 }

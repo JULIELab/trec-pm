@@ -14,14 +14,14 @@ import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
 public final class LiteratureArticlesRetrievalRegistry {
 
-    private static final String IMPROVED_TEMPLATE ="/templates/biomedical_articles/hpipubboost.json";
-    private static final String NONE_TEMPLATE ="/templates/biomedical_articles/hpipubnone.json";
-    private static final String EXTRA_BOOST_TEMPLATE ="/templates/biomedical_articles/hpipubclass.json";
-    private static final String KEYWORD_TEMPLATE ="/templates/biomedical_articles/keyword.json";
-    private static final String BOOST_TEMPLATE ="/templates/biomedical_articles/boost.json";
-    private static final String JULIE_COMMON_TEMPLATE ="/templates/biomedical_articles/jlpmcommon.json";
-    private static final String JULIE_COMMON2_TEMPLATE ="/templates/biomedical_articles/jlpmcommon2.json";
-    private static final String JULIE_BOOST_TEMPLATE ="/templates/biomedical_articles/jlpmboost.json";
+    private static final String IMPROVED_TEMPLATE = "/templates/biomedical_articles/hpipubboost.json";
+    private static final String NONE_TEMPLATE = "/templates/biomedical_articles/hpipubnone.json";
+    private static final String EXTRA_BOOST_TEMPLATE = "/templates/biomedical_articles/hpipubclass.json";
+    private static final String KEYWORD_TEMPLATE = "/templates/biomedical_articles/keyword.json";
+    private static final String BOOST_TEMPLATE = "/templates/biomedical_articles/boost.json";
+    private static final String JULIE_COMMON_TEMPLATE = "/templates/biomedical_articles/jlpmcommon.json";
+    private static final String JULIE_COMMON2_TEMPLATE = "/templates/biomedical_articles/jlpmcommon2.json";
+    private static final String JULIE_BOOST_TEMPLATE = "/templates/biomedical_articles/jlpmboost.json";
     private static final String SYNONYMS_FILE = "/synonyms/trec-synonyms.txt";
 
     public static TrecPmRetrieval hpipubclass(int size) {
@@ -119,6 +119,7 @@ public final class LiteratureArticlesRetrievalRegistry {
 
     /**
      * Uses heavily parametrized templates for use with parameter optimization.
+     *
      * @param size
      * @return
      */
@@ -132,18 +133,42 @@ public final class LiteratureArticlesRetrievalRegistry {
 
         if (conf.getBoolean(slash(RETRIEVALPARAMETERS, QUERYFILTERING)))
             ret.withWordRemoval();
-        if(conf.getBoolean(slash(RETRIEVALPARAMETERS, GENEEXPANSION, SYNONYMS)))
+        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, GENEEXPANSION, SYNONYMS)))
             ret.withGeneSynonym();
         if (conf.getBoolean(slash(RETRIEVALPARAMETERS, SYNONYMLIST)))
             ret.withSynonymList(SYNONYMS_FILE);
-        if(conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, PREFERREDTERM)))
+        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, PREFERREDTERM)))
             ret.withDiseasePreferredTerm();
-        if(conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, SYNONYMS)))
+        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, SYNONYMS)))
             ret.withDiseaseSynonym();
 
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
+
+        return ret;
+    }
+
+    public static TrecPmRetrieval jlpmcommon2paramopt(int size) {
+        FeatureControlCenter fcc = FeatureControlCenter.getInstance();
+        HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
+
+        String matchAllBoost = conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, MATCH_ALL_BOOST));
+        String negKeywordsBoost = conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, NEG_KEYWORDS_BOOST));
+        TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
+                .withExperimentName("jlpmcommon2");
+        ret.withProperties(MATCH_ALL_BOOST, matchAllBoost, NEG_KEYWORDS_BOOST, negKeywordsBoost)
+                .withSubTemplate(conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATE)));
+        ret.withWordRemoval();
+        ret.withGeneSynonym();
+        ret.withSynonymList(SYNONYMS_FILE);
+        ret.withDiseasePreferredTerm();
+        ret.withDiseaseSynonym();
+
+        // The decorator is always added but it internally checks which keywords are active, if any.
+        // Without active keywords, this does nothing.
+        ret.withConditionalCancer();
+
 
         return ret;
     }

@@ -1,13 +1,13 @@
 <configuration>
     <ltrfeatures>
         <featuregroups>
-            <featuregroup name="TFIDF" active="true"/>
+            <featuregroup name="TFIDF" active="false"/>
             <featuregroup name="TOPIC_MATCH" active="true">
                 <feature name="MATCH_TOPIC_DISEASE" active="true"/>
                 <feature name="MATCH_TOPIC_GENE" active="true"/>
                 <feature name="MATCH_TOPIC_VARIANT" active="true"/>
             </featuregroup>
-            <featuregroup name="similarity" active="true">
+            <featuregroup name="similarity" active="false">
                 <feature name="bm25" active="true"/>
                 <feature name="dfr" active="true"/>
                 <feature name="dfi" active="true"/>
@@ -15,7 +15,7 @@
                 <feature name="lmd" active="true"/>
                 <feature name="lmjm" active="true"/>
             </featuregroup>
-            <featuregroup name="documentEmbeddings" active="true">
+            <featuregroup name="documentEmbeddings" active="false">
                 <feature name="fasttext" active="true"/>
             </featuregroup>
             <featuregroup name="docshape" active="true">
@@ -82,6 +82,8 @@
             <abstract_boost>1</abstract_boost>
             <keyword_boost>1</keyword_boost>
             <meshTags_boost>1</meshTags_boost>
+            <match_all_boost>-100</match_all_boost>
+            <neg_keywords_boost>-1</neg_keywords_boost>
         </templateparameters>
     </retrievalparameters>
 </configuration>

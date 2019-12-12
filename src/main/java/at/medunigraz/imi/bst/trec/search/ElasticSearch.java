@@ -90,7 +90,7 @@ public class ElasticSearch implements SearchEngine {
         LOG.trace("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
-            LOG.debug("Query is not cached, getting result from ES");
+            LOG.trace("Query is not cached, getting result from ES");
             if (!(parameters instanceof NoParameters)) {
                 //                ElasticSearchSetup.
             }

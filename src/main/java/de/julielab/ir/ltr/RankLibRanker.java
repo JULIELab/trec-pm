@@ -134,19 +134,20 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
             final double[] values = fv.getValues();
             final int[] indices = fv.getIndices();
 
-            // In RankLib, the 0 index is unused.
-            float[] ranklibValues = new float[indices.length + 1];
-            int[] ranklibIndices = new int[indices.length + 1];
+            float[] ranklibValues = new float[fv.numLocations()];
+            int[] ranklibIndices = new int[fv.numLocations()];
             if (values == null) {
                 // binary vector
                 Arrays.fill(ranklibValues, 1f);
             } else {
-                for (int i = 0; i < values.length; i++)
-                    ranklibValues[i + 1] = (float) values[i];
+                for (int i = 0; i < fv.numLocations(); i++)
+                    ranklibValues[i] = (float) values[i];
             }
-            for (int i = 0; i < indices.length; i++)
-                ranklibIndices[i + 1] = indices[i] + 1;
-            DataPoint dp = new SparseDataPoint(ranklibValues, ranklibIndices, d.getQueryDescription().getCrossDatasetId(), d.getRelevance());
+            for (int i = 0; i < fv.numLocations(); i++)
+                // RankLib indices start counting at 1, MALLET at 0
+                ranklibIndices[i] = indices[i]+1;
+            String queryId = d.getQueryDescription() != null ? d.getQueryDescription().getCrossDatasetId() : "<NoQueryDescriptionGiven>";
+            DataPoint dp = new SparseDataPoint(ranklibValues, ranklibIndices, queryId, d.getRelevance());
             // The description field of the DataPoint is used to store the document ID
             dp.setDescription(d.getId());
             return dp;
@@ -193,6 +194,8 @@ private final static Logger log = LoggerFactory.getLogger(RankLibRanker.class);
                 ret.add(doc);
             }
         }
+
+        Collections.sort(ret,Comparator.<Document<Q>>comparingDouble(d -> d.getIrScore(outputScoreType)).reversed());
 
 //        final List<RankList> resultRankLists = ranker.rank(new ArrayList(rankLists.values()));
 //        for (RankList rl : resultRankLists) {
