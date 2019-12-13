@@ -8,8 +8,6 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
-import de.julielab.ir.ltr.RankerFromCt1718;
-import de.julielab.ir.ltr.RankerFromInternalCt19;
 import de.julielab.java.utilities.cache.CacheService;
 
 import java.util.Arrays;

@@ -368,6 +368,12 @@ public class Topic extends QueryDescription {
     }
 
     @Override
+    public Topic getCleanCopy() {
+       return new Topic().withNumber(number).withDisease(disease).withGeneField(geneField).withGenes(genes)
+               .withDemographic(demographic).withOther(other);
+    }
+
+    @Override
     public String toString() {
         return "Topic [number=" + number + ", disease=" + disease + ", gene=" + geneField
                 + ", demographic=" + demographic + ", other=" + other + "]";

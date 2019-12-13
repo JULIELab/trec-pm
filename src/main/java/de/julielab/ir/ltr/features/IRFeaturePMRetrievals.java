@@ -3,8 +3,7 @@ package de.julielab.ir.ltr.features;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class IRFeaturePMRetrievals {
     private static final String DISEASE = "/subtemplates/biomedical_articles/disease.json";
@@ -15,8 +14,8 @@ public class IRFeaturePMRetrievals {
     private static final String CHEMO = "/subtemplates/biomedical_articles/chemotherapy.json";
     private static final String CANCER = "/subtemplates/biomedical_articles/cancer.json";
 
-    public static Map<IRScoreFeatureKey, TrecPmRetrieval> getRetrievals(String index, EnumSet<TrecPmQueryPart> retrievalTypes) {
-        Map<IRScoreFeatureKey, TrecPmRetrieval> ret = new HashMap<>();
+    public static LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval> getRetrievals(String index, EnumSet<TrecPmQueryPart> retrievalTypes) {
+        LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval> ret = new LinkedHashMap<>();
         if (retrievalTypes.contains(TrecPmQueryPart.DISEASE))
             ret.put(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.DISEASE), new TrecPmRetrieval(index).withSubTemplate(DISEASE));
         if (retrievalTypes.contains(TrecPmQueryPart.GENE))

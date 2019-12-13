@@ -9,11 +9,8 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
-import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
-import de.julielab.ir.ltr.TreatmentRanker;
 import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
-import de.julielab.java.utilities.cache.CacheConfiguration;
 import de.julielab.java.utilities.cache.CacheService;
 
 import java.io.IOException;

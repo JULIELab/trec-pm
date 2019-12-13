@@ -10,11 +10,10 @@ import java.util.stream.Collectors;
 
 public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
 
-    private UmlsSynsetProvider umlsSynsetProvider;
+    private transient UmlsSynsetProvider umlsSynsetProvider;
 
     public DiseaseUmlsSynonymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
-        umlsSynsetProvider = UmlsSynsetProvider.getInstance();
     }
 
     /**
@@ -28,6 +27,8 @@ public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
 
     @Override
     public Topic expandTopic(Topic topic) {
+        if (umlsSynsetProvider == null)
+            umlsSynsetProvider = UmlsSynsetProvider.getInstance();
         String disease = topic.getDisease();
         final Set<String> uniqueLowercasedSynonyms = umlsSynsetProvider.getSynsets(disease).stream().flatMap(Collection::stream).map(String::toLowerCase).filter(s -> !s.equalsIgnoreCase(disease)).distinct().collect(Collectors.toSet());
         for (String synonym : uniqueLowercasedSynonyms) {

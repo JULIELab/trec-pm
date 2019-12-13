@@ -17,11 +17,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
+public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
     protected Query query;
     private Logger log = LogManager.getLogger();
     private ElasticSearchQuery<Q> esQuery;

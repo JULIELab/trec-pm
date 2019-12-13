@@ -2,19 +2,16 @@ package de.julielab.ir.ltr.features.featuregroups;
 
 
 import at.medunigraz.imi.bst.trec.model.Topic;
-import cc.mallet.types.Instance;
+import at.medunigraz.imi.bst.trec.query.*;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.FeatureGroup;
 import de.julielab.ir.ltr.features.FeatureValueAssigner;
 import de.julielab.ir.ltr.features.TopicFieldsCasAnnotator;
+import de.julielab.ir.model.QueryDescription;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.function.Consumer;
 
 /**
  * <p>This feature group only exist to add annotations to a document's CAS object via
@@ -28,12 +25,17 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
     public static final long serialVersionUID = -4602232149056363215L;
     private final static Logger log = LoggerFactory.getLogger(RunTopicMatchAnnotatorFeatureGroup.class);
     private TopicFieldsCasAnnotator topicFieldsAnnotator;
+    private final DiseaseUmlsSynonymQueryDecorator decorator;
 
     public RunTopicMatchAnnotatorFeatureGroup() {
         // This pipe should only run when it is actually required. So let it belong to
         // the same group as the pipe that will eventually use the annotations
         super(TopicMatchFeatureGroup.GROUP_NAME);
         topicFieldsAnnotator = new TopicFieldsCasAnnotator();
+
+        DummyElasticSearchQuery<QueryDescription> dummy = new DummyElasticSearchQuery<>();
+        decorator = new DiseaseUmlsSynonymQueryDecorator(new GeneSynonymQueryDecorator(new GeneDescriptionQueryDecorator(new WordRemovalQueryDecorator(new ConditionalCancerQueryDecorator(dummy)))));
+
     }
 
 
@@ -43,7 +45,9 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
             final Document document = (Document) inst.getSource();
             final CAS cas = document.getCas();
             try {
-                topicFieldsAnnotator.annotate(cas.getJCas(), (Topic) document.getQueryDescription());
+                Topic topic = (Topic) document.getQueryDescription();
+                decorator.query(topic);
+                topicFieldsAnnotator.annotate(cas.getJCas(), topic);
             } catch (CASException e) {
                 log.error("Could not get the JCas from the CAS", e);
             }

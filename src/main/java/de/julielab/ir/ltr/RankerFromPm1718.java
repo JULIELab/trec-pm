@@ -1,7 +1,6 @@
 package de.julielab.ir.ltr;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
@@ -14,7 +13,6 @@ import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
-import de.julielab.ir.goldstandards.AtomicGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.features.*;
@@ -26,12 +24,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
 public class RankerFromPm1718 implements Ranker<Topic> {
+    // TODO save all result changing fields with the model
     private static final Logger log = LogManager.getLogger();
     private final String xmiTableName = "_data_xmi.documents";
     private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
@@ -46,6 +48,11 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     private DocumentList<Topic> trainDocuments;
     private File modelFile;
     private Pipe pipe;
+    /**
+     * The retrievals set IR scores and stored index fields to the documents. Both can be used for feature generation.
+     * Care must be taken with multiple retrieval: They could alter/override fields set by a previous retrieval.
+     */
+    private LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval> irScoreRetrievals;
 
     public RankerFromPm1718() {
         try {
@@ -90,25 +97,19 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 
     @Override
     public void train(DocumentList<Topic> documentList) {
-        final TrecPmRetrieval fullRetrieval;
         String index;
-        final Map<IRScoreFeatureKey, TrecPmRetrieval> subClauseRetrievals;
+        irScoreRetrievals = new LinkedHashMap<>();
         if (task == Task.PUBMED) {
-            fullRetrieval = LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE);
+            irScoreRetrievals.put(new IRScoreFeatureKey(IRScore.BM25, FULL), LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
             index = TrecConfig.ELASTIC_BA_INDEX;
-            subClauseRetrievals = IRFeaturePMRetrievals.getRetrievals(index, EnumSet.of(DISEASE, GENE, DNA, CANCER, CHEMO, NEG_BOOSTS, POS_BOOSTS));
+            irScoreRetrievals.putAll(IRFeaturePMRetrievals.getRetrievals(index, EnumSet.of(DISEASE, GENE, DNA, CANCER, CHEMO, NEG_BOOSTS, POS_BOOSTS)));
         } else if (task == Task.CLINICAL_TRIALS) {
-            fullRetrieval = ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE);
+            irScoreRetrievals.put(new IRScoreFeatureKey(IRScore.BM25, FULL), ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE));
             index = TrecConfig.ELASTIC_CT_INDEX;
-            subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
+            irScoreRetrievals.putAll(IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA)));
         } else throw new IllegalArgumentException("Unsupported task " + task);
-        final Map<IRScoreFeatureKey, TrecPmRetrieval> m = new HashMap<>();
-        // Scores for the overall query
-        m.put(new IRScoreFeatureKey(IRScore.BM25, FULL), fullRetrieval);
-        // Scores for individual query parts
-        m.putAll(subClauseRetrievals);
         log.info("Creating features");
-        featurePreprocessing.setRetrievals(m);
+        featurePreprocessing.setRetrievals(irScoreRetrievals);
         featurePreprocessing.preprocessTrain(documentList, "");
 
         // Early closing the services we needed for feature creation. This removes the respective
@@ -149,9 +150,11 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
         ranker.load(modelFile);
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
-             ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".pipes.bin"))) {
+             ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".pipes.bin"));
+             ObjectInputStream ois3 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".retrievals.bin"))) {
             scalingFactors = (double[]) ois.readObject();
             pipe = (Pipe) ois2.readObject();
+            irScoreRetrievals = (LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval>) ois3.readObject();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -162,11 +165,14 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         log.info("Saving the ranker itself");
         ranker.save(modelFile);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
-             ObjectOutputStream oos2 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".pipes.bin"))) {
+             ObjectOutputStream oos2 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".pipes.bin"));
+        ObjectOutputStream oos3 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() +".retrievals.bin"))) {
             log.info("Saving the feature scaling factors");
             oos.writeObject(scalingFactors);
             log.info("Saving the feature pipe");
             oos2.writeObject(pipe);
+            log.info("Saving the IR retrievals");
+            oos3.writeObject(irScoreRetrievals);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -183,21 +189,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             e.printStackTrace();
             return null;
         }
-        String index;
-        final TrecPmRetrieval fullRetrieval;
-        final Map<IRScoreFeatureKey, TrecPmRetrieval> subClauseRetrievals;
-        if (task == Task.PUBMED) {
-            fullRetrieval = LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE);
-            index = TrecConfig.ELASTIC_BA_INDEX;
-            subClauseRetrievals = IRFeaturePMRetrievals.getRetrievals(index, EnumSet.of(DISEASE, GENE, DNA, CANCER, CHEMO, NEG_BOOSTS, POS_BOOSTS));
-        } else if (task == Task.CLINICAL_TRIALS) {
-            fullRetrieval = ClinicalTrialsRetrievalRegistry.jlctletor(TrecConfig.SIZE);
-            index = TrecConfig.ELASTIC_CT_INDEX;
-            subClauseRetrievals = IRFeatureCTRetrievals.getRetrievals(index, EnumSet.of(AGE, CANCER, STRUCTURED, OTHER, DISEASE, GENE, SEX, POS_BOOSTS, DNA));
-        } else throw new IllegalArgumentException("Unsupported task " + task);
-        // Scores for the overall query
-        subClauseRetrievals.put(new IRScoreFeatureKey(IRScore.BM25, FULL), fullRetrieval);
-        featurePreprocessing.setRetrievals(subClauseRetrievals);
+        featurePreprocessing.setRetrievals(irScoreRetrievals);
         featurePreprocessing.preprocessTest(documentList, pipe, trainDocuments, "");
         if (scalingFactors != null)
             documentList.stream().forEach(d -> FeatureNormalizationUtils.rangeScaleFeatures(d.getFeatureVector(), scalingFactors));

@@ -1,10 +1,8 @@
 package de.julielab.ir.ltr.features;
 
-import at.medunigraz.imi.bst.trec.model.Topic;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
-import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import com.wcohen.ss.TFIDF;
@@ -24,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;

@@ -89,4 +89,10 @@ public abstract class QueryDescription {
      * @return The query attributes.
      */
     public abstract Map<String, String> getAttributes();
+
+    /**
+     * Returns a copy of this query description without any expansions or other modifications.
+     * @return An copy of this description without modifications.
+     */
+    public abstract QueryDescription getCleanCopy();
 }

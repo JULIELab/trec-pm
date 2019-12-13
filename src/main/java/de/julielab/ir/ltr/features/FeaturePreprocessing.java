@@ -17,10 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FeaturePreprocessing<Q extends QueryDescription> {
@@ -39,7 +36,7 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         this.xmiTableName = xmiTableName;
     }
 
-    public void setRetrievals(Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals) {
+    public void setRetrievals(LinkedHashMap<IRScoreFeatureKey, Retrieval<?, Q>> retrievals) {
         this.retrievals = retrievals;
     }
 

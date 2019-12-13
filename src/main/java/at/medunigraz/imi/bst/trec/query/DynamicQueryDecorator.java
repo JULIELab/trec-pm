@@ -11,7 +11,7 @@ import java.util.Set;
 
 public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
-    private Set<Integer> expandedTopics = new HashSet<>();
+    private transient Set<Integer> expandedTopics;
 
     public DynamicQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
@@ -19,6 +19,8 @@ public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
     @Override
     public List<Result> query(Topic topic) {
+        if (expandedTopics == null)
+            expandedTopics = new HashSet<>();
         if (!expandedTopics.contains(topic)) {
             expandTopic(topic);
             expandedTopics.add(System.identityHashCode(topic));
