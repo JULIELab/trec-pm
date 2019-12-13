@@ -1,0 +1,22 @@
+{
+	"bool": {
+		"must": [
+			{{biomedical_articles_generic/disease_boolean.json}},
+			{{biomedical_articles_generic/gene_boolean.json}}
+		],
+		"should": [
+			{{biomedical_articles/extra.json}},
+			{{chemotherapyBoosters:biomedical_articles/conditional_chemotherapy.json}},
+			{{cancerBoosters:biomedical_articles/conditional_cancer.json}},
+			{{positiveBoosters:biomedical_articles_generic/positive_pm_boosters.json}},
+			{{biomedical_articles/dna.json}},
+			{{biomedical_articles/positive_boosters.json}},
+			{{biomedical_articles/negative_boosters.json}},
+			{{biomedical_articles/exists_abstract.json}},
+			{{biomedical_articles/exists_filtered_treatment.json}}
+		],
+		"must_not": [
+			{{biomedical_articles/non_melanoma.json}}
+		]
+	}
+}

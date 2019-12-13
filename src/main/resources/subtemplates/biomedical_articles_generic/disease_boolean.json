@@ -1,0 +1,28 @@
+{
+  "bool": {
+    "boost": {{disease_query_boost}},
+    "should": [
+      {
+        "multi_match": {
+          "query": "{{disease}}",
+          "fields": {{biomedical_articles_generic/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "{{disease_match_type}}",
+          "boost": {{disease_topic_clause_boost}}
+        }
+      },
+      {
+        "multi_match": {
+          "query": "{{diseasePreferredTerm}}",
+          "fields": {{biomedical_articles_generic/fields.json}},
+          "tie_breaker": 0.3,
+          "type": "{{disease_match_type}}",
+          "boost": {{disease_prefterm_boost}}
+        }
+      },
+      {{diseaseSynonyms:biomedical_articles_generic/disease_synonym.json}},
+      {{diseaseHypernyms:biomedical_articles_generic/disease_hypernym.json}},
+      {{customDiseaseExpansions:biomedical_articles_generic/custom_disease.json}}
+    ]
+  }
+}
