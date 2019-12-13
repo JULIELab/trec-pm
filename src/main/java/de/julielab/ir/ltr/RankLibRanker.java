@@ -80,10 +80,6 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         final Map<String, RankList> rankLists = convertToRankList(documents);
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));
         ranker = new RankerTrainer().train(rType, new ArrayList(rankLists.values()), features, metricScorerFactory.createScorer(trainMetric, k));
-        if (!documents.isEmpty()) {
-            final Alphabet alphabet = documents.get(0).getFeatureVector().getAlphabet();
-            log.info("LtR features: " + alphabet);
-        }
     }
 
     @Override
@@ -180,6 +176,23 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         if (!modelFile.getParentFile().exists())
             modelFile.getParentFile().mkdirs();
         ranker.save(modelFile.getAbsolutePath());
+    }
+
+    /**
+     * RankLib models are stored as strings listing the model parameters. This method can be used to return this exact string.
+     * @return The model data.
+     */
+    public String getModelAsString() {
+        return ranker.model();
+    }
+
+    /**
+     * RankLib models are stored as string listing the model parameters. Such a string can be retrieved from {@link #getModelAsString()}.
+     * Passing that string to this method sets the ranker to the given parameters.
+     * @param modelString The model data.
+     */
+    public void loadFromString(String modelString) {
+        ranker = new RankerFactory().loadRankerFromString(modelString);
     }
 
     @Override

@@ -8,6 +8,7 @@ import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import cc.mallet.pipe.Pipe;
+import cc.mallet.pipe.SerialPipes;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
@@ -148,31 +149,48 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     @Override
     public void load(File modelFile) throws IOException {
         ranker = new RankLibRanker<>(rType, null, trainMetric, k, null);
-        ranker.load(modelFile);
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
-             ObjectInputStream ois2 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".pipes.bin"));
-             ObjectInputStream ois3 = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".retrievals.bin"))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFile.getAbsolutePath() + ".bin"))) {
+            rType = (RANKER_TYPE) ois.readObject();
+            trainMetric = (METRIC) ois.readObject();
+            k = (int) ois.readObject();
+            String rankLibModelString = (String) ois.readObject();
+            ranker.loadFromString(rankLibModelString);
             scalingFactors = (double[]) ois.readObject();
-            pipe = (Pipe) ois2.readObject();
-            irScoreRetrievals = (LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval>) ois3.readObject();
+            pipe = (Pipe) ois.readObject();
+            irScoreRetrievals = (LinkedHashMap<IRScoreFeatureKey, TrecPmRetrieval>) ois.readObject();
+
+            log.info("Read ranker type {}", rType);
+            log.info("Read trainMetric {}", trainMetric);
+            log.info("Read top k metric computation documents as {}", k);
+            log.info("Read the RankLib model string of length {}", rankLibModelString.length());
+            log.info("Read {} scaling factors", scalingFactors != null ? scalingFactors.length : 0);
+            log.info("Read pipe with {} elements", ((SerialPipes)pipe).size());
+            log.info("Read IR score retrievals with {} elements", irScoreRetrievals.size());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+
     @Override
     public void save(File modelFile) {
-        log.info("Saving the ranker itself");
-        ranker.save(modelFile);
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".scalingFactors.bin"));
-             ObjectOutputStream oos2 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".pipes.bin"));
-        ObjectOutputStream oos3 = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() +".retrievals.bin"))) {
-            log.info("Saving the feature scaling factors");
+        log.info("Writing all data required for the correct application of the ranker.");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".bin"))) {
+            log.info("Writing the ranker type {}", rType);
+            oos.writeObject(rType);
+            log.info("Writing the trainMetric {}", trainMetric);
+            oos.writeObject(trainMetric);
+            log.info("Writing the top k documents for metric computation: {}", k);
+            oos.writeObject(k);
+            String modelAsString = ranker.getModelAsString();
+            log.info("Writing the ranker itself of length {}", modelAsString.length());
+            oos.writeObject(modelAsString);
+            log.info("Writing the {} feature scaling factors", scalingFactors != null ? scalingFactors.length : 0);
             oos.writeObject(scalingFactors);
-            log.info("Saving the feature pipe");
-            oos2.writeObject(pipe);
-            log.info("Saving the IR retrievals");
-            oos3.writeObject(irScoreRetrievals);
+            log.info("Writing the feature pipe with {} elements", ((SerialPipes)pipe).size());
+            oos.writeObject(pipe);
+            log.info("Writing the IR retrievals with {} elements", irScoreRetrievals.size());
+            oos.writeObject(irScoreRetrievals);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
