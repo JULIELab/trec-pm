@@ -11,14 +11,10 @@ import ciir.umass.edu.metric.METRIC;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
-import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
-import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
-import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.cache.CacheService;
 import org.junit.Test;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
@@ -120,7 +116,7 @@ public class RankLibRankerTest {
     public void removeThisTest()  throws Exception{
         CacheService.initialize(new TrecCacheConfiguration());
         RankerFromPm1718 ranker = new RankerFromPm1718();
-        DocumentList<Topic> qrelDocuments = TrecPMGoldStandardFactory.pubmedOfficial2018().getQrelDocuments();
+        DocumentList<Topic> qrelDocuments = TrecPMGoldStandardFactory.pubmedOfficial2017().getQrelDocuments();
         DocumentList<Topic> rankedList = ranker.rank(qrelDocuments);
         RankLibRanker<Topic> rankLibRanker = ranker.getRankLibRanker();
         System.out.println("Score of ranked list: " + rankLibRanker.score(rankedList, METRIC.NDCG, 1000));
