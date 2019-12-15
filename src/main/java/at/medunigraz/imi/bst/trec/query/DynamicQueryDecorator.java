@@ -5,13 +5,9 @@ import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
-
-    private transient Set<Integer> expandedTopics;
 
     public DynamicQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
@@ -19,12 +15,11 @@ public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
     @Override
     public List<Result> query(Topic topic) {
-        if (expandedTopics == null)
-            expandedTopics = new HashSet<>();
-        if (!expandedTopics.contains(topic)) {
+        if (!topic.hasDecoraterBeenApplied(getMyName())) {
             expandTopic(topic);
-            expandedTopics.add(System.identityHashCode(topic));
+            topic.addAppliedDecorator(getMyName());
         }
+
         return decoratedQuery.query(topic);
     }
 
