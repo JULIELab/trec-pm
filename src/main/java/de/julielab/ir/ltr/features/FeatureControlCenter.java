@@ -45,7 +45,13 @@ public class FeatureControlCenter {
 
     public static void initialize(HierarchicalConfiguration<ImmutableNode> configuration) {
         if (singleton != null)
-            throw new IllegalStateException("The FeatureControlCenter has already been initialized. Do avoid confusion using the singleton pattern, reconfigurations are prohibited.");
+            throw new IllegalStateException("The FeatureControlCenter has already been initialized. Do avoid confusion using the singleton pattern, reconfigurations must happen explicitly through the reconfigure method.");
+        singleton = new FeatureControlCenter(configuration);
+    }
+
+    public static void reconfigure(HierarchicalConfiguration<ImmutableNode> configuration) {
+        if (singleton == null)
+            throw new IllegalStateException("The FeatureControlCenter was not yet initialized and thus cannot be reconfigured.");
         singleton = new FeatureControlCenter(configuration);
     }
 

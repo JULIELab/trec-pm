@@ -9,7 +9,7 @@
                 
         <delegateAnalysisEngine key="JCoRe PubMed ArticleSet Multiplier">
                         
-            <import location="JCoRe PubMed XML Database Multiplier.xml"/>
+            <import location="JCoRe PubMed ArticleSet Multiplier.xml"/>
                     
         </delegateAnalysisEngine>
                 

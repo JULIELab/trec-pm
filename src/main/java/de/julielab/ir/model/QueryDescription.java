@@ -3,10 +3,8 @@ package de.julielab.ir.model;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,11 +15,6 @@ public abstract class QueryDescription {
     protected Challenge challenge;
     protected int year;
     protected int number;
-    protected Set<String> appliedDecorators;
-
-    public QueryDescription() {
-        this.appliedDecorators = new LinkedHashSet<>();
-    }
 
     public QueryDescription(Challenge challenge, int year, int number) {
         this();
@@ -30,14 +23,10 @@ public abstract class QueryDescription {
         this.number = number;
     }
 
-    public void addAppliedDecorator(String uniqueDecoratorName) {
-        if (!appliedDecorators.add(uniqueDecoratorName))
-            throw new IllegalArgumentException("The query decorator with name '" + uniqueDecoratorName + "' has already been applied to this query.");
+    public QueryDescription() {
+
     }
 
-    public boolean hasDecoraterBeenApplied(String uniqueDecoratorName) {
-        return appliedDecorators.contains(uniqueDecoratorName);
-    }
 
     public Challenge getChallenge() {
         return challenge;
@@ -107,5 +96,5 @@ public abstract class QueryDescription {
      * Returns a copy of this query description without any expansions or other modifications.
      * @return An copy of this description without modifications.
      */
-    public abstract QueryDescription getCleanCopy();
+    public abstract <Q extends QueryDescription> Q getCleanCopy();
 }

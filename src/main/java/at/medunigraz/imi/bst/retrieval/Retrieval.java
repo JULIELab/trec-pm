@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
-    protected Query query;
+    protected Query<Q> query;
     private Logger log = LogManager.getLogger();
     private ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
@@ -219,14 +219,15 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         }
         List<ResultList<Q>> resultListSet = new ArrayList<>();
         for (Q topic : queryDescriptions) {
-            List<Result> results = query.query(topic);
+            Q cleanCopy = topic.getCleanCopy();
+            List<Result> results = query.query(cleanCopy);
 
             if (results.isEmpty())
                 //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
                 log.error("RESULT EMPTY for {}", getExperimentId());
 
 
-            ResultList<Q> resultList = new ResultList<>(topic);
+            ResultList<Q> resultList = new ResultList<>(cleanCopy);
             resultList.addAll(results);
             if (negativeBoosts != null) {
                 final Map<String, Result> resultsById = results.stream().collect(Collectors.toMap(Result::getId, Function.identity()));

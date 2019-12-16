@@ -10,6 +10,7 @@ import cc.mallet.types.Alphabet;
 import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.Document2TokenPipe;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
@@ -18,6 +19,7 @@ import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGr
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
 import de.julielab.ir.ltr.features.featurenames.MatchType;
 import de.julielab.java.utilities.ConfigurationUtilities;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.uima.cas.impl.XmiCasSerializer;
@@ -34,13 +36,20 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicMatchFeatureGroupTest {
+    /**
+     * This test expects the UMLS-derived files for hypernyms and synonyms to be present. They are
+     * used in decorators employed by {@link RunTopicMatchAnnotatorFeatureGroup}.
+     * @throws Exception
+     */
     @Test
     public void test() throws Exception {
+        CacheService.initialize(new TrecCacheConfiguration());
         final HierarchicalConfiguration<ImmutableNode> featureConfig = ConfigurationUtilities.createEmptyConfiguration();
-        //  featureConfig.addProperty(slash(FEATUREGROUPS, FEATUREGROUP+ NAME_ATTR), RunTopicMatchAnnotatorFeatureGroup.);
 
         if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(featureConfig);
+        else
+            FeatureControlCenter.reconfigure(featureConfig);
 
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         final Topic testTopic = topicSet.getTopics().get(4);
@@ -85,9 +94,9 @@ public class TopicMatchFeatureGroupTest {
             if (matchType == MatchType.GENE_AND_VARIANT)
                 assertThat(value).isEqualTo(2.0);
             if (matchType == MatchType.DISEASE_HYPERNYM)
-                assertThat(value).isEqualTo(1.0);
+                assertThat(value).isEqualTo(4.0);
             if (matchType == MatchType.DISEASE)
-                assertThat(value).isEqualTo(6.0);
+                assertThat(value).isEqualTo(5.0);
             if (matchType == MatchType.DISEASE_SYNONYM)
                 assertThat(value).isEqualTo(1.0);
         }

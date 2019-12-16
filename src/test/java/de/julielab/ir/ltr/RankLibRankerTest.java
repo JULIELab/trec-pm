@@ -13,6 +13,7 @@ import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 import de.julielab.java.utilities.cache.CacheService;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -113,6 +114,7 @@ public class RankLibRankerTest {
     }
 
     @Test
+    @Ignore
     public void removeThisTest()  throws Exception{
         CacheService.initialize(new TrecCacheConfiguration());
         RankerFromPm1718 ranker = new RankerFromPm1718();

@@ -15,11 +15,7 @@ public abstract class DynamicQueryDecorator extends QueryDecorator<Topic> {
 
     @Override
     public List<Result> query(Topic topic) {
-        if (!topic.hasDecoraterBeenApplied(getMyName())) {
-            expandTopic(topic);
-            topic.addAppliedDecorator(getMyName());
-        }
-
+        expandTopic(topic);
         return decoratedQuery.query(topic);
     }
 

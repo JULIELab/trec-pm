@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
 public class RankerFromPm1718 implements Ranker<Topic> {
-    // TODO save all result changing fields with the model
     private static final Logger log = LogManager.getLogger();
     private final String xmiTableName = "_data_xmi.documents";
     private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
@@ -58,7 +57,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
     public RankerFromPm1718() {
         try {
             task = Task.PUBMED;
-            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2018());
+            trainGoldStandards = Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018());
             if (!FeatureControlCenter.isInitialized())
                 FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
@@ -66,7 +65,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             featurePreprocessing.setCanonicalDbConnectionFiles(Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile()));
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
-            modelFile = new File("rankLibModels/pm18-val20pct-" + rType + ".mod");
+            modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {

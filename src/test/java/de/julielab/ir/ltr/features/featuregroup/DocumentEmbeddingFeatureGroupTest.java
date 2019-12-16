@@ -21,6 +21,8 @@ public class DocumentEmbeddingFeatureGroupTest {
     public void testEmbeddingFeatures() throws Exception {
         if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(ConfigurationUtilities.createEmptyConfiguration());
+        else
+            FeatureControlCenter.reconfigure(ConfigurationUtilities.createEmptyConfiguration());
         final DocumentEmbeddingFeatureGroup fg = new DocumentEmbeddingFeatureGroup();
         final Field featuresField = FeatureGroup.class.getDeclaredField("features");
         featuresField.setAccessible(true);

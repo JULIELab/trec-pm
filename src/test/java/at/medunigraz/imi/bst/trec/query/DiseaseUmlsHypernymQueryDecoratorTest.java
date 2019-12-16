@@ -3,8 +3,10 @@ package at.medunigraz.imi.bst.trec.query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
+import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.umls.UmlsRelationsProvider;
 import de.julielab.ir.umls.UmlsSynsetProvider;
+import de.julielab.java.utilities.cache.CacheService;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +24,7 @@ public class DiseaseUmlsHypernymQueryDecoratorTest {
     }
     @Test
     public void testPmTopics() {
+        CacheService.initialize(new TrecCacheConfiguration());
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
         final DiseaseUmlsHypernymQueryDecorator decorator = new DiseaseUmlsHypernymQueryDecorator(dummyQuery);
         decorator.setSynsetProvider(new UmlsSynsetTestProvider());

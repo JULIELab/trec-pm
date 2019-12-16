@@ -1,6 +1,7 @@
 package de.julielab.ir.ltr.features.featuregroups;
 
 
+import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.*;
 import de.julielab.ir.ltr.Document;
@@ -25,7 +26,7 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
     public static final long serialVersionUID = -4602232149056363215L;
     private final static Logger log = LoggerFactory.getLogger(RunTopicMatchAnnotatorFeatureGroup.class);
     private TopicFieldsCasAnnotator topicFieldsAnnotator;
-    private final DiseaseUmlsSynonymQueryDecorator decorator;
+    private final QueryDecorator decorator;
 
     public RunTopicMatchAnnotatorFeatureGroup() {
         // This pipe should only run when it is actually required. So let it belong to
@@ -34,7 +35,7 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
         topicFieldsAnnotator = new TopicFieldsCasAnnotator();
 
         DummyElasticSearchQuery<QueryDescription> dummy = new DummyElasticSearchQuery<>();
-        decorator = new DiseaseUmlsSynonymQueryDecorator(new GeneSynonymQueryDecorator(new GeneDescriptionQueryDecorator(new WordRemovalQueryDecorator(new ConditionalCancerQueryDecorator(dummy)))));
+        decorator = new DiseaseUmlsHypernymQueryDecorator(new DiseaseUmlsSynonymQueryDecorator(new GeneSynonymQueryDecorator(new GeneDescriptionQueryDecorator(new WordRemovalQueryDecorator(new ConditionalCancerQueryDecorator(dummy))))));
 
     }
 
@@ -45,7 +46,7 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
             final Document document = (Document) inst.getSource();
             final CAS cas = document.getCas();
             try {
-                Topic topic = (Topic) document.getQueryDescription();
+                Topic topic = document.getQueryDescription().getCleanCopy();
                 decorator.query(topic);
                 topicFieldsAnnotator.annotate(cas.getJCas(), topic);
             } catch (CASException e) {
