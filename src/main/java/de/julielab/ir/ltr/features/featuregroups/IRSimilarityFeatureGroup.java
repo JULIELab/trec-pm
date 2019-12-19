@@ -1,12 +1,10 @@
 package de.julielab.ir.ltr.features.featuregroups;
 
-import cc.mallet.types.Instance;
 import cc.mallet.types.Token;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.features.*;
 
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class IRSimilarityFeatureGroup extends FeatureGroup {
     public static final String BM25 = "bm25";
@@ -15,9 +13,10 @@ public class IRSimilarityFeatureGroup extends FeatureGroup {
     public static final String IB = "ib";
     public static final String LMD = "lmd";
     public static final String LMJM = "lmjm";
+    public static final String GROUP_NAME = "similarity";
 
     public IRSimilarityFeatureGroup() {
-        super("similarity");
+        super(GROUP_NAME);
     }
 
     @Override

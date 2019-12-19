@@ -15,7 +15,7 @@ public class UmlsRelationsProvider {
     private static final String DEFAULT_SEPARATOR = "\t";
     private static final Logger log = LogManager.getLogger();
     private static UmlsRelationsProvider instance;
-    private static boolean useCache;
+    private static boolean useCache = true;
     private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";
     private final String umlsRelationsFile;
     private final String separator;
@@ -68,6 +68,7 @@ public class UmlsRelationsProvider {
 
     private Set<String> getRelativesFromFile(String umlsSynsetFile, String separator, String cui, Relation relation) throws IOException {
         Set<String> ret = new HashSet<>();
+        log.debug("Reading file {} to obtain {} relations for {}", umlsSynsetFile, relation, cui);
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);
@@ -102,8 +103,9 @@ public class UmlsRelationsProvider {
         if (sets == null) {
             try {
                 sets = getRelativesFromFile(umlsRelationsFile, separator, cui, relation);
-                if (useCache)
+                if (useCache) {
                     cacheToUse.put(cui, sets);
+                }
             } catch (IOException e) {
                 log.error("Could not retrieve synsets for term {}", cui, e);
             }

@@ -1,13 +1,13 @@
 <configuration>
     <ltrfeatures>
         <featuregroups>
-            <featuregroup name="TFIDF" active="true"/>
+            <featuregroup name="TFIDF" active="false"/>
             <featuregroup name="TOPIC_MATCH" active="true">
                 <feature name="MATCH_TOPIC_DISEASE" active="true"/>
-                <feature name="MATCH_TOPIC_GENE" active="true"/>
-                <feature name="MATCH_TOPIC_VARIANT" active="true"/>
+                <feature name="MATCH_TOPIC_GENE" active="false"/>
+                <feature name="MATCH_TOPIC_VARIANT" active="false"/>
             </featuregroup>
-            <featuregroup name="similarity" active="true">
+            <featuregroup name="similarity" active="false">
                 <feature name="bm25" active="true"/>
                 <feature name="dfr" active="true"/>
                 <feature name="dfi" active="true"/>
@@ -15,7 +15,7 @@
                 <feature name="lmd" active="true"/>
                 <feature name="lmjm" active="true"/>
             </featuregroup>
-            <featuregroup name="documentEmbeddings" active="true">
+            <featuregroup name="documentEmbeddings" active="false">
                 <feature name="fasttext" active="true"/>
             </featuregroup>
             <featuregroup name="docshape" active="true">

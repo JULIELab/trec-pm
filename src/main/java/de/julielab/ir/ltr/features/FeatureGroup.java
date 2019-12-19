@@ -2,10 +2,11 @@ package de.julielab.ir.ltr.features;
 
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * <p>
@@ -29,6 +30,7 @@ public abstract class FeatureGroup extends Pipe {
      */
     protected List<Feature> features = new ArrayList<>();
     private String name;
+    private final static Logger log = LoggerFactory.getLogger(FeatureGroup.class);
 
     public FeatureGroup(String name) {
         this.name = name;
@@ -40,6 +42,7 @@ public abstract class FeatureGroup extends Pipe {
 
     @Override
     public final Instance pipe(Instance instance) {
+        log.trace("Piping instance through feature group {}", name);
         if (!isActive())
             return instance;
         if (features.isEmpty())

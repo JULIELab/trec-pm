@@ -41,8 +41,10 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     }
 
     public void preprocessTrain(DocumentList<Q> trainDocs, String runId) {
-        for (IRScoreFeatureKey featureKey : retrievals.keySet())
-            retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
+        if (FeatureControlCenter.getInstance().isSimilarityFeatureGroupActive()) {
+            for (IRScoreFeatureKey featureKey : retrievals.keySet())
+                retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
+        }
         Set<String> tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
@@ -75,8 +77,10 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     }
 
     public void preprocessTest(DocumentList<Q> testDocs, Pipe trainPipe, DocumentList<Q> trainDocs, String runId) {
-        for (IRScoreFeatureKey featureKey : retrievals.keySet())
-            retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
+        if (FeatureControlCenter.getInstance().isSimilarityFeatureGroupActive()) {
+            for (IRScoreFeatureKey featureKey : retrievals.keySet())
+                retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
+        }
 
         TFIDF trainTfIdf;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {

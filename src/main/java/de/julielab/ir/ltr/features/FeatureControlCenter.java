@@ -59,8 +59,56 @@ public class FeatureControlCenter {
         return singleton != null;
     }
 
+    /**
+     * <p>Extracts a string listing the active keywords in the feature configuration at the given path.</p>
+     * <p>
+     * The feature configuration has substructures like this:
+     * <samp>
+     * <pre>
+     *             &lt;retrievalparameters&gt;
+     *                 &lt;keywords&gt;
+     *                      &lt;chemotherapy&gt;
+     *                          &lt;*mab&gt;true&lt;/*mab&gt;
+     *                          &lt;*nib&gt;false&lt;/*nib&gt;
+     *                          &lt;*cin&gt;true&lt;*cin&gt;
+     *                      &lt;/chemotherapy&gt;
+     *                 &lt;/keywords&gt;
+     *             &lt;/retrievalparameters&gt;
+     *         </pre>
+     * </samp>
+     * To automatically create the list of active keywords - <tt>"*mab *cin"</tt> - the configuration path
+     * <tt>retrievalparameter/keyword/chemotherapy</tt> is passed. By convention, the path must show to
+     * a list of elements exactly named after the keywords with the text value <tt>true</tt> or <tt>false</tt>
+     * for activation or omission. The list is automatically parsed from the configuration and pasted into
+     * a single string where the keywords are whitespace-separated.
+     * </p>
+     *
+     * @param config                   The feature configuration.
+     * @param keywordConfigurationPath The path leading to the keyword list within the configuration.
+     * @return A string containing the activated keywords in the feature configuration, whitespace-separated.
+     */
+    @NotNull
+    public static String getKeywordStringFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String keywordConfigurationPath) {
+        StringBuilder sb = new StringBuilder();
+        List<HierarchicalConfiguration<ImmutableNode>> cancerConfigs = config.configurationsAt(keywordConfigurationPath);
+        for (HierarchicalConfiguration<ImmutableNode> cconfig : cancerConfigs) {
+            Iterator<String> keys = cconfig.getKeys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                if (cconfig.getBoolean(key))
+                    sb.append(key).append(" ");
+            }
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
     public boolean isTfIdfActive() {
         return configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
+    }
+
+    public boolean isSimilarityFeatureGroupActive() {
+        return configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, IRSimilarityFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);
     }
 
     public boolean filterActive(FeatureGroup featureGroup) {
@@ -77,50 +125,8 @@ public class FeatureControlCenter {
     }
 
     /**
-     * <p>Extracts a string listing the active keywords in the feature configuration at the given path.</p>
-     * <p>
-     *     The feature configuration has substructures like this:
-     *     <samp>
-     *         <pre>
-     *             &lt;retrievalparameters&gt;
-     *                 &lt;keywords&gt;
-     *                      &lt;chemotherapy&gt;
-     *                          &lt;*mab&gt;true&lt;/*mab&gt;
-     *                          &lt;*nib&gt;false&lt;/*nib&gt;
-     *                          &lt;*cin&gt;true&lt;*cin&gt;
-     *                      &lt;/chemotherapy&gt;
-     *                 &lt;/keywords&gt;
-     *             &lt;/retrievalparameters&gt;
-     *         </pre>
-     *     </samp>
-     *     To automatically create the list of active keywords - <tt>"*mab *cin"</tt> - the configuration path
-     *     <tt>retrievalparameter/keyword/chemotherapy</tt> is passed. By convention, the path must show to
-     *     a list of elements exactly named after the keywords with the text value <tt>true</tt> or <tt>false</tt>
-     *     for activation or omission. The list is automatically parsed from the configuration and pasted into
-     *     a single string where the keywords are whitespace-separated.
-     * </p>
-     * @param config The feature configuration.
-     * @param keywordConfigurationPath The path leading to the keyword list within the configuration.
-     * @return A string containing the activated keywords in the feature configuration, whitespace-separated.
-     */
-    @NotNull
-    public static String getKeywordStringFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String keywordConfigurationPath) {
-        StringBuilder sb = new StringBuilder();
-        List<HierarchicalConfiguration<ImmutableNode>> cancerConfigs = config.configurationsAt(keywordConfigurationPath);
-        for (HierarchicalConfiguration<ImmutableNode> cconfig : cancerConfigs) {
-            Iterator<String> keys = cconfig.getKeys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if(cconfig.getBoolean(key))
-                    sb.append(key).append(" ");
-            }
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
-
-    /**
      * <p>Used given an already trained model.</p>
+     *
      * @param documents
      * @param trainPipe
      * @param xmiTableName
@@ -149,6 +155,7 @@ public class FeatureControlCenter {
 
     /**
      * Used to train a model.
+     *
      * @param documents
      * @param tfidf
      * @param vocabulary
@@ -180,7 +187,12 @@ public class FeatureControlCenter {
 
         final InstanceList instanceList = new InstanceList(serialPipes);
         log.debug("Creating features for {} training documents.", documents.size());
+
+        int linewidth = 80;
+
+        int i = 0;
         for (Document<Q> document : documents) {
+            i++;
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
             instanceList.addThruPipe(instance);
             document.setFeaturePipes(serialPipes);
@@ -189,7 +201,20 @@ public class FeatureControlCenter {
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
             // OriginalDocumentRetrieval class.
             document.releaseJCas();
+
+            double percentage = i / (double) documents.size();
+            int progress = (int) (linewidth * percentage);
+            System.out.print("[");
+            for (int j = 0; j < linewidth; j++) {
+                if (j < progress)
+                    System.out.print("=");
+                else
+                    System.out.print(" ");
+            }
+            System.out.print("] " + percentage*100 +"%\r");
         }
+
+        System.out.println();
         log.debug("Finished train document feature creation.");
     }
 
