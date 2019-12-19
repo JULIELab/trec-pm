@@ -2,6 +2,8 @@ package at.medunigraz.imi.bst.trec.search;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import de.julielab.ir.TrecCacheConfiguration;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.Assume;
@@ -17,6 +19,7 @@ public class ElasticSearchTest {
 	public ElasticSearchTest() {
 		// There must be an available server
 		Assume.assumeTrue(ConnectionUtils.checkElasticOpenPort());
+		CacheService.initialize(new TrecCacheConfiguration());
 	}
 
 	@Test

@@ -2,13 +2,14 @@
   "bool": {
     "should": {
       "multi_match": {
-        "query": "{{[positivePmBoosters]}}",
+        "query": "{{negative_pm_boosters}}",
         "fields": [
           "title^2",
           "abstract"
         ],
         "tie_breaker": 0.3,
-        "type": "best_fields"
+        "type": "best_fields",
+        "boost": {{neg_keywords_boost}}
       }
     }
   }

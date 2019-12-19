@@ -2,6 +2,7 @@
   "query": "{{[diseaseSynonyms]}}",
   "fields": {{biomedical_articles_generic/fields.json}},
   "tie_breaker": 0.3,
-  "type": "{{disease_match_type}}",
+  "type": "{{disease_syn_match_type}}",
+  "slop": "{{disease_slop}}",
   "boost": {{disease_syn_boost}}
 }

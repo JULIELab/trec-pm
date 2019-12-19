@@ -1,0 +1,7 @@
+pcs-file = config/smac/allparams_ct/smac-parameters.pcs
+runObj = QUALITY
+cutoffTime = 300
+wallclock-limit = 172800
+deterministic = 1
+instance_file = config/smac/allparams_ct/instances.txt
+algo =  java -cp "target/lib/*":.:target/classes de.julielab.ir.paramopt.SigirCT19SmacWrapper

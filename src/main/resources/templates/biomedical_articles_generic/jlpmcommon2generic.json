@@ -1,12 +1,12 @@
 {
 	"bool": {
 		"must": [
-			{{biomedical_articles/disease.json}},
-			{{biomedical_articles/gene.json}}
+			{{biomedical_articles_generic/disease.json}},
+			{{biomedical_articles_generic/gene.json}}
 		],
 		"should": [
 			{{biomedical_articles/extra.json}},
-			{{chemotherapyBoosters:biomedical_articles/conditional_chemotherapy.json}},
+			{{chemotherapyBoosters:biomedical_articles_generic/conditional_chemotherapy.json}},
 			{{cancerBoosters:biomedical_articles/conditional_cancer.json}},
 			{{positiveBoosters:biomedical_articles_generic/positive_pm_boosters.json}},
 			{{biomedical_articles/dna.json}},

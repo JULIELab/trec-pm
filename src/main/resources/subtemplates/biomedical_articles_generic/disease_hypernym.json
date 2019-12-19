@@ -4,6 +4,7 @@
     "fields": {{biomedical_articles_generic/fields.json}},
     "tie_breaker": 0.3,
     "type": "{{disease_hypernyms_match_type}}",
+    "slop": "{{disease_slop}}",
     "boost": {{disease_hypernyms_boost}}
   }
 }

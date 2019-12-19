@@ -140,16 +140,21 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withExperimentName("jlpmcommon2")
                 .withSubTemplate(conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATE)));
 
-        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, QUERYFILTERING)))
+        HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
+        if (retrievalConfig.getBoolean(QUERYFILTERING))
             ret.withWordRemoval();
-        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, GENEEXPANSION, SYNONYMS)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
             ret.withGeneSynonym();
-        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, SYNONYMLIST)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
+            ret.withGeneDescription();
+        if (retrievalConfig.getBoolean(SYNONYMLIST))
             ret.withSynonymList(SYNONYMS_FILE);
-        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, PREFERREDTERM)))
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
             ret.withDiseasePreferredTerm();
-        if (conf.getBoolean(slash(RETRIEVALPARAMETERS, DISEASEEXPANSION, SYNONYMS)))
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS)))
             ret.withDiseaseSynonym();
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
+            ret.withUmlsDiseaseHypernym();
 
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.

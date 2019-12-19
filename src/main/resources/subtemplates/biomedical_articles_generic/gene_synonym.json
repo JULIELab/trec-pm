@@ -1,0 +1,10 @@
+{
+  "multi_match": {
+    "query": "{{[geneSynonyms]}}",
+    "fields": {{biomedical_articles_generic/gene_fields.json}},
+    "tie_breaker": 0.3,
+    "type": "{{gene_syn_match_type}}",
+    "slop": "{{gene_syn_slop}}",
+    "boost": {{gene_syn_boost}}
+  }
+}

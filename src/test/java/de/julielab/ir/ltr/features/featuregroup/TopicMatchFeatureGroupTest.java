@@ -18,6 +18,8 @@ import de.julielab.ir.ltr.features.SetFeatureVectorPipe;
 import de.julielab.ir.ltr.features.featuregroups.RunTopicMatchAnnotatorFeatureGroup;
 import de.julielab.ir.ltr.features.featuregroups.TopicMatchFeatureGroup;
 import de.julielab.ir.ltr.features.featurenames.MatchType;
+import de.julielab.ir.umls.UmlsRelationsProvider;
+import de.julielab.ir.umls.UmlsSynsetProvider;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
@@ -25,6 +27,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.uima.cas.impl.XmiCasSerializer;
 import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.jcas.JCas;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -36,6 +39,15 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicMatchFeatureGroupTest {
+
+    @BeforeClass
+    public static void setUp() {
+        System.setProperty(CacheService.CACHING_ENABLED_PROP, "false");
+        UmlsRelationsProvider.setRelationsSourceFile("src/test/resources/umls/example.relations");
+        UmlsSynsetProvider.setDefaultSynsetFile("src/test/resources/umls/example.synsets");
+        UmlsSynsetProvider.setDefaultSemanticTypesFile("src/test/resources/umls/semanticTypes.test");
+    }
+
     /**
      * This test expects the UMLS-derived files for hypernyms and synonyms to be present. They are
      * used in decorators employed by {@link RunTopicMatchAnnotatorFeatureGroup}.

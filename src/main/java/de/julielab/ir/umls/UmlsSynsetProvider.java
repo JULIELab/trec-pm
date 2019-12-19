@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 public class UmlsSynsetProvider {
     public static final String DEFAULT_SEPARATOR = "\t";
     private static final Logger log = LogManager.getLogger();
-    private final static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
-    private static final String defaultSemanticTypesFile = "resources/umlsSemanticTypes.txt.gz";
+    private static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
+    private static String defaultSemanticTypesFile = "resources/umlsSemanticTypes.txt.gz";
     private static UmlsSynsetProvider instance;
     private final String umlsSynsetFile;
     private final String umlsSemanticTypesFile;
@@ -31,6 +31,23 @@ public class UmlsSynsetProvider {
     private CacheAccess<String, Set<UmlsSynset>> synsetCache;
     private CacheAccess<String,  Set<String>> semanticTypesCache;
 
+    /**
+     * Sets the default file to load the UMLS synsets from. Only has an effect if called before the first
+     * call to {@link #getInstance()}.
+     * @param file
+     */
+    public static void setDefaultSynsetFile(String file) {
+        defaultSynsetFile = file;
+    }
+
+    /**
+     * Sets the default file to load the UMLS semantic types from. Only has an effect if called before the first
+     * call to {@link #getInstance()}.
+     * @param file
+     */
+    public static void setDefaultSemanticTypesFile(String file) {
+        defaultSemanticTypesFile = file;
+    }
     /**
      * Provides synsets for a term
      *

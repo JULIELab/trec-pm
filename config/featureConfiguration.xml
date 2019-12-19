@@ -1,13 +1,13 @@
 <configuration>
     <ltrfeatures>
         <featuregroups>
-            <featuregroup name="TFIDF" active="false"/>
+            <featuregroup name="TFIDF" active="true"/>
             <featuregroup name="TOPIC_MATCH" active="true">
                 <feature name="MATCH_TOPIC_DISEASE" active="true"/>
                 <feature name="MATCH_TOPIC_GENE" active="true"/>
                 <feature name="MATCH_TOPIC_VARIANT" active="true"/>
             </featuregroup>
-            <featuregroup name="similarity" active="false">
+            <featuregroup name="similarity" active="true">
                 <feature name="bm25" active="true"/>
                 <feature name="dfr" active="true"/>
                 <feature name="dfi" active="true"/>
@@ -15,7 +15,7 @@
                 <feature name="lmd" active="true"/>
                 <feature name="lmjm" active="true"/>
             </featuregroup>
-            <featuregroup name="documentEmbeddings" active="false">
+            <featuregroup name="documentEmbeddings" active="true">
                 <feature name="fasttext" active="true"/>
             </featuregroup>
             <featuregroup name="docshape" active="true">
@@ -59,6 +59,7 @@
         <diseaseexpansion>
             <preferredterm>true</preferredterm>
             <synonyms>true</synonyms>
+            <hypernyms>false</hypernyms>
         </diseaseexpansion>
         <geneexpansion>
             <synonyms>true</synonyms>
@@ -74,10 +75,14 @@
         </keywords>
         <extraboost>true</extraboost>
         <templateparameters>
-            <gene_match_type>best_fields</gene_match_type>
-            <gene_boost>1</gene_boost>
-            <disease_match_type>best_fields</disease_match_type>
-            <disease_boost>1</disease_boost>
+            <disease>
+                <disease_match_type>best_fields</disease_match_type>
+                <disease_boost>1</disease_boost>
+            </disease>
+            <gene>
+                <gene_match_type>best_fields</gene_match_type>
+                <gene_boost>1</gene_boost>
+            </gene>
             <title_boost>1</title_boost>
             <abstract_boost>1</abstract_boost>
             <keyword_boost>1</keyword_boost>

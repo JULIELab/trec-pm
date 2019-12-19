@@ -17,18 +17,17 @@ public class UmlsRelationsProvider {
     private static UmlsRelationsProvider instance;
     private static boolean useCache;
     private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";
-    private final String umlsSynsetFile;
+    private final String umlsRelationsFile;
     private final String separator;
     private CacheAccess<String, Set<String>> parentsCache;
     private CacheAccess<String, Set<String>> childrenCache;
 
-    protected UmlsRelationsProvider(String umlsSynsetFile, boolean useCache) {
-        this(umlsSynsetFile, DEFAULT_SEPARATOR, useCache);
+    protected UmlsRelationsProvider(String umlsRelationsFile, boolean useCache) {
+        this(umlsRelationsFile, DEFAULT_SEPARATOR, useCache);
     }
 
-    private UmlsRelationsProvider(String umlsSynsetFile, String separator, boolean useCache) {
-
-        this.umlsSynsetFile = umlsSynsetFile;
+    private UmlsRelationsProvider(String umlsRelationsFile, String separator, boolean useCache) {
+        this.umlsRelationsFile = umlsRelationsFile;
         this.separator = separator;
         this.useCache = useCache;
 
@@ -102,7 +101,7 @@ public class UmlsRelationsProvider {
         Set<String> sets = useCache ? cacheToUse.get(cui) : null;
         if (sets == null) {
             try {
-                sets = getRelativesFromFile(umlsSynsetFile, separator, cui, relation);
+                sets = getRelativesFromFile(umlsRelationsFile, separator, cui, relation);
                 if (useCache)
                     cacheToUse.put(cui, sets);
             } catch (IOException e) {

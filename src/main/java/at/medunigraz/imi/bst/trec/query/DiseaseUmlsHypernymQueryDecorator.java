@@ -41,7 +41,6 @@ public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
     public Topic expandTopic(Topic topic) {
         String disease = topic.getDisease();
 
-
         final Set<String> cuis = synsetProvider.getCuis(disease);
 
         for (String cui : cuis) {

@@ -77,6 +77,7 @@ public class RankLibRankerTest {
     }
 
     @Test
+    @Ignore
     public void test() {
         // Create test documents with test features. First we need an alphabet for the feature vectors.
         Alphabet a = new Alphabet();

@@ -21,6 +21,9 @@ abstract public class SmacWrapperBase {
     public void parseAndRunConfiguration(String[] args) throws ConfigurationException {
         HierarchicalConfiguration<ImmutableNode> config = parseConfiguration(args);
         String instance = args[0];
+        String instanceSpecificInfo = args[1];
+        int cutoffTime = Integer.valueOf(args[2]);
+        int cutoffLength = Integer.valueOf(args[3]);
         int seed = Integer.valueOf(args[4]);
         double score = calculateScore(config, instance, seed);
         System.out.println("Result for SMAC: SUCCESS, 0, 0, " + score + ", 0");

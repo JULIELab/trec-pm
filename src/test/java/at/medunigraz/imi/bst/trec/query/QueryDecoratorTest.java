@@ -2,10 +2,11 @@ package at.medunigraz.imi.bst.trec.query;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
-import at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.utils.ConnectionUtils;
+import de.julielab.ir.TrecCacheConfiguration;
+import de.julielab.java.utilities.cache.CacheService;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -22,6 +23,7 @@ public abstract class QueryDecoratorTest {
 
 	@Test
 	public void testLiveQuery() {
+		CacheService.initialize(new TrecCacheConfiguration());
 		Assume.assumeTrue(ConnectionUtils.checkElasticOpenPort());
 		TrecConfig.SUBTEMPLATES_FOLDER = "/test-subtemplates/";
 		List<Result> resultList = decoratedQuery.query(topic);

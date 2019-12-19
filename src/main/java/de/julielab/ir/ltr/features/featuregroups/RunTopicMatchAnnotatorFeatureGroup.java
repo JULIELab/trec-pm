@@ -36,7 +36,6 @@ public class RunTopicMatchAnnotatorFeatureGroup extends FeatureGroup {
 
         DummyElasticSearchQuery<QueryDescription> dummy = new DummyElasticSearchQuery<>();
         decorator = new DiseaseUmlsHypernymQueryDecorator(new DiseaseUmlsSynonymQueryDecorator(new GeneSynonymQueryDecorator(new GeneDescriptionQueryDecorator(new WordRemovalQueryDecorator(new ConditionalCancerQueryDecorator(dummy))))));
-
     }
 
 

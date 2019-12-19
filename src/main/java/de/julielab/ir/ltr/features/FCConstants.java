@@ -14,6 +14,7 @@ public class FCConstants {
     public static final String TEMPLATE = "template";
     public static final String QUERYFILTERING = "queryfiltering";
     public static final String SYNONYMS = "synonyms";
+    public static final String HYPERNYMS = "hypernyms";
     public static final String KEYWORDS = "keywords";
 
     // cannot be instantiated
