@@ -17,6 +17,7 @@ public class FCConstants {
     public static final String HYPERNYMS = "hypernyms";
     public static final String KEYWORDS = "keywords";
 
+
     // cannot be instantiated
     protected FCConstants() {
     }

@@ -1,7 +1,6 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import com.google.common.base.Functions;
 import com.ximpleware.VTDException;
 import de.julielab.costosys.configuration.DBConfig;
 import de.julielab.costosys.configuration.FieldConfig;
@@ -39,6 +38,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,7 +107,7 @@ public class OriginalDocumentRetrieval {
             final ProcessingResourceMetaData_impl metaData = new ProcessingResourceMetaData_impl();
             metaData.setTypeSystem(tsDesc);
             try {
-                casPool = new CasPool(10, metaData, new ResourceManager_impl());
+                casPool = new CasPool(TrecConfig.CONCURRENCY_MAX, metaData, new ResourceManager_impl());
             } catch (ResourceInitializationException e) {
                 log.error("Could not create CAS pool", e);
             }
@@ -341,9 +341,10 @@ public class OriginalDocumentRetrieval {
      */
     public void setXmiCasDataToDocuments(DocumentList<?> documents, List<File> dbConnections, String table) {
         List<? extends Document<?>> docsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).collect(Collectors.toList());
-        Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream()
-                .filter(d -> xmiCache.get(d.getId()) == null)
-                .collect(Collectors.toSet());
+        log.debug("Got {} documents to set XMI data to", docsWithoutXmiData.size());
+
+        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().collect(Collectors.toMap(Function.identity(), id -> xmiCache.get(id)));
+        Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream().filter(d -> !cachedXmiByDocId.containsKey(d.getId())).collect(Collectors.toSet());
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.
         Map<File, List<Document<?>>> docsByDbConfig = docsWithoutXmiDataNotInCache.stream()
@@ -393,7 +394,7 @@ public class OriginalDocumentRetrieval {
                 log.debug("Assembling the actual XMI documents from the database data.");
                 while (docsWithoutXmiDataIt.hasNext()) {
                     final Document<?> doc = docsWithoutXmiDataIt.next();
-                    byte[] docXmiData = xmiCache.get(doc.getId());
+                    byte[] docXmiData = cachedXmiByDocId.get(doc.getId());
                     if (docXmiData == null) {
                         if (!dataByDocId.containsKey(doc.getId())) {
                             continue;
@@ -439,7 +440,7 @@ public class OriginalDocumentRetrieval {
         }
         for (Document<?> d : documents) {
             if (d.getFullDocumentData() == null) {
-                byte[] xmiData = xmiCache.get(d.getId());
+                byte[] xmiData = cachedXmiByDocId.get(d.getId());
                 if (xmiData != null)
                     d.setFullDocumentData(xmiData);
                 else

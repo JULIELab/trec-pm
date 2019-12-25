@@ -12,6 +12,7 @@ import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -24,14 +25,17 @@ import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsAction;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequestBuilder;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -41,6 +45,9 @@ public class ElasticSearchSetup {
     private static final Logger log = LogManager.getLogger();
 
     private static Map<String, String> defaultProperties = new HashMap<>();
+    private static String[] allSimilarities = new String[]{"bm25"
+            //, "dfr", "dfi", "ib", "lmd", "lmjm"
+    };
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
@@ -62,14 +69,13 @@ public class ElasticSearchSetup {
 
 
     }
-
-    private static String[] allSimilarities = new String[]{"tfidf", "bm25", "dfr", "dfi", "ib", "lmd", "lmjm"};;
+    ;
 
     public static void main(String args[]) {
-        deletePubmedIndices();
-        deleteCtIndices();
-//        createPubmedIndices();
-//        createCtIndices();
+        createPubmedIndices();
+        createCtIndices();
+//        deletePubmedIndices();
+//        deleteCtIndices();
     }
 
     public static void deletePubmedIndices() {
@@ -82,7 +88,7 @@ public class ElasticSearchSetup {
 
     public static void deleteIndices(String indexbaseName) {
         try {
-            final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all "+indexbaseName+" indices. Are you sure?", false);
+            final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all " + indexbaseName + " indices. Are you sure?", false);
             if (doDelete) {
                 final Client client = ElasticClientFactory.getClient();
                 for (String similarity : allSimilarities) {
@@ -126,12 +132,12 @@ public class ElasticSearchSetup {
             final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
             final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
 
-            configureIndex(indexBasename,settings, mappings, esType, similarity);
+            configureIndex(indexBasename, false, settings, mappings, esType, similarity);
         }
     }
 
-    public static void configureSimilarity(String indexBasename, SimilarityParameters parameters, String esType) {
-        String esSettingsTemplate = Path.of("es-mappings", "cikm19-settingsoly-template.json").toFile().getAbsolutePath();
+    public static void configureSimilarity(String indexBasename, boolean isExactIndexName, SimilarityParameters parameters, String esType) {
+        String esSettingsTemplate = Path.of("es-mappings", "cikm19-similarityonly-template.json").toFile().getAbsolutePath();
         final ObjectMapper om = new ObjectMapper();
         final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
         final Map<String, String> parameterMap = new HashMap<>(defaultProperties);
@@ -141,20 +147,46 @@ public class ElasticSearchSetup {
         decorator.query(t);
         final String settingsJson = decorator.getJSONQuery();
         final JSONObject settingsObject = new JSONObject(settingsJson);
-        configureIndex(indexBasename, settingsObject, null, esType, parameters.getBaseSimilarity());
+        JSONObject map = new JSONObject();
+        map.put("similarity", settingsObject);
+
+        final Client client = ElasticClientFactory.getClient();
+        final String indexName = isExactIndexName ? indexBasename : indexBasename + "_" + parameters.getBaseSimilarity();
+        GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(new GetSettingsRequestBuilder(client, GetSettingsAction.INSTANCE, indexName).request()).actionGet();
+        Settings s = getSettingsResponse.getIndexToSettings().get(indexName);
+        boolean unequalSettingFound = false;
+        for (Object key : settingsObject.names()) {
+            JSONObject concreteSimilaritySettings = settingsObject.getJSONObject((String) key);
+            for (Object concreteSimilarityParam : concreteSimilaritySettings.names()) {
+                String setting = "index.similarity." + key + "." + concreteSimilarityParam;
+                String currentValue = s.get(setting);
+                if (!String.valueOf(concreteSimilaritySettings.get((String)concreteSimilarityParam)).equals(currentValue))
+                    unequalSettingFound = true;
+                if (unequalSettingFound)
+                    break;
+            }
+            if (unequalSettingFound)
+                break;
+        }
+        if (unequalSettingFound) {
+            log.debug("Found divergence in current and desired similarity settings, updating the index settings.");
+            configureIndex(indexBasename, isExactIndexName, map, null, esType, parameters.getBaseSimilarity());
+        }
     }
 
     /**
      * Creates and/or configures an ElasticSearch index.
+     *
      * @param indexBasename
-     * @param settingsJson The settings configuration.
-     * @param mappingJson The mapping configuration.
-     * @param esType The index type.
-     * @param similarity The base similarity used by the index. Is used as a index name suffix.
+     * @param isExactIndexName
+     * @param settingsJson     The settings configuration.
+     * @param mappingJson      The mapping configuration.
+     * @param esType           The index type.
+     * @param similarity       The base similarity used by the index. Is used as a index name suffix.
      */
-    private static void configureIndex(String indexBasename, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
+    private static void configureIndex(String indexBasename, boolean isExactIndexName, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
         final Client client = ElasticClientFactory.getClient();
-        final String indexName = indexBasename + "_" + similarity;
+        final String indexName = isExactIndexName ? indexBasename : indexBasename + "_" + similarity;
         boolean indexExisted = false;
 
         final IndicesExistsRequest indicesExistsRequest = Requests.indicesExistsRequest(indexName);
@@ -197,7 +229,15 @@ public class ElasticSearchSetup {
         if (indexExisted) {
             log.info("Reopening index {}.", indexName);
             final OpenIndexRequest openIndexRequest = Requests.openIndexRequest(indexName);
-            final OpenIndexResponse openIndexResponse = client.admin().indices().open(openIndexRequest).actionGet();
+            ActionFuture<OpenIndexResponse> future = client.admin().indices().open(openIndexRequest);
+            final OpenIndexResponse openIndexResponse = future.actionGet();
+            // The sleep is necessary because there will be a connection error with the ES5.4 transport client
+            // when we connect too quickly again to the index
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             if (!openIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not reopen index " + indexName + ", ES did not acknowledge.");
         }

@@ -40,6 +40,7 @@ public class UmlsRelationsProvider {
     public static UmlsRelationsProvider getInstance() {
         if (instance == null) {
             instance = new UmlsRelationsProvider(defaultRelationsFile, useCache);
+            log.debug("Is caching used for {}: {}", UmlsRelationsProvider.class.getSimpleName(), useCache);
         }
         return instance;
     }
@@ -68,7 +69,7 @@ public class UmlsRelationsProvider {
 
     private Set<String> getRelativesFromFile(String umlsSynsetFile, String separator, String cui, Relation relation) throws IOException {
         Set<String> ret = new HashSet<>();
-        log.debug("Reading file {} to obtain {} relations for {}", umlsSynsetFile, relation, cui);
+        log.trace("Reading file {} to obtain {} relations for {}", umlsSynsetFile, relation, cui);
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);

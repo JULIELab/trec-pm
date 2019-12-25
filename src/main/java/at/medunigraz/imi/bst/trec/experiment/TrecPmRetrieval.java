@@ -11,7 +11,7 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         super(indexName);
     }
 
-    public TrecPmRetrieval(String indexName, int resultSize) {
+    public  TrecPmRetrieval(String indexName, int resultSize) {
         super(indexName, resultSize);
     }
 

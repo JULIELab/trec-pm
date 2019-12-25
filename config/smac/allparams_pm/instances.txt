@@ -8,7 +8,3 @@ pm-17-18-19-split6-train
 pm-17-18-19-split7-train
 pm-17-18-19-split8-train
 pm-17-18-19-split9-train
-pm-17
-pm-18
-pm-19
-pm-19-non-cancer

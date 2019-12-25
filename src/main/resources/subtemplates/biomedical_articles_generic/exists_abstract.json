@@ -1,0 +1,6 @@
+{
+  "exists": {
+    "field": "abstract",
+    "boost": {{exists_abstract_boost}}
+  }
+}

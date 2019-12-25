@@ -10,16 +10,16 @@ retrievalparameters.diseaseexpansion.synonyms categorical  {true, false} [true]
 retrievalparameters.diseaseexpansion.hypernyms categorical {true, false} [true]
 retrievalparameters.diseaseexpansion.custom categorical    {true, false} [true]
 ## Boosts
-retrievalparameters.templateparameters.disease.disease_query_boost        real [0.1,2] [1.5]
-retrievalparameters.templateparameters.disease.disease_topic_clause_boost real [0.1,2] [1]
-retrievalparameters.templateparameters.disease.disease_prefterm_boost     real [0.1,2] [1]
-retrievalparameters.templateparameters.disease.disease_syn_boost          real [0.1,2] [1]
-retrievalparameters.templateparameters.disease.disease_hypernyms_boost    real [0.1,2] [1]
-retrievalparameters.templateparameters.disease.disease_custom_boost       real [0.1,2] [1]
+retrievalparameters.templateparameters.disease.disease_query_boost        real [0.1,3] [1.5]
+retrievalparameters.templateparameters.disease.disease_topic_clause_boost real [0.1,3] [1]
+retrievalparameters.templateparameters.disease.disease_prefterm_boost     real [0.1,3] [1]
+retrievalparameters.templateparameters.disease.disease_syn_boost          real [0.1,3] [1]
+retrievalparameters.templateparameters.disease.disease_hypernyms_boost    real [0.1,3] [1]
+retrievalparameters.templateparameters.disease.disease_custom_boost       real [0.1,3] [1]
 ## Match types
-retrievalparameters.templateparameters.disease.disease_match_type           categorical [phrase, best_fields, most_fields] [phrase]
-retrievalparameters.templateparameters.disease.disease_syn_match_type       categorical [phrase, best_fields, most_fields] [phrase]
-retrievalparameters.templateparameters.disease.disease_hypernyms_match_type categorical [phrase, best_fields, most_fields] [phrase]
+retrievalparameters.templateparameters.disease.disease_match_type           categorical [phrase, best_fields] [phrase]
+retrievalparameters.templateparameters.disease.disease_syn_match_type       categorical [phrase, best_fields] [phrase]
+retrievalparameters.templateparameters.disease.disease_hypernyms_match_type categorical [phrase, best_fields] [phrase]
 ## Phrase slop
 retrievalparameters.templateparameters.disease.disease_slop integer [1,5] [1]
 ## Conditional parameter activation
@@ -55,3 +55,13 @@ retrievalparameters.templateparameters.gene.gene_custom_boost | retrievalparamet
 retrievalparameters.templateparameters.gene.gene_topic_slop   | retrievalparameters.templateparameters.gene.gene_topic_match_type == phrase
 retrievalparameters.templateparameters.gene.gene_syn_slop     | retrievalparameters.templateparameters.gene.gene_syn_match_type   == phrase
 retrievalparameters.templateparameters.gene.gene_desc_slop    | retrievalparameters.templateparameters.gene.gene_desc_match_type  == phrase
+
+# Field boosts
+retrievalparameters.templateparameters.title_field_boost      real [0.1,3] [2]
+retrievalparameters.templateparameters.abstract_field_boost   real [0.1,3] [1]
+retrievalparameters.templateparameters.meshTags_field_boost   real [0.1,3] [1]
+retrievalparameters.templateparameters.genes_field_boost      real [0.1,3] [1]
+
+# BM25 parameters
+indexparameters.bm25.k1 real [0.1,2]
+indexparameters.bm25.k1 real [0.1,2]

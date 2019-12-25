@@ -5,7 +5,9 @@ import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
+import cc.mallet.types.SingleInstanceIterator;
 import com.wcohen.ss.TFIDF;
+import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -22,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
@@ -190,28 +195,37 @@ public class FeatureControlCenter {
 
         int linewidth = 80;
 
-        int i = 0;
-        for (Document<Q> document : documents) {
-            i++;
+
+        List<Future<?>> futures = documents.stream().map(document -> Multithreading.getInstance().submit(() -> {
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
-            instanceList.addThruPipe(instance);
+            serialPipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
             document.setFeaturePipes(serialPipes);
             // Within the pipes, the documents need access to their CAS. Since we only have a limited
             // amount of those for performance and scalability considerations, we need to release
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
             // OriginalDocumentRetrieval class.
             document.releaseJCas();
+        })).collect(Collectors.toList());
 
-            double percentage = i / (double) documents.size();
-            int progress = (int) (linewidth * percentage);
-            System.out.print("[");
-            for (int j = 0; j < linewidth; j++) {
-                if (j < progress)
-                    System.out.print("=");
-                else
-                    System.out.print(" ");
+
+        for (int i = 0; i < futures.size(); i++) {
+            try {
+                futures.get(i).get();
+                double percentage = i / (double) documents.size();
+                int progress = (int) (linewidth * percentage);
+                System.out.print("[");
+                for (int j = 0; j < linewidth; j++) {
+                    if (j < progress)
+                        System.out.print("=");
+                    else
+                        System.out.print(" ");
+                }
+                System.out.print("] " + i + "/" + documents.size() + "\r");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
             }
-            System.out.print("] " + percentage*100 +"%\r");
         }
 
         System.out.println();

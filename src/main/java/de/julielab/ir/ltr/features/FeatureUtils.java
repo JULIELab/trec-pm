@@ -1,9 +1,9 @@
 package de.julielab.ir.ltr.features;
 
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.tartarus.snowball.SnowballProgram;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,10 +12,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FeatureUtils {
     private static FeatureUtils instance;
+    private final SnowballProgram englishStemmer;
     private StandardAnalyzer standardAnalyzer;
 
     private FeatureUtils() throws IOException {
         standardAnalyzer = new StandardAnalyzer(new InputStreamReader(FeatureUtils.class.getResourceAsStream("/data/stopwords.txt"), UTF_8));
+        try {
+            Class<? extends SnowballProgram> stemClass = Class.forName("org.tartarus.snowball.ext." + "English" + "Stemmer").asSubclass(SnowballProgram.class);
+            englishStemmer = stemClass.getConstructor().newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public static FeatureUtils getInstance() {
@@ -40,20 +47,20 @@ public class FeatureUtils {
      * @return The normalized text.
      * @throws IOException If the stopwords cannot be read.
      */
-    public String normalizeString(String input)  {
+    public String normalizeString(String input) {
         if (null == input || input.isBlank())
             return "";
         try {
-            final TokenStream ts = standardAnalyzer.tokenStream("none", input);
-            final SnowballFilter sbf = new SnowballFilter(ts, "English");
+            final SnowballFilter sbf = new SnowballFilter(standardAnalyzer.tokenStream("none", input), englishStemmer);
             sbf.reset();
             final CharTermAttribute cta = sbf.addAttribute(CharTermAttribute.class);
             StringBuilder sb = new StringBuilder();
             while (sbf.incrementToken()) {
                 sb.append(cta.buffer(), 0, cta.length()).append(' ');
             }
+            sbf.end();
+            sbf.close();
             sb.deleteCharAt(sb.length() - 1);
-            sbf.reset();
             return sb.toString();
         } catch (IOException e) {
             throw new RuntimeException(e);

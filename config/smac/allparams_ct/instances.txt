@@ -8,7 +8,3 @@ ct-17-18-19-split6-train
 ct-17-18-19-split7-train
 ct-17-18-19-split8-train
 ct-17-18-19-split9-train
-ct-17
-ct-18
-ct-19
-ct-19-non-cancer

@@ -1,6 +1,6 @@
 [
-  "title^2",
-  "abstract",
-  "meshTags",
-  "genes"
+  "title^{{title_field_boost}}",
+  "abstract^{{abstract_field_boost}}",
+  "meshTags^{{meshTags_field_boost}}",
+  "genes^{{genes_field_boost}}"
 ]

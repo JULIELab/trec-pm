@@ -3,6 +3,7 @@ package at.medunigraz.imi.bst.trec.search;
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
+import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.java.utilities.cache.CacheAccess;
@@ -87,12 +88,15 @@ public class ElasticSearch implements SearchEngine {
         }
         LOG.trace(JsonUtils.prettify(jsonQuery));
         String cacheKey = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "");
+        cacheKey = cacheKey.replaceAll("\\s+", " ");
         LOG.trace("Query ID for cache: {}", cacheKey);
         List<Result> result = cache.get(cacheKey);
         if (result == null) {
             LOG.trace("Query is not cached, getting result from ES");
             if (!(parameters instanceof NoParameters)) {
-                //                ElasticSearchSetup.
+                if (client == null)
+                    client = ElasticClientFactory.getClient();
+                ElasticSearchSetup.configureSimilarity(index, true, parameters, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
             }
 
             result = query(qb, size);

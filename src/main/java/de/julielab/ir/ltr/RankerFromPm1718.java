@@ -11,6 +11,7 @@ import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import ciir.umass.edu.learning.RANKER_TYPE;
 import ciir.umass.edu.metric.METRIC;
+import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
@@ -86,6 +87,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
         ElasticClientFactory.getClient().close();
         OriginalDocumentRetrieval.getInstance().shutdown();
         FastTextEmbeddingFeatures.shutdown();
+        Multithreading.getInstance().shutdown();
     }
 
     public void trainModel() {

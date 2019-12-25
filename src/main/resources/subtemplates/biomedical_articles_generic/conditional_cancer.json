@@ -2,11 +2,11 @@
   "bool": {
     "should": {
       "multi_match": {
-        "query": "{{[positive_pm_boosters]}}",
+        "query": "{{[cancerBoosters]}}",
         "fields": {{biomedical_articles_generic/fields.json}},
         "tie_breaker": 0.3,
-        "type": "best_fields"
-        "boost": {{positive_kw_boost}}
+        "type": "best_fields",
+        "boost": {{conditional_cancer_boost}}
       }
     }
   }

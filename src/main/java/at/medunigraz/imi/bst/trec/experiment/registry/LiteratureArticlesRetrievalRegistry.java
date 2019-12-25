@@ -5,9 +5,14 @@ import at.medunigraz.imi.bst.retrieval.StoredFieldsRegistry;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Task;
+import de.julielab.ir.es.BM25Parameters;
+import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static de.julielab.ir.ltr.features.PMFCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
@@ -21,6 +26,7 @@ public final class LiteratureArticlesRetrievalRegistry {
     private static final String BOOST_TEMPLATE = "/templates/biomedical_articles/boost.json";
     private static final String JULIE_COMMON_TEMPLATE = "/templates/biomedical_articles/jlpmcommon.json";
     private static final String JULIE_COMMON2_TEMPLATE = "/templates/biomedical_articles/jlpmcommon2.json";
+    private static final String JULIE_COMMON2_TEMPLATE_NO_EXTRA = "/templates/biomedical_articles/jlpmcommon2_noextra.json";
     private static final String JULIE_COMMON2_ONE_POS_CLAUSE_TEMPLATE = "/templates/biomedical_articles/jlpmcommon2_onepositiveclause.json";
     private static final String JULIE_BOOST_TEMPLATE = "/templates/biomedical_articles/jlpmboost.json";
     private static final String SYNONYMS_FILE = "/synonyms/trec-synonyms.txt";
@@ -75,6 +81,14 @@ public final class LiteratureArticlesRetrievalRegistry {
     public static TrecPmRetrieval jlpmcommon2(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer().withSimilarityParameters(new BM25Parameters(1,1));
+    }
+
+    public static TrecPmRetrieval jlpmcommon2noextra(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE_NO_EXTRA)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
                 .withConditionalCancer();
@@ -137,7 +151,7 @@ public final class LiteratureArticlesRetrievalRegistry {
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
-                .withExperimentName("jlpmcommon2")
+                .withExperimentName("jlpmcommon2gen")
                 .withSubTemplate(conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATE)));
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
@@ -156,9 +170,21 @@ public final class LiteratureArticlesRetrievalRegistry {
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
 
+
+        Map<String, String> templateProperties = new HashMap<>();
+        templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));
+        templateProperties.put("negative_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, NEGATIVEPM)));
+        ret.withProperties(templateProperties);
+
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
+
+        // TODO: field weights
+        // TODO query weights
+
+        SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
+        ret.withSimilarityParameters(similarityParameters);
 
         return ret;
     }

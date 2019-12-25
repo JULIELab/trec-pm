@@ -3,13 +3,10 @@
     "should": {
       "multi_match": {
         "query": "{{negative_pm_boosters}}",
-        "fields": [
-          "title^2",
-          "abstract"
-        ],
+        "fields": {{biomedical_articles_generic/fields.json}},
         "tie_breaker": 0.3,
         "type": "best_fields",
-        "boost": {{neg_keywords_boost}}
+        "boost": {{negative_kw _boost}}
       }
     }
   }

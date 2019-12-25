@@ -15,30 +15,46 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     String getDatasetId();
 
-    default List<List<Q>> createStratifiedQueryPartitioning(int nPartitions, Function<Q, String> topicProperty) {
-        // We will first group all the topics by the property to be stratified by, e.g. the disease topic field.
-        // Then we will iterate through the (initially empty) partitions as long as there are still topics to distribute.
-        // For each iteration round we put one topic from each property value into the current partition.
-        // This way, the different property values are as well distributed over the partitions as possible.
-        final Map<String, Deque<Q>> topicsByProperty = getQueries().collect(Collectors.groupingBy(topicProperty, LinkedHashMap::new, Collectors.toCollection(ArrayDeque::new)));
-
-        List<Map.Entry<String, Deque<Q>>> propertiesSortedByFrequency = new ArrayList<>(topicsByProperty.entrySet());
-        propertiesSortedByFrequency.sort((e1,e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()));
-        final ArrayDeque<Map.Entry<String, Deque<Q>>> deque = new ArrayDeque<>(propertiesSortedByFrequency);
+    /**
+     * <p>Creates <tt>nPartitions</tt> partitions balanced for the query properties obtained by the given functions.</p>
+     * <p>
+     * The idea is to sort all the queries of this gold standard in the order of the properties given with
+     * <tt>topicProperties</tt>. Multiple property functions mean that the queries are sorted by the first
+     * property first, then by the second, then the third etc. until two queries are deemed different or
+     * the last property in <tt>topicProperties</tt> has been used for comparison.
+     * </p>
+     * <p>
+     * Then, the partitions are filled be iterating once over the sorted queries and let the partitions take turns
+     * in adding the current query to them.
+     * </p>
+     *
+     * @param nPartitions The number of partitions to create.
+     * @param topicProperties The functions returning the property to sort the queries by.
+     * @return The query-property-balanced partitions.
+     */
+    default List<List<Q>> createPropertyBalancedQueryPartitioning(int nPartitions, List<Function<Q, String>> topicProperties) {
+        Stream<Q> sortedQueries = getQueries().sorted((q1, q2) -> {
+            int comparison = 0;
+            int numProp = 0;
+            while (comparison == 0 && numProp < topicProperties.size()) {
+                Function<Q, String> queryPropertyFun = topicProperties.get(numProp);
+                String prop1 = queryPropertyFun.apply(q1);
+                String prop2 = queryPropertyFun.apply(q2);
+                comparison = prop1.compareTo(prop2);
+            }
+            return comparison;
+        });
 
         List<List<Q>> partitioning = new ArrayList<>();
         for (int i = 0; i < nPartitions; i++)
             partitioning.add(new ArrayList<>());
 
-        while (!deque.isEmpty()) {
-            for (List<Q> partition : partitioning) {
-                if (deque.isEmpty())
-                    break;
-                final Q pop = deque.peekFirst().getValue().pop();
-                partition.add(pop);
-                if (deque.peekFirst().getValue().isEmpty())
-                    deque.removeFirst();
-            }
+        int i = 0;
+        Iterator<Q> qIt = sortedQueries.iterator();
+        while (qIt.hasNext()) {
+            Q next = qIt.next();
+            partitioning.get(i % nPartitions).add(next);
+            ++i;
         }
         return partitioning;
     }
@@ -68,12 +84,14 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     /**
      * Writes the underlying data structure to a traditional qrel file.
+     *
      * @param qrelFile
      */
     void writeQrelFile(File qrelFile);
 
     /**
-     *  Writes the underlying data structure to a sample qrel file, if possible.
+     * Writes the underlying data structure to a sample qrel file, if possible.
+     *
      * @param qrelFile
      */
     void writeSampleQrelFile(File qrelFile);

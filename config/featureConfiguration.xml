@@ -71,9 +71,10 @@
             <cancer>
                 <cancer>true</cancer>
             </cancer>
-            <generalpm></generalpm>
+            <positivepm></positivepm>
         </keywords>
         <extraboost>true</extraboost>
+        <existsabstract>true</existsabstract>
         <templateparameters>
             <disease>
                 <disease_match_type>best_fields</disease_match_type>
@@ -89,6 +90,13 @@
             <meshTags_boost>1</meshTags_boost>
             <match_all_boost>-100</match_all_boost>
             <neg_keywords_boost>-1</neg_keywords_boost>
+            <exists_abstract_boost>2</exists_abstract_boost>
+            <fieldboosts>
+                <title_field_boost>2</title_field_boost>
+                <abstract_field_boost>1</abstract_field_boost>
+                <meshTags_field_boost>1</meshTags_field_boost>
+                <genes_field_boost>1</genes_field_boost>
+            </fieldboosts>
         </templateparameters>
     </retrievalparameters>
 </configuration>

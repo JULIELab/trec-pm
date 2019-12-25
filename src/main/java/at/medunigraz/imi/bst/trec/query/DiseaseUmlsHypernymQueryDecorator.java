@@ -10,14 +10,13 @@ import java.util.Set;
 
 public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
 
-    private UmlsSynsetProvider synsetProvider;
-    private UmlsRelationsProvider relationsProvider;
+    private transient UmlsSynsetProvider synsetProvider;
+    private transient UmlsRelationsProvider relationsProvider;
 
     public DiseaseUmlsHypernymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
-        synsetProvider = UmlsSynsetProvider.getInstance();
-        relationsProvider = UmlsRelationsProvider.getInstance();
     }
+
 
     /**
      * For tests.
@@ -40,6 +39,10 @@ public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
     @Override
     public Topic expandTopic(Topic topic) {
         String disease = topic.getDisease();
+        if (synsetProvider == null) {
+            synsetProvider = UmlsSynsetProvider.getInstance();
+            relationsProvider = UmlsRelationsProvider.getInstance();
+        }
 
         final Set<String> cuis = synsetProvider.getCuis(disease);
 
@@ -49,5 +52,6 @@ public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
         }
         return topic;
     }
+
 
 }

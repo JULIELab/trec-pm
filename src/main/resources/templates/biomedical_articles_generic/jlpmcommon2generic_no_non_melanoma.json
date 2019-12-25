@@ -11,9 +11,6 @@
 			{{biomedical_articles_generic/negative_boosters.json}},
 			{{biomedical_articles_generic/exists_abstract.json}},
 			{{biomedical_articles_generic/exists_filtered_treatment.json}}
-		],
-		"must_not": [
-			{{biomedical_articles/non_melanoma.json}}
 		]
 	}
 }

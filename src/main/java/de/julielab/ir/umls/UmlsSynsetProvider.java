@@ -75,14 +75,16 @@ public class UmlsSynsetProvider {
 
     public static UmlsSynsetProvider getInstance() {
         if (instance == null) {
-            instance = new UmlsSynsetProvider(defaultSynsetFile, defaultSemanticTypesFile, DEFAULT_SEPARATOR, false, true);
+            boolean useCache = true;
+            instance = new UmlsSynsetProvider(defaultSynsetFile, defaultSemanticTypesFile, DEFAULT_SEPARATOR, false, useCache);
+            log.debug("Is caching used for {}: {}", UmlsSynsetProvider.class.getSimpleName(), useCache);
         }
         return instance;
     }
 
     private Set<UmlsSynset> getSynsetsFromFile(String umlsSynsetFile, String separator, boolean containTermInSynset, String inputTerm) throws IOException {
         Set<UmlsSynset> ret = new HashSet<>();
-        log.debug("Reading file {} to obtain synsets for {}", umlsSynsetFile, inputTerm);
+        log.trace("Reading file {} to obtain synsets for {}", umlsSynsetFile, inputTerm);
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);
@@ -145,7 +147,7 @@ public class UmlsSynsetProvider {
 
     private UmlsSynset getCuiSynsetFromFile(String umlsSynsetFile, String separator, String cui) throws IOException {
         UmlsSynset ret = UmlsSynset.EMPTY;
-        log.debug("Reading file {} to obtain CUI synsets for {}", umlsSynsetFile, cui);
+        log.trace("Reading file {} to obtain CUI synsets for {}", umlsSynsetFile, cui);
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             final Optional<UmlsSynset> synSet = br.lines()
                     .map(line -> line.split(separator))
@@ -167,7 +169,7 @@ public class UmlsSynsetProvider {
 
     private Set<String> getCuisFromFile(String umlsSynsetFile, String separator, String term) throws IOException {
         Set<String> cuis = new HashSet<>();
-        log.debug("Reading file {} to obtain CUIs for {}", umlsSynsetFile, term);
+        log.trace("Reading file {} to obtain CUIs for {}", umlsSynsetFile, term);
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);

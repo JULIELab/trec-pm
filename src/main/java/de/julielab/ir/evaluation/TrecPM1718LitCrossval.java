@@ -30,10 +30,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,7 +59,7 @@ public class TrecPM1718LitCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedQueryPartitioning(CROSSVAL_SIZE, Topic::getDisease);
+        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createPropertyBalancedQueryPartitioning(CROSSVAL_SIZE, Arrays.asList(Topic::getDisease));
 
         final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();

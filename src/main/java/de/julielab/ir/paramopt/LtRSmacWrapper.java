@@ -29,10 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -74,7 +71,7 @@ public class LtRSmacWrapper extends SmacWrapperBase {
     @Override
     protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
         FeatureControlCenter.initialize(config.configurationAt(FCConstants.LTRFEATURES));
-        final List<List<Topic>> splits = gs.createStratifiedQueryPartitioning(nPartitions, t -> t.getDisease());
+        final List<List<Topic>> splits = gs.createPropertyBalancedQueryPartitioning(nPartitions, Arrays.asList(t -> t.getDisease()));
         int splitNum = Integer.valueOf(instance.replace("crossval-", ""));
 
         return calculateScoreForSplit(config, splitNum, splits);
