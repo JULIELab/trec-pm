@@ -105,14 +105,14 @@ public class FeatureControlCenter {
         return sb.toString();
     }
 
-    public static Map<String, Double> getWeightsFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String weightsConfigurationPath) {
-        Map<String, Double> weights = new HashMap<>();
+    public static Map<String, String> getWeightsFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String weightsConfigurationPath) {
+        Map<String, String> weights = new HashMap<>();
         List<HierarchicalConfiguration<ImmutableNode>> weightConfigs = config.configurationsAt(weightsConfigurationPath);
         for (HierarchicalConfiguration<ImmutableNode> wconfig : weightConfigs) {
             Iterator<String> keys = wconfig.getKeys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                weights.put(key, wconfig.getDouble(key));
+                weights.put(key, wconfig.getString(key));
             }
         }
         return weights;

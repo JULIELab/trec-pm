@@ -8,12 +8,14 @@ import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.BM25Parameters;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
+import de.julielab.ir.ltr.features.PMFCConstants;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.julielab.ir.ltr.features.FCConstants.TEMPLATEPARAMETERS;
 import static de.julielab.ir.ltr.features.PMFCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
@@ -175,13 +177,13 @@ public final class LiteratureArticlesRetrievalRegistry {
         templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));
         templateProperties.put("negative_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, NEGATIVEPM)));
         ret.withProperties(templateProperties);
-
+        // Field boosts
+        templateProperties.putAll(FeatureControlCenter.getWeightsFromFeatureConfiguration(retrievalConfig, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, FIELDBOOSTS)));
+        // Keyword clause boosts
+        templateProperties.putAll(FeatureControlCenter.getWeightsFromFeatureConfiguration(retrievalConfig, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, KEYWORDBOOSTS)));
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
-
-        // TODO: field weights
-        // TODO query weights
 
         SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
         ret.withSimilarityParameters(similarityParameters);
@@ -193,8 +195,8 @@ public final class LiteratureArticlesRetrievalRegistry {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
-        String matchAllBoost = conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, MATCH_ALL_BOOST));
-        String negKeywordsBoost = conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, NEG_KEYWORDS_BOOST));
+        String matchAllBoost = conf.getString(slash(RETRIEVALPARAMETERS, PMFCConstants.TEMPLATEPARAMETERS, MATCH_ALL_BOOST));
+        String negKeywordsBoost = conf.getString(slash(RETRIEVALPARAMETERS, PMFCConstants.TEMPLATEPARAMETERS, NEG_KEYWORDS_BOOST));
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
                 .withExperimentName("jlpmcommon2");
         ret.withProperties(MATCH_ALL_BOOST, matchAllBoost, NEG_KEYWORDS_BOOST, negKeywordsBoost)
