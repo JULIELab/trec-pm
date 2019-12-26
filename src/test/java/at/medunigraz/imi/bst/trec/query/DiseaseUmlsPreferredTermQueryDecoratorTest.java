@@ -7,22 +7,24 @@ import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class DiseaseUmlsSynonymQueryDecoratorTest {
-    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
-        private UmlsSynsetTestProvider(boolean containTermInSynset) {
-            super("src/test/resources/umls/melanoma.synset", "src/test/resources/umls/semanticTypes.test", "src/test/resources/umls/example.prefterms",UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
-        }
-    }
+
+public class DiseaseUmlsPreferredTermQueryDecoratorTest {
     @Test
     public void testPmTopics() {
         DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
-        final DiseaseUmlsPreferredTermQueryDecorator decorator = new DiseaseUmlsPreferredTermQueryDecorator(dummyQuery);
+        final DiseaseUmlsSynonymQueryDecorator decorator = new DiseaseUmlsSynonymQueryDecorator(dummyQuery);
         decorator.setUmlsSynsetProvider(new UmlsSynsetTestProvider(false));
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
         for (Topic topic : topicSet.getTopics()) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))
-                assertThat(topic.getDiseasePreferredTerm()).contains("Apref");
+                assertThat(topic.getDiseaseSynonyms()).contains("melanoma synonym");
+        }
+    }
+
+    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
+        private UmlsSynsetTestProvider(boolean containTermInSynset) {
+            super("src/test/resources/umls/melanoma.synset", "src/test/resources/umls/semanticTypes.test", "src/test/resources/umls/example.prefterms",UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
         }
     }
 }

@@ -77,6 +77,11 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         return this;
     }
 
+    public TrecPmRetrieval withUmlsDiseasePreferredTerm() {
+        query = new DiseaseUmlsPreferredTermQueryDecorator(query);
+        return this;
+    }
+
     public TrecPmRetrieval withSolidTumor() {
 
         query = new SolidTumorQueryDecorator(query);
@@ -115,4 +120,6 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         query = new FeatureControlledConditionalCancerQueryDecorator(query);
         return this;
     }
+
+
 }

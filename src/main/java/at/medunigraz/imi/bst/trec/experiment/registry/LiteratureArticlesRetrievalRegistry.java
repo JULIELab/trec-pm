@@ -164,9 +164,9 @@ public final class LiteratureArticlesRetrievalRegistry {
         if (retrievalConfig.getBoolean(SYNONYMLIST))
             ret.withSynonymList(SYNONYMS_FILE);
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
-            ret.withDiseasePreferredTerm();
+            ret.withUmlsDiseasePreferredTerm();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS)))
-            ret.withDiseaseSynonym();
+            ret.withUmlsDiseaseSynonym();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
 
