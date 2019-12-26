@@ -8,6 +8,7 @@ import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A list of documents they either represent labeled data for training or unlabeled data to be ranked.
@@ -32,6 +33,11 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
             documents.add(doc);
         }
         return documents;
+    }
+
+    public DocumentList<Q> getQuerySubset(Collection<Q> queries) {
+        Set<String> queryIds = queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
+        return stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId())).collect(Collectors.toCollection(DocumentList::new));
     }
 
     /**

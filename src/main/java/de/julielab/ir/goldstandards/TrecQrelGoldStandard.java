@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
 
@@ -67,9 +68,15 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     }
 
     public void writeQrelFile(File qrelFile) {
-        List<String> lines = new ArrayList<>();
+        writeQrelFile(qrelFile, null);
+    }
 
-        for (Document<?> d : qrelDocuments) {
+    public void writeQrelFile(File qrelFile, List<Q> queries) {
+        List<String> lines = new ArrayList<>();
+        Set<String> queryIds = queries == null ? null : queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
+        Stream<Document<Q>> documents = queries == null ? qrelDocuments.stream() : qrelDocuments.stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId()));
+
+        for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
             // Do not write documents not judged.
             if (d.getRelevance() != -1) {
                 lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
@@ -80,12 +87,18 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     }
 
     public void writeSampleQrelFile(File qrelFile) {
+        writeSampleQrelFile(qrelFile, null);
+    }
+
+    public void writeSampleQrelFile(File qrelFile, List<Q> queries) {
         if (!isSampleGoldStandard()) {
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }
+        Set<String> queryIds = queries == null ? null : queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
+        Stream<Document<Q>> documents = queries == null ? qrelDocuments.stream() : qrelDocuments.stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId()));
 
         List<String> lines = new ArrayList<>();
-        for (Document<?> d : qrelDocuments) {
+        for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
             lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
         }
 

@@ -90,12 +90,16 @@ public interface GoldStandard<Q extends QueryDescription> {
      */
     void writeQrelFile(File qrelFile);
 
+     void writeQrelFile(File qrelFile, Collection<Q> queries);
+
     /**
      * Writes the underlying data structure to a sample qrel file, if possible.
      *
      * @param qrelFile
      */
     void writeSampleQrelFile(File qrelFile);
+
+    void writeSampleQrelFile(File qrelFile, Collection<Q> queries);
 
     boolean isSampleGoldStandard();
 

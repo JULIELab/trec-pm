@@ -1,5 +1,9 @@
 package de.julielab.ir.paramopt;
 
+import de.julielab.ir.TrecCacheConfiguration;
+import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
+import de.julielab.java.utilities.cache.CacheService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +37,9 @@ public class HttpParamOptServer {
     }
 
     public void startServer() {
-        post("/" + GET_CONFIG_SCORE, new EvaluateConfigurationRoute());
+        CacheService.initialize(new TrecCacheConfiguration());
+
+        post("/" + GET_CONFIG_SCORE, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019())));
 
         log.info("Server is ready for requests.");
     }

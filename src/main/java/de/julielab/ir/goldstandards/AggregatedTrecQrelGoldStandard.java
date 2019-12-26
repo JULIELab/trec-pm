@@ -44,12 +44,26 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
     }
 
     @Override
+    public void writeQrelFile(File qrelFile, Collection<Q> queries) {
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments().getQuerySubset(queries), qrelRecordFunction);
+    }
+
+    @Override
     public void writeSampleQrelFile(File qrelFile) {
         if (!isSampleGoldStandard()) {
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }
 
         writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments(), sampleQrelRecordFunction);
+    }
+
+    @Override
+    public void writeSampleQrelFile(File qrelFile, Collection<Q> queries) {
+        if (!isSampleGoldStandard()) {
+            throw new UnsupportedOperationException("This is not a sample gold standard.");
+        }
+
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments().getQuerySubset(queries), sampleQrelRecordFunction);
     }
 
     /**
