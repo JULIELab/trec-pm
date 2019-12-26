@@ -72,7 +72,7 @@ public class ElasticSearchSetup {
     ;
 
     public static void main(String args[]) {
-        createPubmedIndices();
+        //createPubmedIndices();
         createCtIndices();
 //        deletePubmedIndices();
 //        deleteCtIndices();
