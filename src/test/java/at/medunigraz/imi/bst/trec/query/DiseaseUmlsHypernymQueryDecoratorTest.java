@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DiseaseUmlsHypernymQueryDecoratorTest {
     private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
         private UmlsSynsetTestProvider() {
-            super("src/test/resources/umls/melanoma.synset", "src/test/resources/umls/semanticTypes.test",UmlsSynsetProvider.DEFAULT_SEPARATOR, false, false);
+            super("src/test/resources/umls/melanoma.synset", "src/test/resources/umls/semanticTypes.test","src/test/resources/umls/example.prefterms", UmlsSynsetProvider.DEFAULT_SEPARATOR, false, false);
         }
     }
     private class UmlsRelationsTestProvider extends UmlsRelationsProvider{

@@ -9,10 +9,10 @@ import static org.junit.Assert.assertEquals;
 
 public class UmlsSynsetProviderTest {
 
-    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
-        private UmlsSynsetTestProvider(boolean containTermInSynset) {
-            super("src/test/resources/umls/example.synsets", "src/test/resources/umls/semanticTypes.test", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
-        }
+    @Test
+    public void getPreferredTermForTerm() {
+        UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
+        assertThat(u.getPreftermForTerm("A")).isEqualTo("Bpref");
     }
 
     @Test
@@ -55,5 +55,11 @@ public class UmlsSynsetProviderTest {
         // The term 'A' is associated with CUI1 and CUI2 in the examplet.synsets file. Those
         // have been set the semantic types tested for.
         assertThat(u.getSemanticTypes("A")).containsExactlyInAnyOrder("T121", "T130", "T109");
+    }
+
+    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
+        private UmlsSynsetTestProvider(boolean containTermInSynset) {
+            super("src/test/resources/umls/example.synsets", "src/test/resources/umls/semanticTypes.test", "src/test/resources/umls/example.prefterms",UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
+        }
     }
 }

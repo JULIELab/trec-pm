@@ -9,10 +9,8 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UmlsSynsetProvider {
@@ -20,34 +18,20 @@ public class UmlsSynsetProvider {
     private static final Logger log = LogManager.getLogger();
     private static String defaultSynsetFile = "resources/umlsSynsets.txt.gz";
     private static String defaultSemanticTypesFile = "resources/umlsSemanticTypes.txt.gz";
+    private static String defaultPreferredTermsFile = "resources/umlsPreferredTerms.txt.gz";
     private static UmlsSynsetProvider instance;
     private final String umlsSynsetFile;
     private final String umlsSemanticTypesFile;
+    private final String umlsPreferredTermsFile;
     private final String separator;
     private final boolean useCache;
     private final boolean containTermInSynset;
     private CacheAccess<String, Set<String>> cuisForTermCache;
     private CacheAccess<String, UmlsSynset> cuiSynsetCache;
     private CacheAccess<String, Set<UmlsSynset>> synsetCache;
-    private CacheAccess<String,  Set<String>> semanticTypesCache;
+    private CacheAccess<String, Set<String>> semanticTypesCache;
+    private CacheAccess<String, String> preftermForCuiCache;
 
-    /**
-     * Sets the default file to load the UMLS synsets from. Only has an effect if called before the first
-     * call to {@link #getInstance()}.
-     * @param file
-     */
-    public static void setDefaultSynsetFile(String file) {
-        defaultSynsetFile = file;
-    }
-
-    /**
-     * Sets the default file to load the UMLS semantic types from. Only has an effect if called before the first
-     * call to {@link #getInstance()}.
-     * @param file
-     */
-    public static void setDefaultSemanticTypesFile(String file) {
-        defaultSemanticTypesFile = file;
-    }
     /**
      * Provides synsets for a term
      *
@@ -55,11 +39,12 @@ public class UmlsSynsetProvider {
      * @param separator           Used in synset file to separate terms
      * @param containTermInSynset Is term part of its own synset?
      */
-    protected UmlsSynsetProvider(String umlsSynsetFile, String umlsSemanticTypesFile, String separator,
+    protected UmlsSynsetProvider(String umlsSynsetFile, String umlsSemanticTypesFile, String umlsPreferredTermsFile, String separator,
                                  boolean containTermInSynset, boolean useCache) {
 
         this.umlsSynsetFile = umlsSynsetFile;
         this.umlsSemanticTypesFile = umlsSemanticTypesFile;
+        this.umlsPreferredTermsFile = umlsPreferredTermsFile;
         this.separator = separator;
         this.containTermInSynset = containTermInSynset;
         this.useCache = useCache;
@@ -69,14 +54,34 @@ public class UmlsSynsetProvider {
             cuisForTermCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIsForTerms", CacheAccess.STRING, CacheAccess.JAVA);
             cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
             semanticTypesCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISymanticTypes", CacheAccess.STRING, CacheAccess.JAVA);
+            preftermForCuiCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIPrefTerms", CacheAccess.STRING, CacheAccess.STRING);
         }
     }
 
+    /**
+     * Sets the default file to load the UMLS synsets from. Only has an effect if called before the first
+     * call to {@link #getInstance()}.
+     *
+     * @param file
+     */
+    public static void setDefaultSynsetFile(String file) {
+        defaultSynsetFile = file;
+    }
+
+    /**
+     * Sets the default file to load the UMLS semantic types from. Only has an effect if called before the first
+     * call to {@link #getInstance()}.
+     *
+     * @param file
+     */
+    public static void setDefaultSemanticTypesFile(String file) {
+        defaultSemanticTypesFile = file;
+    }
 
     public static UmlsSynsetProvider getInstance() {
         if (instance == null) {
             boolean useCache = true;
-            instance = new UmlsSynsetProvider(defaultSynsetFile, defaultSemanticTypesFile, DEFAULT_SEPARATOR, false, useCache);
+            instance = new UmlsSynsetProvider(defaultSynsetFile, defaultSemanticTypesFile, defaultPreferredTermsFile,DEFAULT_SEPARATOR, false, useCache);
             log.debug("Is caching used for {}: {}", UmlsSynsetProvider.class.getSimpleName(), useCache);
         }
         return instance;
@@ -101,6 +106,44 @@ public class UmlsSynsetProvider {
             });
         }
         return ret;
+    }
+
+    private String getPreftermFromFile(String umlsPreftermsFile, String separator, String cui) throws IOException {
+        log.trace("Reading file {} to obtain the preferred term for {}", umlsPreftermsFile, cui);
+        String prefTerm = null;
+        try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsPreftermsFile))) {
+            Optional<String> prefTermOpt = br.lines().map(line -> line.split(separator)).filter(split -> split[0].equals(cui)).map(split -> split[1]).findAny();
+            if (prefTermOpt.isPresent()) {
+                prefTerm = prefTermOpt.get();
+                if (useCache)
+                    preftermForCuiCache.put(cui, prefTerm);
+            }
+        }
+        return prefTerm;
+    }
+
+    public String getPreftermForCui(String cui) {
+        String prefTerm = useCache ? preftermForCuiCache.get(cui) : null;
+        if (prefTerm == null) {
+            try {
+                prefTerm = getPreftermFromFile(umlsPreferredTermsFile, separator, cui);
+            } catch (IOException e) {
+                log.error("Could not retrieve the preferred term for CUI {}", cui, e);
+            }
+        }
+        return prefTerm;
+    }
+
+    public String getPreftermForTerm(String term) {
+        Optional<List<String>> mostFrequentPrefTerm = getCuis(term).stream()
+                .map(this::getPreftermForCui)
+                .collect(Collectors.groupingBy(Function.identity()))
+                .values().stream()
+                .sorted(Comparator.<Collection>comparingInt(Collection::size).reversed())
+                .findFirst();
+        if (mostFrequentPrefTerm.isPresent())
+            return mostFrequentPrefTerm.get().get(0);
+        return null;
     }
 
     public Set<UmlsSynset> getSynsets(String term) {
@@ -184,7 +227,7 @@ public class UmlsSynsetProvider {
         return cuis;
     }
 
-    public  Set<String> getSemanticTypeForCui(String cui) {
+    public Set<String> getSemanticTypeForCui(String cui) {
         Set<String> semTypes = useCache ? semanticTypesCache.get(cui) : null;
         if (semTypes == null) {
             semTypes = getSemanticTypeFromFile(umlsSemanticTypesFile, separator, cui);
@@ -197,7 +240,7 @@ public class UmlsSynsetProvider {
     private Set<String> getSemanticTypeFromFile(String umlsSemanticTypesFile, String separator, String cui) {
         Set<String> types = null;
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSemanticTypesFile))) {
-          types = br.lines().map(line -> line.split(separator)).filter(split -> split[0].equals(cui)).map(split -> split[1]).collect(Collectors.toSet());
+            types = br.lines().map(line -> line.split(separator)).filter(split -> split[0].equals(cui)).map(split -> split[1]).collect(Collectors.toSet());
         } catch (IOException e) {
             e.printStackTrace();
         }
