@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -104,8 +105,18 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     }
 
     @Override
+    public void writeQrelFile(File qrelFile, Collection<Q> queries) {
+        throw new NotImplementedException("Use TrecQrelGoldStandard.writeQrelFile instead.");
+    }
+
+    @Override
     public void writeSampleQrelFile(File qrelFile) {
         throw new NotImplementedException("Use TrecQrelGoldStandard.writeSampleQrelFile instead.");
+    }
+
+    @Override
+    public void writeSampleQrelFile(File qrelFile, Collection<Q> queries) {
+        throw new NotImplementedException("Use TrecQrelGoldStandard.writeQrelFile instead.");
     }
 
     @Override

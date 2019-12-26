@@ -1,8 +1,14 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.java.utilities.ConfigurationUtilities;
+import org.apache.commons.configuration2.ConfigurationUtils;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -79,5 +85,20 @@ public class GoldStandardTest {
             c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRCA")).count();
             assertTrue(c <= 1);
         }
+    }
+
+    @Test
+    public void muh() throws ConfigurationException {
+        HierarchicalConfiguration<ImmutableNode> c = ConfigurationUtilities.createEmptyConfiguration();
+
+        String xpath = "/retrievalparameters/keywords/chemotherapy/word";
+        c.addProperty(xpath, "");
+        c.addProperty(xpath+" @attr", "*mab");
+
+
+        System.out.println(ConfigurationUtils.toString(c));
+        System.out.println(c.getString(xpath));
+        ConfigurationUtilities.writeConfiguration(c, new File("myconfig.xml"));
+
     }
 }

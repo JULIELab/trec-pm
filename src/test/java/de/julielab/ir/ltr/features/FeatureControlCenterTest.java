@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.Map;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
+import static de.julielab.ir.ltr.features.PMFCConstants.CHEMOTHERAPY;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 import static org.assertj.core.api.Assertions.assertThat;
 public class FeatureControlCenterTest {
@@ -24,5 +25,12 @@ public class FeatureControlCenterTest {
         assertThat(clauseBoosts.get("match_all_boost")).isEqualTo("-100");
         assertThat(clauseBoosts.get("neg_keywords_boost")).isEqualTo("-1");
         assertThat(clauseBoosts.get("exists_abstract_boost")).isEqualTo("2");
+    }
+
+    @Test
+    public void getKeywordsFromFeatureConfiguration() throws Exception {
+        XMLConfiguration config = ConfigurationUtilities.loadXmlConfiguration(new File("src/test/resources/feature-control-center/keywordsFeatureTestConfiguration.xml"));
+        String keywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CHEMOTHERAPY));
+        assertThat(keywords).contains("cancer").contains("il2").doesNotContain("tubes");
     }
 }

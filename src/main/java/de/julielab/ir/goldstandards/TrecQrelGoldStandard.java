@@ -71,7 +71,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         writeQrelFile(qrelFile, null);
     }
 
-    public void writeQrelFile(File qrelFile, List<Q> queries) {
+    @Override
+    public void writeQrelFile(File qrelFile, Collection<Q> queries) {
         List<String> lines = new ArrayList<>();
         Set<String> queryIds = queries == null ? null : queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
         Stream<Document<Q>> documents = queries == null ? qrelDocuments.stream() : qrelDocuments.stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId()));
@@ -90,7 +91,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         writeSampleQrelFile(qrelFile, null);
     }
 
-    public void writeSampleQrelFile(File qrelFile, List<Q> queries) {
+    @Override
+    public void writeSampleQrelFile(File qrelFile, Collection<Q> queries) {
         if (!isSampleGoldStandard()) {
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }

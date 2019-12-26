@@ -67,11 +67,8 @@
         </geneexpansion>
         <synonymlist>true</synonymlist>
         <keywords>
-            <chemotherapy></chemotherapy>
-            <cancer>
-                <cancer>true</cancer>
-            </cancer>
-            <positivepm></positivepm>
+            <chemotherapy word="cancer">true</chemotherapy>
+            <positivepm word="treatment">true</positivepm>
         </keywords>
         <extraboost>true</extraboost>
         <existsabstract>true</existsabstract>

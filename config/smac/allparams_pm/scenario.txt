@@ -4,4 +4,4 @@ cutoffTime = 300
 wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/allparams_pm/instances.txt
-algo =  java -cp "target/lib/*":.:target/classes de.julielab.ir.paramopt.SigirPM19SmacWrapper
+algo = bash scripts/smacOverHttp.sh 32100

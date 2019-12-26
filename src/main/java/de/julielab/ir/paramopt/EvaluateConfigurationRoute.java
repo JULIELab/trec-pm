@@ -61,16 +61,17 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             int cutoffLength = 0;
             int seed = 0;
             List<String> parameters = new ArrayList<>(queryParams.size() - 4);
+            System.out.println(queryParams);
             for (String queryParam : queryParams) {
                 switch (queryParam) {
                     case INSTANCE:
                         instanceName = req.queryParams(queryParam);
                         break;
                     case CUTOFF_TIME:
-                        cutoffTime = Integer.valueOf(req.queryParams(queryParam));
+                        cutoffTime = (int) Math.round(Double.valueOf(req.queryParams(queryParam)));
                         break;
                     case CUTOFF_LENGTH:
-                        cutoffLength = Integer.valueOf(req.queryParams(queryParam));
+                        cutoffLength = (int) Math.round(Double.valueOf(req.queryParams(queryParam)));
                         break;
                     case SEED:
                         seed = Integer.valueOf(req.queryParams(queryParam));

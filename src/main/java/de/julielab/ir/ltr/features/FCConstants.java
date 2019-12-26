@@ -10,6 +10,7 @@ public class FCConstants {
     public static final String FEATURE = "feature";
     public static final String ACTIVE_ATTR = "@active";
     public static final String NAME_ATTR = "@name";
+    public static final String WORD_ATTR = "@word";
     public static final String RETRIEVALPARAMETERS = "retrievalparameters";
     public static final String TEMPLATEPARAMETERS = "templateparameters";
     public static final String TEMPLATE = "template";

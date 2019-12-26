@@ -69,11 +69,9 @@ public class FeatureControlCenter {
      * <pre>
      *             &lt;retrievalparameters&gt;
      *                 &lt;keywords&gt;
-     *                      &lt;chemotherapy&gt;
-     *                          &lt;*mab&gt;true&lt;/*mab&gt;
-     *                          &lt;*nib&gt;false&lt;/*nib&gt;
-     *                          &lt;*cin&gt;true&lt;*cin&gt;
-     *                      &lt;/chemotherapy&gt;
+     *                      &lt;chemotherapy word="*mab"&gt;true&lt/chemotherapy&gt;
+     *                      &lt;chemotherapy word="*nib"&gt;true&lt/chemotherapy&gt;
+     *                      &lt;chemotherapy word="*cin"&gt;true&lt/chemotherapy&gt;
      *                 &lt;/keywords&gt;
      *             &lt;/retrievalparameters&gt;
      *         </pre>
@@ -94,14 +92,11 @@ public class FeatureControlCenter {
         StringBuilder sb = new StringBuilder();
         List<HierarchicalConfiguration<ImmutableNode>> kwConfigs = config.configurationsAt(keywordConfigurationPath);
         for (HierarchicalConfiguration<ImmutableNode> kwconfig : kwConfigs) {
-            Iterator<String> keys = kwconfig.getKeys();
-            while (keys.hasNext()) {
-                String key = keys.next();
-                if (kwconfig.getBoolean(key))
-                    sb.append(key).append(" ");
-            }
+            if (kwconfig.getBoolean(""))
+                sb.append(kwconfig.getString(WORD_ATTR)).append(" ");
         }
-        sb.deleteCharAt(sb.length() - 1);
+        if (sb.length() > 0)
+            sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
 

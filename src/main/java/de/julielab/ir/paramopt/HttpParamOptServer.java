@@ -1,5 +1,8 @@
 package de.julielab.ir.paramopt;
 
+import at.medunigraz.imi.bst.trec.model.Challenge;
+import at.medunigraz.imi.bst.trec.model.GoldStandardType;
+import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
@@ -39,7 +42,7 @@ public class HttpParamOptServer {
     public void startServer() {
         CacheService.initialize(new TrecCacheConfiguration());
 
-        post("/" + GET_CONFIG_SCORE, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019())));
+        post("/" + GET_CONFIG_SCORE, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019()), Challenge.TREC_PM, Task.PUBMED, GoldStandardType.OFFICIAL));
 
         log.info("Server is ready for requests.");
     }
