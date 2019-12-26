@@ -41,6 +41,7 @@ public interface GoldStandard<Q extends QueryDescription> {
                 String prop1 = queryPropertyFun.apply(q1);
                 String prop2 = queryPropertyFun.apply(q2);
                 comparison = prop1.compareTo(prop2);
+                ++numProp;
             }
             return comparison;
         });

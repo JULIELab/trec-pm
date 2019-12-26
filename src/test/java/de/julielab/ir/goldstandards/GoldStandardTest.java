@@ -3,6 +3,7 @@ package de.julielab.ir.goldstandards;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -54,6 +55,29 @@ public class GoldStandardTest {
             if (i >= 5)
                 expectedSize = 5;
             assertEquals("Split " + i + " is of size " + topics.size() + ".", expectedSize, topics.size());
+        }
+    }
+
+    @Test
+    public void testBalancedSplit() {
+        AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
+        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getGeneField));
+        for (List<Topic> l : geneBalancedPartioning) {
+            long c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRAF")).count();
+            assertTrue(c > 0);
+        }
+    }
+
+    @Test
+    public void testMultiplyBalancedSplit() {
+        AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
+        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getDisease));
+        for (List<Topic> l : geneBalancedPartioning) {
+            System.out.println(l.stream().map(t -> t.getDisease() + ", " + t.getGeneField()).collect(Collectors.joining("-")));
+            long c = l.stream().map(Topic::getDisease).filter(d -> d.toLowerCase().contains("melanoma")).count();
+            assertTrue(c > 1);
+            c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRCA")).count();
+            assertTrue(c <= 1);
         }
     }
 }
