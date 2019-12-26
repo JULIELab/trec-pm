@@ -5,7 +5,7 @@
       {
         "multi_match": {
           "query": "{{gene}}",
-          "fields": {{biomedical_articles_generic/gene_fields.json}},
+          "fields": {{biomedical_articles_generic/fields_gene.json}},
           "tie_breaker": 0.3,
           "type": "{{gene_topic_match_type}}",
           "slop": "{{gene_topic_slop}}",

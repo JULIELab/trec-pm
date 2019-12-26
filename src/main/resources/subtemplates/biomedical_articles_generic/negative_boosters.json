@@ -3,7 +3,7 @@
     "should": {
       "multi_match": {
         "query": "{{negative_pm_boosters}}",
-        "fields": {{biomedical_articles_generic/fields.json}},
+        "fields": {{biomedical_articles_generic/fields_keywords.json}},
         "tie_breaker": 0.3,
         "type": "best_fields",
         "boost": {{negative_kw _boost}}

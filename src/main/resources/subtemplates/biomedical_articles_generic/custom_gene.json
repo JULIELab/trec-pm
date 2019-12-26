@@ -1,7 +1,7 @@
 {
   "multi_match": {
     "query": "{{[customGeneExpansions]}}",
-    "fields": {{biomedical_articles/fields.json}},
+    "fields": {{biomedical_articles/fields_gene.json}},
     "tie_breaker": 0.3,
     "type": "{{custom_gene_match_type}}",
     "boost": {{gene_custom_boost}}

@@ -1,7 +1,7 @@
 {
   "multi_match": {
     "query": "{{[customDiseaseExpansions]}}",
-    "fields": {{biomedical_articles/fields.json}},
+    "fields": {{biomedical_articles/fields_disease.json}},
     "tie_breaker": 0.3,
     "type": "{{disease_match_type}}",
     "slop": "{{disease_slop}}",

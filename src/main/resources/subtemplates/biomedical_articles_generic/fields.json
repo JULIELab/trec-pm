@@ -1,5 +1,0 @@
-[
-  "title^{{title_field_boost}}",
-  "abstract^{{abstract_field_boost}}",
-  "meshTags^{{meshTags_field_boost}}"
-]

@@ -20,10 +20,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -95,17 +92,30 @@ public class FeatureControlCenter {
     @NotNull
     public static String getKeywordStringFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String keywordConfigurationPath) {
         StringBuilder sb = new StringBuilder();
-        List<HierarchicalConfiguration<ImmutableNode>> cancerConfigs = config.configurationsAt(keywordConfigurationPath);
-        for (HierarchicalConfiguration<ImmutableNode> cconfig : cancerConfigs) {
-            Iterator<String> keys = cconfig.getKeys();
+        List<HierarchicalConfiguration<ImmutableNode>> kwConfigs = config.configurationsAt(keywordConfigurationPath);
+        for (HierarchicalConfiguration<ImmutableNode> kwconfig : kwConfigs) {
+            Iterator<String> keys = kwconfig.getKeys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                if (cconfig.getBoolean(key))
+                if (kwconfig.getBoolean(key))
                     sb.append(key).append(" ");
             }
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
+    }
+
+    public static Map<String, Double> getWeightsFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String weightsConfigurationPath) {
+        Map<String, Double> weights = new HashMap<>();
+        List<HierarchicalConfiguration<ImmutableNode>> weightConfigs = config.configurationsAt(weightsConfigurationPath);
+        for (HierarchicalConfiguration<ImmutableNode> wconfig : weightConfigs) {
+            Iterator<String> keys = wconfig.getKeys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                weights.put(key, wconfig.getDouble(key));
+            }
+        }
+        return weights;
     }
 
     public boolean isTfIdfActive() {
