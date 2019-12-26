@@ -20,7 +20,7 @@ public class FeatureControlCenterTest {
         assertThat(fieldBoosts.get("title_field_gene_boost")).isEqualTo(3);
         assertThat(fieldBoosts.get("abstract_field_gene_boost")).isEqualTo(5);
 
-        Map<String, Double> clauseBoosts = FeatureControlCenter.getWeightsFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, CLAUSEBOOSTS));
+        Map<String, Double> clauseBoosts = FeatureControlCenter.getWeightsFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, KEYWORDBOOSTS));
         assertThat(clauseBoosts.get("match_all_boost")).isEqualTo(-100);
         assertThat(clauseBoosts.get("neg_keywords_boost")).isEqualTo(-1);
         assertThat(clauseBoosts.get("exists_abstract_boost")).isEqualTo(2);

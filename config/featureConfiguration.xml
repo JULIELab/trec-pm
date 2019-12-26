@@ -84,17 +84,18 @@
                 <gene_match_type>best_fields</gene_match_type>
                 <gene_boost>1</gene_boost>
             </gene>
-            <title_boost>1</title_boost>
-            <abstract_boost>1</abstract_boost>
-            <keyword_boost>1</keyword_boost>
-            <meshTags_boost>1</meshTags_boost>
-            <match_all_boost>-100</match_all_boost>
-            <neg_keywords_boost>-1</neg_keywords_boost>
-            <exists_abstract_boost>2</exists_abstract_boost>
+            <keywordboosts>
+                <match_all_boost>-100</match_all_boost>
+                <neg_keywords_boost>-1</neg_keywords_boost>
+                <exists_abstract_boost>2</exists_abstract_boost>
+            </keywordboosts>
             <fieldboosts>
-                <title_field_boost>2</title_field_boost>
-                <abstract_field_boost>1</abstract_field_boost>
-                <meshTags_field_boost>1</meshTags_field_boost>
+                <title_field_disease_boost>2</title_field_disease_boost>
+                <abstract_field_disease_boost>1</abstract_field_disease_boost>
+                <meshTags_field_disease_boost>1</meshTags_field_disease_boost>
+                <title_field_gene_boost>2</title_field_gene_boost>
+                <abstract_field_gene_boost>1</abstract_field_gene_boost>
+                <meshTags_field_gene_boost>1</meshTags_field_gene_boost>
                 <genes_field_boost>1</genes_field_boost>
             </fieldboosts>
         </templateparameters>

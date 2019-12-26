@@ -18,7 +18,7 @@ public class FCConstants {
     public static final String HYPERNYMS = "hypernyms";
     public static final String KEYWORDS = "keywords";
     public static final String FIELDBOOSTS = "fieldboosts";
-    public static final String CLAUSEBOOSTS = "clauseboosts";
+    public static final String KEYWORDBOOSTS = "keywordboosts";
 
 
     // cannot be instantiated

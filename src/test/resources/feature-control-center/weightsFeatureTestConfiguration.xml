@@ -1,11 +1,11 @@
 <configuration>
     <retrievalparameters>
         <templateparameters>
-            <clauseboosts>
+            <keywordboosts>
                 <match_all_boost>-100</match_all_boost>
                 <neg_keywords_boost>-1</neg_keywords_boost>
                 <exists_abstract_boost>2</exists_abstract_boost>
-            </clauseboosts>
+            </keywordboosts>
             <fieldboosts>
                 <title_field_disease_boost>2</title_field_disease_boost>
                 <abstract_field_disease_boost>1</abstract_field_disease_boost>
