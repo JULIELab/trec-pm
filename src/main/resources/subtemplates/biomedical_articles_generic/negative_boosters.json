@@ -6,7 +6,7 @@
         "fields": {{biomedical_articles_generic/fields_keywords.json}},
         "tie_breaker": 0.3,
         "type": "best_fields",
-        "boost": {{negative_kw _boost}}
+        "boost": {{negative_kw_boost}}
       }
     }
   }

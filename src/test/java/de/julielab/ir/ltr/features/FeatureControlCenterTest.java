@@ -16,12 +16,12 @@ public class FeatureControlCenterTest {
     @Test
     public void getWeightsFromFeatureConfiguration() throws Exception {
         XMLConfiguration config = ConfigurationUtilities.loadXmlConfiguration(new File("src/test/resources/feature-control-center/weightsFeatureTestConfiguration.xml"));
-        Map<String, String> fieldBoosts = FeatureControlCenter.getWeightsFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, FIELDBOOSTS));
+        Map<String, String> fieldBoosts = FeatureControlCenter.getValuesFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, FIELDBOOSTS));
         assertThat(fieldBoosts.get("title_field_disease_boost")).isEqualTo("2");
         assertThat(fieldBoosts.get("title_field_gene_boost")).isEqualTo("3");
         assertThat(fieldBoosts.get("abstract_field_gene_boost")).isEqualTo("5");
 
-        Map<String, String> clauseBoosts = FeatureControlCenter.getWeightsFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, KEYWORDBOOSTS));
+        Map<String, String> clauseBoosts = FeatureControlCenter.getValuesFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, CLAUSEBOOSTS));
         assertThat(clauseBoosts.get("match_all_boost")).isEqualTo("-100");
         assertThat(clauseBoosts.get("neg_keywords_boost")).isEqualTo("-1");
         assertThat(clauseBoosts.get("exists_abstract_boost")).isEqualTo("2");

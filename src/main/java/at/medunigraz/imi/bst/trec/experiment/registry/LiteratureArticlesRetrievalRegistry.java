@@ -85,7 +85,7 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
-                .withConditionalCancer().withSimilarityParameters(new BM25Parameters(1,1));
+                .withConditionalCancer().withSimilarityParameters(new BM25Parameters(1, 1));
     }
 
     public static TrecPmRetrieval jlpmcommon2noextra(int size) {
@@ -153,10 +153,40 @@ public final class LiteratureArticlesRetrievalRegistry {
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
-                .withExperimentName("jlpmcommon2gen")
-                .withSubTemplate(conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATE)));
+                .withExperimentName("jlpmcommon2gen");
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
+        Map<String, String> templateProperties = new HashMap<>();
+        // Default values for parameters that are not always activated but are still required to create a valid query
+        templateProperties.put(DISEASE_SLOP, "1");
+        templateProperties.put(GENE_TOPIC_SLOP, "1");
+        templateProperties.put(GENE_SYN_SLOP, "1");
+        templateProperties.put(GENE_DESC_SLOP, "1");
+
+        // Reading parameters from the configuration
+        templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));
+        templateProperties.put("negative_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, NEGATIVEPM)));
+        // Field boosts
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, FIELDBOOSTS)));
+        // Keyword clause boosts
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, CLAUSEBOOSTS)));
+        // Disease (sub)query boosts
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, DISEASE, BOOSTS)));
+        // Disease (sub)query match types
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, DISEASE, MATCHTYPES)));
+        // Disease phrase slop
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, DISEASE, PHRASESLOPS)));
+
+        // Gene (sub)query boosts
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, BOOSTS)));
+        // Gene (sub)query match types
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, MATCHTYPES)));
+        // Gene query clauses phrase slopts
+        templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, PHRASESLOPS)));
+        ret.withProperties(templateProperties);
+
+        ret.withSubTemplate(conf.getString(slash(RETRIEVALPARAMETERS, TEMPLATE)));
+
         if (retrievalConfig.getBoolean(QUERYFILTERING))
             ret.withWordRemoval();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
@@ -171,19 +201,10 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withUmlsDiseaseSynonym();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
-
-
-        Map<String, String> templateProperties = new HashMap<>();
-        templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));
-        templateProperties.put("negative_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, NEGATIVEPM)));
-        ret.withProperties(templateProperties);
-        // Field boosts
-        templateProperties.putAll(FeatureControlCenter.getWeightsFromFeatureConfiguration(retrievalConfig, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, FIELDBOOSTS)));
-        // Keyword clause boosts
-        templateProperties.putAll(FeatureControlCenter.getWeightsFromFeatureConfiguration(retrievalConfig, slash(RETRIEVALPARAMETERS, TEMPLATEPARAMETERS, KEYWORDBOOSTS)));
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
+
 
         SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
         ret.withSimilarityParameters(similarityParameters);

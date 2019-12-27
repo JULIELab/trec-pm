@@ -1,3 +1,4 @@
+
 {
   "query": "{{[diseaseSynonyms]}}",
   "fields": {{biomedical_articles_generic/fields_disease.json}},

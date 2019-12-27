@@ -41,8 +41,8 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         log.info("Creating the gold standard cross-validation partitioning of size {}", 10);
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
         goldStandardSplit = new HashMap<>(numSplits);
-        for (int i = 0; i < goldStandardSplit.size(); i++) {
-            goldStandardSplit.put("split" + i, new TrecQrelGoldStandard(challenge, task, -1, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i))));
+        for (int i = 0; i < numSplits; i++) {
+            goldStandardSplit.put("split" + i, new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i))));
         }
     }
 
@@ -113,7 +113,8 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             evalGs = goldStandardSplit.get(splitNumber);
         } else if (partitionType.equals("train")) {
             // The train split is all except the test partition
-            evalGs = new AggregatedTrecQrelGoldStandard<>(IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(goldStandardSplit::get).collect(Collectors.toList()));
+            List<TrecQrelGoldStandard<Topic>> evalData = IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(i -> goldStandardSplit.get("split"+i)).collect(Collectors.toList());
+            evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);
         } else {
             throw new IllegalArgumentException("Unknown split type " + partitionType);
         }

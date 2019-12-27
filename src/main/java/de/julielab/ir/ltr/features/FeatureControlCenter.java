@@ -100,18 +100,25 @@ public class FeatureControlCenter {
         return sb.toString();
     }
 
-    public static Map<String, String> getWeightsFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String weightsConfigurationPath) {
+    /**
+     * <p>Returns a map where the keys are the configuration keys one level below the given <tt>baseConfigurationPath</tt> and the values are the configuration values of the <tt>baseConfigurationPath</tt> plus the following level.</p>
+     * @param config
+     * @param baseConfigurationPath
+     * @return
+     */
+    public static Map<String, String> getValuesFromFeatureConfiguration(HierarchicalConfiguration<ImmutableNode> config, String baseConfigurationPath) {
         Map<String, String> weights = new HashMap<>();
-        List<HierarchicalConfiguration<ImmutableNode>> weightConfigs = config.configurationsAt(weightsConfigurationPath);
-        for (HierarchicalConfiguration<ImmutableNode> wconfig : weightConfigs) {
-            Iterator<String> keys = wconfig.getKeys();
+        List<HierarchicalConfiguration<ImmutableNode>> targetConfigs = config.configurationsAt(baseConfigurationPath);
+        for (HierarchicalConfiguration<ImmutableNode> targetConfig : targetConfigs) {
+            Iterator<String> keys = targetConfig.getKeys();
             while (keys.hasNext()) {
                 String key = keys.next();
-                weights.put(key, wconfig.getString(key));
+                weights.put(key, targetConfig.getString(key));
             }
         }
         return weights;
     }
+
 
     public boolean isTfIdfActive() {
         return configuration.getBoolean(slash(LTRFEATURES, FEATUREGROUPS, FEATUREGROUP + attrEqPred(NAME_ATTR, TfidfFeatureGroup.GROUP_NAME), ACTIVE_ATTR), true);

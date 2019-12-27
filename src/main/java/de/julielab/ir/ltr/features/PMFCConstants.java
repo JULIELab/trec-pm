@@ -21,5 +21,13 @@ public class PMFCConstants extends FCConstants {
     public static final String B = "b";
     public static final String POSITIVEPM = "positivepm";
     public static final String NEGATIVEPM = "negativepm";
-
+    public static final String DISEASE = "disease";
+    public static final String GENE = "gene";
+    public static final String BOOSTS = "boosts";
+    public static final String MATCHTYPES = "matchtypes";
+    public static final String DISEASE_SLOP = "disease_slop";
+    public static final String GENE_TOPIC_SLOP = "gene_topic_slop";
+    public static final String GENE_SYN_SLOP = "gene_syn_slop";
+    public static final String GENE_DESC_SLOP = "gene_desc_slop";
+    public static final String PHRASESLOPS = "phraseslops";
 }
