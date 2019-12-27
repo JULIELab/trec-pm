@@ -9,13 +9,13 @@ seed=$6
 argc=$#
 argv=("$@")
 
-curldata="instance=$instance&cutoff_time=$cutoffTime&cutoff_length=$cutoffLength&seed=$seed"
+curldata="instance=$instance&instance_info=none&cutoff_time=$cutoffTime&cutoff_length=$cutoffLength&seed=$seed"
 for (( j=6; j<argc; j++ )); do
     arg=${argv[j]}
-    if [[ $arg =~ --* ]]; then
+    if [[ $((j%2)) = 0 ]]; then
       argWoDash="${arg:1:${#arg}}"
       value=${argv[j+1]}
       curldata=$curldata"&"$argWoDash=$value
     fi
 done
-curl -XPOST http://localhost:$port/get_configuration_score -d $curldata
+curl -XPOST http://localhost:$port/get_configuration_score -d "$curldata"

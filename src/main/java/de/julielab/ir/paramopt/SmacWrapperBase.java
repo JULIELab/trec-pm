@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-import static de.julielab.ir.ltr.features.FCConstants.*;
-import static de.julielab.java.utilities.ConfigurationUtilities.*;
+import static de.julielab.java.utilities.ConfigurationUtilities.last;
+import static de.julielab.java.utilities.ConfigurationUtilities.ws;
 
 abstract public class SmacWrapperBase {
     private final static Logger log = LoggerFactory.getLogger(SmacWrapperBase.class);
@@ -33,29 +33,22 @@ abstract public class SmacWrapperBase {
         final HierarchicalConfiguration<ImmutableNode> config = ConfigurationUtilities.createEmptyConfiguration();
         for (int i = 5; i < args.length; i++) {
             String parameter = args[i];
-            if (parameter.startsWith("-")) {
+            if (i % 2 == 1) {
                 parameter = "/" + parameter.substring(1);
                 if (i == args.length - 1)
                     throw new IllegalArgumentException("The parameter " + parameter + " has no value specified.");
                 String value = args[i + 1];
-                if (!parameter.contains("@")) {
-                    config.setProperty(parameter.replaceAll("\\.", "/"), value);
+                if (parameter.contains("@")) {
+                    String[] attrSplit = parameter.split("@");
+                    String pathUntilAttr = attrSplit[0].replaceAll("\\.", "/");
+                    String[] attrAndValue = attrSplit[1].split(":");
+                    String attributeName = attrAndValue[0];
+                    String valueWithQuotes = attrAndValue[1];
+                    String valueWithoutQuotes = valueWithQuotes.substring(1, attrAndValue[1].length() - 1);
+                    config.addProperty(pathUntilAttr, "");
+                    config.addProperty(ws(last(pathUntilAttr), "@" + attributeName), valueWithoutQuotes);
                 } else {
-                    String active = String.valueOf(value.equals("on"));
-                    final String[] split = parameter.split("@");
-                    String groupPath = split[0].replaceAll("\\.", "/");
-                    final String featureGroup = split[1];
-                    if (split.length == 2) {
-                        config.addProperty(groupPath, "");
-                        config.addProperty(ws(last(groupPath), NAME_ATTR), featureGroup);
-                        config.addProperty(ws(last(groupPath), ACTIVE_ATTR), active);
-                    } else {
-                        final String feature = split[2];
-                        final String featurePath = slash(last(groupPath), FEATURE);
-                        config.addProperty(featurePath, "");
-                        config.addProperty(ws(last(featurePath), NAME_ATTR), feature);
-                        config.addProperty(ws(last(featurePath), ACTIVE_ATTR), active);
-                    }
+                    config.setProperty(parameter.replaceAll("\\.", "/"), value);
                 }
             }
         }
