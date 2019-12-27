@@ -43,8 +43,7 @@ abstract public class SmacWrapperBase {
                     String pathUntilAttr = attrSplit[0].replaceAll("\\.", "/");
                     String[] attrAndValue = attrSplit[1].split(":");
                     String attributeName = attrAndValue[0];
-                    String valueWithQuotes = attrAndValue[1];
-                    String valueWithoutQuotes = valueWithQuotes.substring(1, attrAndValue[1].length() - 1);
+                    String valueWithoutQuotes = attrAndValue[1];
                     config.addProperty(pathUntilAttr, value);
                     config.addProperty(ws(last(pathUntilAttr), "@" + attributeName), valueWithoutQuotes);
                 } else {

@@ -7,6 +7,7 @@ import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrieva
 import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.GoldStandard;
+import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.model.QueryDescription;
@@ -40,9 +41,14 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         goldStandard = aggregatedTrecQrelGoldStandard;
         log.info("Creating the gold standard cross-validation partitioning of size {}", 10);
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
+        for (int i = 0; i < partitioning.size(); i++) {
+            List<Topic> topics = partitioning.get(i);
+            partitioning.set(i, topics.subList(0, 1));
+        }
         goldStandardSplit = new HashMap<>(numSplits);
         for (int i = 0; i < numSplits; i++) {
-            goldStandardSplit.put("split" + i, new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i))));
+            TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i)));
+            goldStandardSplit.put("split" + i, gsSplit);
         }
     }
 
@@ -113,14 +119,17 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             evalGs = goldStandardSplit.get(splitNumber);
         } else if (partitionType.equals("train")) {
             // The train split is all except the test partition
-            List<TrecQrelGoldStandard<Topic>> evalData = IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(i -> goldStandardSplit.get("split"+i)).collect(Collectors.toList());
+            List<TrecQrelGoldStandard<Topic>> evalData = IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(i -> goldStandardSplit.get("split" + i)).collect(Collectors.toList());
             evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);
+        } else if (partitionType.equals("pm2019")) {
+            evalGs = TrecPMGoldStandardFactory.pubmedOfficial2019();
         } else {
             throw new IllegalArgumentException("Unknown split type " + partitionType);
         }
         Experiment<QueryDescription> exp = new Experiment<>(evalGs, trecPmRetrieval);
 
         Metrics metrics = exp.run();
+        CacheService.getInstance().commitAllCaches();
         logMetrics(config, metrics);
         // SMAC always minimizes the objective, thus multiplying with -1
         return -1 * metrics.getInfNDCG();

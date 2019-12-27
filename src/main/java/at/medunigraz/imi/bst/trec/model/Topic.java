@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 public class Topic extends QueryDescription {
 
+    private static Pattern mutationPattern = Pattern.compile("\\(([^)]+)\\)");
     // MUST be public to be accessed via Reflection on SubTemplateQueryDecorator
     public String diseasePreferredTerm = "";
     // MUST be public to be accessed via Reflection on SubTemplateQueryDecorator
@@ -35,19 +36,16 @@ public class Topic extends QueryDescription {
      * according to the COSMIC CosmicResistanceMutations.tsv file.
      */
     public List<String> resistantDrugs = new ArrayList<>();
-
     /**
      * Custom, handcrafted, expansions. Normally used for the `SolidTumorQueryDecorator`.
      */
     public List<String> customDiseaseExpansions = new ArrayList<>();
     public List<String> customGeneExpansions = new ArrayList<>();
-
     /**
      * Custom boosters for cancer topics.
      */
     public List<String> cancerBoosters = new ArrayList<>();
     public List<String> chemotherapyBoosters = new ArrayList<>();
-
     private String disease = "";
     private String geneField = "";
     private TopicGene[] genes = new TopicGene[0];
@@ -90,12 +88,6 @@ public class Topic extends QueryDescription {
         Element element = (Element) doc.getElementsByTagName("topic").item(0);
 
         return fromElement(element);
-    }
-
-    private static Pattern mutationPattern = Pattern.compile("\\(([^)]+)\\)");
-
-    public TopicGene[] getGenes() {
-        return genes;
     }
 
     public static Topic fromElement(Element element) {
@@ -149,7 +141,9 @@ public class Topic extends QueryDescription {
         return element.getAttribute(name);
     }
 
-
+    public TopicGene[] getGenes() {
+        return genes;
+    }
 
     public Topic withNumber(int number) {
         this.number = number;
@@ -269,6 +263,7 @@ public class Topic extends QueryDescription {
      * <pre>
      *     BRAF (V600E), CDKN2A Deletion
      * </pre>
+     *
      * @return
      */
     public String getGeneField() {
@@ -318,7 +313,8 @@ public class Topic extends QueryDescription {
         ret.put("sex", getSex());
         ret.put("age", String.valueOf(getAge()));
 
-        ret.put("diseasePreferredTerm", diseasePreferredTerm);
+        if (diseasePreferredTerm != null)
+            ret.put("diseasePreferredTerm", diseasePreferredTerm);
 
         for (int i = 0; i < geneDescriptions.size(); i++) {
             ret.put("geneDescriptions" + i, geneDescriptions.get(i));
@@ -369,8 +365,8 @@ public class Topic extends QueryDescription {
 
     @Override
     public Topic getCleanCopy() {
-       return new Topic().withNumber(number).withDisease(disease).withGeneField(geneField).withGenes(genes)
-               .withDemographic(demographic).withOther(other);
+        return new Topic().withNumber(number).withYear(year).withDisease(disease).withGeneField(geneField).withGenes(genes)
+                .withDemographic(demographic).withOther(other);
     }
 
     @Override

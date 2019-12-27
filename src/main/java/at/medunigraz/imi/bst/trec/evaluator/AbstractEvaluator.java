@@ -102,6 +102,7 @@ public abstract class AbstractEvaluator implements Evaluator {
             for (String e : error) {
                 LOG.error(e);
             }
+            LOG.error("Command was: {}", getFullCommand());
             throw new IllegalStateException("Could not run the evaluation.");
         }
 

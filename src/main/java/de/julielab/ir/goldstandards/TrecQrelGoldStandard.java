@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
 
     private static final Logger log = LogManager.getLogger();
+    private Function<QueryDescription, String> queryIdFunction = q -> String.valueOf(q.getNumber());
 
     public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, String qrels) {
         super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
@@ -129,6 +130,10 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
-        return q -> String.valueOf(q.getNumber());
+        return queryIdFunction;
+    }
+
+    public void setQueryIdFunction(Function<QueryDescription, String> queryIdFunction) {
+        this.queryIdFunction = queryIdFunction;
     }
 }

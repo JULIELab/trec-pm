@@ -85,7 +85,7 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
-                .withConditionalCancer().withSimilarityParameters(new BM25Parameters(1, 1));
+                .withConditionalCancer();
     }
 
     public static TrecPmRetrieval jlpmcommon2noextra(int size) {
@@ -100,7 +100,7 @@ public final class LiteratureArticlesRetrievalRegistry {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon21pos")
                 .withSubTemplate(JULIE_COMMON2_ONE_POS_CLAUSE_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
-                .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
                 .withConditionalCancer();
     }
 
@@ -159,9 +159,14 @@ public final class LiteratureArticlesRetrievalRegistry {
         Map<String, String> templateProperties = new HashMap<>();
         // Default values for parameters that are not always activated but are still required to create a valid query
         templateProperties.put(DISEASE_SLOP, "1");
+        templateProperties.put(DISEASE_PREFTERM_BOOST, "1");
+        templateProperties.put(DISEASE_SYN_BOOST, "1");
+        templateProperties.put(DISEASE_HYPERNYMS_BOOST, "1");
         templateProperties.put(GENE_TOPIC_SLOP, "1");
         templateProperties.put(GENE_SYN_SLOP, "1");
         templateProperties.put(GENE_DESC_SLOP, "1");
+        templateProperties.put(GENE_SYN_BOOST, "1");
+        templateProperties.put(GENE_DESC_BOOST, "1");
 
         // Reading parameters from the configuration
         templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));

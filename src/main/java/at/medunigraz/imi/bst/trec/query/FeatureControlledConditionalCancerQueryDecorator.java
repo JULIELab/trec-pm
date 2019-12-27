@@ -3,12 +3,10 @@ package at.medunigraz.imi.bst.trec.query;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.ltr.features.FeatureControlCenter;
+import de.julielab.ir.ltr.features.PMFCConstants;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +32,7 @@ public class FeatureControlledConditionalCancerQueryDecorator extends FileBasedQ
             // as it has been usual in previous years. We do not create duplicates.
             if (disease.contains(concept) && topic.getCancerBoosters().size() == 0) {
                 HierarchicalConfiguration<ImmutableNode> config = FeatureControlCenter.getInstance().getFeatureConfiguration();
-                String cancerKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CANCER));
+                String cancerKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, PMFCConstants.CANCER));
                 topic.withCancerBooster(cancerKeywords);
 
                 String chemoKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CHEMOTHERAPY));

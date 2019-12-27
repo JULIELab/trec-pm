@@ -31,8 +31,8 @@ public class LiteratureArticlesExperimenter {
         final Experiment jlpmcommon2 = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmcommon2(TrecConfig.SIZE));
 
-//                final Experiment jlpmcommon21pos = new Experiment(GOLD_STANDARD,
-//                LiteratureArticlesRetrievalRegistry.jlpmcommon2OnepositiveClause(TrecConfig.SIZE));
+                final Experiment jlpmcommon21pos = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmcommon2OnepositiveClause(TrecConfig.SIZE));
 
 //
 //        final Experiment jlpmletor = new Experiment(GOLD_STANDARD,

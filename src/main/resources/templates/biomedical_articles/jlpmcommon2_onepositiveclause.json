@@ -5,7 +5,6 @@
 			{{biomedical_articles/gene.json}}
 		],
 		"should": [
-			{{biomedical_articles/extra.json}},
 			{{chemotherapyBoosters:biomedical_articles/conditional_chemotherapy.json}},
 			{{cancerBoosters:biomedical_articles/conditional_cancer.json}},
 			{{biomedical_articles/positive_boosters_all.json}},

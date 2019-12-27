@@ -2,9 +2,9 @@
   "multi_match": {
     "query": "{{[diseaseHypernyms]}}",
     "fields": {{biomedical_articles_generic/fields_disease.json}},
-    "tie_breaker": 0.3,
+    "tie_breaker": 99,
     "type": "{{disease_hypernyms_match_type}}",
-    "slop": "{{disease_slop}}",
+    "slop": {{disease_slop}},
     "boost": {{disease_hypernyms_boost}}
   }
 }

@@ -6,11 +6,14 @@ import de.julielab.ir.umls.UmlsSynsetProvider;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
 
     private transient UmlsSynsetProvider umlsSynsetProvider;
+    private Matcher parenthesisM = Pattern.compile("[(\\[{][^]})]+[]})]").matcher("");
 
     public DiseaseUmlsSynonymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
@@ -30,9 +33,16 @@ public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
         if (umlsSynsetProvider == null)
             umlsSynsetProvider = UmlsSynsetProvider.getInstance();
         String disease = topic.getDisease();
-        final Set<String> uniqueLowercasedSynonyms = umlsSynsetProvider.getSynsets(disease).stream().flatMap(Collection::stream).map(String::toLowerCase).filter(s -> !s.equalsIgnoreCase(disease)).distinct().collect(Collectors.toSet());
+        final Set<String> uniqueLowercasedSynonyms = umlsSynsetProvider.getSynsets(disease).stream()
+                .flatMap(Collection::stream)
+                .map(String::toLowerCase)
+                .map(s -> parenthesisM.reset(s).replaceAll(""))
+                .map(String::trim)
+                .filter(s -> !s.equalsIgnoreCase(disease))
+                .collect(Collectors.toSet());
         for (String synonym : uniqueLowercasedSynonyms) {
-            topic.withDiseaseSynonym(synonym);
+            if (!topic.getDiseaseSynonyms().contains(synonym))
+                topic.withDiseaseSynonym(synonym);
         }
         return topic;
     }

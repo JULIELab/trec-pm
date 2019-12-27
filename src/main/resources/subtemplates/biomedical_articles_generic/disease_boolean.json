@@ -5,7 +5,7 @@
       {
         "multi_match": {
           "query": "{{disease}}",
-          "fields": {{biomedical_articles_generic/fields.json}},
+          "fields": {{biomedical_articles_generic/fields_disease.json}},
           "tie_breaker": 0.3,
           "type": "{{disease_match_type}}",
           "boost": {{disease_topic_clause_boost}}
@@ -14,7 +14,7 @@
       {
         "multi_match": {
           "query": "{{diseasePreferredTerm}}",
-          "fields": {{biomedical_articles_generic/fields.json}},
+          "fields": {{biomedical_articles_generic/fields_disease.json}},
           "tie_breaker": 0.3,
           "type": "{{disease_match_type}}",
           "boost": {{disease_prefterm_boost}}

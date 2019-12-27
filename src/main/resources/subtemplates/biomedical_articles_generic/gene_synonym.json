@@ -4,7 +4,7 @@
     "fields": {{biomedical_articles_generic/fields_gene.json}},
     "tie_breaker": 0.3,
     "type": "{{gene_syn_match_type}}",
-    "slop": "{{gene_syn_slop}}",
+    "slop": {{gene_syn_slop}},
     "boost": {{gene_syn_boost}}
   }
 }

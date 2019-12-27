@@ -18,4 +18,5 @@ for (( j=6; j<argc; j++ )); do
       curldata=$curldata"&"$argWoDash=$value
     fi
 done
-curl -XPOST http://localhost:$port/get_configuration_score -d "$curldata"
+score=`curl -s -XPOST http://localhost:$port/get_configuration_score -d "$curldata"`
+echo "Result for SMAC: SUCCESS, 0, 0, $score, 0"
