@@ -65,7 +65,6 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             // Fill the beginning of the list because the parameter parsing algorithm is expecting it
             parameters.addAll(Arrays.asList(null, null, null, null, null));
             for (String queryParam : queryParams) {
-                System.out.println("Hier: " + queryParam);
                 switch (queryParam) {
                     case INSTANCE:
                         instanceName = req.queryParams(queryParam);
@@ -107,16 +106,16 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         // e.g. split2-train
         String[] splitAndType = instance.split("-");
         Integer splitNumber = Integer.valueOf(splitAndType[0].charAt(5));
-        String splitType = splitAndType[1];
+        String partitionType = splitAndType[1];
         GoldStandard<Topic> evalGs;
-        if (splitType.equals("test")) {
+        if (partitionType.equals("test")) {
             // The test partition is just the the partition with the given number
             evalGs = goldStandardSplit.get(splitNumber);
-        } else if (splitType.equals("train")) {
+        } else if (partitionType.equals("train")) {
             // The train split is all except the test partition
             evalGs = new AggregatedTrecQrelGoldStandard<>(IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(goldStandardSplit::get).collect(Collectors.toList()));
         } else {
-            throw new IllegalArgumentException("Unknown split type " + splitType);
+            throw new IllegalArgumentException("Unknown split type " + partitionType);
         }
         Experiment<QueryDescription> exp = new Experiment<>(evalGs, trecPmRetrieval);
 

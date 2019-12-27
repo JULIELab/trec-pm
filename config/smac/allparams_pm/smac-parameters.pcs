@@ -5,12 +5,16 @@ retrievalparameters.template categorical {/templates/biomedical_articles_generic
 
 # Query filtering
 retrievalparameters.queryfiltering categorical {true, false} [true]
+
+# Custom synonym list
+retrievalparameters.synonymlist    categorical {true, false} [true]
+
 # Disease
 ## Expansion on/off
-retrievalparameters.diseaseexpansion.prefterm  categorical  {true, false} [true]
-retrievalparameters.diseaseexpansion.synonyms  categorical  {true, false} [true]
-retrievalparameters.diseaseexpansion.hypernyms categorical {true, false} [true]
-retrievalparameters.diseaseexpansion.custom    categorical    {true, false} [true]
+retrievalparameters.diseaseexpansion.preferredterm categorical  {true, false} [true]
+retrievalparameters.diseaseexpansion.synonyms      categorical  {true, false} [true]
+retrievalparameters.diseaseexpansion.hypernyms     categorical  {true, false} [true]
+retrievalparameters.diseaseexpansion.custom        categorical  {true, false} [true]
 ## Boosts
 retrievalparameters.templateparameters.disease.disease_query_boost        real [0.1,3] [1.5]
 retrievalparameters.templateparameters.disease.disease_topic_clause_boost real [0.1,3] [1]
@@ -25,10 +29,10 @@ retrievalparameters.templateparameters.disease.disease_hypernyms_match_type cate
 ## Phrase slop
 retrievalparameters.templateparameters.disease.disease_slop integer [1,5] [1]
 ## Conditional parameter activation
-retrievalparameters.templateparameters.disease.disease_prefterm_boost  | retrievalparameters.diseaseexpansion.prefterm  == true
-retrievalparameters.templateparameters.disease.disease_syn_boost       | retrievalparameters.diseaseexpansion.synonyms  == true
-retrievalparameters.templateparameters.disease.disease_hypernyms_boost | retrievalparameters.diseaseexpansion.hypernyms == true
-retrievalparameters.templateparameters.disease.disease_custom_boost    | retrievalparameters.diseaseexpansion.custom    == true
+retrievalparameters.templateparameters.disease.disease_prefterm_boost  | retrievalparameters.diseaseexpansion.preferredterm  == true
+retrievalparameters.templateparameters.disease.disease_syn_boost       | retrievalparameters.diseaseexpansion.synonyms       == true
+retrievalparameters.templateparameters.disease.disease_hypernyms_boost | retrievalparameters.diseaseexpansion.hypernyms      == true
+retrievalparameters.templateparameters.disease.disease_custom_boost    | retrievalparameters.diseaseexpansion.custom         == true
 retrievalparameters.templateparameters.disease.disease_slop            | retrievalparameters.templateparameters.disease.disease_match_type == phrase || retrievalparameters.templateparameters.disease.disease_syn_match_type == phrase || retrievalparameters.templateparameters.disease.disease_hypernyms_match_type == phrase
 
 # Gene
