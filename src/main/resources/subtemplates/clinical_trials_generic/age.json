@@ -1,0 +1,16 @@
+{
+    "range": {
+        "minimum_age": {
+            "lte": {{age}}
+        },
+        "boost": {{age_boost}}
+    }
+},
+{
+    "range": {
+        "maximum_age": {
+            "gte": {{age}}
+        },
+        "boost": {{age_boost}}
+    }
+}

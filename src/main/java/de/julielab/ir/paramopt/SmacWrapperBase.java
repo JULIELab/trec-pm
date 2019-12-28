@@ -51,7 +51,7 @@ abstract public class SmacWrapperBase {
                 }
             }
         }
-        log.info("Configuration parsed from SMAC input: {}", ConfigurationUtils.toString(config));
+        log.debug("Configuration parsed from SMAC input: {}", ConfigurationUtils.toString(config));
         return config;
     }
 

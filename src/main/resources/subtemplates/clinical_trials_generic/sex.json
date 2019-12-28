@@ -1,0 +1,6 @@
+{
+  "match": {
+    "sex": "{{sex}}",
+    "boost": {{sex_boost}}
+  }
+}

@@ -1,1 +1,10 @@
-split0-pm2019
+split0-train
+split1-train
+split2-train
+split3-train
+split4-train
+split5-train
+split6-train
+split7-train
+split8-train
+split9-train

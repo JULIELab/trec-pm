@@ -108,7 +108,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             FeatureControlCenter.initialize(config);
         else
             FeatureControlCenter.reconfigure(config);
-        TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2Generic(TrecConfig.SIZE);
+        TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2Generic(TrecConfig.SIZE, instance);
         // e.g. split2-train
         String[] splitAndType = instance.split("-");
         Integer splitNumber = Integer.valueOf(splitAndType[0].charAt(5));
@@ -130,12 +130,12 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
 
         Metrics metrics = exp.run();
         CacheService.getInstance().commitAllCaches();
-        logMetrics(config, metrics);
+        logMetrics(config, instance, metrics);
         // SMAC always minimizes the objective, thus multiplying with -1
         return -1 * metrics.getInfNDCG();
     }
 
-    private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, Metrics metrics) {
+    private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics) {
         File dir = new File("smac-metrics-logging");
         File logfile = new File(dir, "parameteroptimization-log-" + goldStandard.getDatasetId() + ".tsv");
         if (!dir.exists())
@@ -147,7 +147,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                 Iterator<String> keys = config.getKeys();
                 bw.write(String.join("\t", (Iterable<String>) () -> keys));
                 bw.write("\t");
-                bw.write(String.join("\t", "infNDCG", "R-prec", "P@10", "Set-Recall"));
+                bw.write(String.join("\t", "instance", "infNDCG", "R-prec", "P@10", "Set-Recall"));
                 bw.newLine();
             }
             Iterator<String> keys = config.getKeys();
@@ -158,7 +158,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             }
             bw.write(String.join("\t", values));
             bw.write("\t");
-            bw.write(String.join("\t", String.valueOf(metrics.getInfNDCG()), String.valueOf(metrics.getRPrec()), String.valueOf(metrics.getP10()), String.valueOf(metrics.getSetRecall())));
+            bw.write(String.join("\t", instance, String.valueOf(metrics.getInfNDCG()), String.valueOf(metrics.getRPrec()), String.valueOf(metrics.getP10()), String.valueOf(metrics.getSetRecall())));
             bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();

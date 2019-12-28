@@ -148,12 +148,12 @@ public final class LiteratureArticlesRetrievalRegistry {
      * @param size
      * @return
      */
-    public static TrecPmRetrieval jlpmcommon2Generic(int size) {
+    public static TrecPmRetrieval jlpmcommon2Generic(int size, String instance) {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
-                .withExperimentName("jlpmcommon2gen");
+                .withExperimentName("jlpmcommon2gen-"+instance);
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
         Map<String, String> templateProperties = new HashMap<>();
@@ -167,6 +167,8 @@ public final class LiteratureArticlesRetrievalRegistry {
         templateProperties.put(GENE_DESC_SLOP, "1");
         templateProperties.put(GENE_SYN_BOOST, "1");
         templateProperties.put(GENE_DESC_BOOST, "1");
+        templateProperties.put(DISEASE_CUSTOM_BOOST, "1");
+        templateProperties.put(GENE_CUSTOM_BOOST, "1");
 
         // Reading parameters from the configuration
         templateProperties.put("positive_pm_boosters", FeatureControlCenter.getKeywordStringFromFeatureConfiguration(retrievalConfig, slash(KEYWORDS, POSITIVEPM)));

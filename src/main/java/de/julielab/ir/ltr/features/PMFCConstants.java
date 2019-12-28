@@ -35,4 +35,6 @@ public class PMFCConstants extends FCConstants {
     public static final String DISEASE_HYPERNYMS_BOOST = "disease_hypernyms_boost";
     public static final String GENE_SYN_BOOST = "gene_syn_boost";
     public static final String GENE_DESC_BOOST = "gene_desc_boost";
+    public static final String DISEASE_CUSTOM_BOOST = "disease_custom_boost";
+    public static final String GENE_CUSTOM_BOOST = "gene_custom_boost";
 }

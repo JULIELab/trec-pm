@@ -1,0 +1,20 @@
+{
+	"bool": {
+		"must": [
+			{{clinical_trials_generic/age.json}},
+			{{clinical_trials_generic/sex.json}},
+			{{clinical_trials_generic/disease.json}},
+			{{clinical_trials_generic/gene.json}}
+		],
+		"should": [
+			{{chemotherapyBoosters:clinical_trials_generic/conditional_chemotherapy.json}},
+			{{cancerBoosters:clinical_trials_generic/conditional_cancer.json}},
+			{{clinical_trials_generic/dna.json}},
+			{{clinical_trials_generic/positive_boosters.json}},
+			{{clinical_trials_generic/structured.json}}
+		],
+		"must_not": [
+			{{clinical_trials_generic/non_melanoma.json}}
+		]
+	}
+}
