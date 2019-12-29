@@ -1,5 +1,6 @@
 {
   "match": {
-    "outcomeMeasures": "PFS OS"
+    "outcomeMeasures": "PFS OS",
+    "boost": {{structured_boost}}
   }
 }

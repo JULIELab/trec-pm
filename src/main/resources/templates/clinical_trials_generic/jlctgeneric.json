@@ -9,8 +9,8 @@
 		"should": [
 			{{chemotherapyBoosters:clinical_trials_generic/conditional_chemotherapy.json}},
 			{{cancerBoosters:clinical_trials_generic/conditional_cancer.json}},
-			{{clinical_trials_generic/dna.json}},
 			{{clinical_trials_generic/positive_boosters.json}},
+			{{clinical_trials_generic/negative_boosters.json}},
 			{{clinical_trials_generic/structured.json}}
 		],
 		"must_not": [

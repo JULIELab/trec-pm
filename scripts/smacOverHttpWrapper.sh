@@ -1,10 +1,12 @@
 #!/bin/bash
 port=$1
-instance=$2
-instanceInfo=$3
-cutoffTime=$4
-cutoffLength=$5
-seed=$6
+# PM or CT (PubMed for biomedical articles task, ClinicalTrials for clinical trials task), used in the server endpoint
+corpustype=$2
+instance=$3
+instanceInfo=$4
+cutoffTime=$5
+cutoffLength=$6
+seed=$7
 
 argc=$#
 argv=("$@")
@@ -18,5 +20,5 @@ for (( j=6; j<argc; j++ )); do
       curldata=$curldata"&"$argWoDash=$value
     fi
 done
-score=`curl -s -XPOST http://localhost:$port/get_configuration_score -d "$curldata"`
+score=`curl -s -XPOST http://localhost:$port/get_configuration_score_$corpustype -d "$curldata"`
 echo "Result for SMAC: SUCCESS, 0, 0, $score, 0"

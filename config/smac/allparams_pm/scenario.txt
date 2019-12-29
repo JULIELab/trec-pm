@@ -4,4 +4,4 @@ cutoffTime = 300
 wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/allparams_pm/instances.txt
-algo = bash scripts/smacOverHttpWrapper.sh 32100
+algo = bash scripts/smacOverHttpWrapper.sh 32100 pm

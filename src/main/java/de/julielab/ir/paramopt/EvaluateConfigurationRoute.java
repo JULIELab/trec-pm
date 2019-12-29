@@ -39,7 +39,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
 
     public EvaluateConfigurationRoute(AggregatedTrecQrelGoldStandard aggregatedTrecQrelGoldStandard, Challenge challenge, Task task, GoldStandardType type) {
         goldStandard = aggregatedTrecQrelGoldStandard;
-        log.info("Creating the gold standard cross-validation partitioning of size {}", 10);
+        log.info("Creating the gold standard cross-validation partitioning of size {}", numSplits);
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
         for (int i = 0; i < partitioning.size(); i++) {
             List<Topic> topics = partitioning.get(i);
@@ -121,11 +121,26 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             // The train split is all except the test partition
             List<TrecQrelGoldStandard<Topic>> evalData = IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(i -> goldStandardSplit.get("split" + i)).collect(Collectors.toList());
             evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);
-        } else if (partitionType.equals("pm2019")) {
-            evalGs = TrecPMGoldStandardFactory.pubmedOfficial2019();
-        } else {
-            throw new IllegalArgumentException("Unknown split type " + partitionType);
-        }
+        } // the next "else" matches not really crossval splits but just the name of specific datasets like
+        // pm2018 or ct2019. This way, we can easily evaluate on those specific gold standards.
+        else if (partitionType.startsWith("pm")) {
+            if (partitionType.endsWith("2017"))
+                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
+            else if (partitionType.endsWith("2018"))
+                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
+            else if (partitionType.endsWith("2019"))
+                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2019();
+            else throw new IllegalArgumentException("Unknown biomedical abstracts dataset " + partitionType);
+
+        } else if (partitionType.startsWith("ct")) {
+            if (partitionType.endsWith("2018"))
+                evalGs = TrecPMGoldStandardFactory.trialsOfficial2018();
+            if (partitionType.endsWith("2019"))
+                evalGs = TrecPMGoldStandardFactory.trialsOfficial2019();
+            else throw new IllegalArgumentException("Unknown clinical trials dataset " + partitionType);
+        } else
+            throw new IllegalArgumentException("Unknown split/dataset " + partitionType);
+
         Experiment<QueryDescription> exp = new Experiment<>(evalGs, trecPmRetrieval);
 
         Metrics metrics = exp.run();

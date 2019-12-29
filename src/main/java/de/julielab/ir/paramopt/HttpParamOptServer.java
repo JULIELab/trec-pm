@@ -14,7 +14,8 @@ import static spark.Spark.port;
 import static spark.Spark.post;
 
 public class HttpParamOptServer {
-    public static final String GET_CONFIG_SCORE = "get_configuration_score";
+    public static final String GET_CONFIG_SCORE_PM = "get_configuration_score_pm";
+    public static final String GET_CONFIG_SCORE_CT = "get_configuration_score_ct";
     public static final String INSTANCE = "instance";
     public static final String INSTANCE_INFO = "instance_info";
     public static final String CUTOFF_TIME = "cutoff_time";
@@ -42,7 +43,8 @@ public class HttpParamOptServer {
     public void startServer() {
         CacheService.initialize(new TrecCacheConfiguration());
 
-        post("/" + GET_CONFIG_SCORE, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019()), Challenge.TREC_PM, Task.PUBMED, GoldStandardType.OFFICIAL));
+        post("/" + GET_CONFIG_SCORE_PM, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019()), Challenge.TREC_PM, Task.PUBMED, GoldStandardType.OFFICIAL));
+        post("/" + GET_CONFIG_SCORE_CT, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.trialsOfficial2018(), TrecPMGoldStandardFactory.trialsOfficial2019()), Challenge.TREC_PM, Task.CLINICAL_TRIALS, GoldStandardType.OFFICIAL));
 
         log.info("Server is ready for requests.");
     }
