@@ -12,9 +12,9 @@ argc=$#
 argv=("$@")
 
 curldata="instance=$instance&instance_info=none&cutoff_time=$cutoffTime&cutoff_length=$cutoffLength&seed=$seed"
-for (( j=6; j<argc; j++ )); do
+for (( j=7; j<argc; j++ )); do
     arg=${argv[j]}
-    if [[ $((j%2)) = 0 ]]; then
+    if [[ $((j%2)) = 1 ]]; then
       argWoDash="${arg:1:${#arg}}"
       value=${argv[j+1]}
       curldata=$curldata"&"$argWoDash=$value

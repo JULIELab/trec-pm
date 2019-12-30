@@ -54,6 +54,8 @@ public interface GoldStandard<Q extends QueryDescription> {
         Iterator<Q> qIt = sortedQueries.iterator();
         while (qIt.hasNext()) {
             Q next = qIt.next();
+            if (getQrelDocumentsForQuery(next).isEmpty())
+                continue;
             partitioning.get(i % nPartitions).add(next);
             ++i;
         }
@@ -72,6 +74,9 @@ public interface GoldStandard<Q extends QueryDescription> {
         int partitioningIndex = 0;
         for (int i = 0; i < randomizedQueries.size(); i++) {
             Q q = randomizedQueries.get(i);
+            // exclude queries that do not have any documents
+            if (getQrelDocumentsForQuery(q).isEmpty())
+                continue;
             partitioning.get(partitioningIndex++).add(q);
             partitioningIndex %= nPartitions;
         }
@@ -81,7 +86,7 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     List<Q> getQueriesAsList();
 
-    Map<Q, DocumentList> getQrelDocumentsPerQuery();
+    Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery();
 
     /**
      * Writes the underlying data structure to a traditional qrel file.

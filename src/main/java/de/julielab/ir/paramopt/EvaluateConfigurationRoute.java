@@ -41,10 +41,6 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         goldStandard = aggregatedTrecQrelGoldStandard;
         log.info("Creating the gold standard cross-validation partitioning of size {}", numSplits);
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
-        for (int i = 0; i < partitioning.size(); i++) {
-            List<Topic> topics = partitioning.get(i);
-            partitioning.set(i, topics.subList(0, 1));
-        }
         goldStandardSplit = new HashMap<>(numSplits);
         for (int i = 0; i < numSplits; i++) {
             TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i)));
@@ -141,6 +137,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         } else
             throw new IllegalArgumentException("Unknown split/dataset " + partitionType);
 
+        log.debug("Evaluating instance {} with {} queries", instance, evalGs.getQueries().count());
         Experiment<QueryDescription> exp = new Experiment<>(evalGs, trecPmRetrieval);
 
         Metrics metrics = exp.run();

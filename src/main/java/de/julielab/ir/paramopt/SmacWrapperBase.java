@@ -31,6 +31,7 @@ abstract public class SmacWrapperBase {
 
     protected HierarchicalConfiguration<ImmutableNode> parseConfiguration(String[] args) throws ConfigurationException {
         final HierarchicalConfiguration<ImmutableNode> config = ConfigurationUtilities.createEmptyConfiguration();
+        System.out.println(Arrays.toString(args));
         for (int i = 5; i < args.length; i++) {
             String parameter = args[i];
             if (i % 2 == 1) {
@@ -47,6 +48,7 @@ abstract public class SmacWrapperBase {
                     config.addProperty(pathUntilAttr, value);
                     config.addProperty(ws(last(pathUntilAttr), "@" + attributeName), valueWithoutQuotes);
                 } else {
+                    System.out.println(parameter);
                     config.setProperty(parameter.replaceAll("\\.", "/"), value);
                 }
             }

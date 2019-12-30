@@ -80,6 +80,8 @@ retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost      
 retrievalparameters.templateparameters.fieldboosts.meshTags_field_kw_boost        real [0.1,3] [1]
 retrievalparameters.templateparameters.fieldboosts.genes_field_boost              real [0.1,3] [1]
 ## Optional clause boosts
+retrievalparameters.templateparameters.clauseboosts.age_boost                  real [0.1,3]  [1]
+retrievalparameters.templateparameters.clauseboosts.sex_boost                  real [0.1,3]  [1]
 retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost    real [0.1,3]  [1]
 retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost   real [0.1,3]  [1]
 retrievalparameters.templateparameters.clauseboosts.positive_kw_boost          real [0.1,3]  [1]

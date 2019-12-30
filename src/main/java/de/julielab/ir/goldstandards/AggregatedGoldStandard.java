@@ -28,7 +28,7 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     private Logger log;
     protected Map<String, AtomicGoldStandard<Q>> goldStandards;
     private List<Q> queryList;
-    private Map<Q, DocumentList> documentsByQuery;
+    private Map<Q, DocumentList<Q>> documentsByQuery;
 
     public AggregatedGoldStandard(Logger log, AtomicGoldStandard<Q>... goldStandards) {
         this.log = log;
@@ -82,11 +82,14 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
 
     @Override
     public DocumentList<Q> getQrelDocumentsForQuery(QueryDescription query) {
-        return getQrelDocumentsPerQuery().get(query);
+        DocumentList documentList = getQrelDocumentsPerQuery().get(query);
+        if (documentList == null)
+            throw new IllegalArgumentException("The dataset \""+getDatasetId()+"\" does not contain the query " + query);
+        return documentList;
     }
 
     @Override
-    public Map<Q, DocumentList> getQrelDocumentsPerQuery() {
+    public Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery() {
         if (documentsByQuery == null) {
             documentsByQuery = goldStandards.values().stream().map(GoldStandard::getQrelDocumentsPerQuery).collect(HashMap::new, (m1, m2) -> m1.putAll(m2), (m1, m2) -> m1.putAll(m2));
         }

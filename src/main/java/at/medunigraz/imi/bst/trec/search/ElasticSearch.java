@@ -29,9 +29,8 @@ import java.util.concurrent.ExecutionException;
 public class ElasticSearch implements SearchEngine {
 
     private static final Logger LOG = LogManager.getLogger();
-
+    private static CacheAccess<String, List<Result>> cache;
     private Client client;
-
     private String index = "_all";
     private SimilarityParameters parameters;
     private String[] types = new String[0];
@@ -40,10 +39,10 @@ public class ElasticSearch implements SearchEngine {
     // document IDs.
     private BoolQueryBuilder filterQuery;
     private String[] storedFields;
-    private CacheAccess<String, List<Result>> cache;
 
     public ElasticSearch() {
-        cache = CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java");
+        if (cache == null)
+            cache = CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java");
         this.parameters = new NoParameters();
     }
 

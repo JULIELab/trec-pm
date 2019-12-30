@@ -39,7 +39,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     /**
      * The documents in {@link #qrelDocuments} grouped by query.
      */
-    protected Map<Q, DocumentList> documentsByQuery;
+    protected Map<Q, DocumentList<Q>> documentsByQuery;
     /**
      * The queries in {@link #queries} grouped by number.
      */
@@ -81,9 +81,11 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     }
 
     @Override
-    public Map<Q, DocumentList> getQrelDocumentsPerQuery() {
-        if (documentsByQuery == null)
-            documentsByQuery = getQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new)));
+    public Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery() {
+        if (documentsByQuery == null) {
+            documentsByQuery = getQueries().collect(Collectors.toMap(Function.identity(), q -> new DocumentList<Q>()));
+            documentsByQuery.putAll(getQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new))));
+        }
         return documentsByQuery;
     }
 
