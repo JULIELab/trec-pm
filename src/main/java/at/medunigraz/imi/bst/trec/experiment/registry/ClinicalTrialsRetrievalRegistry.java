@@ -83,8 +83,8 @@ public final class ClinicalTrialsRetrievalRegistry {
 
     public static TrecPmRetrieval jlctgenes(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size).withExperimentName("jlctgenes")
-                .withSubTemplate(JULIE_GENES_TEMPLATE).withWordRemoval().withSolidTumor().withUmlsDiseasePreferredTerm()
-                .withUmlsDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS_FILE)
+                .withSubTemplate(JULIE_GENES_TEMPLATE).withWordRemoval().withSolidTumor().withDiseasePreferredTerm()
+                .withDiseaseSynonym().withGeneSynonym().withGeneFamily().withSynonymList(SYNONYMS_FILE)
                 .withConditionalCancer();
     }
 
