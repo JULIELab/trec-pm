@@ -4,8 +4,7 @@
 #SBATCH -J PMSMAC
 #SBATCH --nodelist h1
 # If a SMAC session already exists, add the path to its state directory here to continue
-existingsession=smac-output/state-run835937996/state-run682603137
-#smac-output/allparams_pm/state-run835937996/
+existingsession=""
 restoreparam=""
 if [[ ! -z "$existingsession" ]]; then
     restoreparam="--restore-scenario $existingsession"

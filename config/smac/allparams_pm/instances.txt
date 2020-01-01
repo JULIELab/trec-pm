@@ -1,10 +1,1 @@
-pm-split0-train
-pm-split1-train
-pm-split2-train
-pm-split3-train
-pm-split4-train
-pm-split5-train
-pm-split6-train
-pm-split7-train
-pm-split8-train
-pm-split9-train
+pm-gs-pm2019
