@@ -5,7 +5,7 @@
         "query": "{{[cancerBoosters]}}",
         "fields": {{clinical_trials_generic/fields_keywords.json}},
         "tie_breaker": 0.3,
-        "type": "best_fields"
+        "type": "best_fields",
         "boost": {{conditional_cancer_boost}}
       }
     }

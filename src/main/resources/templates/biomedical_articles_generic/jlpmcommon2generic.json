@@ -13,7 +13,7 @@
 			{{biomedical_articles_generic/exists_filtered_treatment.json}}
 		],
 		"must_not": [
-			{{biomedical_articles/non_melanoma.json}}
+			{{biomedical_articles_generic/non_melanoma.json}}
 		]
 	}
 }

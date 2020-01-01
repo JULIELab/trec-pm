@@ -1,7 +1,7 @@
 {
-  "dis_max": {
+  "bool": {
     "boost": {{gene_query_boost}},
-    "queries": [
+    "should": [
       {
         "multi_match": {
           "query": "{{gene}}",
@@ -13,10 +13,8 @@
         }
       },
       {{geneSynonyms:clinical_trials_generic/gene_synonym.json}},
-      {{geneHypernyms:clinical_trials_generic/gene_hypernym.json}},
       {{geneDescriptions:clinical_trials_generic/gene_description.json}},
-      {{customGeneExpansions:clinical_trials_generic/custom_gene.json}},
-      {{match_all.json}}
+      {{customGeneExpansions:clinical_trials_generic/custom_gene.json}}
     ]
   }
 }

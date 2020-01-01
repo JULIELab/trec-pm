@@ -1,7 +1,7 @@
 {
-  "dis_max": {
+  "bool": {
     "boost": {{disease_query_boost}},
-    "queries": [
+    "should": [
       {
         "multi_match": {
           "query": "{{disease}}",
@@ -24,8 +24,7 @@
       },
       {{diseaseSynonyms:clinical_trials_generic/disease_synonym.json}},
       {{diseaseHypernyms:clinical_trials_generic/disease_hypernym.json}},
-      {{customDiseaseExpansions:clinical_trials_generic/custom_disease.json}},
-      {{match_all.json}}
+      {{customDiseaseExpansions:clinical_trials_generic/custom_disease.json}}
     ]
   }
 }

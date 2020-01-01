@@ -1,5 +1,12 @@
 [
-  "title^{{title_field_disease_boost}}",
-  "abstract^{{abstract_field_disease_boost}}",
+  "brief_title^{{brief_title_field_disease_boost}}",
+  "official_title^{{official_title_field_disease_boost}}",
+  "summary^{{summary_field_disease_boost}}",
+  "description^{{description_field_disease_boost}}",
+  "outcomeMeasures^{{outcomeMeasures_field_disease_boost}}",
+  "outcomeDescriptions^{{outcomeDescriptions_field_disease_boost}}",
+  "conditions^{{conditions_field_disease_boost}}",
+  "inclusion^{{inclusion_field_disease_boost}}",
+  "keywords^{{keywords_field_disease_boost}}",
   "meshTags^{{meshTags_field_disease_boost}}"
 ]

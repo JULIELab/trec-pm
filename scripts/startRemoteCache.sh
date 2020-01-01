@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --mem 10g
+#SBATCH --mem 20g
 #SBATCH --cpus-per-task 4
 #SBATCH -J CACHE
 #SBATCH --nodelist h1

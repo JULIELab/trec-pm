@@ -148,12 +148,12 @@ public final class LiteratureArticlesRetrievalRegistry {
      * @param size
      * @return
      */
-    public static TrecPmRetrieval jlpmcommon2Generic(int size, String instance) {
+    public static TrecPmRetrieval jlpmeneric(int size, String instance) {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
-                .withExperimentName("jlpmcommon2gen-"+instance);
+                .withExperimentName("jlpmgeneric-"+instance);
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
         Map<String, String> templateProperties = new HashMap<>();
@@ -200,6 +200,10 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withGeneSynonym();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
             ret.withGeneDescription();
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, CUSTOM)))
+            ret.withSolidTumor();
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
+            ret.withGeneFamily();
         if (retrievalConfig.getBoolean(SYNONYMLIST))
             ret.withSynonymList(SYNONYMS_FILE);
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))

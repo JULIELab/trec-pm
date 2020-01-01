@@ -27,7 +27,7 @@ retrievalparameters.templateparameters.disease.matchtypes.disease_match_type    
 retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type       categorical {phrase, best_fields} [phrase]
 retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type categorical {phrase, best_fields} [phrase]
 ## Phrase slop
-retrievalparameters.templateparameters.disease.phraseslops.disease_slop integer [1,5] [1]
+retrievalparameters.templateparameters.disease.phraseslops.disease_slop integer [0,5] [0]
 ## Conditional parameter activation
 retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost  | retrievalparameters.diseaseexpansion.preferredterm  == true
 retrievalparameters.templateparameters.disease.boosts.disease_syn_boost       | retrievalparameters.diseaseexpansion.synonyms       == true
@@ -40,6 +40,7 @@ retrievalparameters.templateparameters.disease.phraseslops.disease_slop       | 
 retrievalparameters.geneexpansion.synonyms    categorical    {true, false} [true]
 retrievalparameters.geneexpansion.description categorical    {true, false} [false]
 retrievalparameters.geneexpansion.custom      categorical    {true, false} [true]
+retrievalparameters.geneexpansion.hypernyms   categorical    {true, false} [false]
 ## Boosts
 retrievalparameters.templateparameters.gene.boosts.gene_query_boost        real [0.1,3] [1.5]
 retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost real [0.1,2] [1]
@@ -49,14 +50,16 @@ retrievalparameters.templateparameters.gene.boosts.gene_custom_boost       real 
 ## Match types
 retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type     categorical {phrase, best_fields} [best_fields]
 retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type       categorical {phrase, best_fields} [phrase]
+retrievalparameters.templateparameters.gene.matchtypes.gene_hypernyms_match_type categorical {phrase, best_fields} [phrase]
 retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type      categorical {phrase, best_fields} [phrase]
 retrievalparameters.templateparameters.gene.matchtypes.custom_gene_match_type    categorical {phrase, best_fields} [phrase]
 ## Phrase slop
-retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop integer [1,5]  [1]
-retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop   integer [1,5]  [1]
-retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop  integer [1,15] [10]
+retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop integer [0,5]  [0]
+retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop   integer [0,5]  [0]
+retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop  integer [0,15] [10]
 ## Conditional parameter activation
 retrievalparameters.templateparameters.gene.boosts.gene_syn_boost         | retrievalparameters.geneexpansion.synonyms                            == true
+retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost   | retrievalparameters.geneexpansion.hypernyms                           == true
 retrievalparameters.templateparameters.gene.boosts.gene_desc_boost        | retrievalparameters.geneexpansion.description                         == true
 retrievalparameters.templateparameters.gene.boosts.gene_custom_boost      | retrievalparameters.geneexpansion.custom                              == true
 retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop   | retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type == phrase

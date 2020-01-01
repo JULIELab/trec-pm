@@ -39,12 +39,13 @@ public final class ClinicalTrialsExperimenter {
         final Experiment jlctgenes = new Experiment(GOLD_STANDARD,
                 ClinicalTrialsRetrievalRegistry.jlctgenes(TrecConfig.SIZE));
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlctphrase,  jlctprec, jlctgenes));
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(  jlctgenes));
         for (Experiment exp : experiments) {
             exp.run();
         }
 
         OriginalDocumentRetrieval.getInstance().shutdown();
+        CacheService.getInstance().commitAllCaches();
 
     }
 
