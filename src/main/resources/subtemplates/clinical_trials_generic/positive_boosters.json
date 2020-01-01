@@ -2,7 +2,7 @@
   "bool": {
     "should": {
       "multi_match": {
-        "query": "surgery therapy treatment prognosis prognostic survival patient resistance recurrence targets malignancy study therapeutical outcome gene genotype DNA base",
+        "query": "{{positive_pm_boosters}}",
         "fields": {{clinical_trials_generic/fields_keywords.json}},
         "tie_breaker": 0.3,
         "type": "best_fields",
