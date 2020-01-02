@@ -1,1 +1,10 @@
-ct-gs-ct2019
+ct-split0-train
+ct-split1-train
+ct-split2-train
+ct-split3-train
+ct-split4-train
+ct-split5-train
+ct-split6-train
+ct-split7-train
+ct-split8-train
+ct-split9-train

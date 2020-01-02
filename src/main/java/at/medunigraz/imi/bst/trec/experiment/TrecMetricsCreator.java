@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
+import at.medunigraz.imi.bst.trec.evaluator.EvaluationCommandFailedException;
 import at.medunigraz.imi.bst.trec.evaluator.SampleEval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecEval;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
@@ -40,42 +41,47 @@ public class TrecMetricsCreator {
     public Metrics computeMetrics() {
         final String filename = goldStandardType + "_" + experimentId;
         final File trecEvalOutput = new File(statsDir, filename + ".trec_eval");
-        TrecEval te = new TrecEval(goldStandard, results, trecEvalOutput, k, calculateTrecEvalWithMissingResults);
-        Map<String, Metrics> metricsPerTopic = te.getMetrics();
+        try {
+            TrecEval te = new TrecEval(goldStandard, results, trecEvalOutput, k, calculateTrecEvalWithMissingResults);
+            Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
-        if (sampleGoldStandard != null) {
-            final File samplevalOutput = new File(statsDir, filename + ".sampleval");
-            SampleEval se = new SampleEval(sampleGoldStandard, results, samplevalOutput);
+            if (sampleGoldStandard != null) {
+                final File samplevalOutput = new File(statsDir, filename + ".sampleval");
+                SampleEval se = new SampleEval(sampleGoldStandard, results, samplevalOutput);
 
-            // TODO Refactor into MetricSet
-            Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
-            for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
-                String topic = entry.getKey();
-                if (topic == null)
-                    throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + results.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
-                entry.getValue().merge(sampleEvalMetrics.get(topic));
+                // TODO Refactor into MetricSet
+                Map<String, Metrics> sampleEvalMetrics = se.getMetrics();
+                for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
+                    String topic = entry.getKey();
+                    if (topic == null)
+                        throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + results.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
+                    entry.getValue().merge(sampleEvalMetrics.get(topic));
+                }
             }
+
+            File statsDirFile = new File(statsDir);
+            if (!statsDirFile.exists())
+                statsDirFile.mkdir();
+
+            XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + filename + ".xml"));
+            xsw.write(metricsPerTopic);
+            xsw.close();
+
+            CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + filename + ".csv"));
+            csw.write(metricsPerTopic);
+            csw.close();
+
+            Metrics allMetrics = metricsPerTopic.get("all");
+            LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
+                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
+                    longExperimentId);
+            metrics = allMetrics;
+            LOG.trace(allMetrics);
+            return allMetrics;
+        } catch (EvaluationCommandFailedException e) {
+            LOG.warn("Evaluation of collection {} failed due to evaluation command error {}", longExperimentId, e.getMessage());
+            return Metrics.ZERO;
         }
-
-        File statsDirFile = new File(statsDir);
-        if (!statsDirFile.exists())
-            statsDirFile.mkdir();
-
-        XMLStatsWriter xsw = new XMLStatsWriter(new File(statsDir + filename + ".xml"));
-        xsw.write(metricsPerTopic);
-        xsw.close();
-
-        CSVStatsWriter csw = new CSVStatsWriter(new File(statsDir + filename + ".csv"));
-        csw.write(metricsPerTopic);
-        csw.close();
-
-        Metrics allMetrics = metricsPerTopic.get("all");
-        LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
-                allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
-                longExperimentId);
-        LOG.trace(allMetrics);
-        metrics = allMetrics;
-        return allMetrics;
     }
 
     public Metrics getMetrics() {

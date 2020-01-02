@@ -78,7 +78,7 @@ public class UmlsSynsetProvider {
         defaultSemanticTypesFile = file;
     }
 
-    public static UmlsSynsetProvider getInstance() {
+    public synchronized static UmlsSynsetProvider getInstance() {
         if (instance == null) {
             boolean useCache = true;
             instance = new UmlsSynsetProvider(defaultSynsetFile, defaultSemanticTypesFile, defaultPreferredTermsFile,DEFAULT_SEPARATOR, false, useCache);
@@ -122,7 +122,7 @@ public class UmlsSynsetProvider {
         return prefTerm;
     }
 
-    public String getPreftermForCui(String cui) {
+    public synchronized String getPreftermForCui(String cui) {
         String prefTerm = useCache ? preftermForCuiCache.get(cui) : null;
         if (prefTerm == null) {
             try {
@@ -134,7 +134,7 @@ public class UmlsSynsetProvider {
         return prefTerm;
     }
 
-    public String getPreftermForTerm(String term) {
+    public synchronized String getPreftermForTerm(String term) {
         Optional<List<String>> mostFrequentPrefTerm = getCuis(term).stream()
                 .map(this::getPreftermForCui)
                 .collect(Collectors.groupingBy(Function.identity()))
@@ -146,7 +146,7 @@ public class UmlsSynsetProvider {
         return null;
     }
 
-    public Set<UmlsSynset> getSynsets(String term) {
+    public synchronized Set<UmlsSynset> getSynsets(String term) {
         Set<UmlsSynset> sets = useCache ? synsetCache.get(term) : null;
         if (sets == null) {
             try {
@@ -160,7 +160,7 @@ public class UmlsSynsetProvider {
         return sets;
     }
 
-    public Set<String> getCuis(String term) {
+    public synchronized Set<String> getCuis(String term) {
         try {
             Set<String> cuisForTerm = useCache ? cuisForTermCache.get(term) : null;
             if (cuisForTerm == null) {
@@ -175,7 +175,7 @@ public class UmlsSynsetProvider {
         return null;
     }
 
-    public UmlsSynset getCuiSynset(String cui) {
+    public synchronized UmlsSynset getCuiSynset(String cui) {
         try {
             UmlsSynset synset = useCache ? cuiSynsetCache.get(cui) : null;
             if (synset == null) {
@@ -227,7 +227,7 @@ public class UmlsSynsetProvider {
         return cuis;
     }
 
-    public Set<String> getSemanticTypeForCui(String cui) {
+    public synchronized Set<String> getSemanticTypeForCui(String cui) {
         Set<String> semTypes = useCache ? semanticTypesCache.get(cui) : null;
         if (semTypes == null) {
             semTypes = getSemanticTypeFromFile(umlsSemanticTypesFile, separator, cui);
@@ -247,7 +247,7 @@ public class UmlsSynsetProvider {
         return types;
     }
 
-    public Set<String> getSemanticTypes(String term) {
+    public synchronized Set<String> getSemanticTypes(String term) {
         final Set<String> cuis = getCuis(term);
         return cuis.stream().map(this::getSemanticTypeForCui).flatMap(Collection::stream).collect(Collectors.toSet());
     }

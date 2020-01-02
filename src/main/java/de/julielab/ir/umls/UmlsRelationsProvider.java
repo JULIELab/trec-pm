@@ -37,7 +37,7 @@ public class UmlsRelationsProvider {
         }
     }
 
-    public static UmlsRelationsProvider getInstance() {
+    public synchronized static UmlsRelationsProvider getInstance() {
         if (instance == null) {
             instance = new UmlsRelationsProvider(defaultRelationsFile, useCache);
             log.debug("Is caching used for {}: {}", UmlsRelationsProvider.class.getSimpleName(), useCache);
@@ -84,7 +84,7 @@ public class UmlsRelationsProvider {
         return ret;
     }
 
-    public List<Set<String>> getRelatives(String cui, Relation relation, int maxDistance) {
+    public synchronized List<Set<String>> getRelatives(String cui, Relation relation, int maxDistance) {
         Set<String> currentCuis = Collections.singleton(cui);
         List<Set<String>> relativeLevels = new ArrayList<>();
         for (int i = 0; i < maxDistance; i++) {
@@ -98,7 +98,7 @@ public class UmlsRelationsProvider {
         return relativeLevels;
     }
 
-    public Set<String> getRelatives(String cui, Relation relation) {
+    public synchronized Set<String> getRelatives(String cui, Relation relation) {
         CacheAccess<String, Set<String>> cacheToUse = relation == Relation.PARENT ? parentsCache : childrenCache;
         Set<String> sets = useCache ? cacheToUse.get(cui) : null;
         if (sets == null) {

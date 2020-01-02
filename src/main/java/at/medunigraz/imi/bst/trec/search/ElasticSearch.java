@@ -21,16 +21,15 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 public class ElasticSearch implements SearchEngine {
 
     private static final Logger LOG = LogManager.getLogger();
-    private static CacheAccess<String, List<Result>> cache;
+    private static Map<Thread, CacheAccess<String, List<Result>>> cacheMap = new ConcurrentHashMap<>();
+    private CacheAccess<String, List<Result>> cache;
     private Client client;
     private String index = "_all";
     private SimilarityParameters parameters;
@@ -42,8 +41,9 @@ public class ElasticSearch implements SearchEngine {
     private String[] storedFields;
 
     public ElasticSearch() {
-        if (cache == null)
-            cache = CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java");
+        cache = cacheMap.compute(Thread.currentThread(), (k,v) ->
+            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java")
+        );
         this.parameters = new NoParameters();
     }
 
@@ -80,7 +80,7 @@ public class ElasticSearch implements SearchEngine {
 
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
-        System.out.println(json);
+        //System.out.println(json);
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
         // #setFilterOnFieldValues(String, Collection)
