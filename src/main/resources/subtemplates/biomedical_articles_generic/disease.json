@@ -24,7 +24,8 @@
       },
       {{diseaseSynonyms:biomedical_articles_generic/disease_synonym.json}},
       {{diseaseHypernyms:biomedical_articles_generic/disease_hypernym.json}},
-      {{customDiseaseExpansions:biomedical_articles_generic/custom_disease.json}}
+      {{customDiseaseExpansions:biomedical_articles_generic/custom_disease.json}},
+      {{match_all.json}}
     ]
   }
 }

@@ -88,6 +88,14 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withConditionalCancer();
     }
 
+    public static TrecPmRetrieval jlpmcommongenericcalibration(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer();
+    }
+
     public static TrecPmRetrieval jlpmcommon2noextra(int size) {
         return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE_NO_EXTRA)
