@@ -164,6 +164,7 @@ retrievalparameters.keywords.positivepm@word:healing        categorical {true, f
 retrievalparameters.keywords.positivepm@word:recover        categorical {true, false} [false]
 retrievalparameters.keywords.positivepm@word:recovery       categorical {true, false} [false]
 retrievalparameters.keywords.positivepm@word:patient        categorical {true, false} [true]
+retrievalparameters.keywords.positivepm@word:dna            categorical {true, false} [false]
 ## Negative PM
 retrievalparameters.keywords.negativepm@word:tumor        categorical {true, false} [true]
 retrievalparameters.keywords.negativepm@word:cell         categorical {true, false} [true]
@@ -175,3 +176,4 @@ retrievalparameters.keywords.negativepm@word:specific     categorical {true, fal
 retrievalparameters.keywords.negativepm@word:staining     categorical {true, false} [true]
 retrievalparameters.keywords.negativepm@word:pathogenesis categorical {true, false} [true]
 retrievalparameters.keywords.negativepm@word:case         categorical {true, false} [true]
+retrievalparameters.keywords.negativepm@word:dna          categorical {true, false} [false]

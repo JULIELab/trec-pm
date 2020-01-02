@@ -5,10 +5,8 @@
 			{{biomedical_articles_generic/gene.json}}
 		],
 		"should": [
-			{{biomedical_articles/extra.json}},
 			{{chemotherapyBoosters:biomedical_articles_generic/conditional_chemotherapy.json}},
 			{{cancerBoosters:biomedical_articles_generic/conditional_cancer.json}},
-			{{biomedical_articles/dna.json}},
 			{{biomedical_articles_generic/positive_boosters.json}},
 			{{biomedical_articles_generic/negative_boosters.json}},
 			{{biomedical_articles_generic/exists_abstract.json}},
