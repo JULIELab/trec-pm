@@ -15,6 +15,19 @@ public abstract class QueryDescription {
     protected Challenge challenge;
     protected int year;
     protected int number;
+    protected String index;
+
+    /**
+     * The index in which to search this query.
+     * @return The index with the data for this query.
+     */
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
 
     public QueryDescription(Challenge challenge, int year, int number) {
         this();

@@ -156,7 +156,7 @@ public final class LiteratureArticlesRetrievalRegistry {
      * @param size
      * @return
      */
-    public static TrecPmRetrieval jlpmeneric(int size, String instance) {
+    public static TrecPmRetrieval jlpmgeneric(int size, String instance) {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 

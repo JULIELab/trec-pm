@@ -1,5 +1,6 @@
 package de.julielab.ir.goldstandards;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
@@ -135,5 +136,51 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
     public void setQueryIdFunction(Function<QueryDescription, String> queryIdFunction) {
         this.queryIdFunction = queryIdFunction;
+    }
+
+    @Override
+    protected void setIndexToQuery(Q query) {
+        if (query.getIndex() != null)
+            return;
+        String index;
+        Challenge challenge = query.getChallenge();
+        int year = query.getYear();
+        // TODO the queries don't know their task
+        if (challenge == Challenge.TREC_PM) {
+            if (task == Task.PUBMED) {
+                switch (year) {
+                    case 2017:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2017;
+                        break;
+                    case 2018:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2018;
+                        break;
+                    case 2019:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2019;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown TREC PM year " + year);
+                }
+            } else if (task == Task.CLINICAL_TRIALS) {
+                switch (year) {
+                    case 2017:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2017;
+                        break;
+                    case 2018:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2018;
+                        break;
+                    case 2019:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2019;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown TREC CT year " + year);
+                }
+            } else {
+                throw new IllegalArgumentException("Unknown TREC PM task " + task);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown challenge " + challenge);
+        }
+        query.setIndex(index);
     }
 }

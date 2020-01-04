@@ -7,6 +7,7 @@ public class PMFCConstants extends FCConstants {
     public static final String TEMPLATEPARAMETERS = "templateparameters";
     public static final String INDEXPARAMETERS = "indexparameters";
     public static final String DISEASEEXPANSION = "diseaseexpansion";
+    public static final String DISEASE_PREFERRED_TERM = "diseasePreferredTerm";
     public static final String GENEEXPANSION = "geneexpansion";
     public static final String DESCRIPTION = "description";
     public static final String SYNONYMLIST = "synonymlist";

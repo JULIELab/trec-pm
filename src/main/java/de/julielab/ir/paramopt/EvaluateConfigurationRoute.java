@@ -14,6 +14,8 @@ import de.julielab.ir.ltr.features.FeatureControlCenter;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.io.FileBased;
+import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.tree.ImmutableNode;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,10 +23,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -90,7 +89,16 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                         break;
                 }
             }
-            HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(parameters.toArray(new String[0]));
+            String[] params = parameters.toArray(new String[0]);
+            HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(params);
+            if (log.isDebugEnabled()) {
+                FileHandler fh = new FileHandler((FileBased) configuration);
+                StringWriter sw = new StringWriter();
+                fh.save(sw);
+                String xml = sw.toString();
+                xml = xml.replaceAll("\n(\\s+)?", "");
+                log.debug("Evaluating instance {} in thread {} with configuration: {}", instanceName,  Thread.currentThread(),xml);
+            }
             score = calculateScore(configuration, instanceName, seed);
         } catch (Exception e) {
             throw e;
@@ -105,7 +113,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             FeatureControlCenter.initialize(config);
         else
             FeatureControlCenter.reconfigure(config);
-        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmeneric(TrecConfig.SIZE, instance) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance);
+        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance);
         // e.g. ct-split2-train
         String[] splitAndType = instance.split("-");
         String partitionType = splitAndType[2];
@@ -115,7 +123,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             // The test partition is just the the partition with the given number
             evalGs = goldStandardSplit.get(splitNumber);
         } else if (partitionType.equals("train")) {
-            Integer splitNumber = Integer.valueOf(splitAndType[1].charAt(5));
+            Integer splitNumber = Integer.valueOf(String.valueOf(splitAndType[1].charAt(5)));
             // The train split is all except the test partition
             List<TrecQrelGoldStandard<Topic>> evalData = IntStream.range(0, numSplits).filter(i -> i != splitNumber).mapToObj(i -> goldStandardSplit.get("split" + i)).collect(Collectors.toList());
             evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);

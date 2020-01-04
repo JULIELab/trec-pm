@@ -45,21 +45,22 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, String qrelsFile, BiFunction<String, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries) {
+        this.queries = queries.stream().map(q -> (Q)q.getCleanCopy()).collect(Collectors.toList());
         this.challenge = challenge;
         this.task = task;
         this.year = year;
         this.type = type;
-        this.queries = queries;
+        this.queries.forEach(this::setIndexToQuery);
+    }
+
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, String qrelsFile, BiFunction<String, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
+        this(challenge, task ,year, type, queries);
         qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
     }
 
     public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, DocumentList<Q> qrelDocuments) {
-        this.challenge = challenge;
-        this.task = task;
-        this.year = year;
-        this.type = type;
-        this.queries = queries;
+        this(challenge, task ,year, type, queries);
         this.qrelDocuments = qrelDocuments;
     }
 
@@ -158,4 +159,6 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         for (Document<Q> d : qrelDocuments)
             d.setDocumentDbConfiguration(documentDbConfiguration);
     }
+
+    protected abstract void setIndexToQuery(Q query);
 }

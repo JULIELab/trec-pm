@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ import static de.julielab.java.utilities.ConfigurationUtilities.*;
 
 public class FeatureControlCenter {
     private static final Logger log = LogManager.getLogger();
-    private static FeatureControlCenter singleton;
+    private static Map<Thread, FeatureControlCenter> instances = new ConcurrentHashMap<>();
     private HierarchicalConfiguration<ImmutableNode> configuration;
     private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;
 
@@ -40,25 +41,28 @@ public class FeatureControlCenter {
     }
 
     public static FeatureControlCenter getInstance() {
-        if (singleton == null)
+        FeatureControlCenter instance = instances.get(Thread.currentThread());
+        if (instance == null)
             throw new IllegalStateException("The FeatureControlCenter must be initialized once per application start with the feature configuration to be used. This has not happened yet.");
-        return singleton;
+        return instance;
     }
 
     public static void initialize(HierarchicalConfiguration<ImmutableNode> configuration) {
-        if (singleton != null)
+        FeatureControlCenter instance = instances.get(Thread.currentThread());
+        if (instance != null)
             throw new IllegalStateException("The FeatureControlCenter has already been initialized. Do avoid confusion using the singleton pattern, reconfigurations must happen explicitly through the reconfigure method.");
-        singleton = new FeatureControlCenter(configuration);
+        instances.put(Thread.currentThread(), new FeatureControlCenter(configuration));
     }
 
     public static void reconfigure(HierarchicalConfiguration<ImmutableNode> configuration) {
-        if (singleton == null)
+        FeatureControlCenter instance = instances.get(Thread.currentThread());
+        if (instance == null)
             throw new IllegalStateException("The FeatureControlCenter was not yet initialized and thus cannot be reconfigured.");
-        singleton = new FeatureControlCenter(configuration);
+        instances.put(Thread.currentThread(), new FeatureControlCenter(configuration));
     }
 
     public static boolean isInitialized() {
-        return singleton != null;
+        return instances.get(Thread.currentThread()) != null;
     }
 
     /**
@@ -102,6 +106,7 @@ public class FeatureControlCenter {
 
     /**
      * <p>Returns a map where the keys are the configuration keys one level below the given <tt>baseConfigurationPath</tt> and the values are the configuration values of the <tt>baseConfigurationPath</tt> plus the following level.</p>
+     *
      * @param config
      * @param baseConfigurationPath
      * @return

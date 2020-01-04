@@ -24,6 +24,7 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     // must include at least one. Required for LtR feature creation.
     private String filterField;
     private Collection<String> filterValues;
+
     public ElasticSearchQuery(int size, String index, String... types) {
         this.size = size;
         this.index = index;
@@ -62,10 +63,13 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     @Override
     public List<Result> query(T topic) {
         ElasticSearch es;
+        String index = topic.getIndex() != null ? topic.getIndex() : this.index;
+        if (index == null)
+            throw new IllegalStateException("No index was specified for this ElasticSearchQuery and the given topic does also not specify an index.");
         if (this.types != null) {
-            es = new ElasticSearch(this.index, parameters, this.types);
+            es = new ElasticSearch(index, parameters, this.types);
         } else {
-            es = new ElasticSearch(this.index, parameters);
+            es = new ElasticSearch(index, parameters);
         }
         if (storedFields != null) {
             es.setStoredFields(storedFields);

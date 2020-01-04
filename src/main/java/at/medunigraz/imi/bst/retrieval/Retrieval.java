@@ -15,6 +15,7 @@ import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.Serializable;
@@ -221,10 +222,10 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         for (Q topic : queryDescriptions) {
             Q cleanCopy = topic.getCleanCopy();
             List<Result> results = query.query(cleanCopy);
-
-            if (results.isEmpty())
-                //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
-                log.error("RESULT EMPTY for {}", getExperimentId());
+            if (results.isEmpty()) {
+                String index = topic.getIndex() != null ? topic.getIndex() : indexName;
+                log.error("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index,Thread.currentThread(), new JSONObject(query.getJSONQuery()));
+            }
 
 
             ResultList<Q> resultList = new ResultList<>(cleanCopy);

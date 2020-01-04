@@ -365,8 +365,10 @@ public class Topic extends QueryDescription {
 
     @Override
     public Topic getCleanCopy() {
-        return new Topic().withNumber(number).withYear(year).withDisease(disease).withGeneField(geneField).withGenes(genes)
+        Topic copy = new Topic().withChallenge(challenge).withNumber(number).withYear(year).withDisease(disease).withGeneField(geneField).withGenes(genes)
                 .withDemographic(demographic).withOther(other);
+        copy.setIndex(index);
+        return copy;
     }
 
     @Override

@@ -25,7 +25,7 @@ public class DiseaseUmlsPreferredTermQueryDecorator extends DynamicQueryDecorato
             umlsSynsetProvider = UmlsSynsetProvider.getInstance();
         String disease = topic.getDisease();
         final String preferredTerm = umlsSynsetProvider.getPreftermForTerm(disease);
-        topic.withDiseasePreferredTerm(preferredTerm);
+        topic.withDiseasePreferredTerm(preferredTerm != null ? preferredTerm : "");
         return topic;
     }
 

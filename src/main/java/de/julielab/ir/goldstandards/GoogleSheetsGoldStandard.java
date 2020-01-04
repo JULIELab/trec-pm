@@ -128,4 +128,10 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     public Function<QueryDescription, String> getQueryIdFunction() {
         return q -> String.valueOf(q.getNumber());
     }
+
+
+    @Override
+    protected void setIndexToQuery(Q query) {
+        // not implemented, use default index
+    }
 }
