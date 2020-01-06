@@ -1,7 +1,9 @@
 pcs-file = config/smac/allparams_ct_split1/smac-parameters.pcs
 runObj = QUALITY
-cutoffTime = 300
+cutoffTime = 500
 wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/allparams_ct_split1/instances.txt
-algo = bash scripts/smacOverHttpWrapper.sh 32100 ct
+algo = bash scripts/smacOverHttpWrapper.sh 32100 ct copy1
+save-runs-every-iteration = true
+seed = 1

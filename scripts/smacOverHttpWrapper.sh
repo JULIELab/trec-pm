@@ -2,16 +2,17 @@
 port=$1
 # PM or CT (PubMed for biomedical articles task, ClinicalTrials for clinical trials task), used in the server endpoint
 corpustype=$2
-instance=$3
-instanceInfo=$4
-cutoffTime=$5
-cutoffLength=$6
-seed=$7
+indexSuffix=$3
+instance=$4
+instanceInfo=$5
+cutoffTime=$6
+cutoffLength=$7
+seed=$8
 
 argc=$#
 argv=("$@")
 
-curldata="instance=$instance&instance_info=none&cutoff_time=$cutoffTime&cutoff_length=$cutoffLength&seed=$seed"
+curldata="instance=$instance&instance_info=none&cutoff_time=$cutoffTime&cutoff_length=$cutoffLength&seed=$seed&index_suffix=$indexSuffix"
 for (( j=7; j<argc; j++ )); do
     arg=${argv[j]}
     if [[ $((j%2)) = 1 ]]; then
