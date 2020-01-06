@@ -33,6 +33,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
     private String indexName;
     private List<Retrieval<T, Q>> negativeBoosts;
     private IRScoreFeatureKey scoreKey;
+    private String indexSuffix;
 
     public Retrieval(String indexName) {
         this(indexName, new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL));
@@ -61,6 +62,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     public T withExperimentName(String name) {
         this.experimentName = name;
+        return (T) this;
+    }
+
+    public T withIndexSuffix(String suffix) {
+        indexSuffix = suffix;
+        esQuery.setIndexSuffix(suffix);
         return (T) this;
     }
 
@@ -224,6 +231,8 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
             List<Result> results = query.query(cleanCopy);
             if (results.isEmpty()) {
                 String index = topic.getIndex() != null ? topic.getIndex() : indexName;
+                if (indexSuffix != null && !indexSuffix.isBlank())
+                    index = index + indexSuffix;
                 log.error("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index,Thread.currentThread(), new JSONObject(query.getJSONQuery()));
             }
 

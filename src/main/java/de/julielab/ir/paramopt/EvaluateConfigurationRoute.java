@@ -63,6 +63,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             int cutoffTime = 0;
             int cutoffLength = 0;
             int seed = 0;
+            String indexSuffix = null;
             List<String> parameters = new ArrayList<>(queryParams.size());
             // Fill the beginning of the list because the parameter parsing algorithm is expecting it
             parameters.addAll(Arrays.asList(null, null, null, null, null));
@@ -83,6 +84,9 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                     case SEED:
                         seed = Integer.valueOf(req.queryParams(queryParam));
                         break;
+                    case INDEX_SUFFIX:
+                        indexSuffix = req.queryParams(queryParam);
+                        break;
                     default:
                         parameters.add("-" + queryParam);
                         parameters.add(req.queryParams(queryParam));
@@ -91,13 +95,14 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             }
             String[] params = parameters.toArray(new String[0]);
             HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(params);
+            configuration.addProperty(INDEX_SUFFIX, indexSuffix);
             if (log.isDebugEnabled()) {
                 FileHandler fh = new FileHandler((FileBased) configuration);
                 StringWriter sw = new StringWriter();
                 fh.save(sw);
                 String xml = sw.toString();
                 xml = xml.replaceAll("\n(\\s+)?", "");
-                log.debug("Evaluating instance {} in thread {} with configuration: {}", instanceName,  Thread.currentThread(),xml);
+                log.debug("Evaluating instance {} in thread {} on index copy {} with configuration: {}", instanceName, Thread.currentThread(), indexSuffix,xml);
             }
             score = calculateScore(configuration, instanceName, seed);
         } catch (Exception e) {
@@ -113,7 +118,10 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             FeatureControlCenter.initialize(config);
         else
             FeatureControlCenter.reconfigure(config);
+        String indexSuffix = config.containsKey(INDEX_SUFFIX) ? config.getString(INDEX_SUFFIX) : "";
         TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance);
+        trecPmRetrieval.withIndexSuffix(indexSuffix);
+
         // e.g. ct-split2-train
         String[] splitAndType = instance.split("-");
         String partitionType = splitAndType[2];
@@ -159,7 +167,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
 
     private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics, String corpus, String partitionType) {
         File dir = new File("smac-metrics-logging");
-        File logfile = new File(dir, "parameteroptimization-log-" + corpus+"-"+partitionType +"-"+ goldStandard.getDatasetId() + ".tsv");
+        File logfile = new File(dir, "parameteroptimization-log-" + corpus + "-" + partitionType + "-" + goldStandard.getDatasetId() + ".tsv");
         if (!dir.exists())
             dir.mkdirs();
         boolean logFileExists = logfile.exists();

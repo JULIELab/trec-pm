@@ -21,6 +21,9 @@ public class HttpParamOptServer {
     public static final String CUTOFF_TIME = "cutoff_time";
     public static final String CUTOFF_LENGTH = "cutoff_length";
     public static final String SEED = "seed";
+    // The index_copy parameter value is used as a suffix to the otherwise normally obtained index name.
+    // Used when multiple concurrent runs change index settings, then we need those copies.
+    public static final String INDEX_SUFFIX = "index_suffix";
     private static final Logger log = LogManager.getLogger();
 
 

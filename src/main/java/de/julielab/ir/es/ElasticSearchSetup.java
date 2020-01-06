@@ -51,7 +51,7 @@ public class ElasticSearchSetup {
     /**
      * For multiple concurrent experiments on an index where each run may change the index settings, we need copies for each independent run. Otherwise one run will change the settings of the other run, invalidating the experimental results.
      */
-    private static String[] independentCopies = new String[]{"copy0", "copy1", "copy2"    };
+    private static String[] independentCopies = new String[]{"copy0", "copy1", "copy2", "copy3", "copy4", "copy5", "copy6", "copy7", "copy8", "copy9"};
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
@@ -73,6 +73,7 @@ public class ElasticSearchSetup {
 
 
     }
+
     ;
 
     public static void main(String args[]) {
@@ -97,7 +98,7 @@ public class ElasticSearchSetup {
                 final Client client = ElasticClientFactory.getClient();
                 for (String similarity : allSimilarities) {
                     for (String copy : independentCopies) {
-                        String indexName = indexbaseName + "_" + similarity + "_"+copy;
+                        String indexName = indexbaseName + "_" + similarity + "_" + copy;
                         deleteIndex(client, indexName);
                     }
                 }
@@ -169,7 +170,7 @@ public class ElasticSearchSetup {
             for (Object concreteSimilarityParam : concreteSimilaritySettings.names()) {
                 String setting = "index.similarity." + key + "." + concreteSimilarityParam;
                 String currentValue = s.get(setting);
-                if (!String.valueOf(concreteSimilaritySettings.get((String)concreteSimilarityParam)).equals(currentValue))
+                if (!String.valueOf(concreteSimilaritySettings.get((String) concreteSimilarityParam)).equals(currentValue))
                     unequalSettingFound = true;
                 if (unequalSettingFound)
                     break;

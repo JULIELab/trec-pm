@@ -24,6 +24,8 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     // must include at least one. Required for LtR feature creation.
     private String filterField;
     private Collection<String> filterValues;
+    // This suffix is appended to the index name given or retrieved from the query
+    private String indexSuffix;
 
     public ElasticSearchQuery(int size, String index, String... types) {
         this.size = size;
@@ -64,6 +66,8 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     public List<Result> query(T topic) {
         ElasticSearch es;
         String index = topic.getIndex() != null ? topic.getIndex() : this.index;
+        if (indexSuffix != null && !indexSuffix.isBlank())
+            index = index + indexSuffix;
         if (index == null)
             throw new IllegalStateException("No index was specified for this ElasticSearchQuery and the given topic does also not specify an index.");
         if (this.types != null) {
@@ -105,5 +109,9 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public void setIndexSuffix(String suffix) {
+        indexSuffix = suffix;
     }
 }
