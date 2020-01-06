@@ -1,7 +1,7 @@
-pcs-file = config/smac/allparams_pm/smac-parameters.pcs
+pcs-file = config/smac/allparams_pm_split9/smac-parameters.pcs
 runObj = QUALITY
 cutoffTime = 300
 wallclock-limit = 172800
 deterministic = 1
-instance_file = config/smac/allparams_pm/instances.txt
+instance_file = config/smac/allparams_pm_split9/instances.txt
 algo = bash scripts/smacOverHttpWrapper.sh 32100 pm

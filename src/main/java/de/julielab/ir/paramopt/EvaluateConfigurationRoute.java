@@ -152,14 +152,14 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
 
         Metrics metrics = exp.run();
         CacheService.getInstance().commitAllCaches();
-        logMetrics(config, instance, metrics, partitionType);
+        logMetrics(config, instance, metrics, splitAndType[0], partitionType);
         // SMAC always minimizes the objective, thus multiplying with -1
         return -1 * metrics.getInfNDCG();
     }
 
-    private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics, String partitionType) {
+    private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics, String corpus, String partitionType) {
         File dir = new File("smac-metrics-logging");
-        File logfile = new File(dir, "parameteroptimization-log-" + partitionType + goldStandard.getDatasetId() + ".tsv");
+        File logfile = new File(dir, "parameteroptimization-log-" + corpus+"-"+partitionType +"-"+ goldStandard.getDatasetId() + ".tsv");
         if (!dir.exists())
             dir.mkdirs();
         boolean logFileExists = logfile.exists();
