@@ -48,6 +48,10 @@ public class ElasticSearchSetup {
     private static String[] allSimilarities = new String[]{"bm25"
             //, "dfr", "dfi", "ib", "lmd", "lmjm"
     };
+    /**
+     * For multiple concurrent experiments on an index where each run may change the index settings, we need copies for each independent run. Otherwise one run will change the settings of the other run, invalidating the experimental results.
+     */
+    private static String[] independentCopies = new String[]{"copy0", "copy1", "copy2"    };
 
     static {
         defaultProperties.put("bm25_k1", "1.2");
@@ -92,8 +96,10 @@ public class ElasticSearchSetup {
             if (doDelete) {
                 final Client client = ElasticClientFactory.getClient();
                 for (String similarity : allSimilarities) {
-                    String indexName = indexbaseName + "_" + similarity;
-                    deleteIndex(client, indexName);
+                    for (String copy : independentCopies) {
+                        String indexName = indexbaseName + "_" + similarity + "_"+copy;
+                        deleteIndex(client, indexName);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -122,17 +128,20 @@ public class ElasticSearchSetup {
     public static void createIndices(String indexBasename, String configurationTemplateFile, Map<String, String> properties, String esType) {
         Map<String, String> parameters = new HashMap<>(properties);
         for (String similarity : allSimilarities) {
-            parameters.put("similarity", "my_" + similarity);
-            final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(configurationTemplateFile, new StaticMapQueryDecorator(parameters, new DummyElasticSearchQuery()));
-            final Topic t = new Topic();
-            decorator.query(t);
-            final String indexSettingsAndMappings = decorator.getJSONQuery();
-            JSONObject indexSettingsAndMappingsObject = new JSONObject(indexSettingsAndMappings);
+            for (String copy : independentCopies) {
+                parameters.put("similarity", "my_" + similarity);
+                final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(configurationTemplateFile, new StaticMapQueryDecorator(parameters, new DummyElasticSearchQuery()));
+                final Topic t = new Topic();
+                decorator.query(t);
+                final String indexSettingsAndMappings = decorator.getJSONQuery();
+                JSONObject indexSettingsAndMappingsObject = new JSONObject(indexSettingsAndMappings);
 
-            final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
-            final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
+                final JSONObject settings = indexSettingsAndMappingsObject.getJSONObject("settings");
+                final JSONObject mappings = indexSettingsAndMappingsObject.getJSONObject("mappings").getJSONObject(esType);
 
-            configureIndex(indexBasename, false, settings, mappings, esType, similarity);
+                String indexName = indexBasename + "_" + similarity + "_" + copy;
+                configureIndex(indexName, true, settings, mappings, esType, similarity);
+            }
         }
     }
 
