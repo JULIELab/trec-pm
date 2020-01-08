@@ -6,8 +6,6 @@ retrievalparameters.template categorical {/templates/clinical_trials_generic/jlc
 # Query filtering
 retrievalparameters.queryfiltering categorical {true, false} [true]
 
-# Custom synonym list
-retrievalparameters.synonymlist    categorical {true, false} [true]
 
 # Disease
 ## Expansion on/off

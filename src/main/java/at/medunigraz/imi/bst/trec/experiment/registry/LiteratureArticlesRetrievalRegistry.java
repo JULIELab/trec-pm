@@ -212,12 +212,12 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withSolidTumor();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
             ret.withGeneFamily();
-        if (retrievalConfig.getBoolean(SYNONYMLIST))
-            ret.withSynonymList(SYNONYMS_FILE);
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
             ret.withUmlsDiseasePreferredTerm();
-        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS)))
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
+            ret.withSynonymList(SYNONYMS_FILE);
+        }
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
         // The decorator is always added but it internally checks which keywords are active, if any.
