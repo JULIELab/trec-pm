@@ -208,8 +208,6 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withGeneSynonym();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
             ret.withGeneDescription();
-        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, CUSTOM)))
-            ret.withSolidTumor();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
             ret.withGeneFamily();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
@@ -220,6 +218,8 @@ public final class LiteratureArticlesRetrievalRegistry {
         }
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, CUSTOM)))
+            ret.withSolidTumor();
         // The decorator is always added but it internally checks which keywords are active, if any.
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();

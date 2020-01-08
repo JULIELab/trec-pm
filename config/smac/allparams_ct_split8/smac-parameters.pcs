@@ -45,7 +45,6 @@ retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost real 
 retrievalparameters.templateparameters.gene.boosts.gene_syn_boost          real [0,2] [0.1]
 retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost    real [0,2] [0.1]
 retrievalparameters.templateparameters.gene.boosts.gene_desc_boost         real [0,2] [0.1]
-retrievalparameters.templateparameters.gene.boosts.gene_custom_boost       real [0,2] [0.6]
 ## Match types
 retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type     categorical {phrase, best_fields} [best_fields]
 retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type       categorical {phrase, best_fields} [phrase]
@@ -60,7 +59,6 @@ retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop  integer 
 retrievalparameters.templateparameters.gene.boosts.gene_syn_boost         | retrievalparameters.geneexpansion.synonyms                            == true
 retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost   | retrievalparameters.geneexpansion.hypernyms                           == true
 retrievalparameters.templateparameters.gene.boosts.gene_desc_boost        | retrievalparameters.geneexpansion.description                         == true
-retrievalparameters.templateparameters.gene.boosts.gene_custom_boost      | retrievalparameters.geneexpansion.custom                              == true
 retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop   | retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type == phrase
 retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop     | retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type   == phrase
 retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop    | retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type  == phrase
