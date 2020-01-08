@@ -119,7 +119,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         else
             FeatureControlCenter.reconfigure(config);
         String indexSuffix = config.containsKey(INDEX_SUFFIX) ? config.getString(INDEX_SUFFIX) : "";
-        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance);
+        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance+"-"+indexSuffix) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance+"-"+indexSuffix);
         trecPmRetrieval.withIndexSuffix(indexSuffix);
 
         // e.g. ct-split2-train
