@@ -119,21 +119,36 @@ public class ElasticSearch implements SearchEngine {
             final SearchSourceBuilder sb = new SearchSourceBuilder().query(qb).size(size).storedField("_id");
             if (storedFields != null)
                 sb.fetchSource(storedFields, null);
-            SearchResponse response = client.search(new SearchRequest(index).source(sb)).get();
-            //LOG.trace(JsonUtils.prettify(response.toString()));
-            SearchHit[] results = response.getHits().getHits();
-
-            List<Result> ret = new ArrayList<>();
-            for (SearchHit hit : results) {
-                Result result = new Result(hit.getId(), hit.getScore());
-                result.setSourceFields(hit.getSourceAsMap());
-                ret.add(result);
+            SearchResponse response = null;
+            int retries = 0;
+            ExecutionException lastException = null;
+            while (retries < 3 && response == null) {
+                try {
+                    response = client.search(new SearchRequest(index).source(sb)).get();
+                } catch (InterruptedException e) {
+                    LOG.error("Search was interrupted", e);
+                } catch (ExecutionException e) {
+                    lastException = e;
+                    int waitingtime = 1000*(retries+1);
+                    LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}", waitingtime, retries);
+                    Thread.sleep(waitingtime);
+                }
             }
+            if (response == null) {
+                LOG.error("Could not execute the query after 3 tries, giving up.", lastException);
+            } else {
+                //LOG.trace(JsonUtils.prettify(response.toString()));
+                SearchHit[] results = response.getHits().getHits();
 
-            return ret;
+                List<Result> ret = new ArrayList<>();
+                for (SearchHit hit : results) {
+                    Result result = new Result(hit.getId(), hit.getScore());
+                    result.setSourceFields(hit.getSourceAsMap());
+                    ret.add(result);
+                }
+                return ret;
+            }
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
             e.printStackTrace();
         }
         return null;
