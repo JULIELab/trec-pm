@@ -22,8 +22,8 @@ import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 
 public class RankerFromPm1718 implements Ranker<Topic> {
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(RankerFromPm1718.class);
     private final String xmiTableName = "_data_xmi.documents";
     private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
     private METRIC trainMetric = METRIC.NDCG;

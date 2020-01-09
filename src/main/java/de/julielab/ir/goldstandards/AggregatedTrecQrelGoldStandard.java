@@ -3,8 +3,8 @@ package de.julielab.ir.goldstandards;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Collection;
@@ -25,7 +25,7 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
      */
     public static final Function<QueryDescription, String> CROSS_DATASET_QUERY_ID_FUNCTION = q -> q.getYear() + "" + String.format("%02d", q.getNumber());
 
-    private final static Logger log = LogManager.getLogger();
+    private final static Logger log = LoggerFactory.getLogger(AggregatedTrecQrelGoldStandard.class);
     private static Function<Document, String> qrelRecordFunction = gsDoc -> Stream.of(CROSS_DATASET_QUERY_ID_FUNCTION.apply(gsDoc.getQueryDescription()), "Q0", gsDoc.getId(), String.valueOf(gsDoc.getRelevance())).collect(Collectors.joining("\t"));
     private static Function<Document, String> sampleQrelRecordFunction = gsDoc -> Stream.of(CROSS_DATASET_QUERY_ID_FUNCTION.apply(gsDoc.getQueryDescription()), "Q0", gsDoc.getId(), String.valueOf(gsDoc.getStratum()), String.valueOf(gsDoc.getRelevance())).collect(Collectors.joining("\t"));
 

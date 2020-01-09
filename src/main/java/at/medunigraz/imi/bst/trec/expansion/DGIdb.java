@@ -1,15 +1,15 @@
 package at.medunigraz.imi.bst.trec.expansion;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class DGIdb {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(DGIdb.class);
 
     private static final String ENDPOINT = "http://dgidb.org/api/v2/interactions.json";
 

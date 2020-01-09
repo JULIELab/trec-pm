@@ -3,8 +3,8 @@ package de.julielab.ir.umls;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.cache.CacheAccess;
 import de.julielab.java.utilities.cache.CacheService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.*;
 
 public class UmlsRelationsProvider {
     private static final String DEFAULT_SEPARATOR = "\t";
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(UmlsRelationsProvider.class);
     private static UmlsRelationsProvider instance;
     private static boolean useCache = true;
     private static String defaultRelationsFile = "resources/umlsRelations.txt.gz";

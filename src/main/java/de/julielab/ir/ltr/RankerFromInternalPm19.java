@@ -17,8 +17,6 @@
 //import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 //import de.julielab.java.utilities.ConfigurationUtilities;
 //import org.apache.commons.configuration2.ex.ConfigurationException;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
 //
 //import java.io.*;
 //import java.util.*;
@@ -27,7 +25,7 @@
 //import static de.julielab.ir.ltr.features.TrecPmQueryPart.*;
 //
 //public class RankerFromInternalPm19 implements Ranker<Topic> {
-//    private static final Logger log = LogManager.getLogger();
+//    private static final Logger log = LoggerFactory.getLogger();
 //    private final String xmiTableName = "_data_xmi.documents";
 //    private RANKER_TYPE rType = RANKER_TYPE.LAMBDAMART;
 //    private METRIC trainMetric = METRIC.NDCG;

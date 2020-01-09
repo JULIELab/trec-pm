@@ -20,8 +20,6 @@
 //import de.julielab.ir.ltr.features.*;
 //import de.julielab.java.utilities.ConfigurationUtilities;
 //import org.apache.commons.configuration2.ex.ConfigurationException;
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
 //
 //import java.io.File;
 //import java.io.IOException;

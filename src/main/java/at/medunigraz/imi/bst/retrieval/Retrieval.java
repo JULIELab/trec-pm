@@ -13,9 +13,9 @@ import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
     protected Query<Q> query;
-    private Logger log = LogManager.getLogger();
+    private Logger log = LoggerFactory.getLogger(Retrieval.class);
     private ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
     private String experimentName;

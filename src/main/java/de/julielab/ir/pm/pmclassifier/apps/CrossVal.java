@@ -1,9 +1,9 @@
 package de.julielab.ir.pm.pmclassifier.apps;
 
 import de.julielab.ir.pm.pmclassifier.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.common.util.set.Sets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class CrossVal {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(CrossVal.class);
     private final static int randomSeed = 1;
 
 

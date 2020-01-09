@@ -21,8 +21,6 @@ import de.julielab.xml.binary.BinaryJeDISNodeEncoder;
 import de.julielab.xml.binary.BinaryXmiBuilder;
 import de.julielab.xml.util.XMIBuilderException;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -31,6 +29,8 @@ import org.apache.uima.resource.impl.ResourceManager_impl;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.resource.metadata.impl.ProcessingResourceMetaData_impl;
 import org.apache.uima.util.CasPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -74,7 +74,7 @@ public class OriginalDocumentRetrieval {
      * is much more appropriate which is why we use a CasPool.
      */
     private CasPool casPool;
-    private Logger log = LogManager.getLogger();
+    private Logger log = LoggerFactory.getLogger(OriginalDocumentRetrieval.class);
     /**
      * We use DatabaseConnector objects to communicate with the document database. We have one DatabaseConnector
      * for each document database configuration file.

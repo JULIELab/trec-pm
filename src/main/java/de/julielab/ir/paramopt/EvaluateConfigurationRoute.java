@@ -17,8 +17,8 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.io.FileBased;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -32,7 +32,7 @@ import static de.julielab.ir.paramopt.HttpParamOptServer.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route {
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(EvaluateConfigurationRoute.class);
     private final GoldStandard<Topic> goldStandard;
     private final Map<String, TrecQrelGoldStandard<Topic>> goldStandardSplit;
     private final int numSplits = 10;

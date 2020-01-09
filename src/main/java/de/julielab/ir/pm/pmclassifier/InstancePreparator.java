@@ -8,8 +8,8 @@ import com.wcohen.ss.BasicStringWrapperIterator;
 import com.wcohen.ss.TFIDF;
 import com.wcohen.ss.api.StringWrapper;
 import de.julielab.ir.pm.pmclassifier.featurepipes.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -22,7 +22,7 @@ public class InstancePreparator implements Serializable {
 
     private static final long serialVersionUID = 2018_08_02L;
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(InstancePreparator.class);
 
     private static InstancePreparator service;
 

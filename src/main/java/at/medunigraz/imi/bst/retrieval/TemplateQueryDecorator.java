@@ -4,12 +4,10 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TemplateQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
-	private static final Logger LOG = LogManager.getLogger();
+	private static final Logger LOG = LoggerFactory.getLogger(TemplateQueryDecorator.class);
 	protected String template;
 
 	/**

@@ -7,8 +7,8 @@ import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.AggregatedTrecQrelGoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.java.utilities.cache.CacheService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static spark.Spark.port;
 import static spark.Spark.post;
@@ -24,7 +24,7 @@ public class HttpParamOptServer {
     // The index_copy parameter value is used as a suffix to the otherwise normally obtained index name.
     // Used when multiple concurrent runs change index settings, then we need those copies.
     public static final String INDEX_SUFFIX = "index_suffix";
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(HttpParamOptServer.class);
 
 
     public HttpParamOptServer(int port) {

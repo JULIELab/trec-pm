@@ -5,8 +5,9 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.xml.JulieXMLConstants;
 import de.julielab.xml.JulieXMLTools;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -17,11 +18,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class PubMedOnline implements SearchEngine {
+    private static final Logger log = LoggerFactory.getLogger(PubMedOnline.class);
     public static final String EUTILS_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
     public static final String SORT = "relevance";
     public static final String FIXED_PARAMS = "&retmax=1000&sort=" + SORT;
     public static final String EUTILS_SEARCH_FMT = "esearch.fcgi?db=%s&term=%s" + FIXED_PARAMS;
-    private static final org.apache.logging.log4j.Logger log = LogManager.getLogger();
     private final BlockingQueue<Object> apiTicketQueue = new ArrayBlockingQueue<>(1);
     private ApiTicketGenerator ticketGenerator;
 

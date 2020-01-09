@@ -7,9 +7,9 @@ import de.julielab.ipc.javabridge.StdioBridge;
 import de.julielab.ir.ltr.Document;
 import de.julielab.java.utilities.cache.CacheAccess;
 import de.julielab.java.utilities.cache.CacheService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.uima.cas.CAS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 public class FastTextEmbeddingFeatures extends DocumentEmbeddingFeatures {
     public static final String FT_FEATURE_NAME = "fasttext";
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(FastTextEmbeddingFeatures.class);
     private static Deque<StdioBridge<byte[]>> activeBridges = new ArrayDeque<>();
     private final String EMBEDDING_PATH = "resources/dim300.bin";
     private transient StdioBridge<byte[]> bridge;

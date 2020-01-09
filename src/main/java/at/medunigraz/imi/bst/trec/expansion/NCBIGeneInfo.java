@@ -3,8 +3,8 @@ package at.medunigraz.imi.bst.trec.expansion;
 import at.medunigraz.imi.bst.trec.model.Gene;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class NCBIGeneInfo {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(NCBIGeneInfo.class);
 
     private static final String GENE_INFO_FILE = "/genes/Homo_sapiens.gene_info";
 

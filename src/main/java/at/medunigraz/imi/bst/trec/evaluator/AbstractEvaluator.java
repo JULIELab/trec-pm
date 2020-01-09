@@ -2,8 +2,8 @@ package at.medunigraz.imi.bst.trec.evaluator;
 
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractEvaluator implements Evaluator {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractEvaluator.class);
 
     private static final Set<String> STRING_METRICS = new HashSet<>();
 

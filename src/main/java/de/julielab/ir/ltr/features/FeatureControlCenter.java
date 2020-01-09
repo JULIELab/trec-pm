@@ -15,9 +15,9 @@ import de.julielab.ir.ltr.features.featuregroups.*;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -31,7 +31,7 @@ import static de.julielab.ir.ltr.features.FCConstants.*;
 import static de.julielab.java.utilities.ConfigurationUtilities.*;
 
 public class FeatureControlCenter {
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(FeatureControlCenter.class);
     private static Map<Thread, FeatureControlCenter> instances = new ConcurrentHashMap<>();
     private HierarchicalConfiguration<ImmutableNode> configuration;
     private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;

@@ -7,14 +7,14 @@ import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
 
 public class TrecMetricsCreator {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(TrecMetricsCreator.class);
     private String experimentId;
     private String longExperimentId;
     private File results;
@@ -76,7 +76,7 @@ public class TrecMetricsCreator {
                     allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
                     longExperimentId);
             metrics = allMetrics;
-            LOG.trace(allMetrics);
+            LOG.trace("All metrics: {}", allMetrics);
             return allMetrics;
         } catch (EvaluationCommandFailedException e) {
             LOG.warn("Evaluation of collection {} failed due to evaluation command error {}", longExperimentId, e.getMessage());

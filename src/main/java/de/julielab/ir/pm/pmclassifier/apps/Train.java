@@ -5,8 +5,8 @@ import cc.mallet.types.FeatureVector;
 import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import de.julielab.ir.pm.pmclassifier.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class Train {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(Train.class);
 
     public static void doTrain(PMClassifier classifier, String jsongsdocs, String annotatedGs, String modeloutputfile) throws DataReadingException, IOException, ClassNotFoundException {
         LOG.info("Reading documents");

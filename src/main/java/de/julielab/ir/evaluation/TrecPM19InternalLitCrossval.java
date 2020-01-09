@@ -23,8 +23,8 @@ import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +39,7 @@ import java.util.stream.IntStream;
 public class TrecPM19InternalLitCrossval {
 
     public static final int CROSSVAL_SIZE = 5;
-    private static Logger log = LogManager.getLogger();
+    private static Logger log = LoggerFactory.getLogger(TrecPM19InternalLitCrossval.class);
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 

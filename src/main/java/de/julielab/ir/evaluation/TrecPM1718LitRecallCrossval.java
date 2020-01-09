@@ -10,8 +10,8 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class TrecPM1718LitRecallCrossval {
 
     public static final int CROSSVAL_SIZE = 5;
-    private static Logger log = LogManager.getLogger();
+    private static Logger log = LogManager.getLogger(TrecPM1718LitRecallCrossval.class);
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 
