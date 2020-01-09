@@ -52,7 +52,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
     public Object handle(Request req, Response res) throws Exception {
         if (req.queryParams().contains("SHUTDOWN")) {
             CacheService.getInstance().commitAllCaches();
-            log.info("Comitting all caches is done, server can be shutdown.");
+            log.info("Committing all caches is done, server can be shutdown.");
             return 0;
         }
         double score = 0;
@@ -94,6 +94,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                 }
             }
             String[] params = parameters.toArray(new String[0]);
+            System.out.println(Arrays.toString(params));
             HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(params);
             configuration.addProperty(INDEX_SUFFIX, indexSuffix);
             if (log.isDebugEnabled()) {
