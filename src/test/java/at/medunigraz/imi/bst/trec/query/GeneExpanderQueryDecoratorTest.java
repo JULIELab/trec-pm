@@ -8,8 +8,6 @@ import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import org.junit.Test;
 
-import java.io.File;
-
 import static org.junit.Assert.assertEquals;
 
 public class GeneExpanderQueryDecoratorTest extends QueryDecoratorTest {

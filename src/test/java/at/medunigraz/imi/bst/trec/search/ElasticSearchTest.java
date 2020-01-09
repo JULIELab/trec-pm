@@ -34,4 +34,5 @@ public class ElasticSearchTest {
 		assertFalse(results.isEmpty());
 	}
 
+
 }

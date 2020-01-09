@@ -70,7 +70,7 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         String index = topic.getIndex() != null ? topic.getIndex() : this.index;
         if (indexSuffix != null && !indexSuffix.isBlank())
             index = index + indexSuffix;
-        log.trace("Searching on index {}", index);
+        log.trace("Searching on index {} for query {}", index, topic);
         if (index == null)
             throw new IllegalStateException("No index was specified for this ElasticSearchQuery and the given topic does also not specify an index.");
         if (this.types != null) {

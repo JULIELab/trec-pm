@@ -31,5 +31,4 @@ public abstract class QueryDecoratorTest {
 		assertFalse(resultList.isEmpty());
 		assertThat(resultList.size(), greaterThan(10));
 	}
-
 }

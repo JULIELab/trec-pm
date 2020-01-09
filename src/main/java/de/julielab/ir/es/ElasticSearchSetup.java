@@ -147,11 +147,22 @@ public class ElasticSearchSetup {
     }
 
     public static void configureSimilarity(String indexBasename, boolean isExactIndexName, SimilarityParameters parameters, String esType) {
+        log.trace("Got desired similarity parameters for index {}: {}", indexBasename, parameters);
+        // Strategy: We "mis"use the TemplateQueryDecorator to inject the similarity setting parameters into the JSON template that otherwise adheres to the ElasticSearch required format
+        // For this to work we must create a map with the template property keys and the desired values
         String esSettingsTemplate = Path.of("es-mappings", "cikm19-similarityonly-template.json").toFile().getAbsolutePath();
+        // Read the SimilarityParameters into map so we can easily iterate over its fields (could also be done using reflection but this seemed simpler)
         final ObjectMapper om = new ObjectMapper();
         final MapType mapType = om.getTypeFactory().constructMapType(HashMap.class, String.class, String.class);
+        // Create a parameterMap with all the default property settings. We will replace some values with the given SimilarityParameter values
         final Map<String, String> parameterMap = new HashMap<>(defaultProperties);
-        parameterMap.putAll(om.convertValue(parameters, mapType));
+        Map<String, String> desiredSettingsMap = om.convertValue(parameters, mapType);
+        for (String similarityProperty : desiredSettingsMap.keySet()) {
+            // All similarities have the property "baseSimilarity" that just says what the underlying similarity is, BM25, DFI, ... this is not an actual value we are interested in
+            if (similarityProperty.equals("baseSimilarity")) continue;
+            // Create the template property keys and the desired values
+            parameterMap.put(parameters.getBaseSimilarity() + "_" + similarityProperty, desiredSettingsMap.get(similarityProperty));
+        }
         final TemplateQueryDecorator<QueryDescription> decorator = new TemplateQueryDecorator<>(esSettingsTemplate, new StaticMapQueryDecorator(parameterMap, new DummyElasticSearchQuery()));
         final Topic t = new Topic();
         decorator.query(t);
@@ -165,12 +176,16 @@ public class ElasticSearchSetup {
         GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(new GetSettingsRequestBuilder(client, GetSettingsAction.INSTANCE, indexName).request()).actionGet();
         Settings s = getSettingsResponse.getIndexToSettings().get(indexName);
         boolean unequalSettingFound = false;
+        log.trace("Checking if similarity settings for index {} must be adapted to desired settings {}", indexBasename, settingsObject);
         for (Object key : settingsObject.names()) {
             JSONObject concreteSimilaritySettings = settingsObject.getJSONObject((String) key);
             for (Object concreteSimilarityParam : concreteSimilaritySettings.names()) {
                 String setting = "index.similarity." + key + "." + concreteSimilarityParam;
                 String currentValue = s.get(setting);
-                if (!String.valueOf(concreteSimilaritySettings.get((String) concreteSimilarityParam)).equals(currentValue))
+                Object desiredValue = concreteSimilaritySettings.get((String) concreteSimilarityParam);
+                log.trace("Got current setting {}: {} and desired value {}", setting, currentValue, desiredValue);
+                log.trace("Key: {}", key);
+                if (!String.valueOf(desiredValue).equals(currentValue))
                     unequalSettingFound = true;
                 if (unequalSettingFound)
                     break;
@@ -181,6 +196,8 @@ public class ElasticSearchSetup {
         if (unequalSettingFound) {
             log.debug("Found divergence in current and desired similarity settings, updating the index settings to {}.", map);
             configureIndex(indexBasename, isExactIndexName, map, null, esType, parameters.getBaseSimilarity());
+        } else {
+            log.trace("No index settings update required.");
         }
     }
 
