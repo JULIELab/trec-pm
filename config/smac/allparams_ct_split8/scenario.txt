@@ -4,6 +4,6 @@ cutoffTime = 500
 wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/allparams_ct_split8/instances.txt
-algo = bash scripts/smacOverHttpWrapper.sh 32100 ct copy8
+algo = bash scripts/smacOverHttpWrapper.sh 32100 ct _copy8
 save-runs-every-iteration = true
 seed = 1

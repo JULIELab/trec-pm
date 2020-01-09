@@ -179,7 +179,7 @@ public class ElasticSearchSetup {
                 break;
         }
         if (unequalSettingFound) {
-            log.debug("Found divergence in current and desired similarity settings, updating the index settings.");
+            log.debug("Found divergence in current and desired similarity settings, updating the index settings to {}.", map);
             configureIndex(indexBasename, isExactIndexName, map, null, esType, parameters.getBaseSimilarity());
         }
     }
