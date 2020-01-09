@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -31,7 +31,8 @@ import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
+import org.elasticsearch.cluster.health.ClusterShardHealth;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
@@ -79,7 +80,7 @@ public class ElasticSearchSetup {
     ;
 
     public static void main(String args[]) {
-      //  createPubmedIndices();
+        //  createPubmedIndices();
         createCtIndices();
 //        deletePubmedIndices();
 //        deleteCtIndices();
@@ -189,8 +190,9 @@ public class ElasticSearchSetup {
                 try {
                     Double currentDouble = Double.valueOf(currentValue);
                     Double desiredDouble = Double.valueOf(desiredValue.toString());
-                    if (currentDouble-desiredDouble > 0.00001)
+                    if (Math.abs(currentDouble - desiredDouble) > 0.00001) {
                         unequalSettingFound = true;
+                    }
                 } catch (NumberFormatException e) {
                     if (!String.valueOf(desiredValue).equals(currentValue))
                         unequalSettingFound = true;
@@ -268,16 +270,21 @@ public class ElasticSearchSetup {
             final OpenIndexResponse openIndexResponse = future.actionGet();
             // The sleep is necessary because there will be a connection error with the ES5.4 transport client
             // when we connect too quickly again to the index
-            //curl http://localhost:9203/_cat/indices/trecpm19_ct_bm25_copy9\?h\=status
-            IndexMetaData index = client.admin().cluster().state(new ClusterStateRequest().indices(indexName)).actionGet().getState().getMetaData().index(indexName);
-            System.out.println(index.getState());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            log.trace("Waiting for index {} to have recovered all shards from closing/opening", indexName);
+            int numRed = Integer.MAX_VALUE;
+            while (numRed > 0) {
+                Map<Integer, ClusterShardHealth> shardHealth = client.admin().cluster().health(new ClusterHealthRequest(indexName)).actionGet().getIndices().get(indexName).getShards();
+                for (Integer shardNum : shardHealth.keySet()) {
+                    if (ClusterHealthStatus.RED == shardHealth.get(shardNum).getStatus())
+                        ++numRed;
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-            index = client.admin().cluster().state(new ClusterStateRequest().indices(indexName)).actionGet().getState().getMetaData().index(indexName);
-            System.out.println(index.getState());
+            log.trace("Opening index {} finished.", indexName);
             if (!openIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not reopen index " + indexName + ", ES did not acknowledge.");
         }

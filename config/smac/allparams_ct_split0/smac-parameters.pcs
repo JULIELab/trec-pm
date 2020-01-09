@@ -67,7 +67,7 @@ retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop    | retr
 retrievalparameters.templateparameters.clauseboosts.sex_boost                  real [0,3]  [1]
 
 # BM25 parameters
-indexparameters.bm25.k1 real [0,2] [0]
+indexparameters.bm25.k1 real [0,2] [0.7]
 indexparameters.bm25.b  real [0,1] [1]
 
 # Numerical boosts
