@@ -7,7 +7,7 @@ import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.java.utilities.cache.CacheAccess;
-import de.julielab.java.utilities.cache.CacheService;
+import de.julielab.java.utilities.cache.NoOpCacheAccess;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +41,12 @@ public class ElasticSearch implements SearchEngine {
     private String[] storedFields;
 
     public ElasticSearch() {
-        cache = cacheMap.compute(Thread.currentThread(), (k,v) ->
-            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java")
-        );
+//        cache = cacheMap.compute(Thread.currentThread(), (k,v) ->
+//            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java")
+//        );
+        // This disables the caching. I only do this for parameter optimization because there won't be many - if any - cache hits.
+        // For experiments where the queries might often be the same, use the cache assignment above.
+        cache = new NoOpCacheAccess<>("dummy", "dummy");
         this.parameters = new NoParameters();
     }
 
