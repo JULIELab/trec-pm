@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.CLIInteractionUtilities;
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -30,6 +31,7 @@ import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.json.JSONObject;
@@ -77,7 +79,7 @@ public class ElasticSearchSetup {
     ;
 
     public static void main(String args[]) {
-        createPubmedIndices();
+      //  createPubmedIndices();
         createCtIndices();
 //        deletePubmedIndices();
 //        deleteCtIndices();
@@ -184,9 +186,15 @@ public class ElasticSearchSetup {
                 String currentValue = s.get(setting);
                 Object desiredValue = concreteSimilaritySettings.get((String) concreteSimilarityParam);
                 log.trace("Got current setting {}: {} and desired value {}", setting, currentValue, desiredValue);
-                log.trace("Key: {}", key);
-                if (!String.valueOf(desiredValue).equals(currentValue))
-                    unequalSettingFound = true;
+                try {
+                    Double currentDouble = Double.valueOf(currentValue);
+                    Double desiredDouble = Double.valueOf(desiredValue.toString());
+                    if (currentDouble-desiredDouble > 0.00001)
+                        unequalSettingFound = true;
+                } catch (NumberFormatException e) {
+                    if (!String.valueOf(desiredValue).equals(currentValue))
+                        unequalSettingFound = true;
+                }
                 if (unequalSettingFound)
                     break;
             }
@@ -260,11 +268,16 @@ public class ElasticSearchSetup {
             final OpenIndexResponse openIndexResponse = future.actionGet();
             // The sleep is necessary because there will be a connection error with the ES5.4 transport client
             // when we connect too quickly again to the index
+            //curl http://localhost:9203/_cat/indices/trecpm19_ct_bm25_copy9\?h\=status
+            IndexMetaData index = client.admin().cluster().state(new ClusterStateRequest().indices(indexName)).actionGet().getState().getMetaData().index(indexName);
+            System.out.println(index.getState());
             try {
-                Thread.sleep(100);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            index = client.admin().cluster().state(new ClusterStateRequest().indices(indexName)).actionGet().getState().getMetaData().index(indexName);
+            System.out.println(index.getState());
             if (!openIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not reopen index " + indexName + ", ES did not acknowledge.");
         }
