@@ -94,7 +94,6 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                 }
             }
             String[] params = parameters.toArray(new String[0]);
-            System.out.println(Arrays.toString(params));
             HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(params);
             configuration.addProperty(INDEX_SUFFIX, indexSuffix);
             if (log.isDebugEnabled()) {
@@ -120,7 +119,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         else
             FeatureControlCenter.reconfigure(config);
         String indexSuffix = config.containsKey(INDEX_SUFFIX) ? config.getString(INDEX_SUFFIX) : "";
-        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance+"-"+indexSuffix) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance+"-"+indexSuffix);
+        TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance, indexSuffix) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance, indexSuffix);
         trecPmRetrieval.withIndexSuffix(indexSuffix);
 
         // e.g. ct-split2-train

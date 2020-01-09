@@ -156,12 +156,12 @@ public final class LiteratureArticlesRetrievalRegistry {
      * @param size
      * @return
      */
-    public static TrecPmRetrieval jlpmgeneric(int size, String runsuffix) {
+    public static TrecPmRetrieval jlpmgeneric(int size, String instanceName, String indexSuffix) {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size)
-                .withExperimentName("jlpmgeneric-"+runsuffix);
+                .withExperimentName("jlpmgeneric-"+instanceName).withIndexSuffix(indexSuffix);
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
         Map<String, String> templateProperties = new HashMap<>();

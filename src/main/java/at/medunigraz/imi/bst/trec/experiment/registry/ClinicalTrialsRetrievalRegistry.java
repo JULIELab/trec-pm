@@ -94,12 +94,12 @@ public final class ClinicalTrialsRetrievalRegistry {
      * @param size
      * @return
      */
-    public static TrecPmRetrieval jlctgeneric(int size, String runsuffix) {
+    public static TrecPmRetrieval jlctgeneric(int size, String instanceName, String indexSuffix) {
         FeatureControlCenter fcc = FeatureControlCenter.getInstance();
         HierarchicalConfiguration<ImmutableNode> conf = fcc.getFeatureConfiguration();
 
         TrecPmRetrieval ret = new TrecPmRetrieval(TrecConfig.ELASTIC_CT_INDEX, size)
-                .withExperimentName("jlctgeneric-"+runsuffix);
+                .withExperimentName("jlctgeneric-"+instanceName).withIndexSuffix(indexSuffix);
 
         HierarchicalConfiguration<ImmutableNode> retrievalConfig = conf.configurationAt(RETRIEVALPARAMETERS);
         Map<String, String> templateProperties = new HashMap<>();
