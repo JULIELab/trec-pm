@@ -130,9 +130,10 @@ public class ElasticSearch implements SearchEngine {
                 } catch (ExecutionException e) {
                     lastException = e;
                     int waitingtime = 1000*(retries+1);
-                    LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}", waitingtime, retries);
+                    LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}. Error message: {}", waitingtime, retries, e.getMessage());
                     Thread.sleep(waitingtime);
                 }
+                ++retries;
             }
             if (response == null) {
                 LOG.error("Could not execute the query after 3 tries, giving up.", lastException);
