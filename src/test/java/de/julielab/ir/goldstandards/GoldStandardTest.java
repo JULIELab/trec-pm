@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -11,8 +12,14 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+/**
+ * Ignore as long as the 2019 data may not be uploaded. The travis test phase will fail otherwise since the required files are not in Git.
+ * @throws InterruptedException
+ */
+@Ignore
 public class GoldStandardTest {
 
+    @Ignore
     @Test
     public void testRandomizedQueryPartitioning() throws InterruptedException {
         final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2019();
