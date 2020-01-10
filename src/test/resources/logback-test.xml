@@ -9,6 +9,7 @@
     </appender>
 
     <logger name="at.medunigraz.imi.bst.retrieval.ElasticSearchQuery" level="TRACE"/>
+    <logger name="at.medunigraz.imi.bst.trec.search.ElasticSearch" level="TRACE"/>
     <logger name="de.julielab.ir.es.ElasticSearchSetup" level="TRACE"/>
     <logger name="de.julielab.ir.paramopt.EvaluateConfigurationRoute" level="DEBUG"/>
 
