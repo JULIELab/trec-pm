@@ -8,10 +8,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AblationExperiments {
-    private double requestScoreFromServer(Map<String, String> configuration,  String instance, String indexSuffix, String endpoint) throws IOException {
+
+
+    private double requestScoreFromServer(Map<String, String> configuration, String instance, String indexSuffix, String endpoint) throws IOException {
         String urlString = "http://localhost:" + TrecConfig.EVALSERVER_PORT + "/" + endpoint;
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -37,6 +40,49 @@ public class AblationExperiments {
         writer.close();
         reader.close();
 
-    return 0;
+        return 0;
+    }
+
+
+    /**
+     * Issues two searches: One with the given <tt>referenceParameters</tt> and one where part of the <tt>referenceParameters</tt> is overridden with <tt>ablationOverrides</tt> for deactivate features or set some parameters to neutral values.
+     * @param instance The name of the SMAC-like instance to get the performance for (e.g. pm-split0-train)
+     * @param indexSuffix The name suffix of the index copy to use. May be the empty string if there are no index copies.
+     * @param endpoint The evaluation server endpoint to BA or CT, one of {@link de.julielab.ir.paramopt.HttpParamOptServer#GET_CONFIG_SCORE_CT} and  {@link de.julielab.ir.paramopt.HttpParamOptServer#GET_CONFIG_SCORE_PM}.
+     * @param referenceParameters The search-template parameters of the reference against which ablation experiments are performed.
+     * @param ablationOverrides Parameters that will be used to override parameters in <tt>referenceParameters</tt> for the ablation.
+     * @return A <tt>ComparisonPair</tt> containing the two run scores.
+     * @throws IOException
+     */
+    private ComparisonPair getAblationComparison(String instance, String indexSuffix, String endpoint, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
+        double referenceScore = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint);
+        Map<String, String> ablationParameters = new HashMap<>(referenceParameters);
+        ablationParameters.putAll(ablationOverrides);
+        double ablationScore = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint);
+        return new ComparisonPair(referenceScore, ablationScore);
+    }
+
+    private class ComparisonPair {
+        private double referenceScore;
+        private double ablationScore;
+
+        public ComparisonPair(double referenceScore, double ablationScore) {
+            this.referenceScore = referenceScore;
+            this.ablationScore = ablationScore;
+        }
+
+        /**
+         * @return Score of the reference configuration without removing features.
+         */
+        public double getReferenceScore() {
+            return referenceScore;
+        }
+
+        /**
+         * @return Score of the ablation experiment where some features were removed / neutralized in the reference.
+         */
+        public double getAblationScore() {
+            return ablationScore;
+        }
     }
 }
