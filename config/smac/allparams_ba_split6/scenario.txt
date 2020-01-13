@@ -1,7 +1,6 @@
 pcs-file = config/smac/allparams_ba_split6/smac-parameters.pcs
 runObj = QUALITY
 cutoffTime = 500
-wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/allparams_ba_split6/instances.txt
 algo = bash scripts/smacOverHttpWrapper.sh 32100 pm _copy6

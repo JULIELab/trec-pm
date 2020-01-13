@@ -1,7 +1,6 @@
 pcs-file = config/smac/ltr/smac-parameters.pcs
 runObj = QUALITY
 cutoffTime = 300
-wallclock-limit = 172800
 deterministic = 1
 instance_file = config/smac/ltr/instances.txt
 algo = java -cp target/classes:"target/lib/*" de.julielab.ir.paramopt.LtRSmacWrapper
