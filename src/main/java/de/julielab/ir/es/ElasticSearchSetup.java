@@ -54,7 +54,7 @@ public class ElasticSearchSetup {
     /**
      * For multiple concurrent experiments on an index where each run may change the index settings, we need copies for each independent run. Otherwise one run will change the settings of the other run, invalidating the experimental results.
      */
-    private static String[] independentCopies = new String[]{"copy0", "copy1", "copy2", "copy3", "copy4", "copy5", "copy6", "copy7", "copy8", "copy9"};
+    public static String[] independentCopies = new String[]{"copy0", "copy1", "copy2", "copy3", "copy4", "copy5", "copy6", "copy7", "copy8", "copy9"};
 
     static {
         defaultProperties.put("bm25_k1", "1.2");

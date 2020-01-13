@@ -1,59 +1,58 @@
-package de.julielab.ir.experiments.ablation;
+package de.julielab.ir.experiments.ablation.sigir20;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Sigir20AblationParameters extends ArrayList<Map<String, String>> {
+public class Sigir20AblationParameters extends HashMap<String, Map<String, String>> {
     public Sigir20AblationParameters() {
-        add(params("name", "-DISEXP",
+        put("-DISEXP", params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        add(params("name", "-DISEXP+DISSYN",
+        put("-DISEXP+DISSYN", params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "true"
         ));
-        add(params("name", "-DISEXP+DISHYP",
+        put("-DISEXP+DISHYP", params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        add(params("name", "-GENEXP",
+        put("-GENEXP", params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        add(params("name", "-GENEXP+GENESYN",
+        put("-GENEXP+GENESYN", params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "true"
         ));
-        add(params("name", "-GENEXP+GENEDESC",
+        put("-GENEXP+GENEDESC", params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        add(params("name", "-GENEXP+FAMILIES",
+        put("-GENEXP+FAMILIES", params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        add(params("name", "-BM25",
+        put("-BM25", params(
                 "indexparameters.bm25.b", "0.75",
                 "indexparameters.bm25.k1", "1.2"));
-        add(params("name", "-QF",
+        put("-QF", params(
                 "retrievalparameters.queryfiltering", "false"));
-        add(params("name", "-POSKEY",
+        put("-POSKEY", params(
                 "retrievalparameters.keywords.positivepm@word:Gleason", "false",
                 "retrievalparameters.keywords.positivepm@word:base", "false",
                 "retrievalparameters.keywords.positivepm@word:clinical", "false",
@@ -90,7 +89,7 @@ public class Sigir20AblationParameters extends ArrayList<Map<String, String>> {
                 "retrievalparameters.keywords.positivepm@word:therapy", "false",
                 "retrievalparameters.keywords.positivepm@word:treatment", "false"
         ));
-        add(params("name", "-NEGKEY",
+        put("-NEGKEY", params(
                 "retrievalparameters.keywords.negativepm@word:case", "false",
                 "retrievalparameters.keywords.negativepm@word:cell", "false",
                 "retrievalparameters.keywords.negativepm@word:development", "false",
@@ -103,9 +102,9 @@ public class Sigir20AblationParameters extends ArrayList<Map<String, String>> {
                 "retrievalparameters.keywords.negativepm@word:tissue", "false",
                 "retrievalparameters.keywords.negativepm@word:tumor", "false"
         ));
-        add(params("name", "-DISMAX",
+        put("-DISMAX", params(
                 "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_nodismax.json"));
-        add(params("name", "-FLDWT",
+        put("-FLDWT", params(
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_disease_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost", "1.0",
@@ -117,7 +116,7 @@ public class Sigir20AblationParameters extends ArrayList<Map<String, String>> {
                 "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.title_field_kw_boost", "1.0"
         ));
-        add(params("name", "-CLSWT",
+        put("-CLSWT", params(
                 "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "1.0",
@@ -137,9 +136,9 @@ public class Sigir20AblationParameters extends ArrayList<Map<String, String>> {
                 "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", "1.0",
                 "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", "1.0"
         ));
-        add(params("name", "-SLDTMR",
+        put("-SLDTMR", params(
                 "retrievalparameters.geneexpansion.custom", "false"));
-        add(params("name", "-NONMEL",
+        put("-NONMEL", params(
                 "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json"));
     }
 

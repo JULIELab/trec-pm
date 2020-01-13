@@ -55,13 +55,23 @@ public class AblationExperiments {
      * @return A <tt>ComparisonPair</tt> containing the two run scores.
      * @throws IOException
      */
-    private AblationComparisonPair getAblationComparison(String instance, String indexSuffix, String endpoint, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
+    private AblationComparisonPair getAblationComparison(String ablationName, String instance, String indexSuffix, String endpoint, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
         double referenceScore = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint);
         Map<String, String> ablationParameters = new HashMap<>(referenceParameters);
         ablationParameters.putAll(ablationOverrides);
         double ablationScore = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint);
-        return new AblationComparisonPair(referenceScore, ablationScore);
+        return new AblationComparisonPair(ablationName, referenceScore, ablationScore);
     }
 
+    public AblationCrossValResult getAblationCrossValResult(Map<String, Map<String, String>> ablationParameterMap, Map<String, String> referenceParameters, String instance, String indexSuffix, String endpoint) throws IOException {
+        AblationCrossValResult result = new AblationCrossValResult();
+        for (String ablationGroupName : ablationParameterMap.keySet()) {
+            AblationComparisonPair comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, referenceParameters, ablationParameterMap.get(ablationGroupName));
+            result.add(comparison);
+            // TODO this is only for tests, remove
+            break;
+        }
+        return result;
+    }
 
 }

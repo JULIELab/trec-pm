@@ -1,8 +1,11 @@
 package de.julielab.ir.experiments.ablation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.OptionalDouble;
 import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 public class AblationCrossValResult extends ArrayList<AblationComparisonPair> {
     public double getMeanReferenceScore() {
@@ -43,5 +46,15 @@ public class AblationCrossValResult extends ArrayList<AblationComparisonPair> {
         if (avgOpt.isPresent())
             return avgOpt.getAsDouble();
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        List<Object[]> lines = new ArrayList<>();
+        lines.add(new Object[]{"name", "reference", "ablation"});
+        for (AblationComparisonPair comparison : this) {
+            lines.add(new Object[]{comparison.getAblationName(), comparison.getReferenceScore(), comparison.getAblationScore()});
+        }
+        return lines.stream().map(line -> Arrays.stream(line).map(String::valueOf).collect(Collectors.joining("\t"))).collect(Collectors.joining(System.getProperty("line.separator")));
     }
 }
