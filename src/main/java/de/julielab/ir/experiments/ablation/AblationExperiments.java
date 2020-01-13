@@ -14,6 +14,7 @@ import java.util.Map;
 public class AblationExperiments {
 
 
+
     private double requestScoreFromServer(Map<String, String> configuration, String instance, String indexSuffix, String endpoint) throws IOException {
         String urlString = "http://localhost:" + TrecConfig.EVALSERVER_PORT + "/" + endpoint;
         URL url = new URL(urlString);
@@ -54,35 +55,13 @@ public class AblationExperiments {
      * @return A <tt>ComparisonPair</tt> containing the two run scores.
      * @throws IOException
      */
-    private ComparisonPair getAblationComparison(String instance, String indexSuffix, String endpoint, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
+    private AblationComparisonPair getAblationComparison(String instance, String indexSuffix, String endpoint, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
         double referenceScore = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint);
         Map<String, String> ablationParameters = new HashMap<>(referenceParameters);
         ablationParameters.putAll(ablationOverrides);
         double ablationScore = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint);
-        return new ComparisonPair(referenceScore, ablationScore);
+        return new AblationComparisonPair(referenceScore, ablationScore);
     }
 
-    private class ComparisonPair {
-        private double referenceScore;
-        private double ablationScore;
 
-        public ComparisonPair(double referenceScore, double ablationScore) {
-            this.referenceScore = referenceScore;
-            this.ablationScore = ablationScore;
-        }
-
-        /**
-         * @return Score of the reference configuration without removing features.
-         */
-        public double getReferenceScore() {
-            return referenceScore;
-        }
-
-        /**
-         * @return Score of the ablation experiment where some features were removed / neutralized in the reference.
-         */
-        public double getAblationScore() {
-            return ablationScore;
-        }
-    }
 }
