@@ -1,5 +1,6 @@
 package de.julielab.ir.paramopt;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
@@ -31,13 +32,8 @@ public class HttpParamOptServer {
         port(port);
     }
 
-    public static void main(String[] args) throws Exception {
-        if (args.length < 1) {
-            log.error("Usage: " + HttpParamOptServer.class.getSimpleName() + " <port>");
-            System.exit(1);
-        }
-
-        int port = Integer.valueOf(args[0]);
+    public static void main(String[] args) {
+        int port = TrecConfig.EVALSERVER_PORT;
 
         HttpParamOptServer server = new HttpParamOptServer(port);
         server.startServer();

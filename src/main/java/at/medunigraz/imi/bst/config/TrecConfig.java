@@ -33,6 +33,7 @@ public final class TrecConfig {
     public static final int CACHE_PORT = getInteger("CACHE_PORT");
     public static final String GSHEETS_SHEETID = getString("GSHEETS_SHEETID");
     public static final int CONCURRENCY_MAX = getInteger("CONCURRENCY_MAX");
+    public static final int EVALSERVER_PORT = getInteger("EVALSERVER_PORT");
     public static final int SIZE = 1000;
     public static final int MAX_TREATMENTS = 3;
     public static String SUBTEMPLATES_FOLDER = getString("SUBTEMPLATES_FOLDER");
