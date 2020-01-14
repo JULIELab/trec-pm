@@ -44,6 +44,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         goldStandardSplit = new HashMap<>(numSplits);
         for (int i = 0; i < numSplits; i++) {
             TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i)));
+            gsSplit.setQueryIdFunction(AggregatedTrecQrelGoldStandard.CROSS_DATASET_QUERY_ID_FUNCTION);
             goldStandardSplit.put("split" + i, gsSplit);
         }
     }
@@ -128,9 +129,9 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         String partitionType = splitAndType[2];
         GoldStandard<Topic> evalGs;
         if (partitionType.equals("test")) {
-            Integer splitNumber = Integer.valueOf(splitAndType[1].charAt(5));
+            Integer splitNumber = Integer.valueOf(String.valueOf(splitAndType[1].charAt(5)));
             // The test partition is just the the partition with the given number
-            evalGs = goldStandardSplit.get(splitNumber);
+            evalGs = goldStandardSplit.get("split"+splitNumber);
         } else if (partitionType.equals("train")) {
             Integer splitNumber = Integer.valueOf(String.valueOf(splitAndType[1].charAt(5)));
             // The train split is all except the test partition

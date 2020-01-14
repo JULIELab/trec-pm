@@ -12,9 +12,9 @@ public class AblationCrossValResultTest {
     @BeforeClass
     public static void setup() {
         result = new AblationCrossValResult();
-        result.add(new AblationComparisonPair(0.8, 0.1));
-        result.add(new AblationComparisonPair(0.2, 0.5));
-        result.add(new AblationComparisonPair(0.6, 0.7));
+        result.add(new AblationComparisonPair("1", 0.8, 0.1));
+        result.add(new AblationComparisonPair("2", 0.2, 0.5));
+        result.add(new AblationComparisonPair("3", 0.6, 0.7));
     }
     @Test
     public void getMeanReferenceScore() {

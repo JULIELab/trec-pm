@@ -16,6 +16,7 @@ public class AblationExperiments {
 
 
     private double requestScoreFromServer(Map<String, String> configuration, String instance, String indexSuffix, String endpoint) throws IOException {
+        double score = 0;
         String urlString = "http://localhost:" + TrecConfig.EVALSERVER_PORT + "/" + endpoint;
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -25,7 +26,7 @@ public class AblationExperiments {
         OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
 
         // Create the request string
-        String data = String.format("instance=%s&instance_info=none&cutoff_time=0&cutoff_length=0&seed=1&index_suffix=$indexSuffix", instance, indexSuffix);
+        String data = String.format("instance=%s&instance_info=none&cutoff_time=0&cutoff_length=0&seed=1&index_suffix=%s", instance, indexSuffix);
         StringBuilder sb = new StringBuilder(data);
         for (String key : configuration.keySet())
             sb.append("&").append(key).append("=").append(configuration.get(key));
@@ -36,12 +37,12 @@ public class AblationExperiments {
         BufferedReader reader = new BufferedReader(new
                 InputStreamReader(conn.getInputStream()));
         while ((line = reader.readLine()) != null) {
-            System.out.println(line);
+            score = Double.valueOf(line);
         }
         writer.close();
         reader.close();
 
-        return 0;
+        return score;
     }
 
 
@@ -68,8 +69,6 @@ public class AblationExperiments {
         for (String ablationGroupName : ablationParameterMap.keySet()) {
             AblationComparisonPair comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, referenceParameters, ablationParameterMap.get(ablationGroupName));
             result.add(comparison);
-            // TODO this is only for tests, remove
-            break;
         }
         return result;
     }
