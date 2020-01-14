@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Sigir20CtBottomUpRefParameters extends HashMap<String, String> {
     public Sigir20CtBottomUpRefParameters() {
-        put("retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json");
+        put("retrievalparameters.template", "/templates/clinical_trials_generic/jlctgeneric_no_non_melanoma.json");
         put("retrievalparameters.queryfiltering","false");
         put("retrievalparameters.synonymlist","false");
         put("retrievalparameters.diseaseexpansion.preferredterm", "false");
@@ -76,8 +76,8 @@ public class Sigir20CtBottomUpRefParameters extends HashMap<String, String> {
         put("retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost","1");
         put("retrievalparameters.templateparameters.clauseboosts.positive_kw_boost","1");
         put("retrievalparameters.templateparameters.clauseboosts.negative_kw_boost","-1");
-        put("retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost","1");
-        put("retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost","1");
+        put("retrievalparameters.templateparameters.clauseboosts.structured_boost", "1");
+        put("retrievalparameters.templateparameters.clauseboosts.sex_boost", "1");
         put("retrievalparameters.keywords.chemotherapy@word:*mab","false");
         put("retrievalparameters.keywords.chemotherapy@word:*nib","false");
         put("retrievalparameters.keywords.chemotherapy@word:*cin","false");

@@ -23,7 +23,7 @@ public class Sigir20AblationExperiments {
     public void doBaExperiments() throws IOException {
 
         int smacRunNumber = 1;
-        String corpus = "pm";
+        String corpus = "ba";
         int splitNum = 0;
 
         runCrossvalAblationExperiment(new Sigir20TopDownAblationBAParameters(), smacRunNumber, corpus, splitNum);
@@ -42,13 +42,19 @@ public class Sigir20AblationExperiments {
         SmacLiveRundataReader smacLiveRundataReader = new SmacLiveRundataReader();
         File smacRunFile = Path.of("smac-output", String.format("allparams_%s_split%s", corpus, splitNum), String.format("live-rundata-%s.json", smacRunNumber)).toFile();
         SmacLiveRundataEntry entryWithBestScore = smacLiveRundataReader.read(smacRunFile).getEntryWithBestScore();
-        Map<String, String> referenceParameters = entryWithBestScore.getRunInfo().getConfiguration().getSettings();
+        Map<String, String> topDownReferenceParameters = entryWithBestScore.getRunInfo().getConfiguration().getSettings();
         String instancePrefix = corpus.equals("ba") ? "pm" : "ct";
         String instance = String.format("%s-split%s-test", instancePrefix, splitNum);
         String endpoint = corpus.equals("ba") ? HttpParamOptServer.GET_CONFIG_SCORE_PM : HttpParamOptServer.GET_CONFIG_SCORE_CT;
         String indexSuffix = "_"+ElasticSearchSetup.independentCopies[splitNum];
 
-        AblationCrossValResult ablationCrossValResult = ablationExperiments.getAblationCrossValResult(parameters, referenceParameters, instance, indexSuffix, endpoint);
+        AblationCrossValResult ablationCrossValResult = ablationExperiments.getAblationCrossValResult(parameters, topDownReferenceParameters, instance, indexSuffix, endpoint);
         System.out.println(ablationCrossValResult);
+
+
+       Map<String, Map<String, String>> bottomUpAblationParameters = corpus.equals("ba") ? new Sigir20BottomUpAblationBAParameters(topDownReferenceParameters) : new Sigir20BottomUpAblationCTParameters(topDownReferenceParameters);
+        Map<String, String> buttomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
+        AblationCrossValResult ablationCrossValResult1 = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, buttomUpReferenceParameters, instance, indexSuffix, endpoint);
+        System.out.println(ablationCrossValResult1);
     }
 }
