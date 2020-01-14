@@ -16,7 +16,7 @@ import static de.julielab.java.utilities.ConfigurationUtilities.ws;
 abstract public class SmacWrapperBase {
     private final static Logger log = LoggerFactory.getLogger(SmacWrapperBase.class);
 
-    protected abstract double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed);
+    protected abstract String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed);
 
     public void parseAndRunConfiguration(String[] args) throws ConfigurationException {
         HierarchicalConfiguration<ImmutableNode> config = parseConfiguration(args);
@@ -25,7 +25,7 @@ abstract public class SmacWrapperBase {
         int cutoffTime = Integer.valueOf(args[2]);
         int cutoffLength = Integer.valueOf(args[3]);
         int seed = Integer.valueOf(args[4]);
-        double score = calculateScore(config, instance, seed);
+        String score = calculateScore(config, new String[]{HttpParamOptServer.INFNDCG}, instance, seed);
         System.out.println("Result for SMAC: SUCCESS, 0, 0, " + score + ", 0");
     }
 

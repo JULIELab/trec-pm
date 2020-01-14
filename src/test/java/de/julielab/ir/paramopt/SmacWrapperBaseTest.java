@@ -21,8 +21,8 @@ public class SmacWrapperBaseTest {
 
         SmacWrapperBase testwrapper = new SmacWrapperBase() {
             @Override
-            protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
-                return 0;
+            protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
+                return "0";
             }
         };
         HierarchicalConfiguration<ImmutableNode> config = testwrapper.parseConfiguration(params);

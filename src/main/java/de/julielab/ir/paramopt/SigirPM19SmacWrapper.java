@@ -34,7 +34,7 @@ public class SigirPM19SmacWrapper extends SmacWrapperBase {
     }
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         FeatureControlCenter.initialize(config);
         //TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2Generic(TrecConfig.SIZE);
         TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2paramopt(TrecConfig.SIZE);
@@ -42,7 +42,7 @@ public class SigirPM19SmacWrapper extends SmacWrapperBase {
         Metrics metrics = exp.run();
         logMetrics(config, metrics);
         // SMAC always minimizes the objective
-        return -1 * harmonicMean(metrics.getInfNDCG(), metrics.getRPrec(), metrics.getP10());
+        return String.valueOf(-1 * harmonicMean(metrics.getInfNDCG(), metrics.getRPrec(), metrics.getP10()));
     }
 
     private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, Metrics metrics) {
