@@ -1,9 +1,10 @@
 package de.julielab.ir.experiments.ablation.sigir20;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Sigir20BottomUpAblationBAParameters extends HashMap<String, Map<String, String>> {
+public class Sigir20BottomUpAblationBAParameters extends LinkedHashMap<String, Map<String, String>> {
     public Sigir20BottomUpAblationBAParameters(Map<String, String> optimizedParameters) {
         put("+DISEXP+QF", params(
                 "retrievalparameters.diseaseexpansion.custom", "true",

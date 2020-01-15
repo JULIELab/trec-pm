@@ -1,6 +1,7 @@
 package de.julielab.ir.experiments.ablation;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import de.julielab.ir.Multithreading;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,10 +9,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class AblationExperiments {
 
@@ -69,9 +69,8 @@ public class AblationExperiments {
     }
 
     /**
-     *
      * @param ablationParameterMaps Either one parameter set for each crossval split (commonly used for bottom-up ablation) or one single parameter set to be applied for all splits (for top-down ablation).
-     * @param referenceParameters The reference parameter set for each split (in top-down ablation) or a single reference parameter set (for the bottom-up baseline).
+     * @param referenceParameters   The reference parameter set for each split (in top-down ablation) or a single reference parameter set (for the bottom-up baseline).
      * @param instances
      * @param indexSuffixes
      * @param metricsToReturn
@@ -81,17 +80,34 @@ public class AblationExperiments {
      */
     public Map<String, AblationCrossValResult> getAblationCrossValResult(List<Map<String, Map<String, String>>> ablationParameterMaps, List<Map<String, String>> referenceParameters, List<String> instances, List<String> indexSuffixes, String metricsToReturn, String endpoint) throws IOException {
         Map<String, AblationCrossValResult> ablationResult = new HashMap<>();
+        List<Future<?>> jobs = new ArrayList<>();
         // For each cross val split...
         for (int i = 0; i < instances.size(); i++) {
-            Map<String, Map<String, String>> ablationParameterMap = ablationParameterMaps.size() > 1 ? ablationParameterMaps.get(i) : ablationParameterMaps.get(0);
-            // Apply each ablation group
-            for (String ablationGroupName : ablationParameterMap.keySet()) {
-                String instance = instances.get(i);
-                String indexSuffix = indexSuffixes.get(i);
-                Map<String, String> referenceParametersForThisSplit = referenceParameters.size() > 1 ? referenceParameters.get(i) : referenceParameters.get(0);
-                AblationComparisonPair comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
-                // Get the cross val result object for the current group and add the result for this cross val split
-                ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult() : v).add(comparison);
+            final int finalI = i;
+            Future<?> future = Multithreading.getInstance().submit(() -> {
+                try {
+                    Map<String, Map<String, String>> ablationParameterMap = ablationParameterMaps.size() > 1 ? ablationParameterMaps.get(finalI) : ablationParameterMaps.get(0);
+                    // Apply each ablation group
+                    for (String ablationGroupName : ablationParameterMap.keySet()) {
+                        String instance = instances.get(finalI);
+                        String indexSuffix = indexSuffixes.get(finalI);
+                        Map<String, String> referenceParametersForThisSplit = referenceParameters.size() > 1 ? referenceParameters.get(finalI) : referenceParameters.get(0);
+                        AblationComparisonPair comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                        // Get the cross val result object for the current group and add the result for this cross val split
+                        ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult() : v).add(comparison);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            jobs.add(future);
+        }
+        // Wait for the jobs to finish
+        for (Future job : jobs) {
+            try {
+                job.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
             }
         }
         return ablationResult;

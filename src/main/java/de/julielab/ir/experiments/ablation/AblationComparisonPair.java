@@ -25,10 +25,25 @@ public class AblationComparisonPair {
     }
 
     public double getReferenceScore(String metric) {
+        int index = getMetricIndex(metric);
+        return referenceScores[index];
+    }
+
+    private int getMetricIndex(String metric) {
         int index = metrics.indexOf(metric);
         if (index < 0)
             throw new IllegalArgumentException("This object dos not contain a value for the metric " + metric);
-        return referenceScores[index];
+        return index;
+    }
+
+    public void setReferenceScore(double value, String metric) {
+        int index = getMetricIndex(metric);
+        referenceScores[index] = value;
+    }
+
+    public void setAblationScore(double value, String metric) {
+        int index = getMetricIndex(metric);
+        ablationScores[index] = value;
     }
 
     /**
@@ -39,9 +54,7 @@ public class AblationComparisonPair {
     }
 
     public double getAblationScore(String metric) {
-        int index = metrics.indexOf(metric);
-        if (index < 0)
-            throw new IllegalArgumentException("This object dos not contain a value for the metric " + metric);
+        int index = getMetricIndex(metric);
         return ablationScores[index];
     }
 
