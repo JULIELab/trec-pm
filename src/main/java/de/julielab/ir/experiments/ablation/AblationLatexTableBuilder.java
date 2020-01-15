@@ -9,10 +9,10 @@ import static de.julielab.ir.paramopt.HttpParamOptServer.INFNDCG;
 
 public class AblationLatexTableBuilder {
     @NotNull
-    public static StringBuilder buildLatexTable(Map<String, AblationCrossValResult> topDownResults, Map<String, AblationCrossValResult> bottomUpResults) {
+    public static StringBuilder buildLatexTable(Map<String, AblationCrossValResult> topDownResults, Map<String, AblationCrossValResult> bottomUpResults, String caption, String label, AblationLatexTableInfo topDownTableInfo, AblationLatexTableInfo bottomUpTableInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append("\\begin{table}[htp]\n" +
-                "\\caption{This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item.}\n" +
+                "\\caption{"+caption+"}\n" +
                 "\\begin{center}\n" +
                 "\\begin{tabular}{l|c|c}\n" +
                 "\\toprule\n" +
@@ -22,19 +22,29 @@ public class AblationLatexTableBuilder {
                 "\\midrule\n");
         appendReferenceTableLine(sb, "ALL (ref)", topDownResults.values().iterator().next());
         sb.append("\\midrule\n");
-        for (AblationCrossValResult r : topDownResults.values())
+        for (AblationCrossValResult r : topDownResults.values()) {
+            if (topDownTableInfo != null && topDownTableInfo.indent(r.getAblationGroupName()))
+                sb.append("\\quad");
             getAblationResultTableLine(sb, r);
+            if (topDownTableInfo != null && topDownTableInfo.addMidruleAfter(r.getAblationGroupName()))
+                sb.append("\\midrule\n");
+        }
         sb.append("\\midrule\n" +
                 "\\multicolumn{3}{c}{\\textbf{bottom-up}} \\\\\n" +
                 "\\midrule\n");
         appendReferenceTableLine(sb, "DISMAX (ref)", bottomUpResults.values().iterator().next());
         sb.append("\\midrule\n");
-        for (AblationCrossValResult r : bottomUpResults.values())
+        for (AblationCrossValResult r : bottomUpResults.values()) {
+            if (bottomUpTableInfo != null && bottomUpTableInfo.indent(r.getAblationGroupName()))
+                sb.append("\\quad");
             getAblationResultTableLine(sb, r);
+            if (bottomUpTableInfo != null && bottomUpTableInfo.addMidruleAfter(r.getAblationGroupName()))
+                sb.append("\\midrule\n");
+        }
         sb.append("\\bottomrule\n" +
                 "\\end{tabular}\n" +
                 "\\end{center}\n" +
-                "\\label{tab:bafeatureablation}\n" +
+                "\\label{"+label+"}\n" +
                 "\\end{table}");
         return sb;
     }

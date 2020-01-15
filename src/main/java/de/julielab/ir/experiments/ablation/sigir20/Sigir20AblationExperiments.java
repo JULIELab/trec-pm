@@ -5,6 +5,7 @@ import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.experiments.ablation.AblationCrossValResult;
 import de.julielab.ir.experiments.ablation.AblationExperiments;
 import de.julielab.ir.experiments.ablation.AblationLatexTableBuilder;
+import de.julielab.ir.experiments.ablation.AblationLatexTableInfo;
 import de.julielab.ir.paramopt.HttpParamOptServer;
 import de.julielab.ir.paramopt.SmacLiveRundataEntry;
 import de.julielab.ir.paramopt.SmacLiveRundataReader;
@@ -82,8 +83,8 @@ public class Sigir20AblationExperiments {
             Map<String, Map<String, String>> bottomUpAblationThisSplit = corpus.equals("ba") ? new Sigir20BottomUpAblationBAParameters(topDownReferenceParameters.get(i)) : new Sigir20BottomUpAblationCTParameters(topDownReferenceParameters.get(i));
             bottomUpAblationParameters.add(bottomUpAblationThisSplit);
         }
-        Map<String, String> buttomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
-        Map<String, AblationCrossValResult> ablationCrossValResult1 = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(buttomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, endpoint);
+        Map<String, String> bottomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
+        Map<String, AblationCrossValResult> ablationCrossValResult1 = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(bottomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, endpoint);
 
         /**
          * Multiply all the scores with -1 because the SMAC server returns negative values for parameter minimization
@@ -95,7 +96,9 @@ public class Sigir20AblationExperiments {
             }
         });
 
-        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(ablationCrossValResult, ablationCrossValResult1);
+        String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
+        String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
+        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(ablationCrossValResult, ablationCrossValResult1, caption, label, (AblationLatexTableInfo)topDownReferenceParameters.get(0), (AblationLatexTableInfo)bottomUpAblationParameters.get(0));
 
         System.out.println(sb.toString());
     }
