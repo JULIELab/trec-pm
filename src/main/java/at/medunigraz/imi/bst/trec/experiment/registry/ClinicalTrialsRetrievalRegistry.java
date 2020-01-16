@@ -143,26 +143,21 @@ public final class ClinicalTrialsRetrievalRegistry {
 
         if (retrievalConfig.getBoolean(QUERYFILTERING))
             ret.withWordRemoval();
-//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
             ret.withGeneSynonym();
-//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
             ret.withGeneDescription();
-//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
             ret.withGeneFamily();
-//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
             ret.withUmlsDiseasePreferredTerm();
-//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
-//            ret.withSynonymList(SYNONYMS_FILE);
-//        }
-//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
+        }
+        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, CUSTOM)))
             ret.withSolidTumor();
-        // The decorator is always added but it internally checks which keywords are active, if any.
-        // Without active keywords, this does nothing.
-        ret.withFeatureControlledConditionalCancer();
-
 
         SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
         ret.withSimilarityParameters(similarityParameters);

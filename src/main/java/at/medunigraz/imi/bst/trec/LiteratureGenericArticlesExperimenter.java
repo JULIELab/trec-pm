@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class LiteratureGenericArticlesExperimenter {
 
-    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2017();
+    private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2019();
 
     public static void main(String[] args) throws Exception {
         CacheService.initialize(new TrecCacheConfiguration());
