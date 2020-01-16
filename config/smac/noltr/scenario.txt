@@ -1,6 +1,0 @@
-pcs-file = config/smac/noltr/smac-parameters.pcs
-runObj = QUALITY
-cutoffTime = 300
-deterministic = 1
-instance_file = config/smac/noltr/instances.txt
-algo =  java -jar target/trec-pm-3.0.0-SNAPSHOT-shaded.jar
