@@ -46,6 +46,7 @@ public class TrecMetricsCreator {
             Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
             if (sampleGoldStandard != null) {
+
                 final File samplevalOutput = new File(statsDir, filename + ".sampleval");
                 SampleEval se = new SampleEval(sampleGoldStandard, results, samplevalOutput);
 
@@ -72,8 +73,8 @@ public class TrecMetricsCreator {
             csw.close();
 
             Metrics allMetrics = metricsPerTopic.get("all");
-            LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
-                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
+            LOG.info("Got NDCG = {}, infNDCG = {}, infNDCG_2 = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
+                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getMetric("infNDCG_2"), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
                     longExperimentId);
             metrics = allMetrics;
             LOG.trace("All metrics: {}", allMetrics);

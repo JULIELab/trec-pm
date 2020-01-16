@@ -82,7 +82,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
             // Do not write documents not judged.
             if (d.getRelevance() != -1) {
-                lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
+                lines.add(String.format("%s 0 %s %d", queryIdFunction.apply(d.getQueryDescription()), d.getId(), d.getRelevance()));
             }
         }
 
@@ -103,7 +103,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
         List<String> lines = new ArrayList<>();
         for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
-            lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
+            lines.add(String.format("%s 0 %s %d %d", queryIdFunction.apply(d.getQueryDescription()), d.getId(), d.getStratum(), d.getRelevance()));
         }
 
         write(lines, qrelFile);
@@ -128,6 +128,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         }
         return isSample;
     }
+
+
 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {

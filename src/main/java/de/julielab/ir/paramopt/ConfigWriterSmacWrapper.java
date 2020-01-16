@@ -23,7 +23,7 @@ public class ConfigWriterSmacWrapper extends SmacWrapperBase {
     }
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         throw new IllegalArgumentException("We want to stop here and only check if the configuration was right.");
     }
 }

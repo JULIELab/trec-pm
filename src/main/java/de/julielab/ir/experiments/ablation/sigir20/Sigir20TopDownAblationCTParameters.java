@@ -1,10 +1,13 @@
 package de.julielab.ir.experiments.ablation.sigir20;
 
-import java.util.HashMap;
-import java.util.Map;
+import de.julielab.ir.experiments.ablation.AblationLatexTableInfo;
 
-public class Sigir20AblationParameters extends HashMap<String, Map<String, String>> {
-    public Sigir20AblationParameters() {
+import java.util.*;
+
+public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
+        private static final Set<String> INDENT = new HashSet<>(Arrays.asList("-DISEXP+DISSYN", "-DISEXP+DISHYP", "-GENEXP+GENESYN", "-GENEXP+GENEDESC"));
+        private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList("-DISEXP+DISHYP", "-GENEXP+GENEDESC"));
+    public Sigir20TopDownAblationCTParameters() {
         put("-DISEXP", params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
@@ -103,26 +106,47 @@ public class Sigir20AblationParameters extends HashMap<String, Map<String, Strin
                 "retrievalparameters.keywords.negativepm@word:tumor", "false"
         ));
         put("-DISMAX", params(
-                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_nodismax.json"));
+                "retrievalparameters.template", "/templates/clinical_trials_generic/jlctgeneric_nodismax.json"));
         put("-FLDWT", params(
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_disease_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_gene_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.brief_title_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.brief_title_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.brief_title_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.conditions_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.conditions_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.conditions_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.description_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.description_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.description_field_kw_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.inclusion_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.inclusion_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.inclusion_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.keywords_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.keywords_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.keywords_field_kw_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.meshTags_field_disease_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.meshTags_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.meshTags_field_kw_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_disease_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_kw_boost", "1.0"
+                "retrievalparameters.templateparameters.fieldboosts.official_title_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.official_title_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.official_title_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeDescriptions_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeDescriptions_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeDescriptions_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeMeasures_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeMeasures_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.outcomeMeasures_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.summary_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.summary_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.summary_field_kw_boost", "1.0"
         ));
         put("-CLSWT", params(
                 "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.negative_kw_boost", "-1.0",
                 "retrievalparameters.templateparameters.clauseboosts.positive_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.sex_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.structured_boost", "1.0",
                 "retrievalparameters.templateparameters.disease.boosts.disease_custom_boost", "1.0",
                 "retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost", "1.0",
                 "retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost", "1.0",
@@ -139,16 +163,25 @@ public class Sigir20AblationParameters extends HashMap<String, Map<String, Strin
         put("-SLDTMR", params(
                 "retrievalparameters.geneexpansion.custom", "false"));
         put("-NONMEL", params(
-                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json"));
+                "retrievalparameters.template", "/templates/clinical_trials_generic/jlctgeneric_no_non_melanoma.json"));
     }
 
     private Map<String, String> params(String... entries) {
         Map<String, String> params = new HashMap<>();
         for (int i = 0; i < entries.length; i++) {
-            String entry = entries[i];
             if (i % 2 == 1)
                 params.put(entries[i - 1], entries[i]);
         }
         return params;
+    }
+
+    @Override
+    public boolean indent(String ablationName) {
+        return INDENT.contains(ablationName);
+    }
+
+    @Override
+    public boolean addMidruleAfter(String ablationName) {
+        return MIDRULE_AFTER.contains(ablationName);
     }
 }

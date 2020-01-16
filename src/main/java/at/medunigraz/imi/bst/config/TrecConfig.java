@@ -9,13 +9,13 @@ public final class TrecConfig {
     public static final String SAMPLE_EXTRA_ABSTRACT_TXT = "src/main/resources/data/extra-abstract-sample.txt";
     private static final ResourceBundle PROPERTIES = ResourceBundle.getBundle("config");
     public static final String ELASTIC_BA_INDEX = getString("ELASTIC_BA_INDEX");
-    public static final String ELASTIC_BA_INDEX_2017 = getString("ELASTIC_BA_INDEX_2018");
+    public static final String ELASTIC_BA_INDEX_2017 = getString("ELASTIC_BA_INDEX_2017");
     public static final String ELASTIC_BA_INDEX_2018 = getString("ELASTIC_BA_INDEX_2018");
     public static final String ELASTIC_BA_INDEX_2019 = getString("ELASTIC_BA_INDEX_2019");
     public static final String ELASTIC_BA_MEDLINE_TYPE = getString("ELASTIC_BA_MEDLINE_TYPE");
     public static final String ELASTIC_BA_EXTRA_TYPE = getString("ELASTIC_BA_EXTRA_TYPE");
     public static final String ELASTIC_CT_INDEX = getString("ELASTIC_CT_INDEX");
-    public static final String ELASTIC_CT_INDEX_2017 = getString("ELASTIC_CT_INDEX_2018");
+    public static final String ELASTIC_CT_INDEX_2017 = getString("ELASTIC_CT_INDEX_2017");
     public static final String ELASTIC_CT_INDEX_2018 = getString("ELASTIC_CT_INDEX_2018");
     public static final String ELASTIC_CT_INDEX_2019 = getString("ELASTIC_CT_INDEX_2019");
     public static final String ELASTIC_CT_TYPE = getString("ELASTIC_CT_TYPE");

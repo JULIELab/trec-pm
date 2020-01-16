@@ -128,10 +128,15 @@ public class ElasticSearch implements SearchEngine {
                 } catch (InterruptedException e) {
                     LOG.error("Search was interrupted", e);
                 } catch (ExecutionException e) {
-                    lastException = e;
-                    int waitingtime = 1000*(retries+1);
-                    LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}. Error message: {}", waitingtime, retries, e.getMessage());
-                    Thread.sleep(waitingtime);
+                    if (e.getMessage().contains("no such index")) {
+                        LOG.error("No such index exception. Searched index was {}", index, e);
+                        retries = Integer.MAX_VALUE;
+                    } else {
+                        lastException = e;
+                        int waitingtime = 1000 * (retries + 1);
+                        LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}. Error message: {}", waitingtime, retries, e.getMessage());
+                        Thread.sleep(waitingtime);
+                    }
                 }
                 ++retries;
             }

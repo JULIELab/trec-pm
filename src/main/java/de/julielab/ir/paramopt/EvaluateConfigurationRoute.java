@@ -43,7 +43,8 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
         goldStandardSplit = new HashMap<>(numSplits);
         for (int i = 0; i < numSplits; i++) {
-            TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i)));
+            TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getSampleQrelDocumentsForQueries(partitioning.get(i)));
+            gsSplit.setQueryIdFunction(AggregatedTrecQrelGoldStandard.CROSS_DATASET_QUERY_ID_FUNCTION);
             goldStandardSplit.put("split" + i, gsSplit);
         }
     }
@@ -55,7 +56,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             log.info("Committing all caches is done, server can be shutdown.");
             return 0;
         }
-        double score = 0;
+        String score;
         try {
             Set<String> queryParams = req.queryParams();
             String instanceName = null;
@@ -64,6 +65,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             int cutoffLength = 0;
             int seed = 0;
             String indexSuffix = null;
+            String[] metricsToReturn = null;
             List<String> parameters = new ArrayList<>(queryParams.size());
             // Fill the beginning of the list because the parameter parsing algorithm is expecting it
             parameters.addAll(Arrays.asList(null, null, null, null, null));
@@ -87,6 +89,9 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                     case INDEX_SUFFIX:
                         indexSuffix = req.queryParams(queryParam);
                         break;
+                    case METRICS:
+                        metricsToReturn = req.queryParams(queryParam).split(",");
+                        break;
                     default:
                         parameters.add("-" + queryParam);
                         parameters.add(req.queryParams(queryParam));
@@ -104,7 +109,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                 xml = xml.replaceAll("\n(\\s+)?", "");
                 log.debug("Evaluating instance {} in thread {} on index copy {} with configuration: {}", instanceName, Thread.currentThread(), indexSuffix,xml);
             }
-            score = calculateScore(configuration, instanceName, seed);
+            score = calculateScore(configuration, metricsToReturn, instanceName, seed);
         } catch (Exception e) {
             throw e;
         }
@@ -113,7 +118,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
 
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         if (!FeatureControlCenter.isInitialized())
             FeatureControlCenter.initialize(config);
         else
@@ -128,9 +133,9 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         String partitionType = splitAndType[2];
         GoldStandard<Topic> evalGs;
         if (partitionType.equals("test")) {
-            Integer splitNumber = Integer.valueOf(splitAndType[1].charAt(5));
+            Integer splitNumber = Integer.valueOf(String.valueOf(splitAndType[1].charAt(5)));
             // The test partition is just the the partition with the given number
-            evalGs = goldStandardSplit.get(splitNumber);
+            evalGs = goldStandardSplit.get("split" + splitNumber);
         } else if (partitionType.equals("train")) {
             Integer splitNumber = Integer.valueOf(String.valueOf(splitAndType[1].charAt(5)));
             // The train split is all except the test partition
@@ -138,11 +143,12 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);
         } // the next "else" matches not really crossval splits but just the name of specific datasets like
         // pm2018 or ct2019. This way, we can easily evaluate on those specific gold standards.
+        // The instance name must follow the form 'pm-xx-pm201x'
         else if (partitionType.startsWith("pm")) {
             if (partitionType.endsWith("2017"))
                 evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
             else if (partitionType.endsWith("2018"))
-                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
+                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2018();
             else if (partitionType.endsWith("2019"))
                 evalGs = TrecPMGoldStandardFactory.pubmedOfficial2019();
             else throw new IllegalArgumentException("Unknown biomedical abstracts dataset " + partitionType);
@@ -162,8 +168,32 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         Metrics metrics = exp.run();
         CacheService.getInstance().commitAllCaches();
         logMetrics(config, instance, metrics, splitAndType[0], partitionType);
-        // SMAC always minimizes the objective, thus multiplying with -1
-        return -1 * metrics.getInfNDCG();
+        if (metricsToReturn == null)
+            metricsToReturn = new String[]{INFNDCG};
+        StringBuilder sb = new StringBuilder();
+        for (String metric : metricsToReturn) {
+            double value;
+            switch (metric) {
+                case INFNDCG:
+                    value = metrics.getInfNDCG();
+                    break;
+                case RPREC:
+                    value = metrics.getRPrec();
+                    break;
+                case P10:
+                    value = metrics.getP10();
+                    break;
+                case SET_RECALL:
+                    value = metrics.getSetRecall();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Currenty unsupported metric: " + metric);
+            }
+            // SMAC always minimizes the objective, thus multiplying with -1
+            sb.append(value*-1).append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
 
     private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics, String corpus, String partitionType) {

@@ -5,7 +5,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 
 public class RecallSmacWrapper extends SmacWrapperBase {
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
-        return 0;
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
+        return null;
     }
 }

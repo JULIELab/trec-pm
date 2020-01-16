@@ -69,7 +69,7 @@ public class LtRSmacWrapper extends SmacWrapperBase {
     }
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         FeatureControlCenter.initialize(config.configurationAt(FCConstants.LTRFEATURES));
         final List<List<Topic>> splits = gs.createPropertyBalancedQueryPartitioning(nPartitions, Arrays.asList(t -> t.getDisease()));
         int splitNum = Integer.valueOf(instance.replace("crossval-", ""));
@@ -77,7 +77,7 @@ public class LtRSmacWrapper extends SmacWrapperBase {
         return calculateScoreForSplit(config, splitNum, splits);
     }
 
-    protected double calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<List<Topic>> splits) {
+    protected String calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<List<Topic>> splits) {
         try {
             List<Topic> test = splits.get(splitNum);
             final List<Topic> train = IntStream.range(0, nPartitions).filter(round -> round != splitNum).mapToObj(splits::get).flatMap(Collection::stream).collect(Collectors.toList());
@@ -135,12 +135,12 @@ public class LtRSmacWrapper extends SmacWrapperBase {
             final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + splitNum + "ltr", "pmround" + splitNum + "ltr", output, qRelFile, TrecConfig.SIZE, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
             final Metrics metrics = trecMetricsCreator.computeMetrics();
 
-            return metrics.getInfNDCG();
+            return String.valueOf(metrics.getInfNDCG());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return null;
     }
 
     private Triple<RankLibRanker<Topic>, Set<String>, TFIDF> trainRanker(List<Topic> test, List<Topic> train, String vocabularyId, String tfidfFoldId, File modelFile, DocumentList<Topic> testDocs) throws IOException {

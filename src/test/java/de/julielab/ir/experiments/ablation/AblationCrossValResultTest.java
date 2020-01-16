@@ -4,6 +4,7 @@ import org.assertj.core.data.Offset;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static de.julielab.ir.paramopt.HttpParamOptServer.INFNDCG;
 import static org.assertj.core.api.Assertions.assertThat;
 public class AblationCrossValResultTest {
 
@@ -11,28 +12,28 @@ public class AblationCrossValResultTest {
 
     @BeforeClass
     public static void setup() {
-        result = new AblationCrossValResult();
-        result.add(new AblationComparisonPair("0", 0.8, 0.1));
-        result.add(new AblationComparisonPair("1", 0.2, 0.5));
-        result.add(new AblationComparisonPair("2", 0.6, 0.7));
+        result = new AblationCrossValResult("experiment");
+        result.add(new AblationComparisonPair("1", INFNDCG, new double[]{0.8}, new double[]{0.1}));
+        result.add(new AblationComparisonPair("2", INFNDCG, new double[]{0.2}, new double[]{0.5}));
+        result.add(new AblationComparisonPair("3", INFNDCG, new double[]{0.6}, new double[]{0.7}));
     }
     @Test
     public void getMeanReferenceScore() {
-        assertThat(result.getMeanReferenceScore()).isCloseTo(0.533, Offset.offset(0.001));
+        assertThat(result.getMeanReferenceScore(INFNDCG)).isCloseTo(0.533, Offset.offset(0.001));
     }
 
     @Test
     public void getMeanAblationScore() {
-        assertThat(result.getMeanAblationScore()).isCloseTo(0.433, Offset.offset(0.001));
+        assertThat(result.getMeanAblationScore(INFNDCG)).isCloseTo(0.433, Offset.offset(0.001));
     }
 
     @Test
     public void getReferenceStandardDeviation() {
-        assertThat(result.getReferenceStandardDeviation()).isCloseTo(0.305505, Offset.offset(0.000001));
+        assertThat(result.getReferenceStandardDeviation(INFNDCG)).isCloseTo(0.305505, Offset.offset(0.000001));
     }
 
     @Test
     public void getAblationStandardDeviation() {
-        assertThat(result.getAblationStandardDeviation()).isCloseTo(0.305505, Offset.offset(0.000001));
+        assertThat(result.getAblationStandardDeviation(INFNDCG)).isCloseTo(0.305505, Offset.offset(0.000001));
     }
 }
