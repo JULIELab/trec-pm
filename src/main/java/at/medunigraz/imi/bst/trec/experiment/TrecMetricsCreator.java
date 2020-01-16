@@ -7,11 +7,17 @@ import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import at.medunigraz.imi.bst.trec.stats.CSVStatsWriter;
 import at.medunigraz.imi.bst.trec.stats.XMLStatsWriter;
+import de.julielab.java.utilities.FileUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TrecMetricsCreator {
     private static final Logger LOG = LoggerFactory.getLogger(TrecMetricsCreator.class);
@@ -24,6 +30,7 @@ public class TrecMetricsCreator {
     private String statsDir;
     private GoldStandardType goldStandardType;
     private File sampleGoldStandard;
+    private File sampleGoldStandard2;
     private Metrics metrics;
 
     public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File results, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
@@ -36,6 +43,20 @@ public class TrecMetricsCreator {
         this.statsDir = statsDir;
         this.goldStandardType = goldStandardType;
         this.sampleGoldStandard = sampleGoldStandard;
+
+        // DELETE
+        sampleGoldStandard2 = new File(sampleGoldStandard.getAbsolutePath() + "_2");
+        try {
+            List<String> withoutSamples = FileUtilities.getReaderFromFile(sampleGoldStandard).lines().filter(l -> !l.endsWith("-1")).collect(Collectors.toList());
+            try (BufferedWriter bw = FileUtilities.getWriterToFile(sampleGoldStandard2)) {
+                for (String l : withoutSamples) {
+                    bw.write(l);
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Metrics computeMetrics() {
@@ -46,6 +67,24 @@ public class TrecMetricsCreator {
             Map<String, Metrics> metricsPerTopic = te.getMetrics();
 
             if (sampleGoldStandard != null) {
+
+                // DELETE
+                final File samplevalOutput2 = new File(statsDir, filename + ".sampleeval_2");
+                SampleEval se2 = new SampleEval(sampleGoldStandard2, results, samplevalOutput2);
+
+                // TODO Refactor into MetricSet
+                Map<String, Metrics> sampleEvalMetrics2 = se2.getMetrics();
+                sampleEvalMetrics2.values().forEach(m -> m.put("infNDCG_2", m.getInfNDCG()));
+                for (Map.Entry<String, Metrics> entry : metricsPerTopic.entrySet()) {
+                    String topic = entry.getKey();
+                    if (topic == null)
+                        throw new IllegalStateException("There is no evaluation result for topic " + topic + " in result file " + results.getAbsolutePath() + ". Perhaps the sample_eval.pl file has the wrong version.");
+                    entry.getValue().merge(sampleEvalMetrics2.get(topic));
+                }
+                //------------------
+
+
+
                 final File samplevalOutput = new File(statsDir, filename + ".sampleval");
                 SampleEval se = new SampleEval(sampleGoldStandard, results, samplevalOutput);
 
@@ -72,8 +111,8 @@ public class TrecMetricsCreator {
             csw.close();
 
             Metrics allMetrics = metricsPerTopic.get("all");
-            LOG.info("Got NDCG = {}, infNDCG = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
-                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
+            LOG.info("Got NDCG = {}, infNDCG = {}, infNDCG_2 = {}, P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
+                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getMetric("infNDCG_2"), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
                     longExperimentId);
             metrics = allMetrics;
             LOG.trace("All metrics: {}", allMetrics);

@@ -2,11 +2,11 @@ package de.julielab.ir.experiments.ablation.sigir20;
 
 import de.julielab.ir.experiments.ablation.AblationLatexTableInfo;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList("++DISEXP+DF-DISSYN", "+DISEXP+QF-DISHYP", "+GENEXP+QF-GENESYN", "+GENEXP+QF-GENEDESC", "+GENEXP+QF-FAMILIES"));
+    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList("+DISEXP+QF-DISHYP", "+GENEXP+QF-FAMILIES"));
     public Sigir20BottomUpAblationCTParameters(Map<String, String> optimizedParameters) {
         put("+DISEXP+QF", params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
@@ -250,11 +250,11 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
 
     @Override
     public boolean indent(String ablationName) {
-        return false;
+        return INDENT.contains(ablationName);
     }
 
     @Override
     public boolean addMidruleAfter(String ablationName) {
-        return false;
+        return MIDRULE_AFTER.contains(ablationName);
     }
 }

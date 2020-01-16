@@ -14,7 +14,7 @@ public class AblationCrossValResultTest {
 
     @BeforeClass
     public static void setup() {
-        result = new AblationCrossValResult();
+        result = new AblationCrossValResult("experiment");
         result.add(new AblationComparisonPair("1", INFNDCG, new double[]{0.8}, new double[]{0.1}));
         result.add(new AblationComparisonPair("2", INFNDCG, new double[]{0.2}, new double[]{0.5}));
         result.add(new AblationComparisonPair("3", INFNDCG, new double[]{0.6}, new double[]{0.7}));

@@ -23,7 +23,6 @@ import java.util.stream.Stream;
  */
 public abstract class AggregatedGoldStandard<Q extends QueryDescription> implements GoldStandard<Q> {
 
-    private Map<Integer, Q> queriesByNumber;
     private Map<String, Q> queriesByCrossDatasetId;
     private Logger log;
     protected Map<String, AtomicGoldStandard<Q>> goldStandards;
@@ -90,17 +89,29 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
 
     @Override
     public Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery() {
+        // To create the documentsByQuery field
+        getSampleQrelDocumentsPerQuery();
+        if (isSampleGoldStandard())
+            return documentsByQuery.keySet().stream().collect(Collectors.toMap(Function.identity(), t -> convertSampleToTraditional(documentsByQuery.get(t))));
+        return documentsByQuery;
+    }
+
+    @Override
+    public Map<Q, DocumentList<Q>> getSampleQrelDocumentsPerQuery() {
         if (documentsByQuery == null) {
-            documentsByQuery = goldStandards.values().stream().map(GoldStandard::getQrelDocumentsPerQuery).collect(HashMap::new, (m1, m2) -> m1.putAll(m2), (m1, m2) -> m1.putAll(m2));
+            documentsByQuery = goldStandards.values().stream().map(GoldStandard::getSampleQrelDocumentsPerQuery).collect(HashMap::new, (m1, m2) -> m1.putAll(m2), (m1, m2) -> m1.putAll(m2));
         }
         return documentsByQuery;
     }
 
     @Override
+    public DocumentList<Q> getSampleQrelDocumentsForQuery(int queryId) {
+        throw new IllegalArgumentException("The retrieval of queries by their number makes no sense for aggregated gold standards.");
+    }
+
+    @Override
     public Map<Integer, Q> getQueriesByNumber() {
-        if (queriesByNumber == null)
-            queriesByNumber = getQueries().collect(Collectors.toMap(Q::getNumber, Function.identity()));
-        return queriesByNumber;
+        throw new IllegalArgumentException("The retrieval of queries by their number makes no sense for aggregated gold standards.");
     }
 
     public Map<String, Q> getQueriesByCrossDatasetId() {
@@ -111,7 +122,7 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
 
     @Override
     public DocumentList<Q> getQrelDocumentsForQuery(int queryId) {
-        return getQrelDocumentsPerQuery().get(queryId);
+        return getQrelDocumentsPerQuery().get(getQueriesByNumber().get(queryId));
     }
 
     protected void writeAggregatedQrelFile(File qrelFile, GoldStandard<Q>[] goldStandards, Function<GoldStandard<Q>, DocumentList<Q>> documentListFunction, Function<Document, String> recordFunction) {

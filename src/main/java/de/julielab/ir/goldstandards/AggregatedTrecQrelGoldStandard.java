@@ -2,12 +2,14 @@ package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import de.julielab.ir.ltr.Document;
+import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,7 +56,7 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }
 
-        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments(), sampleQrelRecordFunction);
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getSampleQrelDocuments(), sampleQrelRecordFunction);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }
 
-        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getQrelDocuments().getQuerySubset(queries), sampleQrelRecordFunction);
+        writeAggregatedQrelFile(qrelFile, goldStandards.values().toArray(new GoldStandard[0]), gs -> gs.getSampleQrelDocuments().getQuerySubset(queries), sampleQrelRecordFunction);
     }
 
     /**
@@ -79,6 +81,8 @@ public class AggregatedTrecQrelGoldStandard<Q extends QueryDescription> extends 
         }
         return true;
     }
+
+
 
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {

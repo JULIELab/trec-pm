@@ -129,6 +129,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         return isSample;
     }
 
+
+
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
         return queryIdFunction;

@@ -88,10 +88,42 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withConditionalCancer();
     }
 
-    public static TrecPmRetrieval jlpmcommongenericcalibration(int size) {
-        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2")
+    public static TrecPmRetrieval jlpmcommon2umls(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2umls")
                 .withSubTemplate(JULIE_COMMON2_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmcommon2withumlshypernym(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2umlsdishyp")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withUmlsDiseaseHypernym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmcommon2withlexigramhypernym(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2lexigramdishyp")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval().withGeneSynonym()
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withDiseaseHypernym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmcommon2withoutgenesynonyms(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2lwithoutgenesyn")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval()
+                .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
+                .withConditionalCancer();
+    }
+
+    public static TrecPmRetrieval jlpmcommon2withgenesdesc(int size) {
+        return new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, size).withExperimentName("jlpmcommon2lwithgenedesc")
+                .withSubTemplate(JULIE_COMMON2_TEMPLATE)
+                .withWordRemoval().withGeneSynonym().withGeneDescription()
                 .withUmlsDiseasePreferredTerm().withUmlsDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
                 .withConditionalCancer();
     }
@@ -224,7 +256,7 @@ public final class LiteratureArticlesRetrievalRegistry {
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
 
-
+//        System.err.println("WARN: Similarity changing is currently disabled!!!");
         SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
         ret.withSimilarityParameters(similarityParameters);
 

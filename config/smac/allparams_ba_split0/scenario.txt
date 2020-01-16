@@ -3,6 +3,6 @@ runObj = QUALITY
 cutoffTime = 1000
 deterministic = 1
 instance_file = config/smac/allparams_ba_split0/instances.txt
-algo = bash scripts/smacOverHttpWrapper.sh 32100 pm _copy0
+algo = bash scripts/smacOverHttpWrapper.sh 32200 pm _copy0
 save-runs-every-iteration = true
 seed = 1

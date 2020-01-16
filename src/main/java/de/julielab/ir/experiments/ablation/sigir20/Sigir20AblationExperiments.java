@@ -9,6 +9,7 @@ import de.julielab.ir.experiments.ablation.AblationLatexTableInfo;
 import de.julielab.ir.paramopt.HttpParamOptServer;
 import de.julielab.ir.paramopt.SmacLiveRundataEntry;
 import de.julielab.ir.paramopt.SmacLiveRundataReader;
+import org.apache.http.cookie.SM;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class Sigir20AblationExperiments {
     public static final String METRICS_TO_RETURN = "infndcg";
     private AblationExperiments ablationExperiments = new AblationExperiments();
+    public static final int SMAC_RUN_NUMBER = 3;
 
     public static void main(String args[]) throws ExecutionException, InterruptedException {
         Sigir20AblationExperiments sigir20AblationExperiments = new Sigir20AblationExperiments();
@@ -41,23 +43,19 @@ public class Sigir20AblationExperiments {
         });
 
         f1.get();
+        System.out.println("BA finished");
         f2.get();
+        System.out.println("CT finished");
 
         Multithreading.getInstance().shutdown();
     }
 
     public void doBaExperiments() throws IOException {
-
-        int smacRunNumber = 1;
-        String corpus = "ba";
-        runCrossvalAblationExperiment(new Sigir20TopDownAblationBAParameters(), smacRunNumber, corpus);
+        runCrossvalAblationExperiment(new Sigir20TopDownAblationBAParameters(), SMAC_RUN_NUMBER, "ba");
     }
 
     public void doCtExperiments() throws IOException {
-
-        int smacRunNumber = 1;
-        String corpus = "ct";
-        runCrossvalAblationExperiment(new Sigir20TopDownAblationCTParameters(), smacRunNumber, corpus);
+        runCrossvalAblationExperiment(new Sigir20TopDownAblationCTParameters(), SMAC_RUN_NUMBER, "ct");
     }
 
     private void runCrossvalAblationExperiment(Map<String, Map<String, String>> parameters, int smacRunNumber, String corpus) throws IOException {
@@ -98,7 +96,7 @@ public class Sigir20AblationExperiments {
 
         String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
         String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
-        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(ablationCrossValResult, ablationCrossValResult1, caption, label, (AblationLatexTableInfo)topDownReferenceParameters.get(0), (AblationLatexTableInfo)bottomUpAblationParameters.get(0));
+        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(ablationCrossValResult, ablationCrossValResult1, caption, label, (AblationLatexTableInfo)parameters, (AblationLatexTableInfo)bottomUpAblationParameters.get(0));
 
         System.out.println(sb.toString());
     }

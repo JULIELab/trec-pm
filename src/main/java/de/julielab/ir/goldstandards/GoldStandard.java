@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
+import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 
@@ -28,7 +29,7 @@ public interface GoldStandard<Q extends QueryDescription> {
      * in adding the current query to them.
      * </p>
      *
-     * @param nPartitions The number of partitions to create.
+     * @param nPartitions     The number of partitions to create.
      * @param topicProperties The functions returning the property to sort the queries by.
      * @return The query-property-balanced partitions.
      */
@@ -95,7 +96,7 @@ public interface GoldStandard<Q extends QueryDescription> {
      */
     void writeQrelFile(File qrelFile);
 
-     void writeQrelFile(File qrelFile, Collection<Q> queries);
+    void writeQrelFile(File qrelFile, Collection<Q> queries);
 
     /**
      * Writes the underlying data structure to a sample qrel file, if possible.
@@ -114,14 +115,42 @@ public interface GoldStandard<Q extends QueryDescription> {
 
     Map<Integer, Q> getQueriesByNumber();
 
+    Map<Q, DocumentList<Q>> getSampleQrelDocumentsPerQuery();
+
     DocumentList<Q> getQrelDocumentsForQuery(int queryId);
 
+    DocumentList<Q> getSampleQrelDocumentsForQuery(int queryId);
+
     default DocumentList<Q> getQrelDocumentsForQuery(Q query) {
-        return getQrelDocumentsForQuery(query.getNumber());
+        return getQrelDocumentsPerQuery().get(query);
+    }
+
+    default DocumentList<Q> getSampleQrelDocumentsForQuery(Q query) {
+        return getSampleQrelDocumentsPerQuery().get(query);
     }
 
     default DocumentList<Q> getQrelDocumentsForQueries(Collection<Q> queries) {
         return queries.stream().map(this::getQrelDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
+    }
+
+    default DocumentList<Q> getSampleQrelDocumentsForQueries(Collection<Q> queries) {
+        return queries.stream().map(this::getSampleQrelDocumentsForQuery).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
+    }
+
+    /**
+     * Converts a given DocumentList to a non-stratified list.
+     *
+     * @param sampleQrelDocuments
+     * @return
+     */
+    default DocumentList<Q> convertSampleToTraditional(DocumentList<Q> sampleQrelDocuments) {
+        DocumentList<Q> ret = new DocumentList<>();
+        for (Document<Q> doc : sampleQrelDocuments) {
+            if (doc.getRelevance() != -1) {
+                ret.add(doc);
+            }
+        }
+        return ret;
     }
 
     Function<QueryDescription, String> getQueryIdFunction();

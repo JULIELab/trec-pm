@@ -43,7 +43,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));
         goldStandardSplit = new HashMap<>(numSplits);
         for (int i = 0; i < numSplits; i++) {
-            TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getQrelDocumentsForQueries(partitioning.get(i)));
+            TrecQrelGoldStandard gsSplit = new TrecQrelGoldStandard(challenge, task, i, type, partitioning.get(i), goldStandard.getSampleQrelDocumentsForQueries(partitioning.get(i)));
             gsSplit.setQueryIdFunction(AggregatedTrecQrelGoldStandard.CROSS_DATASET_QUERY_ID_FUNCTION);
             goldStandardSplit.put("split" + i, gsSplit);
         }
@@ -143,11 +143,12 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             evalGs = new AggregatedTrecQrelGoldStandard<>(evalData);
         } // the next "else" matches not really crossval splits but just the name of specific datasets like
         // pm2018 or ct2019. This way, we can easily evaluate on those specific gold standards.
+        // The instance name must follow the form 'pm-xx-pm201x'
         else if (partitionType.startsWith("pm")) {
             if (partitionType.endsWith("2017"))
                 evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
             else if (partitionType.endsWith("2018"))
-                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2017();
+                evalGs = TrecPMGoldStandardFactory.pubmedOfficial2018();
             else if (partitionType.endsWith("2019"))
                 evalGs = TrecPMGoldStandardFactory.pubmedOfficial2019();
             else throw new IllegalArgumentException("Unknown biomedical abstracts dataset " + partitionType);

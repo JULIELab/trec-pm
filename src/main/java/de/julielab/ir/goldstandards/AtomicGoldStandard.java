@@ -9,6 +9,7 @@ import de.julielab.ir.model.QueryDescription;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -82,10 +83,25 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     }
 
     @Override
+    public DocumentList getSampleQrelDocumentsForQuery(Q query) {
+        return getSampleQrelDocumentsPerQuery().get(query);
+    }
+
+    @Override
     public Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery() {
+        // To create the documentsByQuery field
+        getSampleQrelDocumentsPerQuery();
+        if (isSampleGoldStandard()) {
+            return documentsByQuery.keySet().stream().collect(Collectors.toMap(Function.identity(), t -> convertSampleToTraditional(documentsByQuery.get(t))));
+        }
+        return documentsByQuery;
+    }
+
+    @Override
+    public Map<Q, DocumentList<Q>> getSampleQrelDocumentsPerQuery() {
         if (documentsByQuery == null) {
             documentsByQuery = getQueries().collect(Collectors.toMap(Function.identity(), q -> new DocumentList<Q>()));
-            documentsByQuery.putAll(getQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new))));
+            documentsByQuery.putAll(getSampleQrelDocuments().stream().collect(Collectors.groupingBy(Document::getQueryDescription, Collectors.toCollection(DocumentList::new))));
         }
         return documentsByQuery;
     }
@@ -93,6 +109,11 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     @Override
     public DocumentList<Q> getQrelDocumentsForQuery(int queryId) {
         return getQrelDocumentsForQuery(getQueriesByNumber().get(queryId));
+    }
+
+    @Override
+    public DocumentList<Q> getSampleQrelDocumentsForQuery(int queryId) {
+        return getSampleQrelDocumentsForQuery(getQueriesByNumber().get(queryId));
     }
 
     @Override
@@ -107,21 +128,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         this.qrelDocuments = qrelDocuments;
     }
 
-    /**
-     * Converts a given DocumentList to a non-stratified list.
-     *
-     * @param sampleQrelDocuments
-     * @return
-     */
-    private DocumentList<Q> convertSampleToTraditional(DocumentList<Q> sampleQrelDocuments) {
-        DocumentList<Q> ret = new DocumentList<>();
-        for (Document<Q> doc : sampleQrelDocuments) {
-            if (doc.getRelevance() != -1) {
-                ret.add(doc);
-            }
-        }
-        return ret;
-    }
+
 
     @Override
     public DocumentList<Q> getSampleQrelDocuments() {
