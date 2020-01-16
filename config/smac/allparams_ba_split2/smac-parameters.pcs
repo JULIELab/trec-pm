@@ -27,7 +27,7 @@ retrievalparameters.templateparameters.disease.matchtypes.disease_match_type    
 retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type       categorical {phrase, best_fields} [phrase]
 retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type categorical {phrase, best_fields} [phrase]
 ## Phrase slop
-retrievalparameters.templateparameters.disease.phraseslops.disease_slop integer [0,5] [0]
+retrievalparameters.templateparameters.disease.phraseslops.disease_slop integer [0,2] [0]
 ## Conditional parameter activation
 retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost  | retrievalparameters.diseaseexpansion.preferredterm  == true
 retrievalparameters.templateparameters.disease.boosts.disease_syn_boost       | retrievalparameters.diseaseexpansion.synonyms       == true
@@ -55,9 +55,9 @@ retrievalparameters.templateparameters.gene.matchtypes.gene_hypernyms_match_type
 retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type      categorical {phrase, best_fields} [phrase]
 retrievalparameters.templateparameters.gene.matchtypes.custom_gene_match_type    categorical {phrase, best_fields} [phrase]
 ## Phrase slop
-retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop integer [0,5]  [0]
-retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop   integer [0,5]  [0]
-retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop  integer [0,15] [10]
+retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop integer [0,2]  [0]
+retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop   integer [0,2]  [0]
+retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop  integer [0,10] [5]
 ## Conditional parameter activation
 retrievalparameters.templateparameters.gene.boosts.gene_syn_boost         | retrievalparameters.geneexpansion.synonyms                            == true
 retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost   | retrievalparameters.geneexpansion.hypernyms                           == true
@@ -92,18 +92,6 @@ retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost      r
 retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost  real [0,3]  [1]
 
 # Keywords
-## Chemo
-retrievalparameters.keywords.chemotherapy@word:*mab categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*nib categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*cin categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*one categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*ate categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*mus categorical {true, false} [true]
-retrievalparameters.keywords.chemotherapy@word:*lin categorical {true, false} [true]
-## Cancer
-retrievalparameters.keywords.cancer@word:cancer     categorical {true, false} [true]
-retrievalparameters.keywords.cancer@word:carcinoma  categorical {true, false} [true]
-retrievalparameters.keywords.cancer@word:tumor      categorical {true, false} [true]
 ## Positive PM
 retrievalparameters.keywords.positivepm@word:surgery        categorical {true, false} [false]
 retrievalparameters.keywords.positivepm@word:recurrence     categorical {true, false} [false]

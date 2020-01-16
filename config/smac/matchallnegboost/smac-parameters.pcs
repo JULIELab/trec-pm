@@ -1,5 +1,0 @@
-# Parameter ranges
-retrievalparameters.template categorical {/templates/biomedical_articles_generic/jlpmcommon2negboostsearch.json} [/templates/biomedical_articles_generic/jlpmcommon2negboostsearch.json]
-
-retrievalparameters.templateparameters.match_all_boost real [0.00001,1] [0.01]
-retrievalparameters.templateparameters.neg_keywords_boost real [0.00001,1] [0.01]
