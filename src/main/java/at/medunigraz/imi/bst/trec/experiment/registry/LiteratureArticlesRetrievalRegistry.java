@@ -238,7 +238,7 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withWordRemoval();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
             ret.withGeneSynonym();
-//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
+        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
             ret.withGeneDescription();
         if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
             ret.withGeneFamily();
