@@ -35,8 +35,8 @@ public class FeatureControlledConditionalCancerQueryDecorator extends FileBasedQ
                 String cancerKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, PMFCConstants.CANCER));
                 topic.withCancerBooster(cancerKeywords);
 
-                String chemoKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CHEMOTHERAPY));
-                topic.withChemotherapyBooster(chemoKeywords);
+//                String chemoKeywords = FeatureControlCenter.getKeywordStringFromFeatureConfiguration(config, slash(RETRIEVALPARAMETERS, KEYWORDS, CHEMOTHERAPY));
+//                topic.withChemotherapyBooster(chemoKeywords);
             }
         }
 

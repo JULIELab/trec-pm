@@ -246,7 +246,7 @@ public final class LiteratureArticlesRetrievalRegistry {
             ret.withUmlsDiseasePreferredTerm();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
-            ret.withSynonymList(SYNONYMS_FILE);
+//            ret.withSynonymList(SYNONYMS_FILE);
         }
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
@@ -256,9 +256,9 @@ public final class LiteratureArticlesRetrievalRegistry {
         // Without active keywords, this does nothing.
         ret.withFeatureControlledConditionalCancer();
 
-//        System.err.println("WARN: Similarity changing is currently disabled!!!");
-        SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
-        ret.withSimilarityParameters(similarityParameters);
+        System.err.println("WARN: Similarity changing is currently disabled!!!");
+//        SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
+//        ret.withSimilarityParameters(similarityParameters);
 
         return ret;
     }

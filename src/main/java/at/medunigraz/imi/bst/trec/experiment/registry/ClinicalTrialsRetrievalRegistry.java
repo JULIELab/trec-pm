@@ -153,7 +153,7 @@ public final class ClinicalTrialsRetrievalRegistry {
             ret.withUmlsDiseasePreferredTerm();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
-            ret.withSynonymList(SYNONYMS_FILE);
+//            ret.withSynonymList(SYNONYMS_FILE);
         }
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
