@@ -143,19 +143,19 @@ public final class ClinicalTrialsRetrievalRegistry {
 
         if (retrievalConfig.getBoolean(QUERYFILTERING))
             ret.withWordRemoval();
-        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
+//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, SYNONYMS)))
             ret.withGeneSynonym();
-        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
+//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, DESCRIPTION)))
             ret.withGeneDescription();
-        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
+//        if (retrievalConfig.getBoolean(slash(GENEEXPANSION, HYPERNYMS)))
             ret.withGeneFamily();
-        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
+//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, PREFERREDTERM)))
             ret.withUmlsDiseasePreferredTerm();
-        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
+//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
 //            ret.withSynonymList(SYNONYMS_FILE);
-        }
-        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
+//        }
+//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
             ret.withUmlsDiseaseHypernym();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, CUSTOM)))
             ret.withSolidTumor();
