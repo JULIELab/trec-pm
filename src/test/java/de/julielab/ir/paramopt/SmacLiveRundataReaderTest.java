@@ -79,7 +79,7 @@ public class SmacLiveRundataReaderTest {
     @Test
     public void maeh2() throws Exception {
         SmacLiveRundataReader reader = new SmacLiveRundataReader();
-        SmacLiveRundata data = reader.read(new File("smac-output/allparams_ba_split4/live-rundata-3.json"));
+        SmacLiveRundata data = reader.read(new File("smac-output/allparams_ct_split4/live-rundata-3.json"));
         Map<String, String> settings = data.getEntryWithBestScore().getRunInfo().getConfiguration().getSettings();
         String[] p = new String[5 + settings.size()*2];
         int i = 5;
@@ -89,7 +89,7 @@ public class SmacLiveRundataReaderTest {
             i += 2;
         }
         HierarchicalConfiguration<ImmutableNode> c = parseConfiguration(p);
-        ConfigurationUtilities.writeConfiguration(c, new File("config.xml"));
+        ConfigurationUtilities.writeConfiguration(c, new File("config_ct.xml"));
 
     }
 
