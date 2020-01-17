@@ -43,7 +43,7 @@ public class ElasticSearch implements SearchEngine {
 
     public ElasticSearch() {
         cache = cacheMap.compute(Thread.currentThread(), (k,v) ->
-            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java")
+            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java", 0)
         );
         // This disables the caching. I only do this for parameter optimization because there won't be many - if any - cache hits.
         // For experiments where the queries might often be the same, use the cache assignment above.
