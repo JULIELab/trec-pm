@@ -54,8 +54,60 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
         put("-BM25", params(
                 "indexparameters.bm25.b", "0.75",
                 "indexparameters.bm25.k1", "1.2"));
-        put("-QF", params(
-                "retrievalparameters.queryfiltering", "false"));
+        put("-CLSWT", params(
+                "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "1.0",
+                "retrievalparameters.templateparameters.clauseboosts.negative_kw_boost", "-1.0",
+                "retrievalparameters.templateparameters.clauseboosts.positive_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_custom_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_query_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_syn_boost", "1.0",
+                "retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_custom_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_desc_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_query_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", "1.0",
+                "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", "1.0"
+        ));
+        put("-DISMAX", params(
+                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_nodismax.json"));
+        put("-GENFLD", params(
+                "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "0.0"
+        ));
+        put("-HASAB", params("retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "0.0"));
+        put("-HASTR", params("retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "0.0" ));
+        put("-FLDWT", params(
+                "retrievalparameters.templateparameters.fieldboosts.abstract_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.abstract_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_kw_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.title_field_disease_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "1.0",
+                "retrievalparameters.templateparameters.fieldboosts.title_field_kw_boost", "1.0"
+        ));
+        put("-NEGKEY", params(
+                "retrievalparameters.keywords.negativepm@word:case", "false",
+                "retrievalparameters.keywords.negativepm@word:cell", "false",
+                "retrievalparameters.keywords.negativepm@word:development", "false",
+                "retrievalparameters.keywords.negativepm@word:dna", "false",
+                "retrievalparameters.keywords.negativepm@word:model", "false",
+                "retrievalparameters.keywords.negativepm@word:mouse", "false",
+                "retrievalparameters.keywords.negativepm@word:pathogenesis", "false",
+                "retrievalparameters.keywords.negativepm@word:specific", "false",
+                "retrievalparameters.keywords.negativepm@word:staining", "false",
+                "retrievalparameters.keywords.negativepm@word:tissue", "false",
+                "retrievalparameters.keywords.negativepm@word:tumor", "false"
+        ));
+        put("-NONMEL", params(
+                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json"));
         put("-POSKEY", params(
                 "retrievalparameters.keywords.positivepm@word:Gleason", "false",
                 "retrievalparameters.keywords.positivepm@word:base", "false",
@@ -93,57 +145,10 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.keywords.positivepm@word:therapy", "false",
                 "retrievalparameters.keywords.positivepm@word:treatment", "false"
         ));
-        put("-NEGKEY", params(
-                "retrievalparameters.keywords.negativepm@word:case", "false",
-                "retrievalparameters.keywords.negativepm@word:cell", "false",
-                "retrievalparameters.keywords.negativepm@word:development", "false",
-                "retrievalparameters.keywords.negativepm@word:dna", "false",
-                "retrievalparameters.keywords.negativepm@word:model", "false",
-                "retrievalparameters.keywords.negativepm@word:mouse", "false",
-                "retrievalparameters.keywords.negativepm@word:pathogenesis", "false",
-                "retrievalparameters.keywords.negativepm@word:specific", "false",
-                "retrievalparameters.keywords.negativepm@word:staining", "false",
-                "retrievalparameters.keywords.negativepm@word:tissue", "false",
-                "retrievalparameters.keywords.negativepm@word:tumor", "false"
-        ));
-        put("-DISMAX", params(
-                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_nodismax.json"));
-        put("-FLDWT", params(
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_disease_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_gene_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_disease_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_gene_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.meshTags_field_kw_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_disease_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "1.0",
-                "retrievalparameters.templateparameters.fieldboosts.title_field_kw_boost", "1.0"
-        ));
-        put("-CLSWT", params(
-                "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "1.0",
-                "retrievalparameters.templateparameters.clauseboosts.negative_kw_boost", "-1.0",
-                "retrievalparameters.templateparameters.clauseboosts.positive_kw_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_custom_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_query_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_syn_boost", "1.0",
-                "retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_custom_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_desc_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_query_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", "1.0",
-                "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", "1.0"
-        ));
+        put("-QF", params(
+                "retrievalparameters.queryfiltering", "false"));
         put("-SLDTMR", params(
                 "retrievalparameters.geneexpansion.custom", "false"));
-        put("-NONMEL", params(
-                "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json"));
     }
 
     private Map<String, String> params(String... entries) {

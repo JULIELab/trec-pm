@@ -39,8 +39,8 @@ public class Sigir20CtBottomUpRefParameters extends HashMap<String, String> {
         put("retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop","0");
         put("retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop","0");
         put("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop","0");
-        put("indexparameters.bm25.k1","1");
-        put("indexparameters.bm25.b","1");
+        put("indexparameters.bm25.k1","1.2");
+        put("indexparameters.bm25.b","0.75");
         put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_disease_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_gene_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_kw_boost", "1.0");
@@ -50,7 +50,7 @@ public class Sigir20CtBottomUpRefParameters extends HashMap<String, String> {
         put("retrievalparameters.templateparameters.fieldboosts.description_field_disease_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.description_field_gene_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.description_field_kw_boost", "1.0");
-        put("retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "1.0");
+        put("retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "0.0");
         put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_disease_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_gene_boost", "1.0");
         put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_kw_boost", "1.0");
@@ -74,9 +74,9 @@ public class Sigir20CtBottomUpRefParameters extends HashMap<String, String> {
         put("retrievalparameters.templateparameters.fieldboosts.summary_field_kw_boost", "1.0");
         put("retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost","1");
         put("retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost","1");
-        put("retrievalparameters.templateparameters.clauseboosts.positive_kw_boost","1");
-        put("retrievalparameters.templateparameters.clauseboosts.negative_kw_boost","-1");
-        put("retrievalparameters.templateparameters.clauseboosts.structured_boost", "1");
+        put("retrievalparameters.templateparameters.clauseboosts.positive_kw_boost","0");
+        put("retrievalparameters.templateparameters.clauseboosts.negative_kw_boost","0");
+        put("retrievalparameters.templateparameters.clauseboosts.structured_boost", "0");
         put("retrievalparameters.templateparameters.clauseboosts.sex_boost", "1");
         put("retrievalparameters.keywords.chemotherapy@word:*mab","false");
         put("retrievalparameters.keywords.chemotherapy@word:*nib","false");
