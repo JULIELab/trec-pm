@@ -1,10 +1,11 @@
 package de.julielab.ir.experiments.ablation;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AblationComparisonPair {
+public class AblationComparisonPair implements Serializable {
     private String ablationName;
     private double[] referenceScores;
     private double[] ablationScores;

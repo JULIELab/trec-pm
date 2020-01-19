@@ -2,11 +2,13 @@ package de.julielab.ir.experiments.ablation;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import de.julielab.ir.Multithreading;
+import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheServer;
+import de.julielab.java.utilities.cache.CacheService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -17,9 +19,13 @@ import static de.julielab.ir.paramopt.HttpParamOptClient.requestScoreFromServer;
 
 public class AblationExperiments {
 
+    private final static Logger log = LoggerFactory.getLogger(AblationExperiments.class);
 
+    private CacheAccess<CacheKey, AblationComparisonPair> cache;
 
-
+    public AblationExperiments() {
+        cache = CacheService.getInstance().getCacheAccess("AblationCache", "AblatinoPairs", CacheAccess.JAVA, CacheAccess.JAVA);
+    }
 
     /**
      * Issues two searches: One with the given <tt>referenceParameters</tt> and one where part of the <tt>referenceParameters</tt> is overridden with <tt>ablationOverrides</tt> for deactivate features or set some parameters to neutral values.
@@ -66,9 +72,15 @@ public class AblationExperiments {
                         String instance = instances.get(finalI);
                         String indexSuffix = indexSuffixes.get(finalI);
                         Map<String, String> referenceParametersForThisSplit = referenceParameters.size() > 1 ? referenceParameters.get(finalI) : referenceParameters.get(0);
-                        AblationComparisonPair comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                        CacheKey cacheKey = new CacheKey(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                        AblationComparisonPair comparison = cache.get(cacheKey);
+                        if (comparison == null) {
+                            comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                            cache.put(cacheKey, comparison);
+                        }
                         // Get the cross val result object for the current group and add the result for this cross val split
                         ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult(ablationGroupName) : v).add(comparison);
+                        log.debug("Finished ablation group {} on instance {}", ablationGroupName, instance);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -85,6 +97,26 @@ public class AblationExperiments {
             }
         }
         return ablationResult;
+    }
+
+    private class CacheKey implements Serializable {
+        private String ablationGroupName;
+        private String instance;
+        private String indexSuffix;
+        private String endpoint;
+        private String metricsToReturn;
+        private Map<String, String> referenceParameters;
+        private Map<String, String> ablationParameters;
+
+        public CacheKey(String ablationGroupName, String instance, String indexSuffix, String endpoint, String metricsToReturn, Map<String, String> referenceParameters, Map<String, String> ablationParameters) {
+            this.ablationGroupName = ablationGroupName;
+            this.instance = instance;
+            this.indexSuffix = indexSuffix;
+            this.endpoint = endpoint;
+            this.metricsToReturn = metricsToReturn;
+            this.referenceParameters = referenceParameters;
+            this.ablationParameters = ablationParameters;
+        }
     }
 
 }

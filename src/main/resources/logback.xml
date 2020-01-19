@@ -20,6 +20,7 @@
     <logger name="de.julielab.ir.es.ElasticSearchSetup" level="WARN"/>
     <logger name="de.julielab.ir.paramopt.EvaluateConfigurationRoute" level="INFO"/>
     <logger name="at.medunigraz.imi.bst.trec.search.ElasticSearch" level="DEBUG"/>
+    <logger name="de.julielab.ir.experiments.ablation.AblationExperiments" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
