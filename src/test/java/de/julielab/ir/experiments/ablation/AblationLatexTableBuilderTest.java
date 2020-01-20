@@ -2,12 +2,8 @@ package de.julielab.ir.experiments.ablation;
 
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class AblationLatexTableBuilderTest {
 

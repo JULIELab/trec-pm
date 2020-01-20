@@ -1,16 +1,12 @@
 package de.julielab.ir.experiments.ablation;
 
-import at.medunigraz.imi.bst.config.TrecConfig;
 import de.julielab.ir.Multithreading;
 import de.julielab.java.utilities.cache.CacheAccess;
-import de.julielab.java.utilities.cache.CacheServer;
 import de.julielab.java.utilities.cache.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -21,10 +17,13 @@ public class AblationExperiments {
 
     private final static Logger log = LoggerFactory.getLogger(AblationExperiments.class);
 
-    private CacheAccess<CacheKey, AblationComparisonPair> cache;
+    private static CacheAccess<AblationExperimentCacheKey, AblationComparisonPair> cache;
 
     public AblationExperiments() {
-        cache = CacheService.getInstance().getCacheAccess("AblationCache", "AblatinoPairs", CacheAccess.JAVA, CacheAccess.JAVA);
+        if (cache == null) {
+            log.debug("Creating new cache access");
+            cache = CacheService.getInstance().getCacheAccess("AblationCache", "AblationPairs", CacheAccess.JAVA, CacheAccess.JAVA);
+        }
     }
 
     /**
@@ -41,9 +40,11 @@ public class AblationExperiments {
      * @throws IOException
      */
     private AblationComparisonPair getAblationComparison(String ablationName, String instance, String indexSuffix, String endpoint, String metricsToReturn, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
+        log.trace("Searching reference configuration for instance {} with parameters {}", instance, referenceParameters);
         double[] referenceScores = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint, metricsToReturn);
         Map<String, String> ablationParameters = new HashMap<>(referenceParameters);
         ablationParameters.putAll(ablationOverrides);
+        log.trace("Searching ablation configuration {} for instance {} with parameters {}", ablationName, instance, referenceParameters);
         double[] ablationScores = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint, metricsToReturn);
         return new AblationComparisonPair(ablationName, metricsToReturn, referenceScores, ablationScores);
     }
@@ -60,28 +61,31 @@ public class AblationExperiments {
      */
     public Map<String, AblationCrossValResult> getAblationCrossValResult(List<Map<String, Map<String, String>>> ablationParameterMaps, List<Map<String, String>> referenceParameters, List<String> instances, List<String> indexSuffixes, String metricsToReturn, String endpoint) throws IOException {
         Map<String, AblationCrossValResult> ablationResult = new LinkedHashMap<>();
-        List<Future<?>> jobs = new ArrayList<>();
+        List<Future<Map<String, AblationComparisonPair>>> jobs = new ArrayList<>();
         // For each cross val split...
         for (int i = 0; i < instances.size(); i++) {
             final int finalI = i;
-            Future<?> future = Multithreading.getInstance().submit(() -> {
+            Future<Map<String, AblationComparisonPair>> future = Multithreading.getInstance().submit(() -> {
                 try {
+                    Map<String, AblationComparisonPair> pairs = new LinkedHashMap<>();
                     Map<String, Map<String, String>> ablationParameterMap = ablationParameterMaps.size() > 1 ? ablationParameterMaps.get(finalI) : ablationParameterMaps.get(0);
                     // Apply each ablation group
                     for (String ablationGroupName : ablationParameterMap.keySet()) {
                         String instance = instances.get(finalI);
                         String indexSuffix = indexSuffixes.get(finalI);
                         Map<String, String> referenceParametersForThisSplit = referenceParameters.size() > 1 ? referenceParameters.get(finalI) : referenceParameters.get(0);
-                        CacheKey cacheKey = new CacheKey(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                        AblationExperimentCacheKey cacheKey = new AblationExperimentCacheKey(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
                         AblationComparisonPair comparison = cache.get(cacheKey);
                         if (comparison == null) {
                             comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
                             cache.put(cacheKey, comparison);
                         }
                         // Get the cross val result object for the current group and add the result for this cross val split
-                        ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult(ablationGroupName) : v).add(comparison);
+//                        ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult(ablationGroupName, instances.size()) : v).set(finalI, comparison);
                         log.debug("Finished ablation group {} on instance {}", ablationGroupName, instance);
+                        pairs.put(ablationGroupName, comparison);
                     }
+                    return pairs;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -89,9 +93,14 @@ public class AblationExperiments {
             jobs.add(future);
         }
         // Wait for the jobs to finish
-        for (Future job : jobs) {
+        for (Future<Map<String, AblationComparisonPair>> job : jobs) {
             try {
-                job.get();
+                Map<String, AblationComparisonPair> map = job.get();
+                for (String key : map.keySet()) {
+                    AblationComparisonPair ablationComparisonPair = map.get(key);
+                    String ablationGroupName = ablationComparisonPair.getAblationName();
+                    ablationResult.compute(ablationGroupName, (k, v) -> v == null ? new AblationCrossValResult(ablationGroupName) : v).add(ablationComparisonPair);
+                }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -99,24 +108,5 @@ public class AblationExperiments {
         return ablationResult;
     }
 
-    private class CacheKey implements Serializable {
-        private String ablationGroupName;
-        private String instance;
-        private String indexSuffix;
-        private String endpoint;
-        private String metricsToReturn;
-        private Map<String, String> referenceParameters;
-        private Map<String, String> ablationParameters;
-
-        public CacheKey(String ablationGroupName, String instance, String indexSuffix, String endpoint, String metricsToReturn, Map<String, String> referenceParameters, Map<String, String> ablationParameters) {
-            this.ablationGroupName = ablationGroupName;
-            this.instance = instance;
-            this.indexSuffix = indexSuffix;
-            this.endpoint = endpoint;
-            this.metricsToReturn = metricsToReturn;
-            this.referenceParameters = referenceParameters;
-            this.ablationParameters = ablationParameters;
-        }
-    }
 
 }

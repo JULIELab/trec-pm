@@ -16,7 +16,6 @@ public class CrossEvaluation {
             String instance = String.format(instanceFmtStr, i);
             String indexSuffix = String.format(indexSuffixFmtStr, i);
             double[] doubles = HttpParamOptClient.requestScoreFromServer(configurations.get(0), instance, indexSuffix, endpoint, metricsToReturn);
-            System.out.println(Arrays.toString(doubles));
             reference.add(new AblationComparisonPair("reference", metricsToReturn, doubles, new double[doubles.length]));
         }
         return reference;

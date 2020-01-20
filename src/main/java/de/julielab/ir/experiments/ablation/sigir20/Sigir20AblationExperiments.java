@@ -1,18 +1,26 @@
 package de.julielab.ir.experiments.ablation.sigir20;
 
 import de.julielab.ir.Multithreading;
+import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.evaluation.CrossEvaluation;
 import de.julielab.ir.experiments.ablation.*;
 import de.julielab.ir.paramopt.HttpParamOptServer;
 import de.julielab.ir.paramopt.SmacLiveRundataEntry;
 import de.julielab.ir.paramopt.SmacLiveRundataReader;
+import de.julielab.ir.paramopt.SmacParameterConfiguration;
+import de.julielab.java.utilities.ConfigurationUtilities;
+import de.julielab.java.utilities.cache.CacheService;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.io.FileBased;
+import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
@@ -25,50 +33,57 @@ import static de.julielab.ir.paramopt.HttpParamOptServer.INFNDCG;
 public class Sigir20AblationExperiments {
     public static final String METRICS_TO_RETURN = "infndcg";
     public static final int SMAC_RUN_NUMBER = 1;
-    public static final String SPLIT_TYPE = "train";
     private static final Logger log = LoggerFactory.getLogger(Sigir20AblationExperiments.class);
+    public static String splitType = "test";
     private AblationExperiments ablationExperiments = new AblationExperiments();
 
     public static void main(String args[]) throws ExecutionException, InterruptedException {
+        CacheService.initialize(new TrecCacheConfiguration());
         Sigir20AblationExperiments sigir20AblationExperiments = new Sigir20AblationExperiments();
+        if (args.length > 0)
+            splitType = args[0];
 
         Future<?> f1 = Multithreading.getInstance().submit(() -> {
             try {
                 sigir20AblationExperiments.doBaExperiments();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+            log.info("BA finished");
         });
         Future<?> f2 = Multithreading.getInstance().submit(() -> {
             try {
                 sigir20AblationExperiments.doCtExperiments();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+            log.info("CT finished");
         });
 
         f1.get();
-        log.info("BA finished");
         f2.get();
-        log.info("CT finished");
 
         Multithreading.getInstance().shutdown();
+        CacheService.getInstance().commitAllCaches();
     }
 
-    public void doBaExperiments() throws IOException {
+    public void doBaExperiments() throws IOException, ConfigurationException {
         doExperiments(new Sigir20TopDownAblationBAParameters(), "ba");
     }
 
-    public void doExperiments(Map<String, Map<String, String>> ablationParameters, String corpus) throws IOException {
+    public void doExperiments(Map<String, Map<String, String>> ablationParameters, String corpus) throws IOException, ConfigurationException {
         Map<String, AblationCrossValResult> topDownAblationResults = runCrossvalAblationExperiment(ablationParameters, SMAC_RUN_NUMBER, corpus);
         List<AblationCrossValResult> scoreImprovingAblations = topDownAblationResults.values().stream().filter(result -> result.getMeanAblationScore(INFNDCG) > result.getMeanReferenceScore(INFNDCG)).collect(Collectors.toList());
 
         if (log.isInfoEnabled()) {
             log.info("Found the following ablations that actually improved the reference score:");
-            for (AblationCrossValResult r : scoreImprovingAblations)
-                log.info("{}: ablation {}, reference {} ({})", r.getAblationGroupName(), r.getMeanReferenceScore(INFNDCG), INFNDCG);
+            for (AblationCrossValResult r : scoreImprovingAblations) {
+                log.info("[{}] {}: ablation {}, reference {} ({})", corpus, r.getAblationGroupName(), r.getMeanAblationScore(INFNDCG), r.getMeanReferenceScore(INFNDCG), INFNDCG);
+            }
         }
 
+
+        // Check score-improving ablations
         Map<String, String> improvingAblationsParameters = new HashMap<>();
         scoreImprovingAblations.stream().map(r -> ablationParameters.get(r.getAblationGroupName())).forEach(improvingAblationsParameters::putAll);
 
@@ -79,10 +94,13 @@ public class Sigir20AblationExperiments {
             SmacLiveRundataEntry entryWithBestScore = smacLiveRundataReader.read(smacRunFile).getEntryWithBestScore();
             Map<String, String> params = new HashMap<>();
             params.putAll(entryWithBestScore.getRunInfo().getConfiguration().getSettings());
+
             params.putAll(improvingAblationsParameters);
+            evalParams.add(params);
         }
         String endpoint = corpus.equals("ba") ? HttpParamOptServer.GET_CONFIG_SCORE_PM : HttpParamOptServer.GET_CONFIG_SCORE_CT;
-        AblationCrossValResult crossValResult = CrossEvaluation.runEval(evalParams, "%s-split%d-%s", "_copy%s", endpoint, METRICS_TO_RETURN);
+        String instancePrefix = corpus.equals("ba") ? "pm" : "ct";
+        AblationCrossValResult crossValResult = CrossEvaluation.runEval(evalParams, instancePrefix + "-split%d-" + splitType, "_copy%s", endpoint, METRICS_TO_RETURN);
         log.info("Evaluation with reference parameters overridden with best performing ablations:");
         for (AblationComparisonPair evalPair : crossValResult) {
             log.info("[{}] {}", corpus, evalPair.getReferenceScore(INFNDCG));
@@ -92,26 +110,53 @@ public class Sigir20AblationExperiments {
 
     }
 
-    public void doCtExperiments() throws IOException {
+    public void doCtExperiments() throws IOException, ConfigurationException {
         doExperiments(new Sigir20TopDownAblationCTParameters(), "ct");
     }
 
-    private Map<String, AblationCrossValResult> runCrossvalAblationExperiment(Map<String, Map<String, String>> parameters, int smacRunNumber, String corpus) throws IOException {
+    private Map<String, AblationCrossValResult> runCrossvalAblationExperiment(Map<String, Map<String, String>> topDownAblationParams, int smacRunNumber, String corpus) throws IOException, ConfigurationException {
         SmacLiveRundataReader smacLiveRundataReader = new SmacLiveRundataReader();
         String instancePrefix = corpus.equals("ba") ? "pm" : "ct";
         String instanceFmtStr = "%s-split%d-%s";
         List<String> instances = new ArrayList<>();
         List<Map<String, String>> topDownReferenceParameters = new ArrayList<>();
+        List<SmacLiveRundataEntry> bestRuns = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            instances.add(String.format(instanceFmtStr, instancePrefix, i, SPLIT_TYPE));
+            instances.add(String.format(instanceFmtStr, instancePrefix, i, splitType));
             File smacRunFile = Path.of("smac-output", String.format("allparams_%s_split%s", corpus, i), String.format("live-rundata-%s.json", smacRunNumber)).toFile();
             SmacLiveRundataEntry entryWithBestScore = smacLiveRundataReader.read(smacRunFile).getEntryWithBestScore();
-            topDownReferenceParameters.add(entryWithBestScore.getRunInfo().getConfiguration().getSettings());
+            bestRuns.add(entryWithBestScore);
+            if (log.isDebugEnabled()) {
+                FileHandler fh = new FileHandler((FileBased) entryWithBestScore.getRunInfo().getConfiguration().getSettingsAsXmlConfiguration());
+                StringWriter sw = new StringWriter();
+                fh.save(sw);
+                String xml = sw.toString();
+                xml = xml.replaceAll("\n(\\s+)?", "");
+                log.debug("[{}, split{}] Best score from SMAC: {}, configuration: {} ", corpus, i, entryWithBestScore.getrQuality(), xml);
+            }
+            Map<String, String> optimizedSettings = entryWithBestScore.getRunInfo().getConfiguration().getSettings();
+            // always set hypernyms to false - they are contained in the optimized parameters but deactivated in the optimization code
+            optimizedSettings.put("retrievalparameters.diseaseexpansion.hypernyms", "false");
+            topDownReferenceParameters.add(optimizedSettings);
         }
         String endpoint = corpus.equals("ba") ? HttpParamOptServer.GET_CONFIG_SCORE_PM : HttpParamOptServer.GET_CONFIG_SCORE_CT;
         List<String> indexSuffixes = Arrays.stream(ElasticSearchSetup.independentCopies).map(c -> "_" + c).collect(Collectors.toList());
 
-        Map<String, AblationCrossValResult> topDownAblationResults = ablationExperiments.getAblationCrossValResult(Collections.singletonList(parameters), topDownReferenceParameters, instances, indexSuffixes, METRICS_TO_RETURN, endpoint);
+        Map<String, AblationCrossValResult> topDownAblationResults = ablationExperiments.getAblationCrossValResult(Collections.singletonList(topDownAblationParams), topDownReferenceParameters, instances, indexSuffixes, METRICS_TO_RETURN, endpoint);
+
+        // Check scoring consistency
+        if (splitType.equalsIgnoreCase("train")) {
+            for (String ablationGroup : topDownAblationResults.keySet()) {
+                for (int i = 0; i < 10; i++) {
+                    if (i >= topDownAblationResults.get(ablationGroup).size())
+                        continue;
+                    double referenceScore = topDownAblationResults.get(ablationGroup).get(i).getReferenceScore(INFNDCG);
+                    double bestScore = bestRuns.get(i).getrQuality();
+                    if (Math.abs(bestScore - referenceScore) > 0.01)
+                        log.warn("[{}] Expected best score {} as reference for ablation group {} on instance {} but got reference score {}", corpus, bestScore, ablationGroup, instances.get(i), referenceScore);
+                }
+            }
+        }
 
 
         List<Map<String, Map<String, String>>> bottomUpAblationParameters = new ArrayList<>();
@@ -140,9 +185,9 @@ public class Sigir20AblationExperiments {
 
         String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
         String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
-        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) parameters, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
+        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) topDownAblationParams, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
 
-        File tablefile = new File("sigir20-ablation-results", corpus + "-" + SPLIT_TYPE + ".tex");
+        File tablefile = new File("sigir20-ablation-results", corpus + "-" + splitType + ".tex");
         if (!tablefile.exists())
             tablefile.getParentFile().mkdirs();
 

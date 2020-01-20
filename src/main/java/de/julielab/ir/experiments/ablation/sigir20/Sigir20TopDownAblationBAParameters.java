@@ -4,57 +4,59 @@ import de.julielab.ir.experiments.ablation.AblationLatexTableInfo;
 
 import java.util.*;
 
+import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
+
 public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList("-DISEXP+DISSYN", "-DISEXP+DISHYP", "-GENEXP+GENESYN", "-GENEXP+GENEDESC"));
-    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList("-DISEXP+DISHYP", "-GENEXP+GENEDESC"));
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s+%s", DISEXP, SYN), String.format("-%s+%s", DISEXP, HYP), "-"+GENEXP+"+"+HYP, String.format("-%s+%s", GENEXP, DESC)));
+    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("-%s+%s", DISEXP, HYP), String.format("-%s+%s", GENEXP, DESC)));
 
     public Sigir20TopDownAblationBAParameters() {
-        put("-DISEXP", params(
+        put(String.format("-%s", DISEXP), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        put("-DISEXP+DISSYN", params(
+        put(String.format("-%s+%s", DISEXP, SYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "true"
         ));
-        put("-DISEXP+DISHYP", params(
+        put(String.format("-%s+%s", DISEXP, HYP), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        put("-GENEXP", params(
+        put(String.format("-%s", GENEXP), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put("-GENEXP+GENESYN", params(
+        put(String.format("-%s+%s", GENEXP, SYN), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "true"
         ));
-        put("-GENEXP+GENEDESC", params(
+        put(String.format("-%s+%s", GENEXP, DESC), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put("-GENEXP+FAMILIES", params(
+        put(String.format("-%s+%s", GENEXP, FAM), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put("-BM25", params(
+        put(String.format("-%s", BM25), params(
                 "indexparameters.bm25.b", "0.75",
                 "indexparameters.bm25.k1", "1.2"));
-        put("-CLSWT", params(
+        put(String.format("-%s", CLSWT), params(
                 "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", "1.0",
                 "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "1.0",
@@ -74,14 +76,14 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", "1.0",
                 "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", "1.0"
         ));
-        put("-DISMAX", params(
+        put(String.format("-%s", DISMAX), params(
                 "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_nodismax.json"));
-        put("-GENFLD", params(
+        put(String.format("-%s", GENFLD), params(
                 "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "0.0"
         ));
-        put("-HASAB", params("retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "0.0"));
-        put("-HASTR", params("retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "0.0" ));
-        put("-FLDWT", params(
+        put(String.format("-%s", HASAB), params("retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", "0.0"));
+        put(String.format("-%s", HASTR), params("retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", "0.0" ));
+        put(String.format("-%s", FLDWT), params(
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_disease_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.abstract_field_kw_boost", "1.0",
@@ -93,7 +95,7 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.templateparameters.fieldboosts.title_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.title_field_kw_boost", "1.0"
         ));
-        put("-NEGKEY", params(
+        put(String.format("-%s", NEG), params(
                 "retrievalparameters.keywords.negativepm@word:case", "false",
                 "retrievalparameters.keywords.negativepm@word:cell", "false",
                 "retrievalparameters.keywords.negativepm@word:development", "false",
@@ -106,9 +108,9 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.keywords.negativepm@word:tissue", "false",
                 "retrievalparameters.keywords.negativepm@word:tumor", "false"
         ));
-        put("-NONMEL", params(
+        put(String.format("-%s", NONMEL), params(
                 "retrievalparameters.template", "/templates/biomedical_articles_generic/jlpmcommon2generic_no_non_melanoma.json"));
-        put("-POSKEY", params(
+        put(String.format("-%s", POS), params(
                 "retrievalparameters.keywords.positivepm@word:Gleason", "false",
                 "retrievalparameters.keywords.positivepm@word:base", "false",
                 "retrievalparameters.keywords.positivepm@word:clinical", "false",
@@ -145,16 +147,15 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.keywords.positivepm@word:therapy", "false",
                 "retrievalparameters.keywords.positivepm@word:treatment", "false"
         ));
-        put("-QF", params(
+        put(String.format("-%s", STOP), params(
                 "retrievalparameters.queryfiltering", "false"));
-        put("-SLDTMR", params(
-                "retrievalparameters.geneexpansion.custom", "false"));
+        put(String.format("-%s", SLDTMR), params(
+                "retrievalparameters.diseaseexpansion.custom", "false"));
     }
 
     private Map<String, String> params(String... entries) {
         Map<String, String> params = new HashMap<>();
         for (int i = 0; i < entries.length; i++) {
-            String entry = entries[i];
             if (i % 2 == 1)
                 params.put(entries[i - 1], entries[i]);
         }

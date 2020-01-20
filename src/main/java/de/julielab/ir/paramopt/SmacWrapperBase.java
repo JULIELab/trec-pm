@@ -29,7 +29,7 @@ abstract public class SmacWrapperBase {
         System.out.println("Result for SMAC: SUCCESS, 0, 0, " + score + ", 0");
     }
 
-    protected HierarchicalConfiguration<ImmutableNode> parseConfiguration(String[] args) throws ConfigurationException {
+    public static HierarchicalConfiguration<ImmutableNode> parseConfiguration(String[] args) throws ConfigurationException {
         final HierarchicalConfiguration<ImmutableNode> config = ConfigurationUtilities.createEmptyConfiguration();
         for (int i = 5; i < args.length; i++) {
             String parameter = args[i];
