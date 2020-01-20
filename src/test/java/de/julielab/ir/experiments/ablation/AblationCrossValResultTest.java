@@ -1,12 +1,10 @@
 package de.julielab.ir.experiments.ablation;
 
-import de.julielab.ir.paramopt.HttpParamOptServer;
 import org.assertj.core.data.Offset;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static de.julielab.ir.paramopt.HttpParamOptServer.INFNDCG;
-import static de.julielab.ir.paramopt.HttpParamOptServer.METRICS;
 import static org.assertj.core.api.Assertions.assertThat;
 public class AblationCrossValResultTest {
 

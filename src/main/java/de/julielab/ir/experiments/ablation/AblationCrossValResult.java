@@ -2,13 +2,11 @@ package de.julielab.ir.experiments.ablation;
 
 import java.util.*;
 import java.util.function.ToDoubleFunction;
-import java.util.stream.Collectors;
 
 public class AblationCrossValResult extends ArrayList<AblationComparisonPair> {
     private String ablationGroupName;
 
     public AblationCrossValResult(String ablationGroupName) {
-
         this.ablationGroupName = ablationGroupName;
     }
 
