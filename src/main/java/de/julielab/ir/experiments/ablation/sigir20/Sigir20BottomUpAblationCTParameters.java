@@ -7,8 +7,8 @@ import java.util.*;
 import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
 
 public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("+%s+%s-%s", DISEXP, STOP, SYN), String.format("+%s+%s-%s", DISEXP, STOP, HYP), String.format("+%s+%s-%s", GENEXP, STOP, SYN), String.format("+%s+%s-%s", GENEXP, STOP, DESC), String.format("+%s+%s-%s", GENEXP, STOP, FAM)));
-    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("+%s+%s-%s", DISEXP, STOP, HYP), String.format("+%s+%s-%s", GENEXP, STOP, FAM)));
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s", SYN), String.format("-%s",  HYP), String.format("-%s",  SYN), String.format("-%s", DESC), String.format("-%s", FAM)));
+    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("-%s", HYP), String.format("-%s", FAM)));
     public Sigir20BottomUpAblationCTParameters(Map<String, String> optimizedParameters) {
         put(String.format("+%s+%s", DISEXP, STOP), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
@@ -21,7 +21,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("+%s+%s-%s", DISEXP, STOP, SYN), params(
+        put(String.format("-%s", SYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "true",
@@ -32,7 +32,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("+%s+%s-%s", DISEXP, STOP, HYP), params(
+        put(String.format("-%s",  HYP), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "true",
@@ -58,7 +58,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("+%s+%s-%s", GENEXP, STOP, SYN), params(
+        put(String.format("-%s", SYN), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
@@ -73,7 +73,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("+%s+%s-%s", GENEXP, STOP, DESC), params(
+        put(String.format("-%s",  DESC), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
@@ -88,7 +88,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("+%s+%s-%s", GENEXP, STOP, FAM), params(
+        put(String.format("-%s",  FAM), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",

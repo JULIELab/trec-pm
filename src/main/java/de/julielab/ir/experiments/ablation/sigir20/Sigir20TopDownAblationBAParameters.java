@@ -7,8 +7,8 @@ import java.util.*;
 import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
 
 public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s+%s", DISEXP, SYN), String.format("-%s+%s", DISEXP, HYP), "-"+GENEXP+"+"+HYP, String.format("-%s+%s", GENEXP, DESC)));
-    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("-%s+%s", DISEXP, HYP), String.format("-%s+%s", GENEXP, DESC)));
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("+%s",  SYN), String.format("+%s",  HYP), String.format("+%s", FAM), String.format("+%s", DESC)));
+    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("+%s",  HYP), String.format("+%s",  DESC)));
 
     public Sigir20TopDownAblationBAParameters() {
         put(String.format("-%s", DISEXP), params(
@@ -17,13 +17,13 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        put(String.format("-%s+%s", DISEXP, SYN), params(
+        put(String.format("+%s", SYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "true"
         ));
-        put(String.format("-%s+%s", DISEXP, HYP), params(
+        put(String.format("+%s", HYP), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
@@ -35,19 +35,19 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put(String.format("-%s+%s", GENEXP, SYN), params(
+        put(String.format("+%s", SYN), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "true"
         ));
-        put(String.format("-%s+%s", GENEXP, DESC), params(
+        put(String.format("+%s", DESC), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put(String.format("-%s+%s", GENEXP, FAM), params(
+        put(String.format("+%s", FAM), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
