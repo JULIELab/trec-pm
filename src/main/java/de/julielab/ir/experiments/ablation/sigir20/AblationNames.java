@@ -4,6 +4,7 @@ public class AblationNames {
     public static final String DISEXP = "Disease Expansion";
     public static final String SYN = "Synonyms";
     public static final String HYP = "Hypernyms";
+    public static final String PREF = "Preferred Name";
     public static final String GENEXP = "Gene Expansion";
     public static final String DESC = "Description";
     public static final String FAM = "Families";
