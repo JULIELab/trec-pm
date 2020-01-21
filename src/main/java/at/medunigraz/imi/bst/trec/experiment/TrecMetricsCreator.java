@@ -31,6 +31,7 @@ public class TrecMetricsCreator {
     private GoldStandardType goldStandardType;
     private File sampleGoldStandard;
     private Metrics metrics;
+    private Map<String, Metrics> metricsPerTopic;
 
     public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File results, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
         this.experimentId = shortExperimentId;
@@ -44,12 +45,16 @@ public class TrecMetricsCreator {
         this.sampleGoldStandard = sampleGoldStandard;
     }
 
+    public Map<String, Metrics> getMetricsPerTopic() {
+        return metricsPerTopic;
+    }
+
     public Metrics computeMetrics() {
         final String filename = goldStandardType + "_" + experimentId;
         final File trecEvalOutput = new File(statsDir, filename + ".trec_eval");
         try {
             TrecEval te = new TrecEval(goldStandard, results, trecEvalOutput, k, calculateTrecEvalWithMissingResults);
-            Map<String, Metrics> metricsPerTopic = te.getMetrics();
+            metricsPerTopic = te.getMetrics();
 
             if (sampleGoldStandard != null) {
 

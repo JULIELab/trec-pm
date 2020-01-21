@@ -1,5 +1,6 @@
 package de.julielab.ir.experiments.ablation;
 
+import at.medunigraz.imi.bst.trec.model.Metrics;
 import de.julielab.ir.Multithreading;
 import de.julielab.java.utilities.cache.CacheAccess;
 import de.julielab.java.utilities.cache.CacheService;
@@ -39,14 +40,14 @@ public class AblationExperiments {
      * @return A <tt>ComparisonPair</tt> containing the two run scores.
      * @throws IOException
      */
-    private AblationComparisonPair getAblationComparison(String ablationName, String instance, String indexSuffix, String endpoint, String metricsToReturn, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
+    private AblationComparisonPair getAblationComparison(String ablationName, String instance, String indexSuffix, String endpoint, String metricsToReturn, boolean metricsPerTopic, Map<String, String> referenceParameters, Map<String, String> ablationOverrides) throws IOException {
         log.trace("Searching reference configuration for instance {} with parameters {}", instance, referenceParameters);
-        double[] referenceScores = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint, metricsToReturn);
+        Map<String, Metrics> referenceScores = requestScoreFromServer(referenceParameters, instance, indexSuffix, endpoint, metricsToReturn, metricsPerTopic);
         Map<String, String> ablationParameters = new HashMap<>(referenceParameters);
         ablationParameters.putAll(ablationOverrides);
         log.trace("Searching ablation configuration {} for instance {} with parameters {}", ablationName, instance, referenceParameters);
-        double[] ablationScores = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint, metricsToReturn);
-        return new AblationComparisonPair(ablationName, metricsToReturn, referenceScores, ablationScores);
+        Map<String, Metrics> ablationScores = requestScoreFromServer(ablationParameters, instance, indexSuffix, endpoint, metricsToReturn, metricsPerTopic);
+        return new AblationComparisonPair(ablationName,  referenceScores, ablationScores);
     }
 
     /**
@@ -59,7 +60,7 @@ public class AblationExperiments {
      * @return
      * @throws IOException
      */
-    public Map<String, AblationCrossValResult> getAblationCrossValResult(List<Map<String, Map<String, String>>> ablationParameterMaps, List<Map<String, String>> referenceParameters, List<String> instances, List<String> indexSuffixes, String metricsToReturn, String endpoint) throws IOException {
+    public Map<String, AblationCrossValResult> getAblationCrossValResult(List<Map<String, Map<String, String>>> ablationParameterMaps, List<Map<String, String>> referenceParameters, List<String> instances, List<String> indexSuffixes, String metricsToReturn, boolean metricsPerTopic, String endpoint) throws IOException {
         Map<String, AblationCrossValResult> ablationResult = new LinkedHashMap<>();
         List<Future<Map<String, AblationComparisonPair>>> jobs = new ArrayList<>();
         // For each cross val split...
@@ -77,7 +78,7 @@ public class AblationExperiments {
                         AblationExperimentCacheKey cacheKey = new AblationExperimentCacheKey(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
                         AblationComparisonPair comparison = cache.get(cacheKey);
                         if (comparison == null) {
-                            comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
+                            comparison = getAblationComparison(ablationGroupName, instance, indexSuffix, endpoint, metricsToReturn, metricsPerTopic, referenceParametersForThisSplit, ablationParameterMap.get(ablationGroupName));
                             cache.put(cacheKey, comparison);
                         }
                         // Get the cross val result object for the current group and add the result for this cross val split
