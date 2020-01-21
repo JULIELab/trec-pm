@@ -35,6 +35,7 @@ public class Experiment<Q extends QueryDescription> {
     private List<ResultList<Q>> lastResultListSet;
     // This ranker will be applied to retrieved results, if it is present.
     private Ranker<Q> reRanker;
+    private Map<String, Metrics> metricsByTopic;
 
 
     /**
@@ -146,6 +147,10 @@ public class Experiment<Q extends QueryDescription> {
         return lastResultListSet.stream().map(DocumentList::fromRetrievalResultList).flatMap(Collection::stream).collect(Collectors.toCollection(DocumentList::new));
     }
 
+    public Map<String, Metrics> getMetricsByTopic() {
+        return metricsByTopic;
+    }
+
     public Metrics run() {
         final String experimentId = retrieval.getExperimentId();
         final String longExperimentId = experimentId + " with decorators " + retrieval.getQuery().getName();
@@ -161,8 +166,9 @@ public class Experiment<Q extends QueryDescription> {
         boolean calculateTrecEvalWithMissingResults = isCalculateTrecEvalWithMissingResults();
         String statsDir = this.statsDir;
 
-        Metrics allMetrics = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard.getType(), getSampleQrelFile())
-                .computeMetrics();
+        TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard.getType(), getSampleQrelFile());
+        Metrics allMetrics = trecMetricsCreator.computeMetrics();
+        metricsByTopic = trecMetricsCreator.getMetricsPerTopic();
 
         return allMetrics;
 

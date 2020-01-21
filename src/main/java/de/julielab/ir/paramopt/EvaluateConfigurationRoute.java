@@ -17,6 +17,7 @@ import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.io.FileBased;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -66,6 +67,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             int seed = 0;
             String indexSuffix = null;
             String[] metricsToReturn = null;
+            boolean metricsPerTopic = false;
             List<String> parameters = new ArrayList<>(queryParams.size());
             // Fill the beginning of the list because the parameter parsing algorithm is expecting it
             parameters.addAll(Arrays.asList(null, null, null, null, null));
@@ -92,6 +94,8 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                     case METRICS:
                         metricsToReturn = req.queryParams(queryParam).split(",");
                         break;
+                    case METRICS_PER_TOPIC:
+                        metricsPerTopic = Boolean.valueOf(req.queryParams(queryParam));
                     default:
                         parameters.add("-" + queryParam);
                         parameters.add(req.queryParams(queryParam));
@@ -101,13 +105,14 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
             String[] params = parameters.toArray(new String[0]);
             HierarchicalConfiguration<ImmutableNode> configuration = parseConfiguration(params);
             configuration.addProperty(INDEX_SUFFIX, indexSuffix);
+            configuration.addProperty(METRICS_PER_TOPIC, metricsPerTopic);
             if (log.isDebugEnabled()) {
                 FileHandler fh = new FileHandler((FileBased) configuration);
                 StringWriter sw = new StringWriter();
                 fh.save(sw);
                 String xml = sw.toString();
                 xml = xml.replaceAll("\n(\\s+)?", "");
-                log.debug("Evaluating instance {} in thread {} on index copy {} with configuration: {}", instanceName, Thread.currentThread(), indexSuffix,xml);
+                log.debug("Evaluating instance {} in thread {} on index copy {} with configuration: {}", instanceName, Thread.currentThread(), indexSuffix, xml);
             }
             score = calculateScore(configuration, metricsToReturn, instanceName, seed);
         } catch (Exception e) {
@@ -124,6 +129,7 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         else
             FeatureControlCenter.reconfigure(config);
         String indexSuffix = config.containsKey(INDEX_SUFFIX) ? config.getString(INDEX_SUFFIX) : "";
+        boolean metricsPerTopic = config.getBoolean(METRICS_PER_TOPIC);
         log.debug("Index Suffix is set to '{}'", indexSuffix);
         TrecPmRetrieval trecPmRetrieval = instance.startsWith("pm-") ? LiteratureArticlesRetrievalRegistry.jlpmgeneric(TrecConfig.SIZE, instance, indexSuffix) : ClinicalTrialsRetrievalRegistry.jlctgeneric(TrecConfig.SIZE, instance, indexSuffix);
         trecPmRetrieval.withIndexSuffix(indexSuffix);
@@ -170,6 +176,23 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
         logMetrics(config, instance, metrics, splitAndType[0], partitionType);
         if (metricsToReturn == null)
             metricsToReturn = new String[]{INFNDCG};
+        String result = getMetricsAsString(metricsToReturn, metrics);
+        StringBuilder sb = new StringBuilder(result);
+        if (metricsPerTopic) {
+            Map<String, Metrics> metricsByTopic = exp.getMetricsByTopic();
+            for (String topic : metricsByTopic.keySet()) {
+                sb.append(";");
+                sb.append(topic).append(":");
+                Metrics metricsForTopic = metricsByTopic.get(topic);
+                String metricsAsString = getMetricsAsString(metricsToReturn, metricsForTopic);
+                sb.append(metricsAsString);
+            }
+        }
+        return sb.toString();
+    }
+
+    @NotNull
+    private String getMetricsAsString(String[] metricsToReturn, Metrics metrics) {
         StringBuilder sb = new StringBuilder();
         for (String metric : metricsToReturn) {
             double value;
@@ -190,10 +213,9 @@ public class EvaluateConfigurationRoute extends SmacWrapperBase implements Route
                     throw new IllegalArgumentException("Currenty unsupported metric: " + metric);
             }
             // SMAC always minimizes the objective, thus multiplying with -1
-            sb.append(value*-1).append(",");
+            sb.append(value * -1).append(",");
         }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
+        return sb.deleteCharAt(sb.length() - 1).toString();
     }
 
     private void logMetrics(HierarchicalConfiguration<ImmutableNode> config, String instance, Metrics metrics, String corpus, String partitionType) {

@@ -1,5 +1,6 @@
 package de.julielab.ir.experiments.ablation.sigir20;
 
+import at.medunigraz.imi.bst.trec.model.Metrics;
 import de.julielab.ir.paramopt.HttpParamOptClient;
 import de.julielab.ir.paramopt.HttpParamOptServer;
 import de.julielab.ir.paramopt.SmacLiveRundataEntry;
@@ -16,6 +17,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigurationReproduction {
     public static void main(String args[]) throws Exception {
@@ -52,8 +54,8 @@ public class ConfigurationReproduction {
                 xml = xml.replaceAll("\n(\\s+)?", "");
                 log.debug("[{}, split{}] Best score from SMAC: {}, configuration: {} ", corpus, i, entryWithBestScore.getrQuality(), xml);
             }
-            double[] doubles = HttpParamOptClient.requestScoreFromServer(entryWithBestScore.getRunInfo().getConfiguration().getSettings(), instance, "_copy" + i, endpoint, HttpParamOptServer.INFNDCG);
-            log.info("[{}] instance: {}, expected score: {}, actual score: {}", corpus, instance, entryWithBestScore.getrQuality(), doubles[0]);
+            Map<String, Metrics> metricsPerTopic = HttpParamOptClient.requestScoreFromServer(entryWithBestScore.getRunInfo().getConfiguration().getSettings(), instance, "_copy" + i, endpoint, HttpParamOptServer.INFNDCG, false);
+            log.info("[{}] instance: {}, expected score: {}, actual score: {}", corpus, instance, entryWithBestScore.getrQuality(), metricsPerTopic.get("all").getInfNDCG());
         }
     }
 }

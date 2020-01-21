@@ -24,11 +24,24 @@ public class Metrics {
     private Map<String, Double> metrics = new TreeMap<>();
 
     public void put(String name, double value) {
-        metrics.put(name, value);
+        metrics.put(resolveMetricName(name), Math.abs(value));
+    }
+
+    private String resolveMetricName(String name) {
+        if (name.equalsIgnoreCase("ndcg")) return "ndcg";
+        if (name.equalsIgnoreCase("infndcg")) return "infNDCG";
+        if (name.equalsIgnoreCase("rprec")) return "Rprec";
+        if (name.equalsIgnoreCase("infap")) return "infAP";
+        if (name.equalsIgnoreCase("p_5")) return "P_5";
+        if (name.equalsIgnoreCase("p_10")) return "P_10";
+        if (name.equalsIgnoreCase("p_15")) return "P_15";
+        if (name.equalsIgnoreCase("set_f")) return "set_F";
+        if (name.equalsIgnoreCase("set_recall")) return "set_recall";
+        throw new IllegalArgumentException("Unknown metric name '" + name + "'");
     }
 
     public double getMetric(String name) {
-        return metrics.getOrDefault(name, 0d);
+        return metrics.getOrDefault(resolveMetricName(name), 0d);
     }
 
     public boolean hasMetric(String name) {
