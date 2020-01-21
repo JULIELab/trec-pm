@@ -157,8 +157,8 @@ public class Sigir20AblationExperiments {
         Map<String, AblationCrossValResult> topDownAblationResults = ablationExperiments.getAblationCrossValResult(Collections.singletonList(topDownAblationParams), topDownReferenceParameters, instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
 
         // Result logging
-        Stream<String> crossvalReferenceAblationResults = topDownAblationResults.values().iterator().next().stream().map(String::valueOf);
-        String ablationResultString = Stream.concat(Stream.of("experiments", corpus), crossvalSmacResults).collect(Collectors.joining("\t"));
+        Stream<String> crossvalReferenceAblationResults = topDownAblationResults.values().iterator().next().stream().map(c -> String.valueOf(c.getReferenceScore(INFNDCG)));
+        String ablationResultString = Stream.concat(Stream.of("experiments", corpus), crossvalReferenceAblationResults).collect(Collectors.joining("\t"));
         FileUtils.write(crossvalResults, ablationResultString, UTF_8, true);
         log.info("[{}] Reference crossval scores as obtained in ablation experiments for {}: {}",corpus, splitType, ablationResultString);
 
@@ -177,26 +177,26 @@ public class Sigir20AblationExperiments {
         }
 
 
-        List<Map<String, Map<String, String>>> bottomUpAblationParameters = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Map<String, Map<String, String>> bottomUpAblationThisSplit = corpus.equals("ba") ? new Sigir20BottomUpAblationBAParameters(topDownReferenceParameters.get(i)) : new Sigir20BottomUpAblationCTParameters(topDownReferenceParameters.get(i));
-            bottomUpAblationParameters.add(bottomUpAblationThisSplit);
-        }
-        Map<String, String> bottomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
-        Map<String, AblationCrossValResult> bottomUpAblationResults = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(bottomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
-
-
-
-        String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
-        String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
-        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) topDownAblationParams, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
-
-        sigirExperimentResults = "sigir20-ablation-results";
-        File tablefile = new File(sigirExperimentResults, corpus + "-" + splitType + ".tex");
-        if (!tablefile.exists())
-            tablefile.getParentFile().mkdirs();
-
-        FileUtils.write(tablefile, sb.toString(), UTF_8);
+//        List<Map<String, Map<String, String>>> bottomUpAblationParameters = new ArrayList<>();
+//        for (int i = 0; i < 10; i++) {
+//            Map<String, Map<String, String>> bottomUpAblationThisSplit = corpus.equals("ba") ? new Sigir20BottomUpAblationBAParameters(topDownReferenceParameters.get(i)) : new Sigir20BottomUpAblationCTParameters(topDownReferenceParameters.get(i));
+//            bottomUpAblationParameters.add(bottomUpAblationThisSplit);
+//        }
+//        Map<String, String> bottomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
+//        Map<String, AblationCrossValResult> bottomUpAblationResults = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(bottomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
+//
+//
+//
+//        String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
+//        String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
+//        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) topDownAblationParams, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
+//
+//        sigirExperimentResults = "sigir20-ablation-results";
+//        File tablefile = new File(sigirExperimentResults, corpus + "-" + splitType + ".tex");
+//        if (!tablefile.exists())
+//            tablefile.getParentFile().mkdirs();
+//
+//        FileUtils.write(tablefile, sb.toString(), UTF_8);
 
         return topDownAblationResults;
     }

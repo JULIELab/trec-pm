@@ -16,11 +16,23 @@ public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
+        put(String.format("+%s", PREF), params(
+                "retrievalparameters.diseaseexpansion.custom", "false",
+                "retrievalparameters.diseaseexpansion.hypernyms", "false",
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
+                "retrievalparameters.diseaseexpansion.synonyms", "false"
+        ));
         put(String.format("+%s", SYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "true"
+        ));
+        put(String.format("+%s", SLDTMR), params(
+                "retrievalparameters.diseaseexpansion.custom", "true",
+                "retrievalparameters.diseaseexpansion.hypernyms", "false",
+                "retrievalparameters.diseaseexpansion.preferredterm", "false",
+                "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
         put(String.format("+%s", HYP), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
@@ -168,8 +180,6 @@ public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Ma
         ));
         put(String.format("-%s", STOP), params(
                 "retrievalparameters.queryfiltering", "false"));
-        put(String.format("-%s", SLDTMR), params(
-                "retrievalparameters.diseaseexpansion.custom", "false"));
     }
 
     private Map<String, String> params(String... entries) {
