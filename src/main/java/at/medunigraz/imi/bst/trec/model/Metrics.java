@@ -1,10 +1,12 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class Metrics {
+public class Metrics implements Serializable {
 
 
     public static final Metrics ZERO = new Metrics();
@@ -37,7 +39,7 @@ public class Metrics {
         if (name.equalsIgnoreCase("p_15")) return "P_15";
         if (name.equalsIgnoreCase("set_f")) return "set_F";
         if (name.equalsIgnoreCase("set_recall")) return "set_recall";
-        throw new IllegalArgumentException("Unknown metric name '" + name + "'");
+        return name;
     }
 
     public double getMetric(String name) {
@@ -105,5 +107,18 @@ public class Metrics {
 
     public double getSetRecall() {
         return getMetric("set_recall");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Metrics metrics1 = (Metrics) o;
+        return Objects.equals(metrics, metrics1.metrics);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metrics);
     }
 }

@@ -147,8 +147,9 @@ public class Sigir20AblationExperiments {
         File crossvalResults = new File(sigirExperimentResults, "crossvalScores.tsv");
         FileUtils.write(crossvalResults, Stream.concat(Stream.of("source", "corpustype"), IntStream.range(0, 10).mapToObj(i -> "split"+i)).collect(Collectors.joining("\t")), UTF_8);
         Stream<String> crossvalSmacResults = bestRuns.stream().map(SmacLiveRundataEntry::getrQuality).map(String::valueOf);
-        FileUtils.write(crossvalResults, Stream.concat(Stream.of("smac", corpus), crossvalSmacResults).collect(Collectors.joining("\t")), UTF_8, true);
-        log.info("[{}] Best SMAC configuration crossval scores for train: {}", corpus, crossvalSmacResults);
+        String resultString = Stream.concat(Stream.of("smac", corpus), crossvalSmacResults).collect(Collectors.joining("\t"));
+        FileUtils.write(crossvalResults, resultString, UTF_8, true);
+        log.info("[{}] Best SMAC configuration crossval scores for train: {}", corpus, resultString);
 
         String endpoint = corpus.equals("ba") ? HttpParamOptServer.GET_CONFIG_SCORE_PM : HttpParamOptServer.GET_CONFIG_SCORE_CT;
         List<String> indexSuffixes = Arrays.stream(ElasticSearchSetup.independentCopies).map(c -> "_" + c).collect(Collectors.toList());
@@ -157,8 +158,9 @@ public class Sigir20AblationExperiments {
 
         // Result logging
         Stream<String> crossvalReferenceAblationResults = topDownAblationResults.values().iterator().next().stream().map(String::valueOf);
-        FileUtils.write(crossvalResults, Stream.concat(Stream.of("experiments", corpus), crossvalSmacResults).collect(Collectors.joining("\t")), UTF_8, true);
-        log.info("[{}] Reference crossval scores as obtained in ablation experiments for {}: {}",corpus, splitType, crossvalReferenceAblationResults);
+        String ablationResultString = Stream.concat(Stream.of("experiments", corpus), crossvalSmacResults).collect(Collectors.joining("\t"));
+        FileUtils.write(crossvalResults, ablationResultString, UTF_8, true);
+        log.info("[{}] Reference crossval scores as obtained in ablation experiments for {}: {}",corpus, splitType, ablationResultString);
 
         // Check scoring consistency
         if (splitType.equalsIgnoreCase("train")) {
