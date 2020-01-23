@@ -7,8 +7,9 @@ import java.util.*;
 import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
 
 public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("+%s",  SYN), String.format("+%s",  HYP), String.format("+%s", FAM), String.format("+%s", DESC)));
-    private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("+%s",  HYP), String.format("+%s",  FAM)));
+    //private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("+%s",  SYN), String.format("+%s",  HYP), String.format("+%s", FAM), String.format("+%s", DESC), String.format("+%s", PREF),String.format("+%s", SLDTMR)));
+    private static final Set<String> INDENT = Collections.emptySet();
+    private static final Set<String> MIDRULE_AFTER = Collections.emptySet();//new HashSet<>(Arrays.asList(String.format("+%s",  HYP), String.format("+%s",  FAM)));
     public Sigir20TopDownAblationCTParameters() {
         put(String.format("-%s", DISEXP), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
@@ -16,29 +17,29 @@ public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        put(String.format("+%s", PREF), params(
-                "retrievalparameters.diseaseexpansion.custom", "false",
-                "retrievalparameters.diseaseexpansion.hypernyms", "false",
-                "retrievalparameters.diseaseexpansion.preferredterm", "true",
-                "retrievalparameters.diseaseexpansion.synonyms", "false"
-        ));
-        put(String.format("+%s", SYN), params(
-                "retrievalparameters.diseaseexpansion.custom", "false",
+        put(String.format("-%s", PREF), params(
+                "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "false",
                 "retrievalparameters.diseaseexpansion.synonyms", "true"
         ));
-        put(String.format("+%s", SLDTMR), params(
+        put(String.format("-%s", DISSYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
-                "retrievalparameters.diseaseexpansion.preferredterm", "false",
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
                 "retrievalparameters.diseaseexpansion.synonyms", "false"
         ));
-        put(String.format("+%s", HYP), params(
+        put(String.format("-%s", SLDTMR), params(
                 "retrievalparameters.diseaseexpansion.custom", "false",
+                "retrievalparameters.diseaseexpansion.hypernyms", "false",
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
+                "retrievalparameters.diseaseexpansion.synonyms", "true"
+        ));
+        put(String.format("+%s", HYP), params(
+                "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
-                "retrievalparameters.diseaseexpansion.preferredterm", "false",
-                "retrievalparameters.diseaseexpansion.synonyms", "false"
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
+                "retrievalparameters.diseaseexpansion.synonyms", "true"
         ));
         put(String.format("-%s", GENEXP), params(
                 "retrievalparameters.geneexpansion.custom", "false",
@@ -46,26 +47,30 @@ public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "false"
         ));
-        put(String.format("+%s", SYN), params(
-                "retrievalparameters.geneexpansion.custom", "false",
+        put(String.format("-%s", GENSYN), params(
+                "retrievalparameters.geneexpansion.custom", "true",
+                "retrievalparameters.geneexpansion.description", "true",
+                "retrievalparameters.geneexpansion.hypernyms", "true",
+                "retrievalparameters.geneexpansion.synonyms", "false"
+        ));
+        put(String.format("-%s", DESC), params(
+                "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
+                "retrievalparameters.geneexpansion.hypernyms", "true",
+                "retrievalparameters.geneexpansion.synonyms", "true"
+        ));
+        put(String.format("-%s", FAM), params(
+                "retrievalparameters.geneexpansion.custom", "true",
+                "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "false",
                 "retrievalparameters.geneexpansion.synonyms", "true"
         ));
-        put(String.format("+%s", DESC), params(
-                "retrievalparameters.geneexpansion.custom", "false",
-                "retrievalparameters.geneexpansion.description", "true",
-                "retrievalparameters.geneexpansion.hypernyms", "false",
-                "retrievalparameters.geneexpansion.synonyms", "false"
-        ));
-        put(String.format("+%s", FAM), params(
-                "retrievalparameters.geneexpansion.custom", "true",
-                "retrievalparameters.geneexpansion.description", "false",
-                "retrievalparameters.geneexpansion.hypernyms", "false",
-                "retrievalparameters.geneexpansion.synonyms", "false"
-        ));
         put(String.format("-%s", BM25), params(
                 "indexparameters.bm25.b", "0.75",
+                "indexparameters.bm25.k1", "1.2"));
+        put(String.format("-%s", BM25+"_bdefault"), params(
+                "indexparameters.bm25.b", "0.75"));
+        put(String.format("-%s", BM25+"_k1default"), params(
                 "indexparameters.bm25.k1", "1.2"));
         put(String.format("-%s", CLSWT), params(
                 "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",
@@ -125,6 +130,15 @@ public class Sigir20TopDownAblationCTParameters extends LinkedHashMap<String, Ma
                 "retrievalparameters.templateparameters.fieldboosts.summary_field_disease_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.summary_field_gene_boost", "1.0",
                 "retrievalparameters.templateparameters.fieldboosts.summary_field_kw_boost", "1.0"
+        ));
+        put(String.format("-%s", MULTWRDS), params("retrievalparameters.templateparameters.disease.matchtypes.disease_match_type", "best_fields",
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type", "best_fields",
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type", "best_fields",
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type", "best_fields",
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type", "best_fields",
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_hypernyms_match_type", "best_fields",
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type", "phrase",
+                "retrievalparameters.templateparameters.gene.matchtypes.custom_gene_match_type", "best_fields"
         ));
         put(String.format("-%s", NEG), params(
                 "retrievalparameters.keywords.negativepm@word:case", "false",

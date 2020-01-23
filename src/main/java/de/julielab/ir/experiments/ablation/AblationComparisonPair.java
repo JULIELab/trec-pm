@@ -36,6 +36,14 @@ public class AblationComparisonPair implements Serializable {
         return referenceScores.get("all");
     }
 
+    public Map<String, Metrics> getReferenceMetrics() {
+        return referenceScores;
+    }
+
+    public Map<String, Metrics> getAblationMetrics() {
+        return ablationScores;
+    }
+
     public Metrics getReferenceScores(String topic) {
         return referenceScores.get(topic);
     }

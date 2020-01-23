@@ -2,10 +2,11 @@ package de.julielab.ir.experiments.ablation.sigir20;
 
 public class AblationNames {
     public static final String DISEXP = "Disease Expansion";
-    public static final String SYN = "Synonyms";
+    public static final String DISSYN = "Disease Synonyms";
     public static final String HYP = "Hypernyms";
     public static final String PREF = "Preferred Name";
     public static final String GENEXP = "Gene Expansion";
+    public static final String GENSYN = "Gene Synonyms";
     public static final String DESC = "Description";
     public static final String FAM = "Families";
     public static final String STOP = "Stopword Filtering";
@@ -22,6 +23,7 @@ public class AblationNames {
     public static final String DISMAX = "dis\\_max";
     public static final String PHRASE = "phrase";
     public static final String GENFLD = "Gene Field";
-    public static final String SLDTMR = "Solid Tumor";
+    public static final String MULTWRDS = "Multi-word";
 
+    public static final String SLDTMR = "Solid Tumor";
 }

@@ -7,9 +7,47 @@ import java.util.*;
 import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
 
 public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s", SYN), String.format("-%s",  HYP), String.format("-%s",  SYN), String.format("-%s", DESC), String.format("-%s", FAM)));
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s", DISSYN), String.format("-%s", HYP), String.format("-%s", DISSYN), String.format("-%s", DESC), String.format("-%s", FAM)));
     private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("-%s", HYP), String.format("-%s", FAM)));
+
     public Sigir20BottomUpAblationCTParameters(Map<String, String> optimizedParameters) {
+        put("Reduced good-performing model", params(
+                "retrievalparameters.diseaseexpansion.custom", "true",
+                "retrievalparameters.diseaseexpansion.hypernyms", "true",
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
+                "retrievalparameters.diseaseexpansion.synonyms", "true",
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type"),
+                "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
+                "retrievalparameters.diseaseexpansion.custom", "true",
+                "retrievalparameters.diseaseexpansion.hypernyms", "true",
+                "retrievalparameters.diseaseexpansion.preferredterm", "true",
+                "retrievalparameters.diseaseexpansion.synonyms", "true",
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type"),
+                "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
+                "retrievalparameters.queryfiltering", "true",
+                "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.negative_kw_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.negative_kw_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.positive_kw_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.positive_kw_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.sex_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.sex_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.structured_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.structured_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_custom_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_custom_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_query_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_query_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_syn_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_syn_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_custom_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_custom_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_desc_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_desc_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_query_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_query_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_syn_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost")
+        ));
         put(String.format("+%s+%s", DISEXP, STOP), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
@@ -21,7 +59,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s", SYN), params(
+        put(String.format("-%s", DISSYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "true",
@@ -32,7 +70,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s",  HYP), params(
+        put(String.format("-%s", HYP), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "false",
                 "retrievalparameters.diseaseexpansion.preferredterm", "true",
@@ -58,7 +96,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s", SYN), params(
+        put(String.format("-%s", DISSYN), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
@@ -73,7 +111,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s",  DESC), params(
+        put(String.format("-%s", DESC), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "false",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
@@ -88,7 +126,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s",  FAM), params(
+        put(String.format("-%s", FAM), params(
                 "retrievalparameters.geneexpansion.custom", "false",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
@@ -169,7 +207,7 @@ public class Sigir20BottomUpAblationCTParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.fieldboosts.summary_field_gene_boost", optimizedParameters.get("retrievalparameters.templateparameters.fieldboosts.summary_field_gene_boost"),
                 "retrievalparameters.templateparameters.fieldboosts.summary_field_kw_boost", optimizedParameters.get("retrievalparameters.templateparameters.fieldboosts.summary_field_kw_boost")
         ));
-        put("+"+GENEXP+"", params(
+        put("+" + GENEXP + "", params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
