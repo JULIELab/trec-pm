@@ -7,9 +7,78 @@ import java.util.*;
 import static de.julielab.ir.experiments.ablation.sigir20.AblationNames.*;
 
 public class Sigir20BottomUpAblationBAParameters extends LinkedHashMap<String, Map<String, String>> implements AblationLatexTableInfo {
-    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s", SYN), String.format("-%s",  HYP), String.format("-%s",  SYN), String.format("-%s", DESC), String.format("-%s", FAM)));
+    private static final Set<String> INDENT = new HashSet<>(Arrays.asList(String.format("-%s", DISSYN), String.format("-%s",  HYP), String.format("-%s", DISSYN), String.format("-%s", DESC), String.format("-%s", FAM)));
     private static final Set<String> MIDRULE_AFTER = new HashSet<>(Arrays.asList(String.format("-%s", HYP), String.format("-%s", FAM)));
     public Sigir20BottomUpAblationBAParameters(Map<String, String> optimizedParameters) {
+        put("Reduced good-performing model", params(  "retrievalparameters.keywords.positivepm@word:Gleason", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:Gleason"),
+                "retrievalparameters.keywords.positivepm@word:base", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:base"),
+                "retrievalparameters.keywords.positivepm@word:clinical", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:clinical"),
+                "retrievalparameters.keywords.positivepm@word:cure", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:cure"),
+                "retrievalparameters.keywords.positivepm@word:dna", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:dna"),
+                "retrievalparameters.keywords.positivepm@word:efficacy", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:efficacy"),
+                "retrievalparameters.keywords.positivepm@word:gefitinib", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:gefitinib"),
+                "retrievalparameters.keywords.positivepm@word:gene", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:gene"),
+                "retrievalparameters.keywords.positivepm@word:genotype", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:genotype"),
+                "retrievalparameters.keywords.positivepm@word:heal", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:heal"),
+                "retrievalparameters.keywords.positivepm@word:healing", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:healing"),
+                "retrievalparameters.keywords.positivepm@word:malignancy", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:malignancy"),
+                "retrievalparameters.keywords.positivepm@word:outcome", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:outcome"),
+                "retrievalparameters.keywords.positivepm@word:patient", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:patient"),
+                "retrievalparameters.keywords.positivepm@word:personalized", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:personalized"),
+                "retrievalparameters.keywords.positivepm@word:prevent", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prevent"),
+                "retrievalparameters.keywords.positivepm@word:prognoses", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prognoses"),
+                "retrievalparameters.keywords.positivepm@word:prognosis", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prognosis"),
+                "retrievalparameters.keywords.positivepm@word:prognostic", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prognostic"),
+                "retrievalparameters.keywords.positivepm@word:prophylactic", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prophylactic"),
+                "retrievalparameters.keywords.positivepm@word:prophylaxis", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:prophylaxis"),
+                "retrievalparameters.keywords.positivepm@word:recover", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:recover"),
+                "retrievalparameters.keywords.positivepm@word:recovery", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:recovery"),
+                "retrievalparameters.keywords.positivepm@word:recurrence", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:recurrence"),
+                "retrievalparameters.keywords.positivepm@word:resistance", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:resistance"),
+                "retrievalparameters.keywords.positivepm@word:study", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:study"),
+                "retrievalparameters.keywords.positivepm@word:surgery", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:surgery"),
+                "retrievalparameters.keywords.positivepm@word:survival", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:survival"),
+                "retrievalparameters.keywords.positivepm@word:survive", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:survive"),
+                "retrievalparameters.keywords.positivepm@word:target", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:target"),
+                "retrievalparameters.keywords.positivepm@word:targets", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:targets"),
+                "retrievalparameters.keywords.positivepm@word:therapeutic", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:therapeutic"),
+                "retrievalparameters.keywords.positivepm@word:therapeutical", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:therapeutical"),
+                "retrievalparameters.keywords.positivepm@word:therapy", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:therapy"),
+                "retrievalparameters.keywords.positivepm@word:treatment", optimizedParameters.get("retrievalparameters.keywords.positivepm@word:treatment"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_syn_match_type"),
+                "retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type", optimizedParameters.get("retrievalparameters.templateparameters.disease.matchtypes.disease_hypernyms_match_type"),
+                "retrievalparameters.templateparameters.disease.phraseslops.disease_slop", optimizedParameters.get("retrievalparameters.templateparameters.disease.phraseslops.disease_slop"),
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type", optimizedParameters.get("retrievalparameters.templateparameters.gene.matchtypes.gene_topic_match_type"),
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type", optimizedParameters.get("retrievalparameters.templateparameters.gene.matchtypes.gene_syn_match_type"),
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_hypernyms_match_type", optimizedParameters.get("retrievalparameters.templateparameters.gene.matchtypes.gene_hypernyms_match_type"),
+                "retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type", optimizedParameters.get("retrievalparameters.templateparameters.gene.matchtypes.gene_desc_match_type"),
+                "retrievalparameters.templateparameters.gene.matchtypes.custom_gene_match_type", optimizedParameters.get("retrievalparameters.templateparameters.gene.matchtypes.custom_gene_match_type"),
+                "retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_topic_slop"),
+                "retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_syn_slop"),
+                "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
+                "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.conditional_chemo_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.exists_abstract_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.filtered_treatments_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.negative_kw_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.negative_kw_boost"),
+                "retrievalparameters.templateparameters.clauseboosts.positive_kw_boost", optimizedParameters.get("retrievalparameters.templateparameters.clauseboosts.positive_kw_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_custom_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_custom_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_hypernyms_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_prefterm_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_query_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_query_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_syn_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_syn_boost"),
+                "retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost", optimizedParameters.get("retrievalparameters.templateparameters.disease.boosts.disease_topic_clause_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_custom_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_custom_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_desc_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_desc_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_hypernyms_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_query_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_query_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_syn_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_syn_boost"),
+                "retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost", optimizedParameters.get("retrievalparameters.templateparameters.gene.boosts.gene_topic_clause_boost"),
+                "retrievalparameters.diseaseexpansion.synonyms", "true",
+                "retrievalparameters.geneexpansion.synonyms", "true",
+                "retrievalparameters.queryfiltering", "true"
+        ));
         put(String.format("+%s+%s", DISEXP, STOP), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
@@ -22,7 +91,7 @@ public class Sigir20BottomUpAblationBAParameters extends LinkedHashMap<String, M
                 "retrievalparameters.queryfiltering", "true"
 
         ));
-        put(String.format("-%s", SYN), params(
+        put(String.format("-%s", DISSYN), params(
                 "retrievalparameters.diseaseexpansion.custom", "true",
                 "retrievalparameters.diseaseexpansion.hypernyms", "true",
                 "retrievalparameters.diseaseexpansion.preferredterm", "true",
@@ -59,7 +128,7 @@ public class Sigir20BottomUpAblationBAParameters extends LinkedHashMap<String, M
                 "retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop", optimizedParameters.get("retrievalparameters.templateparameters.gene.phraseslops.gene_desc_slop"),
                 "retrievalparameters.queryfiltering", "true"
         ));
-        put(String.format("-%s",  SYN), params(
+        put(String.format("-%s", DISSYN), params(
                 "retrievalparameters.geneexpansion.custom", "true",
                 "retrievalparameters.geneexpansion.description", "true",
                 "retrievalparameters.geneexpansion.hypernyms", "true",
