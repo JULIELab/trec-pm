@@ -1,10 +1,12 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class Metrics {
+public class Metrics implements Serializable {
 
 
     public static final Metrics ZERO = new Metrics();
@@ -24,11 +26,24 @@ public class Metrics {
     private Map<String, Double> metrics = new TreeMap<>();
 
     public void put(String name, double value) {
-        metrics.put(name, value);
+        metrics.put(resolveMetricName(name), Math.abs(value));
+    }
+
+    private String resolveMetricName(String name) {
+        if (name.equalsIgnoreCase("ndcg")) return "ndcg";
+        if (name.equalsIgnoreCase("infndcg")) return "infNDCG";
+        if (name.equalsIgnoreCase("rprec")) return "Rprec";
+        if (name.equalsIgnoreCase("infap")) return "infAP";
+        if (name.equalsIgnoreCase("p_5")) return "P_5";
+        if (name.equalsIgnoreCase("p_10")) return "P_10";
+        if (name.equalsIgnoreCase("p_15")) return "P_15";
+        if (name.equalsIgnoreCase("set_f")) return "set_F";
+        if (name.equalsIgnoreCase("set_recall")) return "set_recall";
+        return name;
     }
 
     public double getMetric(String name) {
-        return metrics.getOrDefault(name, 0d);
+        return metrics.getOrDefault(resolveMetricName(name), 0d);
     }
 
     public boolean hasMetric(String name) {
@@ -92,5 +107,18 @@ public class Metrics {
 
     public double getSetRecall() {
         return getMetric("set_recall");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Metrics metrics1 = (Metrics) o;
+        return Objects.equals(metrics, metrics1.metrics);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metrics);
     }
 }

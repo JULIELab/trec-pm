@@ -154,8 +154,8 @@ public final class ClinicalTrialsRetrievalRegistry {
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, SYNONYMS))) {
             ret.withUmlsDiseaseSynonym();
         }
-//        if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
-//            ret.withUmlsDiseaseHypernym();
+    //    if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, HYPERNYMS)))
+      //      ret.withUmlsDiseaseHypernym();
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, CUSTOM)))
             ret.withSolidTumor();
 

@@ -114,6 +114,7 @@ regular configuration settings but change basic behaviour of the system, often u
 
 *A: Directly indexing from the source data is very well possible by combining the respective parts of the three steps (reading, preprocessing, indexing). Note however, that the LtR feature generation makes use of the document stored in the database. Thus, LtR wouldn't work this way.*
 
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2b63c0e0c69140318323c9eb1cd19f32)](https://www.codacy.com/app/michelole/trec-pm)
 [![Build Status](https://travis-ci.com/JULIELab/trec-pm.svg?branch=master)](https://travis-ci.com/JULIELab/trec-pm)
 [![Coverage Status](https://coveralls.io/repos/github/michelole/trec-pm/badge.svg?branch=master)](https://coveralls.io/github/michelole/trec-pm?branch=master)

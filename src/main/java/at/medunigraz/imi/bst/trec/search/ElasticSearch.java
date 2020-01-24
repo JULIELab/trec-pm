@@ -84,14 +84,13 @@ public class ElasticSearch implements SearchEngine {
 
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
-//        System.out.println(Thread.currentThread().getName() + ", " + index + ": " + json);
+        LOG.trace("Sending query: {}", Thread.currentThread().getName() + ", " + index + ": " + json);
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
         // #setFilterOnFieldValues(String, Collection)
         if (filterQuery != null) {
             qb = filterQuery.must(qb);
         }
-        LOG.trace(JsonUtils.prettify(jsonQuery));
         String idString = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "");
         idString = idString.replaceAll("\\s+", " ");
         final String cacheKey = DigestUtils.md5Hex(idString);

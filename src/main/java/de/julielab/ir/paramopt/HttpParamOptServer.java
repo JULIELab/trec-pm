@@ -27,6 +27,7 @@ public class HttpParamOptServer {
     public static final String RPREC = "rprec";
     public static final String P10 = "p10";
     public static final String SET_RECALL = "set_recall";
+    public static final String METRICS_PER_TOPIC = "metrics_per_topic";
     // The index_copy parameter value is used as a suffix to the otherwise normally obtained index name.
     // Used when multiple concurrent runs change index settings, then we need those copies.
     public static final String INDEX_SUFFIX = "index_suffix";
