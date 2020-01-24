@@ -8,6 +8,7 @@ import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.java.utilities.cache.CacheAccess;
 import de.julielab.java.utilities.cache.CacheService;
+import de.julielab.java.utilities.cache.NoOpCacheAccess;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
