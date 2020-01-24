@@ -50,19 +50,20 @@ public class AblationLatexTableBuilder {
     }
 
     private static void getAblationResultTableLine(StringBuilder sb, AblationCrossValResult crossValResult) {
-        DecimalFormat df = new DecimalFormat("#,###,###,##0.00");
+        DecimalFormat dfscores = new DecimalFormat("#,###,###,##0.0000");
+        DecimalFormat dfpct = new DecimalFormat("#,###,###,##0.00");
         double ablationScore = crossValResult.getMeanAblationScore(INFNDCG);
         double referenceScore = crossValResult.getMeanReferenceScore(INFNDCG);
         double diff = referenceScore - ablationScore;
         double pct = diff / referenceScore * 100;
-        sb.append(crossValResult.get(0).getAblationName()).append(" & ").append(df.format(ablationScore)).append(" & $");
+        sb.append(crossValResult.get(0).getAblationName()).append(" & ").append(dfscores.format(ablationScore)).append(" & $");
         if (pct < 0)
             sb.append("+");
-        sb.append(df.format(pct * -1)).append("\\%$").append(" \\\\").append("\n");
+        sb.append(dfpct.format(pct * -1)).append("\\%$").append(" \\\\").append("\n");
     }
 
     private static void appendReferenceTableLine(StringBuilder sb, String referenceName, AblationCrossValResult crossValResult) {
-        DecimalFormat df = new DecimalFormat("#,###,###,##0.00");
+        DecimalFormat df = new DecimalFormat("#,###,###,##0.0000");
         double score = crossValResult.getMeanReferenceScore(INFNDCG);
 
         sb.append(referenceName).append("  & ").append(df.format(score)).append(" & ").append("$0.0\\%$").append(" \\\\").append("\n");

@@ -1,64 +1,87 @@
 package de.julielab.ir.experiments.ablation;
 
-import java.util.Arrays;
-import java.util.List;
+import at.medunigraz.imi.bst.trec.model.Metrics;
+import de.julielab.ir.paramopt.HttpParamOptClient;
 
-public class AblationComparisonPair {
+import java.io.Serializable;
+import java.util.*;
+
+public class AblationComparisonPair implements Serializable {
     private String ablationName;
-    private double[] referenceScores;
-    private double[] ablationScores;
-    private List<String> metrics;
+    private Map<String, Metrics> referenceScores = new HashMap<>();
+    private Map<String, Metrics> ablationScores = new HashMap<>();
 
     public AblationComparisonPair(String ablationName, String metrics, double[] referenceScores, double[] ablationScores) {
         this.ablationName = ablationName;
-        this.referenceScores = referenceScores;
-        this.ablationScores = ablationScores;
-        this.metrics = Arrays.asList(metrics.split(","));
+        this.referenceScores.put("all", new Metrics());
+        this.ablationScores.put("all", new Metrics());
+        List<String> metricList = Arrays.asList(metrics.split(","));
+        for (int i = 0; i < metricList.size(); i++) {
+            String metricName = metricList.get(i);
+            this.referenceScores.get("all").put(metricName, referenceScores[i]);
+            this.ablationScores.get("all").put(metricName, ablationScores[i]);
+        }
+    }
+
+    public AblationComparisonPair(String ablationName, Map<String, Metrics> referenceMetrics, Map<String, Metrics> ablationMetrics) {
+        this.ablationName = ablationName;
+        this.referenceScores = referenceMetrics;
+        this.ablationScores = ablationMetrics;
     }
 
     /**
      * @return Score of the reference configuration without removing features.
      */
-    public double[] getReferenceScores() {
+    public Metrics getReferenceScores() {
+        return referenceScores.get("all");
+    }
+
+    public Map<String, Metrics> getReferenceMetrics() {
         return referenceScores;
     }
 
-    public double getReferenceScore(String metric) {
-        int index = getMetricIndex(metric);
-        return referenceScores[index];
+    public Map<String, Metrics> getAblationMetrics() {
+        return ablationScores;
     }
 
-    private int getMetricIndex(String metric) {
-        int index = metrics.indexOf(metric);
-        if (index < 0)
-            throw new IllegalArgumentException("This object dos not contain a value for the metric " + metric);
-        return index;
+    public Metrics getReferenceScores(String topic) {
+        return referenceScores.get(topic);
     }
+
+    public double getReferenceScore(String metric) {
+        return referenceScores.get("all").getMetric(metric);
+    }
+
+    public double getReferenceScore(String topic, String metric) {
+        return referenceScores.get(topic).getMetric(metric);
+    }
+
 
     public void setReferenceScore(double value, String metric) {
-        int index = getMetricIndex(metric);
-        referenceScores[index] = value;
+        referenceScores.get("all").put(metric, value);
     }
 
     public void setAblationScore(double value, String metric) {
-        int index = getMetricIndex(metric);
-        ablationScores[index] = value;
+        ablationScores.get("all").put(metric, value);
     }
 
     /**
      * @return Score of the ablation experiment where some features were removed / neutralized in the reference.
      */
-    public double[] getAblationScores() {
-        return ablationScores;
+    public Metrics getAblationScores() {
+        return ablationScores.get("all");
+    }
+
+    public Metrics getAblationScores(String topic) {
+        return ablationScores.get(topic);
     }
 
     public double getAblationScore(String metric) {
-        int index = getMetricIndex(metric);
-        return ablationScores[index];
+        return ablationScores.get("all").getMetric(metric);
     }
 
-    public List<String> getMetrics() {
-        return metrics;
+    public double getAblationScore(String topic, String metric) {
+        return ablationScores.get(topic).getMetric(metric);
     }
 
     public String getAblationName() {

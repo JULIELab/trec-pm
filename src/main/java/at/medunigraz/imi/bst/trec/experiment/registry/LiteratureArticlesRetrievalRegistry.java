@@ -252,7 +252,7 @@ public final class LiteratureArticlesRetrievalRegistry {
         if (retrievalConfig.getBoolean(slash(DISEASEEXPANSION, CUSTOM)))
             ret.withSolidTumor();
 
-//        System.err.println("WARN: Similarity changing is currently disabled!!!");
+        //System.err.println("WARN: Similarity changing is currently disabled!!!");
         SimilarityParameters similarityParameters = new BM25Parameters(conf.getDouble(slash(INDEXPARAMETERS, BM25, K1)), conf.getDouble(slash(INDEXPARAMETERS, BM25, B)));
         ret.withSimilarityParameters(similarityParameters);
 

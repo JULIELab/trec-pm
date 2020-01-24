@@ -8,7 +8,6 @@ public class AblationCrossValResult extends ArrayList<AblationComparisonPair> {
     private String ablationGroupName;
 
     public AblationCrossValResult(String ablationGroupName) {
-
         this.ablationGroupName = ablationGroupName;
     }
 
