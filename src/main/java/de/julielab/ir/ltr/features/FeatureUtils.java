@@ -7,11 +7,13 @@ import org.tartarus.snowball.SnowballProgram;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FeatureUtils {
-    private static FeatureUtils instance;
+    private static Map<Thread, FeatureUtils> instances = new ConcurrentHashMap<>();
     private final SnowballProgram englishStemmer;
     private StandardAnalyzer standardAnalyzer;
 
@@ -26,9 +28,13 @@ public class FeatureUtils {
     }
 
     public static FeatureUtils getInstance() {
+        Thread thread = Thread.currentThread();
+        FeatureUtils instance = instances.get(thread);
         try {
-            if (instance == null)
+            if (instance == null) {
                 instance = new FeatureUtils();
+                instances.put(thread, instance);
+            }
         } catch (IOException e) {
             throw new IllegalStateException("The stopwords file could not be read from the resource path /data/stopwords.txt");
         }

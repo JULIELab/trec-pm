@@ -43,7 +43,7 @@ public class FeatureControlCenter {
     public static FeatureControlCenter getInstance() {
         FeatureControlCenter instance = instances.get(Thread.currentThread());
         if (instance == null)
-            throw new IllegalStateException("The FeatureControlCenter must be initialized once per application start with the feature configuration to be used. This has not happened yet.");
+            throw new IllegalStateException("The FeatureControlCenter must be initialized once per thread using it with the feature configuration to be employed. This has not happened yet for thread '" + Thread.currentThread().getName() + "' . Registered threads: " + instances.keySet());
         return instance;
     }
 
@@ -214,6 +214,9 @@ public class FeatureControlCenter {
 
 
         List<Future<?>> futures = documents.stream().map(document -> Multithreading.getInstance().submit(() -> {
+            // We use multithreading here. Each thread has its own configuration which is why we copy it here
+            if (!isInitialized())
+                initialize(configuration);
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
             serialPipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
             document.setFeaturePipes(serialPipes);
