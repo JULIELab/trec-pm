@@ -3,7 +3,10 @@ package at.medunigraz.imi.bst.trec.query;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.umls.UmlsSynsetProvider;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -13,10 +16,15 @@ import java.util.stream.Collectors;
 public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
 
     private transient UmlsSynsetProvider umlsSynsetProvider;
-    private Matcher parenthesisM = Pattern.compile("[(\\[{][^]})]+[]})]").matcher("");
+    private transient Matcher parenthesisM = init();
 
     public DiseaseUmlsSynonymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
+    }
+
+    @NotNull
+    private Matcher init() {
+        return Pattern.compile("[(\\[{][^]})]+[]})]").matcher("");
     }
 
     /**
@@ -46,5 +54,11 @@ public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
         }
         return topic;
     }
+
+    private void readObject(ObjectInputStream aInputStream) throws ClassNotFoundException, IOException {
+        aInputStream.defaultReadObject();
+        init();
+    }
+
 
 }
