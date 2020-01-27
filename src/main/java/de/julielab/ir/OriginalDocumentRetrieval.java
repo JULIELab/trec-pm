@@ -21,6 +21,7 @@ import de.julielab.xml.binary.BinaryJeDISNodeEncoder;
 import de.julielab.xml.binary.BinaryXmiBuilder;
 import de.julielab.xml.util.XMIBuilderException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -38,7 +39,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -343,7 +343,7 @@ public class OriginalDocumentRetrieval {
         List<? extends Document<?>> docsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).collect(Collectors.toList());
         log.debug("Got {} documents to set XMI data to", docsWithoutXmiData.size());
 
-        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().collect(Collectors.toMap(Function.identity(), id -> xmiCache.get(id)));
+        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().map(id -> new ImmutablePair<>(id, xmiCache.get(id))).filter(pair -> pair.getRight() != null).collect(Collectors.toMap(pair -> pair.getLeft(), pair -> pair.getRight()));
         Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream().filter(d -> !cachedXmiByDocId.containsKey(d.getId())).collect(Collectors.toSet());
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.
