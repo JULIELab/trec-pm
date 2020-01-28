@@ -343,7 +343,7 @@ public class OriginalDocumentRetrieval {
         List<? extends Document<?>> docsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).collect(Collectors.toList());
         log.debug("Got {} documents to set XMI data to", docsWithoutXmiData.size());
 
-        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().map(id -> new ImmutablePair<>(id, xmiCache.get(id))).filter(pair -> pair.getRight() != null).collect(Collectors.toMap(pair -> pair.getLeft(), pair -> pair.getRight()));
+        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().map(id -> new ImmutablePair<>(id, xmiCache.get(id))).filter(pair -> pair.getRight() != null).collect(Collectors.toMap(pair -> pair.getLeft(), pair -> pair.getRight() ));
         Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream().filter(d -> !cachedXmiByDocId.containsKey(d.getId())).collect(Collectors.toSet());
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.

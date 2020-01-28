@@ -2,15 +2,16 @@ package de.julielab.ir.ltr.features;
 
 
 import cc.mallet.pipe.Pipe;
-import cc.mallet.types.Instance;
-import cc.mallet.types.Label;
-import cc.mallet.types.LabelAlphabet;
-import cc.mallet.types.Token;
+import cc.mallet.types.*;
 import de.julielab.ir.ltr.Document;
 
 public class Document2TokenPipe extends Pipe {
     public Document2TokenPipe() {
         setTargetAlphabet(new LabelAlphabet());
+    }
+
+    public Document2TokenPipe(Alphabet targetAlphabet) {
+        setTargetAlphabet(targetAlphabet);
     }
 
     @Override

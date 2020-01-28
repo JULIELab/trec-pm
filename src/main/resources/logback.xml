@@ -24,6 +24,7 @@
     <logger name="de.julielab.java.utilities.cache" level="INFO"/>
     <logger name="de.julielab.ir.experiments.ablation.sigir20.Sigir20AblationExperiments" level="INFO"/>
     <logger name="de.julielab.ir.experiments.ablation.sigir20.ConfigurationReproduction" level="INFO"/>
+    <logger name="de.julielab.ir.ltr.features.FeatureControlCenter" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
