@@ -205,7 +205,9 @@ public class FeatureControlCenter {
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
             SerialPipes pipes = pipesPerThread.compute(Thread.currentThread(), (k, v) -> v != null ? v : new SerialPipes(createFeaturePipes(tfidf, vocabulary,ta, da)));
             pipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
-            document.setFeaturePipes(pipes);
+            // We set the single instance 'serialPipes' instead of the thread-specific instance 'pipes'. The thread-specific pipes
+            // only exist for concurrency. Ultimately, we just want one pipe and one set of alphabets.
+            document.setFeaturePipes(serialPipes);
             // Within the pipes, the documents need access to their CAS. Since we only have a limited
             // amount of those for performance and scalability considerations, we need to release
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
@@ -220,14 +222,16 @@ public class FeatureControlCenter {
                 futures.get(i).get();
                 double percentage = i / (double) documents.size();
                 int progress = (int) (linewidth * percentage);
-                System.out.print("[");
+                StringBuilder sb = new StringBuilder();
+                sb.append("[");
                 for (int j = 0; j < linewidth; j++) {
                     if (j < progress)
-                        System.out.print("=");
+                        sb.append("=");
                     else
-                        System.out.print(" ");
+                        sb.append(" ");
                 }
-                System.out.print("] " + i + "/" + documents.size() + "\r");
+                sb.append("] " + i + "/" + documents.size() + "\r");
+                System.out.print(sb.toString());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
