@@ -19,7 +19,11 @@ public class Document2TokenPipe extends Pipe {
         Document doc = (Document) inst.getData();
         Token token = new Token(doc.getId());
         inst.setData(token);
-        Label label = ((LabelAlphabet) getTargetAlphabet()).lookupLabel(inst.getTarget());
+        LabelAlphabet ta = (LabelAlphabet) getTargetAlphabet();
+        Label label;
+        synchronized (ta) {
+            label = ta.lookupLabel(inst.getTarget());
+        }
         inst.setTarget(label);
         return inst;
     }
