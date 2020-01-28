@@ -3,9 +3,7 @@ package de.julielab.ir.ltr.features;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
-import cc.mallet.types.Instance;
-import cc.mallet.types.InstanceList;
-import cc.mallet.types.SingleInstanceIterator;
+import cc.mallet.types.*;
 import com.wcohen.ss.TFIDF;
 import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
@@ -186,24 +184,10 @@ public class FeatureControlCenter {
      */
     public <Q extends QueryDescription> void createFeatures(DocumentList<Q> documents, TFIDF tfidf, Set<String> vocabulary, String xmiTableName) {
         // We here use the MALLET facilities to create feature vectors.
-        List<Pipe> featurePipes = new ArrayList<>();
-        featurePipes.add(new Document2TokenPipe());
-        if (documentEmbeddingFeatureGroup == null)
-            documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
-        Stream.of(
-                new TfidfFeatureGroup(tfidf, vocabulary),
-                new RunTopicMatchAnnotatorFeatureGroup(),
-                new TopicMatchFeatureGroup(),
-                new IRSimilarityFeatureGroup(),
-                documentEmbeddingFeatureGroup,
-                new DocumentShapeFeatureGroup()
-        ).filter(this::filterActive)
-                .forEach(featurePipes::add);
-        featurePipes.add(new Token2FeatureVector(false, true));
-        // Sort and consolidate the feature vector values for AugmentableFeatureVectors.
-        featurePipes.add(new SetFeatureVectorPipe());
+        List<Pipe> featurePipes = createFeaturePipes(tfidf, vocabulary, new LabelAlphabet(), new Alphabet());
         final SerialPipes serialPipes = new SerialPipes(featurePipes);
-
+        Alphabet ta = serialPipes.getTargetAlphabet();
+        Alphabet da = serialPipes.getDataAlphabet();
         // Fetch the XMI cas information for the documents
         OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, null, xmiTableName);
 
@@ -213,13 +197,15 @@ public class FeatureControlCenter {
         int linewidth = 80;
 
 
+        Map<Thread, SerialPipes> pipesPerThread = new ConcurrentHashMap<>();
         List<Future<?>> futures = documents.stream().map(document -> Multithreading.getInstance().submit(() -> {
             // We use multithreading here. Each thread has its own configuration which is why we copy it here
             if (!isInitialized())
                 initialize(configuration);
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
-            serialPipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
-            document.setFeaturePipes(serialPipes);
+            SerialPipes pipes = pipesPerThread.compute(Thread.currentThread(), (k, v) -> v != null ? v : new SerialPipes(createFeaturePipes(tfidf, vocabulary,ta, da)));
+            pipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
+            document.setFeaturePipes(pipes);
             // Within the pipes, the documents need access to their CAS. Since we only have a limited
             // amount of those for performance and scalability considerations, we need to release
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
@@ -228,6 +214,7 @@ public class FeatureControlCenter {
         })).collect(Collectors.toList());
 
 
+        long time = System.currentTimeMillis();
         for (int i = 0; i < futures.size(); i++) {
             try {
                 futures.get(i).get();
@@ -247,9 +234,31 @@ public class FeatureControlCenter {
                 e.printStackTrace();
             }
         }
+        time = System.currentTimeMillis() - time;
 
         System.out.println();
-        log.debug("Finished train document feature creation.");
+        log.debug("Finished train document feature creation. Took " + time + "ms ("+(time/1000d)+"s).");
+    }
+
+    @NotNull
+    private List<Pipe> createFeaturePipes(TFIDF tfidf, Set<String> vocabulary, Alphabet targetAlphabet, Alphabet dataAlphabet) {
+        List<Pipe> featurePipes = new ArrayList<>();
+        featurePipes.add(new Document2TokenPipe(targetAlphabet));
+        if (documentEmbeddingFeatureGroup == null)
+            documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
+        Stream.of(
+                new TfidfFeatureGroup(tfidf, vocabulary),
+                new RunTopicMatchAnnotatorFeatureGroup(),
+                new TopicMatchFeatureGroup(),
+                new IRSimilarityFeatureGroup(),
+                documentEmbeddingFeatureGroup,
+                new DocumentShapeFeatureGroup()
+        ).filter(this::filterActive)
+                .forEach(featurePipes::add);
+        featurePipes.add(new Token2FeatureVector(dataAlphabet, false, true));
+        // Sort and consolidate the feature vector values for AugmentableFeatureVectors.
+        featurePipes.add(new SetFeatureVectorPipe());
+        return featurePipes;
     }
 
     public String getActiveFeatureDescriptionString() {
