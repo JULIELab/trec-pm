@@ -35,6 +35,7 @@ public class Multithreading {
     }
 
     public void shutdown() {
+        log.info("Shutting down Multithreading executor service.");
         executorService.shutdown();
     }
 }
