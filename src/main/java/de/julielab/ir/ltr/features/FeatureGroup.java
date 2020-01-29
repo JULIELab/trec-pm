@@ -25,12 +25,12 @@ import java.util.List;
  * throrough experiments unfeasible anyway.</p>
  */
 public abstract class FeatureGroup extends Pipe {
+    private final static Logger log = LoggerFactory.getLogger(FeatureGroup.class);
     /**
      * This is the set of features contained in this feature group.
      */
     protected List<Feature> features = new ArrayList<>();
     private String name;
-    private final static Logger log = LoggerFactory.getLogger(FeatureGroup.class);
 
     public FeatureGroup(String name) {
         this.name = name;
@@ -56,6 +56,7 @@ public abstract class FeatureGroup extends Pipe {
     protected void addFeature(String name, FeatureValueAssigner valueAssinger) {
         features.add(new Feature(name, valueAssinger));
     }
+
     /**
      * <p>For feature groups with toggleable feature, this method will apply all active features.</p>
      * <p>The feature group

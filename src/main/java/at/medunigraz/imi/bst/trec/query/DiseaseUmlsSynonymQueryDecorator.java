@@ -16,15 +16,16 @@ import java.util.stream.Collectors;
 public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
 
     private transient UmlsSynsetProvider umlsSynsetProvider;
-    private transient Matcher parenthesisM = init();
+    private transient Matcher parenthesisM;
 
     public DiseaseUmlsSynonymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);
+        init();
     }
 
     @NotNull
-    private Matcher init() {
-        return Pattern.compile("[(\\[{][^]})]+[]})]").matcher("");
+    private void init() {
+        parenthesisM = Pattern.compile("[(\\[{][^]})]+[]})]").matcher("");
     }
 
     /**

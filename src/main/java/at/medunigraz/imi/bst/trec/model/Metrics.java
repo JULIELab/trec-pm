@@ -1,5 +1,8 @@
 package at.medunigraz.imi.bst.trec.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
@@ -8,7 +11,7 @@ import java.util.TreeMap;
 
 public class Metrics implements Serializable {
 
-
+    private static final Logger log = LoggerFactory.getLogger(Metrics.class);
     public static final Metrics ZERO = new Metrics();
 
     static {
@@ -69,7 +72,7 @@ public class Metrics implements Serializable {
         try {
             metrics.putAll(b.metrics);
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            log.error("Passed metrics are null", e);
         }
     }
 

@@ -205,6 +205,8 @@ public class UmlsSynsetProvider {
                 ret = synSet.get();
                 if (useCache)
                     cuiSynsetCache.put(ret.getCui(), ret);
+            } else if (useCache){
+                cuiSynsetCache.put(cui, UmlsSynset.EMPTY);
             }
         }
         return ret;

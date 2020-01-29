@@ -32,7 +32,7 @@ public class FeatureControlCenter {
     private static final Logger log = LoggerFactory.getLogger(FeatureControlCenter.class);
     private static Map<Thread, FeatureControlCenter> instances = new ConcurrentHashMap<>();
     private HierarchicalConfiguration<ImmutableNode> configuration;
-    private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;
+    //private DocumentEmbeddingFeatureGroup documentEmbeddingFeatureGroup;
 
     private FeatureControlCenter(HierarchicalConfiguration<ImmutableNode> configuration) {
         this.configuration = configuration;
@@ -248,14 +248,15 @@ public class FeatureControlCenter {
     private List<Pipe> createFeaturePipes(TFIDF tfidf, Set<String> vocabulary, Alphabet targetAlphabet, Alphabet dataAlphabet) {
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe(targetAlphabet));
-        if (documentEmbeddingFeatureGroup == null)
-            documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
+       // if (documentEmbeddingFeatureGroup == null)
+          //  documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup(),
-                documentEmbeddingFeatureGroup,
+             //   documentEmbeddingFeatureGroup,
+                new DocumentEmbeddingFeatureGroup(),
                 new DocumentShapeFeatureGroup()
         ).filter(this::filterActive)
                 .forEach(featurePipes::add);

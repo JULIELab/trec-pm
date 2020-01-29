@@ -2,17 +2,16 @@ package at.medunigraz.imi.bst.trec.search;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.utils.JsonUtils;
 import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.java.utilities.cache.CacheAccess;
 import de.julielab.java.utilities.cache.CacheService;
-import de.julielab.java.utilities.cache.NoOpCacheAccess;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -42,8 +41,8 @@ public class ElasticSearch implements SearchEngine {
     private String[] storedFields;
 
     public ElasticSearch() {
-        cache = cacheMap.compute(Thread.currentThread(), (k,v) ->
-            v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java", 0)
+        cache = cacheMap.compute(Thread.currentThread(), (k, v) ->
+                v != null ? v : CacheService.getInstance().getCacheAccess("elasticsearch.db", "ElasticSearchResultCache", "string", "java", 0)
         );
         // This disables the caching. I only do this for parameter optimization because there won't be many - if any - cache hits.
         // For experiments where the queries might often be the same, use the cache assignment above.
@@ -136,6 +135,21 @@ public class ElasticSearch implements SearchEngine {
                         int waitingtime = 1000 * (retries + 1);
                         LOG.debug("ExecutionException happened when searching. This happens sometimes after the settings of the searched index were updated directly before. Trying again after waiting for {}ms. Number of tries: {}. Error message: {}", waitingtime, retries, e.getMessage());
                         Thread.sleep(waitingtime);
+                    }
+                } catch (NoNodeAvailableException e) {
+                    LOG.error("Could not connect to ElasticSearch cluster. Connecting will be retried every 30 seconds. Error message: {}", e.getMessage());
+                    boolean connected = false;
+                    int reconnections = 1;
+                    while (!connected) {
+                        Thread.sleep(30000);
+                        try {
+                            response = client.search(new SearchRequest(index).source(sb)).get();
+                            connected = true;
+                        } catch (NoNodeAvailableException e1) {
+                            LOG.debug("Could still not connect to ElasticSearch. Tried {} times.", reconnections);
+                        } catch (ExecutionException ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
                 ++retries;
