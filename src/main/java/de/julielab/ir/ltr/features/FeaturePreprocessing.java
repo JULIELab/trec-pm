@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.retrieval.Retrieval;
 import cc.mallet.pipe.Pipe;
 import cc.mallet.pipe.SerialPipes;
 import com.wcohen.ss.TFIDF;
+import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TfIdfManager;
 import de.julielab.ir.VocabularyRestrictor;
@@ -18,6 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class FeaturePreprocessing<Q extends QueryDescription> {
@@ -42,8 +45,18 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
 
     public void preprocessTrain(DocumentList<Q> trainDocs, String runId) {
         if (FeatureControlCenter.getInstance().isSimilarityFeatureGroupActive()) {
-            for (IRScoreFeatureKey featureKey : retrievals.keySet())
-                retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
+            List<Future<?>> jobs = new ArrayList<>();
+            for (IRScoreFeatureKey featureKey : retrievals.keySet()) {
+                jobs.add(Multithreading.getInstance().submit(() ->
+                        retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey)));
+            }
+            for (Future<?> job : jobs) {
+                try {
+                    job.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         Set<String> tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;

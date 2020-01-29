@@ -1,6 +1,7 @@
 package de.julielab.ir.ltr;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.TrecPmRetrieval;
 import at.medunigraz.imi.bst.trec.experiment.registry.ClinicalTrialsRetrievalRegistry;
 import at.medunigraz.imi.bst.trec.experiment.registry.LiteratureArticlesRetrievalRegistry;
@@ -63,10 +64,10 @@ public class RankerFromPm1718 implements Ranker<Topic> {
                 FeatureControlCenter.initialize(ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")));
             featurePreprocessing = new FeaturePreprocessing("pubmedId.keyword", vocabCutoff, xmiTableName);
             // Set the DB connection to get the test documents from (the train documents are retrieved from trainGoldStandards).
-            featurePreprocessing.setCanonicalDbConnectionFiles(Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile()));
+            featurePreprocessing.setCanonicalDbConnectionFiles(Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile(), new File("config", "costosys-pm1718.xml").getCanonicalFile()));
             AggregatedTrecQrelGoldStandard<Topic> gs1718 = new AggregatedTrecQrelGoldStandard<>(trainGoldStandards);
             trainDocuments = gs1718.getQrelDocuments();
-            modelFile = new File("rankLibModels/pm1718-val20pct-" + rType + ".mod");
+            modelFile = new File("rankLibModels/pm1818-val20pct-" + rType + ".mod");
         } catch (ConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -120,6 +121,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 //        FastTextEmbeddingFeatures.shutdown();
 //        OriginalDocumentRetrieval.getInstance().shutdown();
 //        ElasticClientFactory.getClient().close();
+        CacheService.getInstance().commitAllCaches();
 
         scalingFactors = FeatureNormalizationUtils.scaleFeatures(documentList.stream().map(Document::getFeatureVector).collect(Collectors.toList()));
         pipe = trainDocuments.stream().findFirst().get().getFeaturePipes();
@@ -133,13 +135,15 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 
         if (log.isDebugEnabled()) {
             DocumentList<Topic> rankedDocuments = ranker.rank(trainDocuments);
-            log.debug(METRIC.NDCG + "@1000 score of the newly trained ranker on the whole training data: {}", ranker.score(rankedDocuments, trainMetric, k));
+            log.debug(trainMetric + "@"+k+" score of the newly trained ranker on the whole training data (including the dev set(s)): {}", ranker.score(rankedDocuments, trainMetric, k));
+
+            log.info("Applying the learned ranker directly to the gold standard corpus for validation");
+            Experiment<Topic> exp = new Experiment<>(new AggregatedTrecQrelGoldStandard(trainGoldStandards), irScoreRetrievals.get(new IRScoreFeatureKey(IRScore.BM25, FULL)));
+            exp.setReRanker(this);
+            exp.run();
         }
 
-//        log.info("Applying the learned ranker directly to the gold standard corpus for validation");
-//        Experiment<Topic> exp = new Experiment<>(TrecPMGoldStandardFactory.pubmedOfficial2018(), fullRetrieval);
-//        exp.setReRanker(this);
-//        exp.run();
+
     }
 
     @Override
@@ -165,7 +169,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             log.info("Read top k metric computation documents as {}", k);
             log.info("Read the RankLib model string of length {}", rankLibModelString.length());
             log.info("Read {} scaling factors", scalingFactors != null ? scalingFactors.length : 0);
-            log.info("Read pipe with {} elements", ((SerialPipes)pipe).size());
+            log.info("Read pipe with {} elements", ((SerialPipes) pipe).size());
             log.info("Read IR score retrievals with {} elements", irScoreRetrievals.size());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -175,7 +179,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
 
     @Override
     public void save(File modelFile) {
-        log.info("Writing all data required for the correct application of the ranker.");
+        log.info("Writing all data required for the correct application of the ranker to {}.", modelFile);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(modelFile.getAbsolutePath() + ".bin"))) {
             log.info("Writing the ranker type {}", rType);
             oos.writeObject(rType);
@@ -188,7 +192,7 @@ public class RankerFromPm1718 implements Ranker<Topic> {
             oos.writeObject(modelAsString);
             log.info("Writing the {} feature scaling factors", scalingFactors != null ? scalingFactors.length : 0);
             oos.writeObject(scalingFactors);
-            log.info("Writing the feature pipe with {} elements", ((SerialPipes)pipe).size());
+            log.info("Writing the feature pipe with {} elements", ((SerialPipes) pipe).size());
             oos.writeObject(pipe);
             log.info("Writing the IR retrievals with {} elements", irScoreRetrievals.size());
             oos.writeObject(irScoreRetrievals);

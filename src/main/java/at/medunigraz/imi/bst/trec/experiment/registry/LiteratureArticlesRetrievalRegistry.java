@@ -149,7 +149,7 @@ public final class LiteratureArticlesRetrievalRegistry {
                 .withSubTemplate(JULIE_COMMON_TEMPLATE)
                 .withWordRemoval().withGeneSynonym()
                 .withDiseasePreferredTerm().withDiseaseSynonym().withSynonymList(SYNONYMS_FILE)
-                .withStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019)
+               // .withStoredFields(Challenge.TREC_PM, Task.PUBMED, 2019)
                 .withConditionalCancer();
     }
 
