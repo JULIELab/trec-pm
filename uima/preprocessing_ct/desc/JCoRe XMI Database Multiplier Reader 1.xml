@@ -315,11 +315,11 @@
                         
             <nameValuePair>
                                 
-                <name>Table</name>
+                <name>CostosysConfigFile</name>
                                 
                 <value>
                                         
-                    <string>public.preprocessing_all_ct</string>
+                    <string>../costosys.xml</string>
                                     
                 </value>
                             
@@ -327,11 +327,11 @@
                         
             <nameValuePair>
                                 
-                <name>CostosysConfigFile</name>
+                <name>Table</name>
                                 
                 <value>
                                         
-                    <string>../costosys.xml</string>
+                    <string>public.preprocessing_all_ct</string>
                                     
                 </value>
                             

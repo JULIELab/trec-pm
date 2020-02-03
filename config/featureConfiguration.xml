@@ -4,8 +4,8 @@
             <featuregroup name="TFIDF" active="true"/>
             <featuregroup name="TOPIC_MATCH" active="true">
                 <feature name="MATCH_TOPIC_DISEASE" active="true"/>
-                <feature name="MATCH_TOPIC_GENE" active="false"/>
-                <feature name="MATCH_TOPIC_VARIANT" active="false"/>
+                <feature name="MATCH_TOPIC_GENE" active="true"/>
+                <feature name="MATCH_TOPIC_VARIANT" active="true"/>
             </featuregroup>
             <featuregroup name="similarity" active="true">
                 <feature name="bm25" active="true"/>

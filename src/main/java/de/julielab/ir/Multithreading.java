@@ -36,6 +36,10 @@ public class Multithreading {
 
     public void shutdown() {
         log.info("Shutting down Multithreading executor service.");
-        executorService.shutdownNow();
+        executorService.shutdown();
+        log.info("Shutdown successful: {}", executorService.isShutdown());
+        log.info("Executor terminated: {}", executorService.isTerminated());
+        if (!executorService.isTerminated())
+            executorService.shutdownNow();
     }
 }
