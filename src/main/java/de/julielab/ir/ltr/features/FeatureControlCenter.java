@@ -220,7 +220,7 @@ public class FeatureControlCenter {
         for (int i = 0; i < futures.size(); i++) {
             try {
                 futures.get(i).get();
-                double percentage = i / (double) documents.size();
+                double percentage = (i+1) / (double) documents.size();
                 int progress = (int) (linewidth * percentage);
                 StringBuilder sb = new StringBuilder();
                 sb.append("[");
@@ -230,7 +230,7 @@ public class FeatureControlCenter {
                     else
                         sb.append(" ");
                 }
-                sb.append("] " + i + "/" + documents.size() + "\r");
+                sb.append("] " + (i+1) + "/" + documents.size() + "\r");
                 System.out.print(sb.toString());
             } catch (InterruptedException e) {
                 e.printStackTrace();

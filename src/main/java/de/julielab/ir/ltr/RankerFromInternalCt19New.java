@@ -16,16 +16,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class RankerFromPm1718 extends PrecisionMedicineReranker {
+public class RankerFromInternalCt19New extends PrecisionMedicineReranker {
 
 
-    public RankerFromPm1718() throws ConfigurationException, IOException {
-        super(Task.PUBMED,
-                Arrays.asList(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018()),
+    public RankerFromInternalCt19New() throws ConfigurationException, IOException {
+        super(Task.CLINICAL_TRIALS,
+                Arrays.asList(TrecPMGoldStandardFactory.trialsInternal2019(), TrecPMGoldStandardFactory.trialsOfficial2018()),
                 ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")),
-                Arrays.asList(new File("config", "costosys-pm19.xml").getCanonicalFile(), new File("config", "costosys-pm1718.xml").getCanonicalFile()),
-                "_data_xmi.documents",
-                "pubmedId.keyword", new File("rankLibModels/pm1718-val20pct-" + RANKER_TYPE.LAMBDAMART + ".mod"));
+                Arrays.asList(new File("config", "costosys-ct19.xml").getCanonicalFile(), new File("config", "costosys-ct1718.xml").getCanonicalFile()),
+                "_data_xmi.documents_ct",
+                "id.keyword",
+                new File("rankLibModels/ctInternal19-val20pct-" + RANKER_TYPE.LAMBDAMART + ".mod"));
+
     }
 
     /**
@@ -35,8 +37,8 @@ public class RankerFromPm1718 extends PrecisionMedicineReranker {
      */
     public static void main(String args[]) throws ConfigurationException, IOException {
         CacheService.initialize(new TrecCacheConfiguration());
-        final RankerFromPm1718 rankerFromPm1718 = new RankerFromPm1718();
-        rankerFromPm1718.trainModel();
+        final RankerFromInternalCt19New ranker = new RankerFromInternalCt19New();
+        ranker.trainModel();
         CacheService.getInstance().commitAllCaches();
         ElasticClientFactory.getClient().close();
         OriginalDocumentRetrieval.getInstance().shutdown();

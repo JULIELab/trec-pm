@@ -9,9 +9,11 @@ import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
+import de.julielab.ir.ltr.RankerFromInternalPm19;
 import de.julielab.ir.ltr.RankerFromPm1718;
 import de.julielab.ir.ltr.features.features.FastTextEmbeddingFeatures;
 import de.julielab.java.utilities.cache.CacheService;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,7 +24,7 @@ public class LiteratureArticlesExperimenter {
 
     private static final TrecQrelGoldStandard<Topic> GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficial2019();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ConfigurationException {
         CacheService.initialize(new TrecCacheConfiguration());
 
 //        // Judging order: ?
@@ -48,10 +50,10 @@ public class LiteratureArticlesExperimenter {
         final Experiment jlpmletor = new Experiment(GOLD_STANDARD,
                 LiteratureArticlesRetrievalRegistry.jlpmletor(TrecConfig.SIZE));
         jlpmletor.setReRanker(new RankerFromPm1718());
-//
-//        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
-//                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
-//        jlpmltrin.setReRanker(new RankerFromInternalPm19());
+
+        final Experiment jlpmltrin = new Experiment(GOLD_STANDARD,
+                LiteratureArticlesRetrievalRegistry.jlpmltrin(TrecConfig.SIZE));
+        jlpmltrin.setReRanker(new RankerFromInternalPm19());
 //
 //        final Experiment jlpmtrcommon = new Experiment(GOLD_STANDARD,
 //                LiteratureArticlesRetrievalRegistry.jlpmtrcommon(TrecConfig.SIZE));
@@ -61,7 +63,7 @@ public class LiteratureArticlesExperimenter {
 //                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
 //        jlpmtrboost.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList( jlpmletor
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(  jlpmletor, jlpmltrin
 //                , umlshyp, lexigramhyp, nogenesyn, withgenedesc
         ));
         for (Experiment exp : experiments) {
