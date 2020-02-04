@@ -1,0 +1,8 @@
+{
+  "multi_match": {
+    "query": "PFS OS",
+    "fields": ["outcomeMeasures"],
+    "tie_breaker": 0.3,
+    "boost": {{structured_boost}}
+  }
+}

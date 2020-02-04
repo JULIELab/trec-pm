@@ -7,8 +7,8 @@ import cc.mallet.types.Instance;
 import cc.mallet.types.InstanceList;
 import cc.mallet.types.Label;
 import de.julielab.java.utilities.FileUtilities;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class MalletClassifier implements Serializable, PMClassifier {
 
     private static final long serialVersionUID = 2018_08_02L;
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(MalletClassifier.class);
     private Classifier classifier;
     private InstancePreparator instancePreparator;
 

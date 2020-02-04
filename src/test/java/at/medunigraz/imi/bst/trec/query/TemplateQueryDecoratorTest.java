@@ -19,7 +19,7 @@ public class TemplateQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String DISEASE_1 = "thyroid";
 	private static final String DISEASE_2 = "breast";
 
-	private final File template = new File(getClass().getResource("/templates/match-title.json").getFile());
+	private final String template = "/test-templates/match-title.json";
 
 	public TemplateQueryDecoratorTest() {
 		this.decoratedQuery = new TemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX));
@@ -45,7 +45,7 @@ public class TemplateQueryDecoratorTest extends QueryDecoratorTest {
 
 	@Test
 	public void testUseTopicNumberInTemplate() {
-		File template = new File(getClass().getResource("/templates/topicnumber-template.json").getFile());
+		String template ="/test-templates/topicnumber-template.json";
 		Query decoratedQuery = new TemplateQueryDecorator(template, new DummyElasticSearchQuery());
 
 		topic.withNumber(42);
@@ -57,7 +57,7 @@ public class TemplateQueryDecoratorTest extends QueryDecoratorTest {
 
     @Test
     public void testTemplateProperties() {
-        File template = new File(getClass().getResource("/templates/template-properties.json").getFile());
+        String template = "/test-templates/template-properties.json";
         Map<String, String> properties = new HashMap<>();
         properties.put("prop1", "value1");
         properties.put("prop2", "value2");
@@ -69,5 +69,6 @@ public class TemplateQueryDecoratorTest extends QueryDecoratorTest {
         String expected = "{\"match\":{\"value1\": \"value2\"}}";
         assertEquals(expected, actual);
     }
+
 
 }

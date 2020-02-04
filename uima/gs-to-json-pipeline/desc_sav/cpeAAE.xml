@@ -4,7 +4,7 @@
     <primitive>false</primitive>
     <delegateAnalysisEngineSpecifiers>
         <delegateAnalysisEngine key="JCoRe JSON Consumer">
-            <import name="CAS Consumers" location="JCoRe JSON Consumer.xml"/>
+            <import location="JCoRe JSON Consumer.xml"/>
         </delegateAnalysisEngine>
     </delegateAnalysisEngineSpecifiers>
     <analysisEngineMetaData>

@@ -1,5 +1,6 @@
 package de.julielab.ir.goldstandards;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.Task;
@@ -9,20 +10,24 @@ import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
 
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(TrecQrelGoldStandard.class);
+    private Function<QueryDescription, String> queryIdFunction = q -> String.valueOf(q.getNumber());
 
-    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, File qrels) {
+    public TrecQrelGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, Collection<Q> topics, String qrels) {
         super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrels, TrecQrelGoldStandard::readQrels);
     }
 
@@ -30,10 +35,13 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         super(challenge, task, year, type, topics.stream().sorted(Comparator.comparingInt(QueryDescription::getNumber)).collect(Collectors.toList()), qrelDocuments);
     }
 
-    private static <Q extends QueryDescription> DocumentList readQrels(File qrels, Map<Integer, Q> queriesByNumber) {
+    private static <Q extends QueryDescription> DocumentList readQrels(String qrels, Map<Integer, Q> queriesByNumber) {
         final DocumentList<Q> documents = new DocumentList();
         try {
-            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(FileUtilities.getInputStreamFromFile(qrels));
+            InputStream qrelStream = FileUtilities.findResource(qrels);
+            if (qrelStream == null)
+                throw new FileNotFoundException("Could not find the qrel file " + qrels + " as classpath resource or regular file.");
+            final List<String> lines = IOStreamUtilities.getLinesFromInputStream(qrelStream);
             for (String line : lines) {
                 final String[] record = line.split("\\s+");
                 if (record.length < 4 || record.length > 5)
@@ -62,12 +70,19 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     }
 
     public void writeQrelFile(File qrelFile) {
-        List<String> lines = new ArrayList<>();
+        writeQrelFile(qrelFile, null);
+    }
 
-        for (Document<?> d : qrelDocuments) {
+    @Override
+    public void writeQrelFile(File qrelFile, Collection<Q> queries) {
+        List<String> lines = new ArrayList<>();
+        Set<String> queryIds = queries == null ? null : queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
+        Stream<Document<Q>> documents = queries == null ? qrelDocuments.stream() : qrelDocuments.stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId()));
+
+        for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
             // Do not write documents not judged.
             if (d.getRelevance() != -1) {
-                lines.add(String.format("%d 0 %s %d", d.getQueryDescription().getNumber(), d.getId(), d.getRelevance()));
+                lines.add(String.format("%s 0 %s %d", queryIdFunction.apply(d.getQueryDescription()), d.getId(), d.getRelevance()));
             }
         }
 
@@ -75,13 +90,20 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
     }
 
     public void writeSampleQrelFile(File qrelFile) {
+        writeSampleQrelFile(qrelFile, null);
+    }
+
+    @Override
+    public void writeSampleQrelFile(File qrelFile, Collection<Q> queries) {
         if (!isSampleGoldStandard()) {
             throw new UnsupportedOperationException("This is not a sample gold standard.");
         }
+        Set<String> queryIds = queries == null ? null : queries.stream().map(QueryDescription::getCrossDatasetId).collect(Collectors.toSet());
+        Stream<Document<Q>> documents = queries == null ? qrelDocuments.stream() : qrelDocuments.stream().filter(d -> queryIds.contains(d.getQueryDescription().getCrossDatasetId()));
 
         List<String> lines = new ArrayList<>();
-        for (Document<?> d : qrelDocuments) {
-            lines.add(String.format("%d 0 %s %d %d", d.getQueryDescription().getNumber(), d.getId(), d.getStratum(), d.getRelevance()));
+        for (Document<?> d : (Iterable<Document<Q>>) () -> documents.iterator()) {
+            lines.add(String.format("%s 0 %s %d %d", queryIdFunction.apply(d.getQueryDescription()), d.getId(), d.getStratum(), d.getRelevance()));
         }
 
         write(lines, qrelFile);
@@ -107,8 +129,60 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         return isSample;
     }
 
+
+
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
-        return q -> String.valueOf(q.getNumber());
+        return queryIdFunction;
+    }
+
+    public void setQueryIdFunction(Function<QueryDescription, String> queryIdFunction) {
+        this.queryIdFunction = queryIdFunction;
+    }
+
+    @Override
+    protected void setIndexToQuery(Q query) {
+        if (query.getIndex() != null)
+            return;
+        String index;
+        Challenge challenge = query.getChallenge();
+        int year = query.getYear();
+        // TODO the queries don't know their task
+        if (challenge == Challenge.TREC_PM) {
+            if (task == Task.PUBMED) {
+                switch (year) {
+                    case 2017:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2017;
+                        break;
+                    case 2018:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2018;
+                        break;
+                    case 2019:
+                        index = TrecConfig.ELASTIC_BA_INDEX_2019;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown TREC PM year " + year);
+                }
+            } else if (task == Task.CLINICAL_TRIALS) {
+                switch (year) {
+                    case 2017:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2017;
+                        break;
+                    case 2018:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2018;
+                        break;
+                    case 2019:
+                        index = TrecConfig.ELASTIC_CT_INDEX_2019;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unknown TREC CT year " + year);
+                }
+            } else {
+                throw new IllegalArgumentException("Unknown TREC PM task " + task);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown challenge " + challenge);
+        }
+        query.setIndex(index);
     }
 }

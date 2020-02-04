@@ -1,5 +1,5 @@
 [
-  "title^2",
-  "abstract",
-  "meshTags"
+  "title^2.0",
+  "abstract^1.0",
+  "meshTags^1.0"
 ]

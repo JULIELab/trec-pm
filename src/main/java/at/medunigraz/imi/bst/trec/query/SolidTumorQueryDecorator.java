@@ -6,7 +6,7 @@ import java.io.File;
 
 public class SolidTumorQueryDecorator extends FileBasedQueryDecorator {
 
-    private static final File SOLID = new File(SolidTumorQueryDecorator.class.getResource("/synonyms/solid.txt").getFile());
+    private static final String SOLID ="/synonyms/solid.txt";
 
     public SolidTumorQueryDecorator(Query decoratedQuery) {
         super(SOLID, decoratedQuery);

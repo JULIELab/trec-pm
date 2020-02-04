@@ -5,14 +5,14 @@ import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.Topic;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class DiseaseReplacerQueryDecorator extends QueryDecorator<Topic> {
 
-	private static final Logger LOG = LogManager.getLogger();
+	private static final Logger LOG = LoggerFactory.getLogger(DiseaseReplacerQueryDecorator.class);
 
 	public DiseaseReplacerQueryDecorator(Query decoratedQuery) {
 		super(decoratedQuery);

@@ -22,7 +22,7 @@ import java.util.Map;
 public class DrugInteractionQueryDecoratorTest extends QueryDecoratorTest {
     private static final String GENE = "BRAF";
 
-    private final File template = new File(getClass().getResource("/templates/match-title-drug-interaction.json").getFile());
+    private final String template = "/templates/match-title-drug-interaction.json";
 
     public DrugInteractionQueryDecoratorTest() {
         this.decoratedQuery = new DrugInteractionQueryDecorator(

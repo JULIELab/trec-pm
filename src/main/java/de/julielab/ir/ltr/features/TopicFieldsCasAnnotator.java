@@ -13,7 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>This class takes a UIMA CAS and a {@link Topic} and finds different kinds of topic field occurrences in the document for subsequent feature generation.</p>
@@ -29,17 +32,19 @@ public class TopicFieldsCasAnnotator implements Serializable {
      * @param topic      The topic.
      * @param dictionary The dictionary being built.
      */
-    private void addDiseaseToDictionary(Topic topic, Map<String, Map<String, TopicMatch>> dictionary) {
+    private void addDiseaseToDictionary(Topic topic, Map<String, List<TopicMatch>> dictionary) {
         FeatureUtils fu = FeatureUtils.getInstance();
         String normDisease = fu.normalizeString(topic.getDisease());
-        addToDictionary(normDisease, new TopicMatch(topic, MatchType.DISEASE), dictionary, topic);
+        addToDictionary(normDisease, new TopicMatch(topic, MatchType.DISEASE), dictionary);
         for (String diseaseSynonym : topic.getDiseaseSynonyms()) {
             final String normDiseaseSynonym = fu.normalizeString(diseaseSynonym);
-            addToDictionary(normDiseaseSynonym, new TopicMatch(topic, MatchType.DISEASE_SYNONYM), dictionary, topic);
+            if (!normDiseaseSynonym.equals(normDisease))
+                addToDictionary(normDiseaseSynonym, new TopicMatch(topic, MatchType.DISEASE_SYNONYM), dictionary);
         }
         for (String diseaseHypernym : topic.getDiseaseHypernyms()) {
-            final String normDiseaseSynonym = fu.normalizeString(diseaseHypernym);
-            addToDictionary(normDiseaseSynonym, new TopicMatch(topic, MatchType.DISEASE_HYPERNYM), dictionary, topic);
+            final String normDiseaseHypernym = fu.normalizeString(diseaseHypernym);
+            if (!normDiseaseHypernym.equals(normDisease))
+                addToDictionary(normDiseaseHypernym, new TopicMatch(topic, MatchType.DISEASE_HYPERNYM), dictionary);
         }
     }
 
@@ -49,23 +54,23 @@ public class TopicFieldsCasAnnotator implements Serializable {
      * @param topic      The topic.
      * @param dictionary The dictionary being built.
      */
-    private void addTopicGenesToDictionary(Topic topic, Map<String, Map<String, TopicMatch>> dictionary) {
+    private void addTopicGenesToDictionary(Topic topic, Map<String, List<TopicMatch>> dictionary) {
         FeatureUtils fu = FeatureUtils.getInstance();
         for (TopicGene gene : topic.getGenes()) {
             String normGene = fu.normalizeString(gene.getGeneSymbol());
-            addToDictionary(normGene, new TopicMatch(topic, MatchType.GENE), dictionary, topic);
+            addToDictionary(normGene, new TopicMatch(topic, MatchType.GENE), dictionary);
 
             if (gene.getMutation() != null) {
                 // we don't normalize the variant because we will compare with the PointMutations created
                 // by the MutationFinder which already should be the normalization.
-                addToDictionary(gene.getMutation(), new TopicMatch(topic, MatchType.VARIANT), dictionary, topic);
-                addToDictionary(gene.getMutation().substring(0, gene.getMutation().length() - 1), new TopicMatch(topic, MatchType.VARIANT), dictionary, topic);
+                addToDictionary(gene.getMutation(), new TopicMatch(topic, MatchType.VARIANT), dictionary);
+                addToDictionary(gene.getMutation().substring(0, gene.getMutation().length() - 1), new TopicMatch(topic, MatchType.VARIANT), dictionary);
 
                 final String normVariant = fu.normalizeString(gene.getMutation());
-                addToDictionary(normGene + normVariant, new TopicMatch(topic, MatchType.GENE_AND_VARIANT), dictionary, topic);
+                addToDictionary(normGene + normVariant, new TopicMatch(topic, MatchType.GENE_AND_VARIANT), dictionary);
 
                 String variantWoSuffix = normVariant.substring(0, normVariant.length() - 1);
-                addToDictionary(normGene + variantWoSuffix, new TopicMatch(topic, MatchType.GENE_AND_VARIANT), dictionary, topic);
+                addToDictionary(normGene + variantWoSuffix, new TopicMatch(topic, MatchType.GENE_AND_VARIANT), dictionary);
             }
         }
     }
@@ -76,10 +81,11 @@ public class TopicFieldsCasAnnotator implements Serializable {
      * @param keyword    The new dictionary entry.
      * @param tm         The value that matches with the given keyword should return.
      * @param dictionary The dictionary to add the new entry to.
-     * @param topic      The topic.
      */
-    private void addToDictionary(String keyword, TopicMatch tm, Map<String, Map<String, TopicMatch>> dictionary, Topic topic) {
-        dictionary.compute(keyword, (k, v) -> v == null ? new HashMap<>() : v).put(topic.getCrossDatasetId(), tm);
+    private void addToDictionary(String keyword, TopicMatch tm, Map<String, List<TopicMatch>> dictionary) {
+        List<TopicMatch> list = dictionary.compute(keyword, (k, v) -> v == null ? new ArrayList<>() : v);
+        if (!list.stream().anyMatch(containedtm -> containedtm.matchType == tm.matchType))
+            list.add(tm);
     }
 
     /**
@@ -92,29 +98,30 @@ public class TopicFieldsCasAnnotator implements Serializable {
      * </p>
      *
      * @param jCas  The document CAS.
-     * @param topic The topic of the document. Only dictionary matches regarding this topic will be added to the CAS.
+     * @param topic The <em>clean copy</em> of the original topic of the document. Only dictionary matches regarding this topic will be added to the CAS.
      */
     public void annotate(JCas jCas, Topic topic) {
         if (topic == null)
             throw new IllegalArgumentException("The passed topic is null");
-        Map<String, Map<String, TopicMatch>> dictionary = new LinkedHashMap<>();
+        Map<String, List<TopicMatch>> dictionary = new LinkedHashMap<>();
         addDiseaseToDictionary(topic, dictionary);
         addTopicGenesToDictionary(topic, dictionary);
-        StringMap<Map<String, TopicMatch>> matcher = new WholeWordLongestMatchMap<>(dictionary.keySet(), dictionary.values(), false);
+        StringMap<List<TopicMatch>> matcher = new WholeWordLongestMatchMap<>(dictionary.keySet(), dictionary.values(), false);
         List<TopicMatch> matches = new ArrayList<>();
         final String haystack = FeatureUtils.getInstance().normalizeString(jCas.getDocumentText());
         matcher.match(haystack, (key, start, end, value) -> {
-            if (value.containsKey(topic.getCrossDatasetId())) {
-                final TopicMatch topicMatch;
-                try {
-                    topicMatch = value.get(topic.getCrossDatasetId()).clone();
+            try {
+                for (TopicMatch tm : value) {
+                    TopicMatch topicMatch = tm.clone();
                     topicMatch.setKeyword(key.substring(start, end));
                     topicMatch.setBegin(start);
                     topicMatch.setEnd(end);
                     matches.add(topicMatch);
-                } catch (CloneNotSupportedException e) {
-                    log.error("Cloning the TopicMatch object failed", e);
+
+
                 }
+            } catch (CloneNotSupportedException e) {
+                log.error("Cloning the TopicMatch object failed", e);
             }
             return true;
         });

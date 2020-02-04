@@ -1,0 +1,12 @@
+[
+  "brief_title^{{brief_title_field_kw_boost}}",
+  "official_title^{{official_title_field_kw_boost}}",
+  "summary^{{summary_field_kw_boost}}",
+  "description^{{description_field_kw_boost}}",
+  "outcomeMeasures^{{outcomeMeasures_field_kw_boost}}",
+  "outcomeDescriptions^{{outcomeDescriptions_field_kw_boost}}",
+  "conditions^{{conditions_field_kw_boost}}",
+  "inclusion^{{inclusion_field_kw_boost}}",
+  "keywords^{{keywords_field_kw_boost}}",
+  "meshTags^{{meshTags_field_kw_boost}}"
+]

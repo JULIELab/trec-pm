@@ -1,6 +1,6 @@
 package de.julielab.ir.es;
 
-public class LMDParameters implements SimilarityParameters {
+public class  LMDParameters implements SimilarityParameters {
     private int mu;
 
     public LMDParameters(int mu) {

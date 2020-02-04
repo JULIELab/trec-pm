@@ -19,6 +19,7 @@ public class DiseaseHypernymQueryDecorator extends DynamicQueryDecorator {
         for (String hypernym : ancestors) {
             topic.withDiseaseHypernym(hypernym);
         }
+//        System.out.println("LEXI " + topic.getDisease() + " " + topic.getDiseaseHypernyms());
         return topic;
     }
 

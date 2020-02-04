@@ -1,0 +1,20 @@
+{
+  "bool": {
+    "boost": {{gene_query_boost}},
+    "should": [
+      {
+        "multi_match": {
+          "query": "{{gene}}",
+          "fields": {{clinical_trials_generic/fields_gene.json}},
+          "tie_breaker": 0.3,
+          "type": "{{gene_topic_match_type}}",
+          "slop": {{gene_topic_slop}},
+          "boost": {{gene_topic_clause_boost}}
+        }
+      },
+      {{geneSynonyms:clinical_trials_generic/gene_synonym.json}},
+      {{geneDescriptions:clinical_trials_generic/gene_description.json}},
+      {{customGeneExpansions:clinical_trials_generic/custom_gene.json}}
+    ]
+  }
+}

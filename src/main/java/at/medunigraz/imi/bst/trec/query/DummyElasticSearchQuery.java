@@ -12,7 +12,7 @@ public class DummyElasticSearchQuery<T extends QueryDescription> extends Elastic
 		super("NOOP");
 	}
 
-	private T topic;
+	private transient T topic;
 
 	@Override
 	public List<Result> query(T topic) {

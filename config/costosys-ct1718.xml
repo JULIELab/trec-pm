@@ -12,13 +12,10 @@
         </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-        <activeDBConnection>trecpm2018ltr</activeDBConnection>
+        <activeDBConnection>trecpm1718</activeDBConnection>
         <DBConnections>
-            <DBConnection name="trecpm2019ltr" url="jdbc:postgresql://localhost:5432/trecpm2019ltr"/>
-            <DBConnection name="trecpm2018ltr" url="jdbc:postgresql://localhost:5432/trecpm2018ltr"/>
-            <DBConnection name="pubmed2019" url="jdbc:postgresql://localhost:5432/pubmed2019"/>
-            <DBConnection name="trecpm19" url="jdbc:postgresql://localhost:5432/trecpm2019"/>
-            <DBConnection name="trecpm" url="jdbc:postgresql://localhost:5432/trecpm"/>
+            <DBConnection name="trecpm19" url="jdbc:postgresql://localhost:5432/trecpm19"/>
+            <DBConnection name="trecpm1718" url="jdbc:postgresql://localhost:5432/trecpm1718"/>
         </DBConnections>
     </DBConnectionInformation>
 </databaseConnectorConfiguration>

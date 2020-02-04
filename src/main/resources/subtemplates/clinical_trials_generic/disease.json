@@ -1,0 +1,30 @@
+{
+  "dis_max": {
+    "boost": {{disease_query_boost}},
+    "queries": [
+      {
+        "multi_match": {
+          "query": "{{disease}}",
+          "fields": {{clinical_trials_generic/fields_disease.json}},
+          "tie_breaker": 0.3,
+          "type": "{{disease_match_type}}",
+          "slop": {{disease_slop}},
+          "boost": {{disease_topic_clause_boost}}
+        }
+      },
+      {
+        "multi_match": {
+          "query": "{{diseasePreferredTerm}}",
+          "fields": {{clinical_trials_generic/fields_disease.json}},
+          "tie_breaker": 0.3,
+          "type": "{{disease_match_type}}",
+          "slop":  {{disease_slop}},
+          "boost": {{disease_prefterm_boost}}
+        }
+      },
+      {{diseaseSynonyms:clinical_trials_generic/disease_synonym.json}},
+      {{diseaseHypernyms:clinical_trials_generic/disease_hypernym.json}},
+      {{customDiseaseExpansions:clinical_trials_generic/custom_disease.json}}
+    ]
+  }
+}

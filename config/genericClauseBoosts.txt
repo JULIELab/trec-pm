@@ -1,0 +1,17 @@
+disease_query_boost
+disease_topic_clause_boost
+disease_prefterm_boost
+disease_syn_boost
+disease_hypernyms_boost
+disease_custom_boost
+gene_query_boost
+gene_topic_clause_boost
+gene_syn_boost
+gene_desc_boost
+gene_custom_boost
+conditional_chemo_boost
+conditional_cancer_boost
+positive_kw_boost
+negative_kw_boost
+exists_abstract_boost
+filtered_treatments_boost

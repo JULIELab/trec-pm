@@ -4,6 +4,7 @@
     "fields": {{biomedical_articles/fields.json}},
     "tie_breaker": 0.3,
     "type": "phrase",
-    "boost": 0.1
+    "boost": 0.1,
+    "slop": 0
   }
 }

@@ -9,9 +9,15 @@ public final class TrecConfig {
     public static final String SAMPLE_EXTRA_ABSTRACT_TXT = "src/main/resources/data/extra-abstract-sample.txt";
     private static final ResourceBundle PROPERTIES = ResourceBundle.getBundle("config");
     public static final String ELASTIC_BA_INDEX = getString("ELASTIC_BA_INDEX");
+    public static final String ELASTIC_BA_INDEX_2017 = getString("ELASTIC_BA_INDEX_2017");
+    public static final String ELASTIC_BA_INDEX_2018 = getString("ELASTIC_BA_INDEX_2018");
+    public static final String ELASTIC_BA_INDEX_2019 = getString("ELASTIC_BA_INDEX_2019");
     public static final String ELASTIC_BA_MEDLINE_TYPE = getString("ELASTIC_BA_MEDLINE_TYPE");
     public static final String ELASTIC_BA_EXTRA_TYPE = getString("ELASTIC_BA_EXTRA_TYPE");
     public static final String ELASTIC_CT_INDEX = getString("ELASTIC_CT_INDEX");
+    public static final String ELASTIC_CT_INDEX_2017 = getString("ELASTIC_CT_INDEX_2017");
+    public static final String ELASTIC_CT_INDEX_2018 = getString("ELASTIC_CT_INDEX_2018");
+    public static final String ELASTIC_CT_INDEX_2019 = getString("ELASTIC_CT_INDEX_2019");
     public static final String ELASTIC_CT_TYPE = getString("ELASTIC_CT_TYPE");
     public static final String ELASTIC_HOSTNAME = getString("ELASTIC_HOSTNAME");
     public static final int ELASTIC_PORT = getInteger("ELASTIC_PORT");
@@ -26,8 +32,11 @@ public final class TrecConfig {
     public static final String CACHE_HOST = getString("CACHE_HOST");
     public static final int CACHE_PORT = getInteger("CACHE_PORT");
     public static final String GSHEETS_SHEETID = getString("GSHEETS_SHEETID");
+    public static final int CONCURRENCY_MAX = getInteger("CONCURRENCY_MAX");
+    public static final int EVALSERVER_PORT = getInteger("EVALSERVER_PORT");
     public static final int SIZE = 1000;
     public static final int MAX_TREATMENTS = 3;
+    public static String SUBTEMPLATES_FOLDER = getString("SUBTEMPLATES_FOLDER");
 
     public static String getString(String key) {
         return PROPERTIES.getString(key);

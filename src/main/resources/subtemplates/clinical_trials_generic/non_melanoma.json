@@ -1,0 +1,8 @@
+{
+      "multi_match": {
+        "query": "non-melanoma",
+        "fields": {{clinical_trials_generic/fields_keywords.json}},
+        "tie_breaker": 0.3,
+        "type": "phrase"
+      }
+}

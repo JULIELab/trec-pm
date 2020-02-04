@@ -1,0 +1,9 @@
+<configuration>
+    <retrievalparameters>
+        <keywords>
+            <chemotherapy word="cancer">true</chemotherapy>
+            <chemotherapy word="il2">true</chemotherapy>
+            <chemotherapy word="tubes">false</chemotherapy>
+        </keywords>
+    </retrievalparameters>
+</configuration>

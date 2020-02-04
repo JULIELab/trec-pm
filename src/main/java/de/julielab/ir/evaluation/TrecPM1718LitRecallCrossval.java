@@ -10,8 +10,8 @@ import de.julielab.ir.goldstandards.TrecQrelGoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.java.utilities.FileUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
@@ -26,12 +26,11 @@ import java.util.stream.Collectors;
 public class TrecPM1718LitRecallCrossval {
 
     public static final int CROSSVAL_SIZE = 5;
-    private static Logger log = LogManager.getLogger();
+    private static Logger log = LogManager.getLogger(TrecPM1718LitRecallCrossval.class);
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 
-        final File noClassifierTemplate = new File(
-                TrecPM1718LitRecallCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym().withResistantDrugs();
 
         String experimentName = "Base";
@@ -40,7 +39,7 @@ public class TrecPM1718LitRecallCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedQueryPartitioning(CROSSVAL_SIZE, Topic::getDisease);
+        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createPropertyBalancedQueryPartitioning(CROSSVAL_SIZE, Arrays.asList(Topic::getDisease));
 
 
         runRecallExperiment(retrieval, experimentName, new File("recallResults"), aggregatedGoldStandard, topicPartitioning);

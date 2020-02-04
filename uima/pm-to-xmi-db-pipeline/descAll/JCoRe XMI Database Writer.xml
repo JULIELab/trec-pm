@@ -281,13 +281,13 @@
                                         
                     <array>
                                                 
-                        <string>de.julielab.jcore.types.AbstractText</string>
-                                                
                         <string>de.julielab.jcore.types.Title</string>
                                                 
                         <string>de.julielab.jcore.types.pubmed.Header</string>
                                                 
                         <string>de.julielab.jcore.types.pubmed.ManualDescriptor</string>
+                                                
+                        <string>de.julielab.jcore.types.pubmed.AbstractText</string>
                                             
                     </array>
                                     

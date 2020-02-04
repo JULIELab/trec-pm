@@ -7,9 +7,9 @@
         
     <delegateAnalysisEngineSpecifiers>
                 
-        <delegateAnalysisEngine key="JCoRe Sentence Annotator">
+        <delegateAnalysisEngine key="BioLemmatizer">
                         
-            <import location="JCoRe Sentence Annotator.xml"/>
+            <import location="BioLemmatizer.xml"/>
                     
         </delegateAnalysisEngine>
                 
@@ -19,9 +19,21 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCoRe Flair Named Entity Recognizer">
+        <delegateAnalysisEngine key="JCoRe Sentence Annotator">
                         
-            <import location="JCoRe Flair Named Entity Recognizer.xml"/>
+            <import location="JCoRe Sentence Annotator.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe OpenNLP POS Tagger">
+                        
+            <import location="JCoRe OpenNLP POS Tagger.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe BANNER AE for Biomedical English">
+                        
+            <import location="JCoRe BANNER AE for Biomedical English.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -41,11 +53,15 @@
                         
             <fixedFlow>
                                 
-                <node>JCoRe Sentence Annotator</node>
+                <node>BioLemmatizer</node>
                                 
                 <node>JCoRe Token Annotator</node>
                                 
-                <node>JCoRe Flair Named Entity Recognizer</node>
+                <node>JCoRe Sentence Annotator</node>
+                                
+                <node>JCoRe OpenNLP POS Tagger</node>
+                                
+                <node>JCoRe BANNER AE for Biomedical English</node>
                             
             </fixedFlow>
                     

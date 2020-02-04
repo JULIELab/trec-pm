@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.trec.model;
 
 import com.opencsv.CSVWriter;
+import de.julielab.java.utilities.FileUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -22,13 +23,13 @@ public class TopicSet {
 		this.topics = new ArrayList<>(topics);
 	}
 
-	public TopicSet(File xmlFile, Challenge challenge, int year) {
+	public TopicSet(String xmlFile, Challenge challenge, int year) {
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 
 		Document doc;
 		try {
 			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			doc = documentBuilder.parse(xmlFile);
+			doc = documentBuilder.parse(FileUtilities.findResource(xmlFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;

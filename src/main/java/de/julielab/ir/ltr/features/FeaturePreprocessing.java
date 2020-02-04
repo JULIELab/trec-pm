@@ -12,19 +12,16 @@ import de.julielab.ir.ltr.features.featuregroups.TfidfFeatureGroup;
 import de.julielab.ir.model.QueryDescription;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FeaturePreprocessing<Q extends QueryDescription> {
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LoggerFactory.getLogger(FeaturePreprocessing.class);
     private final String xmiTableName;
 
     private String docIdIndexField;
@@ -39,13 +36,15 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         this.xmiTableName = xmiTableName;
     }
 
-    public void setRetrievals(Map<IRScoreFeatureKey, Retrieval<?, Q>> retrievals) {
+    public void setRetrievals(LinkedHashMap<IRScoreFeatureKey, Retrieval<?, Q>> retrievals) {
         this.retrievals = retrievals;
     }
 
     public void preprocessTrain(DocumentList<Q> trainDocs, String runId) {
-        for (IRScoreFeatureKey featureKey : retrievals.keySet())
-            retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
+        if (FeatureControlCenter.getInstance().isSimilarityFeatureGroupActive()) {
+            for (IRScoreFeatureKey featureKey : retrievals.keySet())
+                retrievals.get(featureKey).setIrScoresToDocuments(trainDocs, docIdIndexField, featureKey);
+        }
         Set<String> tfIdfVocabulary = null;
         TFIDF trainTfIdf = null;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
@@ -64,7 +63,8 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
         Set<String> tfIdfVocabulary = VocabularyRestrictor.getInstance().calculateVocabulary(vocabularyId, trainDocumentText.stream(), VocabularyRestrictor.Restriction.TFIDF, vocabularyCutoff);
         if (!TfIdfManager.getInstance().hasModelForKey(vocabularyId))
             trainTfIdf = TfIdfManager.getInstance().trainAndSetTfIdf(vocabularyId, trainDocumentText.stream());
-        else trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(vocabularyId);
+        else
+            trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(vocabularyId);
         return new ImmutablePair<>(trainTfIdf, tfIdfVocabulary);
     }
 
@@ -77,23 +77,25 @@ public class FeaturePreprocessing<Q extends QueryDescription> {
     }
 
     public void preprocessTest(DocumentList<Q> testDocs, Pipe trainPipe, DocumentList<Q> trainDocs, String runId) {
-        for (IRScoreFeatureKey featureKey : retrievals.keySet())
-            retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
+        if (FeatureControlCenter.getInstance().isSimilarityFeatureGroupActive()) {
+            for (IRScoreFeatureKey featureKey : retrievals.keySet())
+                retrievals.get(featureKey).setIrScoresToDocuments(testDocs, docIdIndexField, featureKey);
+        }
 
         TFIDF trainTfIdf;
         if (FeatureControlCenter.getInstance().isTfIdfActive()) {
             final String tfIdfId = getTfIdfId(runId);
-            log.debug("Training TFIDF from training documents");
-            Pair<TFIDF, Set<String>> tfidfSetPair = learnTfidf(trainDocs, runId);
             if (TfIdfManager.getInstance().hasModelForKey(tfIdfId))
                 trainTfIdf = TfIdfManager.getInstance().getTrainedTfIdf(tfIdfId);
-            else
-                trainTfIdf = tfidfSetPair.getLeft();
+            else {
+                log.debug("Training TFIDF from training documents");
+                trainTfIdf = learnTfidf(trainDocs, runId).getLeft();
+            }
             Optional<Pipe> tfIdfFgOpt = ((SerialPipes) trainPipe).pipes().stream().filter(TfidfFeatureGroup.class::isInstance).findAny();
             if (!tfIdfFgOpt.isPresent())
                 throw new IllegalStateException("TFIDF vocabulary feature is active but the given training pipe does not contain the TfidfFeatureGroup.");
             else
-                ((TfidfFeatureGroup)tfIdfFgOpt.get()).setTfidf(trainTfIdf);
+                ((TfidfFeatureGroup) tfIdfFgOpt.get()).setTfidf(trainTfIdf);
         }
         FeatureControlCenter.getInstance().createFeatures(testDocs, trainPipe, canonicalDbConnectionFiles, xmiTableName);
     }

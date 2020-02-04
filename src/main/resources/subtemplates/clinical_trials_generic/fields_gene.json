@@ -1,0 +1,13 @@
+[
+  "brief_title^{{brief_title_field_gene_boost}}",
+  "official_title^{{official_title_field_gene_boost}}",
+  "summary^{{summary_field_gene_boost}}",
+  "description^{{description_field_gene_boost}}",
+  "outcomeMeasures^{{outcomeMeasures_field_gene_boost}}",
+  "outcomeDescriptions^{{outcomeDescriptions_field_gene_boost}}",
+  "conditions^{{conditions_field_gene_boost}}",
+  "inclusion^{{inclusion_field_gene_boost}}",
+  "keywords^{{keywords_field_gene_boost}}",
+  "meshTags^{{meshTags_field_gene_boost}}",
+  "genes^{{genes_field_boost}}"
+]
