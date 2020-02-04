@@ -12,7 +12,6 @@ import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -101,28 +100,6 @@ public class RankLibRanker<Q extends QueryDescription> implements Ranker<Q> {
         } else {
             train = new ArrayList<>(rankLists.values());
             validation = Collections.emptyList();
-        }
-
-//        for (Document d : documents) {
-//            System.out.println(d.getId() + ": " + d.getFeatureVector().toString(true));
-//        }
-        File out = new File("features.txt");
-        StringBuilder sb = new StringBuilder();
-        for (RankList rl : train) {
-            for (int i = 0; i < rl.size(); i++) {
-                DataPoint dp = rl.get(i);
-                for (int j = 0; j < dp.getNumberOfKnownFeatures(); j++) {
-                    float v = dp.getFeatureValue(j);
-                    sb.append(i + "" + v);
-
-                }
-            }
-            sb.append("\n");
-        }
-        try {
-            FileUtils.write(out, sb.toString(), "UTF-8", false);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
 
         this.features = this.features != null ? this.features : FeatureManager.getFeatureFromSampleVector(new ArrayList(rankLists.values()));

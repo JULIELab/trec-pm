@@ -3,6 +3,7 @@ package de.julielab.ir.ltr;
 import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import ciir.umass.edu.learning.RANKER_TYPE;
+import ciir.umass.edu.utilities.MyThreadPool;
 import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
@@ -21,7 +22,7 @@ public class RankerFromInternalCt19New extends PrecisionMedicineReranker {
 
     public RankerFromInternalCt19New() throws ConfigurationException, IOException {
         super(Task.CLINICAL_TRIALS,
-                Arrays.asList(TrecPMGoldStandardFactory.trialsInternal2019(), TrecPMGoldStandardFactory.trialsOfficial2018()),
+                Arrays.asList(TrecPMGoldStandardFactory.trialsInternal2019()),
                 ConfigurationUtilities.loadXmlConfiguration(new File("config", "featureConfiguration.xml")),
                 Arrays.asList(new File("config", "costosys-ct19.xml").getCanonicalFile(), new File("config", "costosys-ct1718.xml").getCanonicalFile()),
                 "_data_xmi.documents_ct",
@@ -44,6 +45,7 @@ public class RankerFromInternalCt19New extends PrecisionMedicineReranker {
         OriginalDocumentRetrieval.getInstance().shutdown();
         FastTextEmbeddingFeatures.shutdown();
         Multithreading.getInstance().shutdown();
+        MyThreadPool.getInstance().shutdown();
     }
 
 }
