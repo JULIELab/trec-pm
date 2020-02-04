@@ -1,0 +1,7 @@
+{
+  "bool": {
+    "should": [
+      {{cancerBoosters:conditional_cancer.json}}
+    ]
+  }
+}

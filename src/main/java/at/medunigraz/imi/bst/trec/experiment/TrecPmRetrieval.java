@@ -5,15 +5,13 @@ import at.medunigraz.imi.bst.trec.model.Gene;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.*;
 
-import java.io.File;
-
 public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
 
     public TrecPmRetrieval(String indexName) {
         super(indexName);
     }
 
-    public TrecPmRetrieval(String indexName, int resultSize) {
+    public  TrecPmRetrieval(String indexName, int resultSize) {
         super(indexName, resultSize);
     }
 
@@ -79,6 +77,11 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         return this;
     }
 
+    public TrecPmRetrieval withUmlsDiseasePreferredTerm() {
+        query = new DiseaseUmlsPreferredTermQueryDecorator(query);
+        return this;
+    }
+
     public TrecPmRetrieval withSolidTumor() {
 
         query = new SolidTumorQueryDecorator(query);
@@ -103,7 +106,7 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         return this;
     }
 
-    public TrecPmRetrieval withSynonymList(File synonymList) {
+    public TrecPmRetrieval withSynonymList(String synonymList) {
         query = new FileBasedQueryDecorator(synonymList, query);
         return this;
     }
@@ -112,4 +115,11 @@ public class TrecPmRetrieval extends Retrieval<TrecPmRetrieval, Topic> {
         query = new ConditionalCancerQueryDecorator(query);
         return this;
     }
+
+    public TrecPmRetrieval withFeatureControlledConditionalCancer() {
+        query = new FeatureControlledConditionalCancerQueryDecorator(query);
+        return this;
+    }
+
+
 }

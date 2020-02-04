@@ -2,10 +2,7 @@ package de.julielab.ir.ltr.features;
 
 
 import cc.mallet.pipe.Pipe;
-import cc.mallet.types.Instance;
-import cc.mallet.types.Label;
-import cc.mallet.types.LabelAlphabet;
-import cc.mallet.types.Token;
+import cc.mallet.types.*;
 import de.julielab.ir.ltr.Document;
 
 public class Document2TokenPipe extends Pipe {
@@ -13,12 +10,20 @@ public class Document2TokenPipe extends Pipe {
         setTargetAlphabet(new LabelAlphabet());
     }
 
+    public Document2TokenPipe(Alphabet targetAlphabet) {
+        setTargetAlphabet(targetAlphabet);
+    }
+
     @Override
     public Instance pipe(Instance inst) {
         Document doc = (Document) inst.getData();
         Token token = new Token(doc.getId());
         inst.setData(token);
-        Label label = ((LabelAlphabet) getTargetAlphabet()).lookupLabel(inst.getTarget());
+        LabelAlphabet ta = (LabelAlphabet) getTargetAlphabet();
+        Label label;
+        synchronized (ta) {
+            label = ta.lookupLabel(inst.getTarget());
+        }
         inst.setTarget(label);
         return inst;
     }

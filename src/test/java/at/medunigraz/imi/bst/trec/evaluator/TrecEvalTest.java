@@ -12,7 +12,7 @@ public class TrecEvalTest {
 
     private static final String GOLD = "/gold-standard/test.qrels";
     private static final String RESULTS = "/results/test.trec_results";
-    private static final String OUTPUT = "/stats/test.trec_eval";
+    private static final String OUTPUT = "src/test/resources/stats/test.trec_eval";
 
     @Before
     public void setUp() {
@@ -23,7 +23,7 @@ public class TrecEvalTest {
     public void testEvaluate() {
         File goldStandard = new File(getClass().getResource(GOLD).getFile());
         File results = new File(getClass().getResource(RESULTS).getFile());
-        File output = new File(getClass().getResource(OUTPUT).getFile());
+        File output = new File(OUTPUT);
 
         TrecEval t = new TrecEval(goldStandard, results, output);
         assertEquals(0.6309, t.getNDCG(), 0.00001);

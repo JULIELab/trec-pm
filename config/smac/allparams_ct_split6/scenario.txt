@@ -1,0 +1,8 @@
+pcs-file = config/smac/allparams_ct_split6/smac-parameters.pcs
+runObj = QUALITY
+cutoffTime = 500
+deterministic = 1
+instance_file = config/smac/allparams_ct_split6/instances.txt
+algo = bash scripts/smacOverHttpWrapper.sh 32100 ct _copy6
+save-runs-every-iteration = true
+seed = 1

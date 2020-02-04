@@ -6,10 +6,10 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TopicSet;
 import at.medunigraz.imi.bst.trec.model.TrecPMTopicSetFactory;
 import at.medunigraz.imi.bst.trec.utils.JsonUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 import java.util.*;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class Lexigram {
 
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(Lexigram.class);
 
     private static final String ENDPOINT = "https://api.lexigram.io/v1/lexigraph/";
 

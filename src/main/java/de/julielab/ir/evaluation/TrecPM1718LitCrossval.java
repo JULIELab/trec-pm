@@ -24,23 +24,20 @@ import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.java.utilities.ConfigurationUtilities;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TrecPM1718LitCrossval {
 
     public static final int CROSSVAL_SIZE = 5;
-    private static Logger log = LogManager.getLogger();
+    private static Logger log = LoggerFactory.getLogger(TrecPM1718LitCrossval.class);
 
     public static void main(String args[]) throws ConfigurationException, IOException {
 
@@ -62,10 +59,9 @@ public class TrecPM1718LitCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createStratifiedQueryPartitioning(CROSSVAL_SIZE, Topic::getDisease);
+        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createPropertyBalancedQueryPartitioning(CROSSVAL_SIZE, Arrays.asList(Topic::getDisease));
 
-        final File noClassifierTemplate = new File(
-                TrecPM1718LitCrossval.class.getResource("/templates/biomedical_articles/hpipubnone.json").getFile());
+        final String noClassifierTemplate ="/templates/biomedical_articles/hpipubnone.json";
         final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(noClassifierTemplate).withGeneSynonym().withUmlsDiseaseSynonym();
 
         List<Double> rankLibScores = new ArrayList<>();

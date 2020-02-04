@@ -1,7 +1,7 @@
 """
 Creates the UMLS term synsets used for query term expansion.
 Example call:
-    python createUmlsTermSynsets.py /data/data_resources/UMLS/UMLS2019/UMLS2019AA/MRCONSO.RRF ENG > ../resources/umlsSynsets.txt
+    python createUmlsTermSynsets.py /data/data_resources/UMLS/UMLS2019/2019AA/META/MRCONSO.RRF ENG > ../resources/umlsSynsets.txt
 """
 
 from collections import defaultdict
@@ -15,7 +15,7 @@ def getSynsets(mrconso, language):
 		term_language = line[1]
 		term = line[14]
 		suppressed = line[16]
-		preferredName = line[6]
+		termstatus = line[2]
 		if language == term_language and suppressed == "N":
 			cui2synsets[cui].add(term)
 	for item in cui2synsets.items():

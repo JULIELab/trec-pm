@@ -4,15 +4,15 @@ import de.julielab.ir.pm.pmclassifier.DataReader;
 import de.julielab.ir.pm.pmclassifier.DataReadingException;
 import de.julielab.ir.pm.pmclassifier.Document;
 import de.julielab.ir.pm.pmclassifier.PMClassifier;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 public class Eval {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(Eval.class);
 
     public static void doEval(PMClassifier classifier, String jsongsdocs, String annotatedGs, String modelFile) throws DataReadingException, IOException, ClassNotFoundException {
         LOG.info("Reading documents");

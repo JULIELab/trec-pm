@@ -2,13 +2,15 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -16,8 +18,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TemplateQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
-	private static final Logger LOG = LogManager.getLogger();
-	protected File template;
+	private static final Logger LOG = LoggerFactory.getLogger(TemplateQueryDecorator.class);
+	protected String template;
 
 	/**
 	 * Matches double+ commas with any whitespace in between (this happens when two dynamic subtemplates are not expanded).
@@ -31,7 +33,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	 *                 curly braces to be correctly filled with the desired values.
 	 * @param decoratedQuery The query to be decorated
 	 */
-	public TemplateQueryDecorator(File template, Query decoratedQuery) {
+	public TemplateQueryDecorator(String template, Query decoratedQuery) {
 		super(decoratedQuery);
 		if (template == null)
             throw new IllegalArgumentException("The passed template is null");
@@ -65,10 +67,13 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 			throw new IllegalStateException("The following template properties have not been set: " + missingTemplates);
 	}
 
-	protected static String readTemplate(File template) {
+	protected static String readTemplate(String template) {
 		String ret = "";
 		try {
-			ret = FileUtils.readFileToString(template, "UTF-8");
+			InputStream resource = FileUtilities.findResource(template);
+			if (resource == null)
+				throw new FileNotFoundException("Did not find resource " + template + " as file or as classpath resource.");
+			ret = IOStreamUtilities.getStringFromInputStream(resource);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -85,7 +90,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	
 	@Override
 	protected String getMyName() {
-		return getSimpleClassName() + "(" + template.getName() + ")";
+		return getSimpleClassName() + "(" + template + ")";
 	}
 
 }

@@ -1,0 +1,4 @@
+[
+  "title^{{title_field_kw_boost}}",
+  "abstract^{{abstract_field_kw_boost}}"
+]

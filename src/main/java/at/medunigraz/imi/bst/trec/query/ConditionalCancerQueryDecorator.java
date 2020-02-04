@@ -2,14 +2,21 @@ package at.medunigraz.imi.bst.trec.query;
 
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
+import de.julielab.ir.ltr.features.FeatureControlCenter;
+import org.apache.commons.configuration2.HierarchicalConfiguration;
+import org.apache.commons.configuration2.tree.ImmutableNode;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static de.julielab.ir.ltr.features.FCConstants.*;
+import static de.julielab.java.utilities.ConfigurationUtilities.slash;
+
 public class ConditionalCancerQueryDecorator extends FileBasedQueryDecorator {
 
-    private static final File CANCER = new File(ConditionalCancerQueryDecorator.class.getResource("/synonyms/cancer.txt").getFile());
+    private static final String CANCER ="/synonyms/cancer.txt";
 
     private static final String CANCER_BOOSTER = "cancer carcinoma tumor";
     private static final String CHEMOTHERAPY_BOOSTER = "*mab *nib *cin *one *ate *mus *lin";

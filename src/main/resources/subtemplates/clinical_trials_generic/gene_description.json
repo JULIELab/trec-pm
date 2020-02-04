@@ -1,0 +1,10 @@
+{
+  "multi_match": {
+    "query": "{{[geneDescriptions]}}",
+    "fields": {{clinical_trials_generic/fields_gene.json}},
+    "tie_breaker": 0.3,
+    "type": "{{gene_desc_match_type}}",
+    "slop": {{gene_desc_slop}},
+    "boost": {{gene_desc_boost}}
+  }
+}

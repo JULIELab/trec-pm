@@ -15,16 +15,31 @@ public abstract class QueryDescription {
     protected Challenge challenge;
     protected int year;
     protected int number;
+    protected String index;
 
-    public QueryDescription() {
+    /**
+     * The index in which to search this query.
+     * @return The index with the data for this query.
+     */
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
     }
 
     public QueryDescription(Challenge challenge, int year, int number) {
-
+        this();
         this.challenge = challenge;
         this.year = year;
         this.number = number;
     }
+
+    public QueryDescription() {
+
+    }
+
 
     public Challenge getChallenge() {
         return challenge;
@@ -89,4 +104,10 @@ public abstract class QueryDescription {
      * @return The query attributes.
      */
     public abstract Map<String, String> getAttributes();
+
+    /**
+     * Returns a copy of this query description without any expansions or other modifications.
+     * @return An copy of this description without modifications.
+     */
+    public abstract <Q extends QueryDescription> Q getCleanCopy();
 }

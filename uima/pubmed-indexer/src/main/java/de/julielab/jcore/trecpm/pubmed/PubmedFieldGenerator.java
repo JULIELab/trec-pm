@@ -3,17 +3,15 @@ package de.julielab.jcore.trecpm.pubmed;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import de.julielab.jcore.consumer.es.ArrayFieldValue;
-import de.julielab.jcore.consumer.es.FieldGenerationException;
 import de.julielab.jcore.consumer.es.FieldGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.filter.SnowballFilter;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
 import de.julielab.jcore.consumer.es.preanalyzed.RawToken;
-import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.Date;
+import de.julielab.jcore.types.*;
 import de.julielab.jcore.utility.JCoReTools;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
@@ -21,8 +19,8 @@ import org.apache.uima.jcas.cas.FSArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class PubmedFieldGenerator extends FieldGenerator {
@@ -304,8 +302,8 @@ public class PubmedFieldGenerator extends FieldGenerator {
 
 
     private void addAbstract(JCas jCas, Document document) {
-        Collection<AbstractText> titles = JCasUtil.select(jCas, AbstractText.class);
-        titles.stream().findFirst().ifPresent(abstractText -> document.addField("abstract", abstractText.getCoveredText()));
+        Collection<AbstractText> abstracts = JCasUtil.select(jCas, AbstractText.class);
+        abstracts.stream().findFirst().ifPresent(abstractText -> document.addField("abstract", abstractText.getCoveredText()));
     }
 
     private void addTitle(JCas jCas, Document document) {

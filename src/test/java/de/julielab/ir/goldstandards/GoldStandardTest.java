@@ -1,8 +1,10 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
@@ -10,11 +12,17 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
+/**
+ * Ignore as long as the 2019 data may not be uploaded. The travis test phase will fail otherwise since the required files are not in Git.
+ * @throws InterruptedException
+ */
+@Ignore
 public class GoldStandardTest {
 
+    @Ignore
     @Test
     public void testRandomizedQueryPartitioning() throws InterruptedException {
-        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedInternal2019();
+        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2019();
         final List<List<Topic>> split = gs.createRandomizedQueryPartitioning(10, 1);
         assertEquals(10, split.size());
         assertEquals(40, split.stream().flatMap(Collection::stream).collect(Collectors.toList()).size());
@@ -42,7 +50,7 @@ public class GoldStandardTest {
 
     @Test
     public void testEqualSplitSize() {
-        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedInternal2019();
+        final TrecQrelGoldStandard<Topic> gs = TrecPMGoldStandardFactory.pubmedOfficial2019();
         final List<List<Topic>> split = gs.createRandomizedQueryPartitioning(7, 1);
         assertEquals(7, split.size());
         assertEquals(40, split.stream().flatMap(Collection::stream).collect(Collectors.toList()).size());
@@ -54,6 +62,29 @@ public class GoldStandardTest {
             if (i >= 5)
                 expectedSize = 5;
             assertEquals("Split " + i + " is of size " + topics.size() + ".", expectedSize, topics.size());
+        }
+    }
+
+    @Test
+    public void testBalancedSplit() {
+        AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
+        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getGeneField));
+        for (List<Topic> l : geneBalancedPartioning) {
+            long c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRAF")).count();
+            assertTrue(c > 0);
+        }
+    }
+
+    @Test
+    public void testMultiplyBalancedSplit() {
+        AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
+        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getDisease));
+        for (List<Topic> l : geneBalancedPartioning) {
+            System.out.println(l.stream().map(t -> t.getDisease() + ", " + t.getGeneField()).collect(Collectors.joining("-")));
+            long c = l.stream().map(Topic::getDisease).filter(d -> d.toLowerCase().contains("melanoma")).count();
+            assertTrue(c > 1);
+            c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRCA")).count();
+            assertTrue(c <= 1);
         }
     }
 }

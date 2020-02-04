@@ -18,7 +18,7 @@ import java.util.Map;
 public class DiseaseSynonymQueryDecoratorTest extends QueryDecoratorTest {
 	private static final String DISEASE = "Cholangiocarcinoma";
 
-	private final File template = new File(getClass().getResource("/templates/match-title-expansion.json").getFile());
+	private final String template ="/templates/match-title-expansion.json";
 
 	@Before
 	public void setUp() {

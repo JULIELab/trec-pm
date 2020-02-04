@@ -1,0 +1,9 @@
+{
+  "multi_match": {
+    "query": "{{[geneHypernyms]}}",
+    "fields": {{clinical_trials_generic/fields_gene.json}},
+    "tie_breaker": 0.3,
+    "type": "{{gene_hypernyms_match_type}}",
+    "boost": {{gene_hypernyms_boost}}
+  }
+}

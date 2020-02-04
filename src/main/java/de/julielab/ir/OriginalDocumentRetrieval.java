@@ -1,7 +1,6 @@
 package de.julielab.ir;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import com.google.common.base.Functions;
 import com.ximpleware.VTDException;
 import de.julielab.costosys.configuration.DBConfig;
 import de.julielab.costosys.configuration.FieldConfig;
@@ -22,8 +21,7 @@ import de.julielab.xml.binary.BinaryJeDISNodeEncoder;
 import de.julielab.xml.binary.BinaryXmiBuilder;
 import de.julielab.xml.util.XMIBuilderException;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.impl.XmiCasDeserializer;
 import org.apache.uima.fit.factory.TypeSystemDescriptionFactory;
@@ -32,6 +30,8 @@ import org.apache.uima.resource.impl.ResourceManager_impl;
 import org.apache.uima.resource.metadata.TypeSystemDescription;
 import org.apache.uima.resource.metadata.impl.ProcessingResourceMetaData_impl;
 import org.apache.uima.util.CasPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -74,7 +74,7 @@ public class OriginalDocumentRetrieval {
      * is much more appropriate which is why we use a CasPool.
      */
     private CasPool casPool;
-    private Logger log = LogManager.getLogger();
+    private Logger log = LoggerFactory.getLogger(OriginalDocumentRetrieval.class);
     /**
      * We use DatabaseConnector objects to communicate with the document database. We have one DatabaseConnector
      * for each document database configuration file.
@@ -107,7 +107,7 @@ public class OriginalDocumentRetrieval {
             final ProcessingResourceMetaData_impl metaData = new ProcessingResourceMetaData_impl();
             metaData.setTypeSystem(tsDesc);
             try {
-                casPool = new CasPool(10, metaData, new ResourceManager_impl());
+                casPool = new CasPool(TrecConfig.CONCURRENCY_MAX, metaData, new ResourceManager_impl());
             } catch (ResourceInitializationException e) {
                 log.error("Could not create CAS pool", e);
             }
@@ -341,19 +341,15 @@ public class OriginalDocumentRetrieval {
      */
     public void setXmiCasDataToDocuments(DocumentList<?> documents, List<File> dbConnections, String table) {
         List<? extends Document<?>> docsWithoutXmiData = documents.stream().filter(d -> d.getFullDocumentData() == null).collect(Collectors.toList());
-        Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream()
-                .filter(d -> xmiCache.get(d.getId()) == null)
-                .collect(Collectors.toSet());
+        log.debug("Got {} documents to set XMI data to", docsWithoutXmiData.size());
+
+        Map<String, byte[]> cachedXmiByDocId = docsWithoutXmiData.stream().map(Document::getId).distinct().map(id -> new ImmutablePair<>(id, xmiCache.get(id))).filter(pair -> pair.getRight() != null).collect(Collectors.toMap(pair -> pair.getLeft(), pair -> pair.getRight() ));
+        Set<? extends Document<?>> docsWithoutXmiDataNotInCache = docsWithoutXmiData.stream().filter(d -> !cachedXmiByDocId.containsKey(d.getId())).collect(Collectors.toSet());
         // For group the documents to be retrieved by the database they reside in. In this way we can fetch the documents
         // from one database batch-wise.
         Map<File, List<Document<?>>> docsByDbConfig = docsWithoutXmiDataNotInCache.stream()
                 .filter(d -> d.getDocumentDbConfiguration() != null)
                 .collect(Collectors.groupingBy(Document::getDocumentDbConfiguration));
-//                .docsByDbConfig(Collectors.groupingBy(d -> {
-//            if (d.getDocumentDbConfiguration() == null && (dbConnections.isEmpty() || dbConnections == null))
-//                throw new IllegalStateException("The XMI data for document with ID " + d.getId() + " should be fetched but it specifies no document database connection configuration and no database connection files have been passed to this method.");
-//            return d.getDocumentDbConfiguration();
-//        }));
 
         List<Document<?>> docsWithoutDbConfig = docsWithoutXmiDataNotInCache.stream()
                 .filter(d -> d.getDocumentDbConfiguration() == null)
@@ -371,17 +367,6 @@ public class OriginalDocumentRetrieval {
 
         for (File costosysConfig : docsByDbConfig.keySet()) {
             List<Object[]> docsForCurrentDbConfig = docsByDbConfig.get(costosysConfig).stream().map(d -> new Object[]{d.getId()}).distinct().collect(Collectors.toList());
-//            log.debug("Got {} documents whose XMI data is not present in the cache. Fetching them from the database.", docsForCurrentDbConfig.size());
-//            Iterator<Object[]> it = docsForCurrentDbConfig.iterator();
-//            while (it.hasNext()) {
-//                Object[] key = it.next();
-//                String id = (String) key[0];
-//                byte[][] bytes = dbDataCache.get(id);
-//                if (bytes != null) {
-//                    dataByDocId.put(id, bytes);
-//                    it.remove();
-//                }
-//            }
             Map<String, byte[][]> dataByDocId = new HashMap<>();
             try {
                 if (!docsForCurrentDbConfig.isEmpty()) {
@@ -391,7 +376,6 @@ public class OriginalDocumentRetrieval {
                         byte[][] data = xmiData.next();
                         String id = new String(data[0], UTF_8);
                         dataByDocId.put(id, data);
-                        // dbDataCache.put(id, data);
                         ++i;
                         double reportFraction = 0.1;
                         if (i % (docsForCurrentDbConfig.size() * reportFraction) == 0)
@@ -410,14 +394,13 @@ public class OriginalDocumentRetrieval {
                 log.debug("Assembling the actual XMI documents from the database data.");
                 while (docsWithoutXmiDataIt.hasNext()) {
                     final Document<?> doc = docsWithoutXmiDataIt.next();
-                    docsWithoutXmiDataIt.remove();
-                    byte[] docXmiData = xmiCache.get(doc.getId());
+                    byte[] docXmiData = cachedXmiByDocId.get(doc.getId());
                     if (docXmiData == null) {
                         if (!dataByDocId.containsKey(doc.getId())) {
-                            String requested = documents.stream().map(Document::getId).collect(Collectors.toSet()).contains(doc.getId()) ? "" : "not ";
-                           // log.warn("The document with ID " + doc.getId() + " is not contained in the cache and was not returned from a database.");
                             continue;
                         }
+                        // At this point, we have data for the current document
+                        docsWithoutXmiDataIt.remove();
                         final byte[][] documentData = dataByDocId.get(doc.getId());
                         LinkedHashMap<String, InputStream> dataMap = new LinkedHashMap<>();
                         List<String> xmiColumnNames = new ArrayList<>();
@@ -453,13 +436,20 @@ public class OriginalDocumentRetrieval {
             } catch (XMIBuilderException e) {
                 e.printStackTrace();
             }
-            log.debug("Setting the XMI data to {} documents has been finished.", docsForCurrentDbConfig.size());
             releaseCas(cas);
         }
         for (Document<?> d : documents) {
-            if (d.getFullDocumentData() == null)
-                log.warn("Document with ID {} did not get its XMI data set.", d.getId());
+            if (d.getFullDocumentData() == null) {
+                byte[] xmiData = cachedXmiByDocId.get(d.getId());
+                if (xmiData != null)
+                    d.setFullDocumentData(xmiData);
+                else
+                    log.warn("Document with ID {} did not get its XMI data set. The document specified the following " +
+                            "database connection: {}. If it is null, the following database connections are passed to search " +
+                            "for the document: {}. In none of those the document was found.", d.getId(), d.getDocumentDbConfiguration(), dbConnections);
+            }
         }
+        log.debug("Setting the XMI data to {} documents has been finished.", docsWithoutXmiData.size());
     }
 
     public void shutdown() {

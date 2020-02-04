@@ -1,0 +1,10 @@
+{
+  "multi_match": {
+    "query": "{{[diseaseSynonyms]}}",
+    "fields": {{clinical_trials_generic/fields_disease.json}},
+    "tie_breaker": 0.3,
+    "type": "{{disease_syn_match_type}}",
+    "slop": {{disease_slop}},
+    "boost": {{disease_syn_boost}}
+  }
+}

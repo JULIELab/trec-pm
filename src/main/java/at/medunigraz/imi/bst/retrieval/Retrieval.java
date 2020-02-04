@@ -13,17 +13,19 @@ import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
-    protected Query query;
-    private Logger log = LogManager.getLogger();
+public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
+    protected Query<Q> query;
+    private Logger log = LoggerFactory.getLogger(Retrieval.class);
     private ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
     private String experimentName;
@@ -31,6 +33,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
     private String indexName;
     private List<Retrieval<T, Q>> negativeBoosts;
     private IRScoreFeatureKey scoreKey;
+    private String indexSuffix;
 
     public Retrieval(String indexName) {
         this(indexName, new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL));
@@ -62,6 +65,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
+    public T withIndexSuffix(String suffix) {
+        indexSuffix = suffix;
+        esQuery.setIndexSuffix(suffix);
+        return (T) this;
+    }
+
     public T withStoredFields(String... fields) {
         esQuery.setStoredFields(fields);
         return (T) this;
@@ -77,12 +86,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         return (T) this;
     }
 
-    public T withTemplate(File template) {
+    public T withTemplate(String template) {
         query = new TemplateQueryDecorator(template, query);
         return (T) this;
     }
 
-    public T withSubTemplate(File template) {
+    public T withSubTemplate(String template) {
         query = new SubTemplateQueryDecorator(template, query);
         return (T) this;
     }
@@ -218,14 +227,17 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> {
         }
         List<ResultList<Q>> resultListSet = new ArrayList<>();
         for (Q topic : queryDescriptions) {
-            List<Result> results = query.query(topic);
+            Q cleanCopy = topic.getCleanCopy();
+            List<Result> results = query.query(cleanCopy);
+            if (results.isEmpty()) {
+                String index = topic.getIndex() != null ? topic.getIndex() : indexName;
+                if (indexSuffix != null && !indexSuffix.isBlank())
+                    index = index + indexSuffix;
+                log.debug("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index,Thread.currentThread(), new JSONObject(query.getJSONQuery()));
+            }
 
-            if (results.isEmpty())
-                //  throw new IllegalStateException("RESULT EMPTY for " + getExperimentId());
-                log.error("RESULT EMPTY for {}", getExperimentId());
 
-
-            ResultList<Q> resultList = new ResultList<>(topic);
+            ResultList<Q> resultList = new ResultList<>(cleanCopy);
             resultList.addAll(results);
             if (negativeBoosts != null) {
                 final Map<String, Result> resultsById = results.stream().collect(Collectors.toMap(Result::getId, Function.identity()));

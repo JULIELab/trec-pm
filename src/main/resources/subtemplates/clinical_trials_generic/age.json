@@ -1,0 +1,14 @@
+{
+    "range": {
+        "minimum_age": {
+            "lte": {{age}}
+        }
+    }
+},
+{
+    "range": {
+        "maximum_age": {
+            "gte": {{age}}
+        }
+    }
+}

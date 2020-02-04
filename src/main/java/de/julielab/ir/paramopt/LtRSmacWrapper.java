@@ -29,18 +29,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static de.julielab.ir.paramopt.RCConstants.RETRIEVAL_PARAMETERS;
-import static de.julielab.ir.paramopt.RCConstants.TEMPLATE;
+import static de.julielab.ir.ltr.features.FCConstants.RETRIEVALPARAMETERS;
+import static de.julielab.ir.ltr.features.FCConstants.TEMPLATE;
 import static de.julielab.java.utilities.ConfigurationUtilities.slash;
 
-public class LtRSmacWrapper extends SmacWrapper {
+public class LtRSmacWrapper extends SmacWrapperBase {
     private final static Logger log = LoggerFactory.getLogger(LtRSmacWrapper.class);
     private final TrecQrelGoldStandard<Topic> gs;
     private final String documentTable;
@@ -51,7 +48,7 @@ public class LtRSmacWrapper extends SmacWrapper {
     private int k = TrecConfig.SIZE;
 
     public static void main(String args[]) throws ConfigurationException {
-        new LtRSmacWrapper().runConfiguration(args);
+        new LtRSmacWrapper().parseAndRunConfiguration(args);
     }
 
     public LtRSmacWrapper() {
@@ -72,15 +69,15 @@ public class LtRSmacWrapper extends SmacWrapper {
     }
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         FeatureControlCenter.initialize(config.configurationAt(FCConstants.LTRFEATURES));
-        final List<List<Topic>> splits = gs.createStratifiedQueryPartitioning(nPartitions, t -> t.getDisease());
+        final List<List<Topic>> splits = gs.createPropertyBalancedQueryPartitioning(nPartitions, Arrays.asList(t -> t.getDisease()));
         int splitNum = Integer.valueOf(instance.replace("crossval-", ""));
 
         return calculateScoreForSplit(config, splitNum, splits);
     }
 
-    protected double calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<List<Topic>> splits) {
+    protected String calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<List<Topic>> splits) {
         try {
             List<Topic> test = splits.get(splitNum);
             final List<Topic> train = IntStream.range(0, nPartitions).filter(round -> round != splitNum).mapToObj(splits::get).flatMap(Collection::stream).collect(Collectors.toList());
@@ -99,7 +96,7 @@ public class LtRSmacWrapper extends SmacWrapper {
             Set<String> vocabulary = rankerAndVocabulary.getMiddle();
             TFIDF trainTfIdf = rankerAndVocabulary.getRight();
 
-            File template = new File(config.getString(slash(RETRIEVAL_PARAMETERS, TEMPLATE)));
+            String template = config.getString(slash(RETRIEVALPARAMETERS, TEMPLATE));
             final TrecPmRetrieval retrieval = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX).withResultsDir("myresultsdir/").withSubTemplate(template).withGeneSynonym().withUmlsDiseaseSynonym();
             final DocumentList<Topic> result = ranker.rank(testDocs);
 
@@ -138,12 +135,12 @@ public class LtRSmacWrapper extends SmacWrapper {
             final TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator("pmround" + splitNum + "ltr", "pmround" + splitNum + "ltr", output, qRelFile, TrecConfig.SIZE, false, "stats-tr/", GoldStandardType.OFFICIAL, sampleQrelFile);
             final Metrics metrics = trecMetricsCreator.computeMetrics();
 
-            return metrics.getInfNDCG();
+            return String.valueOf(metrics.getInfNDCG());
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return 0;
+        return null;
     }
 
     private Triple<RankLibRanker<Topic>, Set<String>, TFIDF> trainRanker(List<Topic> test, List<Topic> train, String vocabularyId, String tfidfFoldId, File modelFile, DocumentList<Topic> testDocs) throws IOException {

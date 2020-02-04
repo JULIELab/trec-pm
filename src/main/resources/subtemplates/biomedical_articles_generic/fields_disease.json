@@ -1,0 +1,5 @@
+[
+  "title^{{title_field_disease_boost}}",
+  "abstract^{{abstract_field_disease_boost}}",
+  "meshTags^{{meshTags_field_disease_boost}}"
+]

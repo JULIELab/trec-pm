@@ -7,7 +7,7 @@ import org.apache.commons.configuration2.tree.ImmutableNode;
 
 import java.io.File;
 
-public class ConfigWriterSmacWrapper extends SmacWrapper {
+public class ConfigWriterSmacWrapper extends SmacWrapperBase {
 
     public static void main(String args[]) throws ConfigurationException {
         final ConfigWriterSmacWrapper wrapper = new ConfigWriterSmacWrapper();
@@ -23,7 +23,7 @@ public class ConfigWriterSmacWrapper extends SmacWrapper {
     }
 
     @Override
-    protected double calculateScore(HierarchicalConfiguration<ImmutableNode> config, String instance, int seed) {
+    protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         throw new IllegalArgumentException("We want to stop here and only check if the configuration was right.");
     }
 }

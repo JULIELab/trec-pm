@@ -1,0 +1,35 @@
+<configuration scan="true" scanPeriod="10 seconds">
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
+            by default -->
+        <encoder>
+            <pattern>%d{HH:mm:ss}[%thread] %5p [%-20c{1}] %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>trecpm.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss}[%thread] %5p [%-20c{1}] %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="at.medunigraz.imi.bst.retrieval.ElasticSearchQuery" level="INFO"/>
+    <logger name="at.medunigraz.imi.bst.trec.search.ElasticSearch" level="INFO"/>
+    <logger name="de.julielab.ir.es.ElasticSearchSetup" level="WARN"/>
+    <logger name="de.julielab.ir.paramopt.EvaluateConfigurationRoute" level="INFO"/>
+    <logger name="de.julielab.ir.experiments.ablation.AblationExperiments" level="INFO"/>
+    <logger name="de.julielab.java.utilities.cache" level="INFO"/>
+    <logger name="de.julielab.ir.experiments.ablation.sigir20.Sigir20AblationExperiments" level="INFO"/>
+    <logger name="de.julielab.ir.experiments.ablation.sigir20.ConfigurationReproduction" level="INFO"/>
+    <logger name="de.julielab.ir.ltr.features.FeatureControlCenter" level="INFO"/>
+    <logger name="de.julielab.ir.ltr.RankerFromPm1718" level="INFO"/>
+    <logger name="de.julielab.ir.umls.UmlsSynsetProvider" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

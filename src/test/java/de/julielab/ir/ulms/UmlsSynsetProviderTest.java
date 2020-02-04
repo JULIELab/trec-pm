@@ -4,15 +4,17 @@ import com.google.common.collect.Sets;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class UmlsSynsetProviderTest {
 
-    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
-        private UmlsSynsetTestProvider(boolean containTermInSynset) {
-            super("src/test/resources/umls/example.synsets", "src/test/resources/umls/semanticTypes.test", UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
-        }
+    @Test
+    public void getPreferredTermForTerm() {
+        UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
+        assertThat(u.getPreftermForTerm("A")).isEqualTo("Bpref");
     }
 
     @Test
@@ -20,8 +22,8 @@ public class UmlsSynsetProviderTest {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(true);
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
-        assertEquals(2, u.getSynsets("A").size());
-        assertEquals(Sets.newHashSet(Sets.newHashSet("A", "B", "C"), Sets.newHashSet("A", "F", "G")), u.getSynsets("A"));
+        assertEquals(3, u.getSynsets("A").size());
+        assertEquals(Sets.newHashSet(Sets.newHashSet("A"), Sets.newHashSet("A", "B", "C"), Sets.newHashSet("A", "F", "G")), u.getSynsets("A"));
     }
 
     @Test
@@ -29,14 +31,14 @@ public class UmlsSynsetProviderTest {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
-        assertEquals(2, u.getSynsets("A").size());
-        assertEquals(Sets.newHashSet(Sets.newHashSet("B", "C"), Sets.newHashSet("F", "G")), u.getSynsets("A"));
+        assertEquals(3, u.getSynsets("A").size());
+        assertEquals(Sets.newHashSet(Collections.emptySet(), Sets.newHashSet("B", "C"), Sets.newHashSet("F", "G")), u.getSynsets("A"));
     }
 
     @Test
     public void testGetCuis() {
         UmlsSynsetProvider u = new UmlsSynsetTestProvider(false);
-        assertThat(u.getCuis("A")).containsExactlyInAnyOrder("CUI1", "CUI2");
+        assertThat(u.getCuis("A")).containsExactlyInAnyOrder("CUI1", "CUI2", "CUI3");
         assertThat(u.getCuis("B")).containsExactlyInAnyOrder("CUI1");
         assertThat(u.getCuis("C")).containsExactlyInAnyOrder("CUI1");
         assertThat(u.getCuis("F")).containsExactlyInAnyOrder("CUI2");
@@ -55,5 +57,11 @@ public class UmlsSynsetProviderTest {
         // The term 'A' is associated with CUI1 and CUI2 in the examplet.synsets file. Those
         // have been set the semantic types tested for.
         assertThat(u.getSemanticTypes("A")).containsExactlyInAnyOrder("T121", "T130", "T109");
+    }
+
+    private class UmlsSynsetTestProvider extends UmlsSynsetProvider{
+        private UmlsSynsetTestProvider(boolean containTermInSynset) {
+            super("src/test/resources/umls/example.synsets", "src/test/resources/umls/semanticTypes.test", "src/test/resources/umls/example.prefterms",UmlsSynsetProvider.DEFAULT_SEPARATOR, containTermInSynset, false);
+        }
     }
 }

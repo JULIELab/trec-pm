@@ -1,7 +1,6 @@
 import fasttext
 
 import sys
-import json
 from struct import *
 
 

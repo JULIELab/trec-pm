@@ -2,10 +2,11 @@ package de.julielab.ir.ltr.features;
 
 import cc.mallet.pipe.Pipe;
 import cc.mallet.types.Instance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * <p>
@@ -24,6 +25,7 @@ import java.util.function.Consumer;
  * throrough experiments unfeasible anyway.</p>
  */
 public abstract class FeatureGroup extends Pipe {
+    private final static Logger log = LoggerFactory.getLogger(FeatureGroup.class);
     /**
      * This is the set of features contained in this feature group.
      */
@@ -40,6 +42,7 @@ public abstract class FeatureGroup extends Pipe {
 
     @Override
     public final Instance pipe(Instance instance) {
+        log.trace("Piping instance through feature group {}", name);
         if (!isActive())
             return instance;
         if (features.isEmpty())
@@ -53,6 +56,7 @@ public abstract class FeatureGroup extends Pipe {
     protected void addFeature(String name, FeatureValueAssigner valueAssinger) {
         features.add(new Feature(name, valueAssinger));
     }
+
     /**
      * <p>For feature groups with toggleable feature, this method will apply all active features.</p>
      * <p>The feature group

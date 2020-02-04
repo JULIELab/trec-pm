@@ -1,0 +1,9 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "{{[cancerBoosters]}}"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "query_string": {
+    "query": "{{[chemotherapyBoosters]}}",
+    "fields": {{clinical_trials_generic/fields_keywords.json}},
+    "boost": {{conditional_chemo_boost}}
+  }
+}

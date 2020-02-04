@@ -1,0 +1,3 @@
+{
+	"match_all": { "boost" : {{match_all_boost}} }
+}

@@ -16,19 +16,15 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class QueryExpansionExperimenter {
-    private static final File EMBEDDINGS = new File(SolidTumorQueryDecorator.class.getResource("/synonyms/embeddings.txt").getFile());
+    private static final String EMBEDDINGS = "/synonyms/embeddings.txt";
 
     private static final String BOOST = "0.01";
 
-    private static final File BA_TEMPLATE = new File(
-            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba.json").getFile());
-    private static final File CT_TEMPLATE = new File(
-            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct.json").getFile());
+    private static final String BA_TEMPLATE = "/templates/query_expansion/ba.json";
+    private static final String CT_TEMPLATE = "/templates/query_expansion/ct.json";
 
-    private static final File BA_BASE_TEMPLATE = new File(
-            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ba-base.json").getFile());
-    private static final File CT_BASE_TEMPLATE = new File(
-            QueryExpansionExperimenter.class.getResource("/templates/query_expansion/ct-base.json").getFile());
+    private static final String BA_BASE_TEMPLATE = "/templates/query_expansion/ba-base.json";
+    private static final String CT_BASE_TEMPLATE = "/templates/query_expansion/ct-base.json";
 
     private static final GoldStandard<Topic> BA_GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
     private static final GoldStandard<Topic> CT_GOLD_STANDARD = TrecPMGoldStandardFactory.trialsOfficialAggregated();

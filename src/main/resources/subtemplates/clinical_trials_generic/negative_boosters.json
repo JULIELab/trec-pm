@@ -1,0 +1,13 @@
+{
+  "bool": {
+    "should": {
+      "multi_match": {
+        "query": "{{negative_pm_boosters}}",
+        "fields": {{clinical_trials_generic/fields_keywords.json}},
+        "tie_breaker": 0.3,
+        "type": "best_fields",
+        "boost": {{negative_kw_boost}}
+      }
+    }
+  }
+}

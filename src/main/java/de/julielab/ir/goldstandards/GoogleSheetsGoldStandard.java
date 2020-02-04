@@ -8,18 +8,19 @@ import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.ir.sheets.GoogleSheets;
 import org.apache.commons.lang3.NotImplementedException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
 public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
-    private static final Logger LOG = LogManager.getLogger();
+    private static final Logger LOG = LoggerFactory.getLogger(GoogleSheetsGoldStandard.class);
 
     private static final int TOPIC_COLUMN = 0;
     private static final int DOC_COLUMN = 2;
@@ -104,8 +105,18 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     }
 
     @Override
+    public void writeQrelFile(File qrelFile, Collection<Q> queries) {
+        throw new NotImplementedException("Use TrecQrelGoldStandard.writeQrelFile instead.");
+    }
+
+    @Override
     public void writeSampleQrelFile(File qrelFile) {
         throw new NotImplementedException("Use TrecQrelGoldStandard.writeSampleQrelFile instead.");
+    }
+
+    @Override
+    public void writeSampleQrelFile(File qrelFile, Collection<Q> queries) {
+        throw new NotImplementedException("Use TrecQrelGoldStandard.writeQrelFile instead.");
     }
 
     @Override
@@ -116,5 +127,11 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
     @Override
     public Function<QueryDescription, String> getQueryIdFunction() {
         return q -> String.valueOf(q.getNumber());
+    }
+
+
+    @Override
+    protected void setIndexToQuery(Q query) {
+        // not implemented, use default index
     }
 }

@@ -1,7 +1,6 @@
 package de.julielab.ir.pm.pmclassifier.lucene;
 
 import de.julielab.ir.pm.pmclassifier.*;
-import org.apache.logging.log4j.LogManager;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -17,6 +16,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.IOContext;
 import org.apache.lucene.store.RAMDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 public class LuceneClassifier implements PMClassifier {
-    private static final org.apache.logging.log4j.Logger LOG = LogManager.getLogger();
+
+    private static final Logger LOG = LoggerFactory.getLogger(LuceneClassifier.class);
     private Directory dir;
 
     public void train(File documentJsonZip, File gsTable) throws DataReadingException {
