@@ -5,7 +5,6 @@ import cc.mallet.pipe.SerialPipes;
 import cc.mallet.pipe.Token2FeatureVector;
 import cc.mallet.types.*;
 import com.wcohen.ss.TFIDF;
-import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -20,9 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.julielab.ir.ltr.features.FCConstants.*;
@@ -192,18 +188,17 @@ public class FeatureControlCenter {
         OriginalDocumentRetrieval.getInstance().setXmiCasDataToDocuments(documents, null, xmiTableName);
 
         final InstanceList instanceList = new InstanceList(serialPipes);
-        log.debug("Creating features for {} training documents.", documents.size());
+        log.info("Creating features for {} training documents.", documents.size());
 
         int linewidth = 80;
 
 
+        long time = System.currentTimeMillis();
         Map<Thread, SerialPipes> pipesPerThread = new ConcurrentHashMap<>();
-        List<Future<?>> futures = documents.stream().map(document -> Multithreading.getInstance().submit(() -> {
-            // We use multithreading here. Each thread has its own configuration which is why we copy it here
-            if (!isInitialized())
-                initialize(configuration);
+        int done = 0;
+        for (Document document : documents) {
             final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
-            SerialPipes pipes = pipesPerThread.compute(Thread.currentThread(), (k, v) -> v != null ? v : new SerialPipes(createFeaturePipes(tfidf, vocabulary,ta, da)));
+            SerialPipes pipes = pipesPerThread.compute(Thread.currentThread(), (k, v) -> v != null ? v : new SerialPipes(createFeaturePipes(tfidf, vocabulary, ta, da)));
             pipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
             // We set the single instance 'serialPipes' instead of the thread-specific instance 'pipes'. The thread-specific pipes
             // only exist for concurrency. Ultimately, we just want one pipe and one set of alphabets.
@@ -213,49 +208,83 @@ public class FeatureControlCenter {
             // the CASes back to the CAS pool after usage. The CAS pool is managed by the
             // OriginalDocumentRetrieval class.
             document.releaseJCas();
-        })).collect(Collectors.toList());
 
 
-        long time = System.currentTimeMillis();
-        for (int i = 0; i < futures.size(); i++) {
-            try {
-                futures.get(i).get();
-                double percentage = (i+1) / (double) documents.size();
-                int progress = (int) (linewidth * percentage);
-                StringBuilder sb = new StringBuilder();
-                sb.append("[");
-                for (int j = 0; j < linewidth; j++) {
-                    if (j < progress)
-                        sb.append("=");
-                    else
-                        sb.append(" ");
-                }
-                sb.append("] " + (i+1) + "/" + documents.size() + "\r");
-                System.out.print(sb.toString());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+            double percentage = (done + 1) / (double) documents.size();
+            int progress = (int) (linewidth * percentage);
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int j = 0; j < linewidth; j++) {
+                if (j < progress)
+                    sb.append("=");
+                else
+                    sb.append(" ");
             }
+            sb.append("] " + (done + 1) + "/" + documents.size() + "\r");
+            System.out.print(sb.toString());
+            ++done;
+
         }
+        // Below: Multithreaded code. It unfortunately leads to non-identical feature sets over multiple runs (even with another number of scaling factors)
+        // and, consequently, to different models and different results (a range of approx. 2% (inf)NDCG was observed across multiple runs)
+//        List<Future<?>> futures = documents.stream().map(document -> Multithreading.getInstance().submit(() -> {
+//            // We use multithreading here. Each thread has its own configuration which is why we copy it here
+//            if (!isInitialized())
+//                initialize(configuration);
+//            final Instance instance = new Instance(document, document.getRelevance(), document.getId(), document);
+//            SerialPipes pipes = pipesPerThread.compute(Thread.currentThread(), (k, v) -> v != null ? v : new SerialPipes(createFeaturePipes(tfidf, vocabulary,ta, da)));
+//            pipes.newIteratorFrom(new SingleInstanceIterator(instance)).next();
+//            // We set the single instance 'serialPipes' instead of the thread-specific instance 'pipes'. The thread-specific pipes
+//            // only exist for concurrency. Ultimately, we just want one pipe and one set of alphabets.
+//            document.setFeaturePipes(serialPipes);
+//            // Within the pipes, the documents need access to their CAS. Since we only have a limited
+//            // amount of those for performance and scalability considerations, we need to release
+//            // the CASes back to the CAS pool after usage. The CAS pool is managed by the
+//            // OriginalDocumentRetrieval class.
+//            document.releaseJCas();
+//        })).collect(Collectors.toList());
+
+
+
+//        for (int i = 0; i < futures.size(); i++) {
+//            try {
+//                futures.get(i).get();
+//                double percentage = (i+1) / (double) documents.size();
+//                int progress = (int) (linewidth * percentage);
+//                StringBuilder sb = new StringBuilder();
+//                sb.append("[");
+//                for (int j = 0; j < linewidth; j++) {
+//                    if (j < progress)
+//                        sb.append("=");
+//                    else
+//                        sb.append(" ");
+//                }
+//                sb.append("] " + (i+1) + "/" + documents.size() + "\r");
+//                System.out.print(sb.toString());
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            }
+//        }
         time = System.currentTimeMillis() - time;
 
-        System.out.println();
-        log.debug("Finished train document feature creation. Took " + time + "ms ("+(time/1000d)+"s).");
+//        System.out.println();
+        log.debug("Finished train document feature creation. Took " + time + "ms (" + (time / 1000d) + "s).");
     }
 
     @NotNull
     private List<Pipe> createFeaturePipes(TFIDF tfidf, Set<String> vocabulary, Alphabet targetAlphabet, Alphabet dataAlphabet) {
         List<Pipe> featurePipes = new ArrayList<>();
         featurePipes.add(new Document2TokenPipe(targetAlphabet));
-       // if (documentEmbeddingFeatureGroup == null)
-          //  documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
+        // if (documentEmbeddingFeatureGroup == null)
+        //  documentEmbeddingFeatureGroup = new DocumentEmbeddingFeatureGroup();
         Stream.of(
                 new TfidfFeatureGroup(tfidf, vocabulary),
                 new RunTopicMatchAnnotatorFeatureGroup(),
                 new TopicMatchFeatureGroup(),
                 new IRSimilarityFeatureGroup(),
-             //   documentEmbeddingFeatureGroup,
+                //   documentEmbeddingFeatureGroup,
                 new DocumentEmbeddingFeatureGroup(),
                 new DocumentShapeFeatureGroup()
         ).filter(this::filterActive)

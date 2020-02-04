@@ -19,7 +19,7 @@ public class Multithreading {
         executorService = Executors.newFixedThreadPool(TrecConfig.CONCURRENCY_MAX);
     }
 
-    public static Multithreading getInstance() {
+    public synchronized static Multithreading getInstance() {
         if (instance == null)
             instance = new Multithreading();
         return instance;
@@ -34,7 +34,7 @@ public class Multithreading {
         return executorService.submit(callable);
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         log.info("Shutting down Multithreading executor service.");
         executorService.shutdown();
         log.info("Shutdown successful: {}", executorService.isShutdown());

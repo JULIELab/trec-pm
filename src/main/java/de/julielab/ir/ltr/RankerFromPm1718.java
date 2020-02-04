@@ -3,7 +3,7 @@ package de.julielab.ir.ltr;
 import at.medunigraz.imi.bst.trec.model.Task;
 import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import ciir.umass.edu.learning.RANKER_TYPE;
-import de.julielab.ir.Multithreading;
+import ciir.umass.edu.utilities.MyThreadPool;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
@@ -41,7 +41,8 @@ public class RankerFromPm1718 extends PrecisionMedicineReranker {
         ElasticClientFactory.getClient().close();
         OriginalDocumentRetrieval.getInstance().shutdown();
         FastTextEmbeddingFeatures.shutdown();
-        Multithreading.getInstance().shutdown();
+        MyThreadPool.getInstance().shutdown();
+//        Multithreading.getInstance().shutdown();
     }
 
 }
