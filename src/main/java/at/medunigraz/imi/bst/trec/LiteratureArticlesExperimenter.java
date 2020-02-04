@@ -63,7 +63,7 @@ public class LiteratureArticlesExperimenter {
 //                LiteratureArticlesRetrievalRegistry.jlpmtrboost(TrecConfig.SIZE));
 //        jlpmtrboost.setReRanker(new TreatmentRanker());
 
-        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(  jlpmletor//, jlpmltrin
+        Set<Experiment> experiments = new LinkedHashSet<>(Arrays.asList(  jlpmletor, jlpmltrin
 //                , umlshyp, lexigramhyp, nogenesyn, withgenedesc
         ));
         for (Experiment exp : experiments) {
