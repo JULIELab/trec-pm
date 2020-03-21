@@ -54,3 +54,4 @@ src/main/resources/internal
 
 # Python Notebooks checkpoints
 .ipynb_checkpoints
+.Rproj.user
