@@ -2,6 +2,7 @@ library(dplyr)
 library(ggplot2)
 library(gridExtra)
 library(stringr)
+library(coin) # For approximate statistical testing
 
 #mug_green <- "#007A25"
 tug_red <- "#ff0a6e"
@@ -257,5 +258,30 @@ precision_recall <- function(results) {
   dev.off()
 }
 precision_recall(results)
+
+### Statistical Tests ###
+# Our experiments are paired/dependent, i.e., all methods are applied to all topics.
+# Based on https://stats.stackexchange.com/questions/6127/which-permutation-test-implementation-in-r-to-use-instead-of-t-tests-paired-and
+baseline <- 'boost'
+experiments <- levels(results$run)
+experiments <- experiments[experiments!=baseline]
+for (metric in metrics) {
+  base_results <- results %>%
+    filter(measure==metric, topic!='all', run==baseline) %>%
+    mutate(value = as.numeric(value))
+  for (exp in experiments) {
+    print(metric)
+    print(exp)
+    
+    exp_results <- results %>%
+      filter(measure==metric, topic!='all', run==exp) %>%
+      mutate(value = as.numeric(value))
+    DV <- c(base_results$value, exp_results$value)
+    IV <- factor(rep(c("A", "B"), c(length(base_results$value), length(exp_results$value))))
+    id <- factor(rep(1:length(base_results$value), 2))    # factor by topic
+    test_results <- oneway_test(DV ~ IV | id, distribution=approximate()) # Two-sided by default
+    print(pvalue(test_results))
+  }
+}
 
 setwd(old_wd)
