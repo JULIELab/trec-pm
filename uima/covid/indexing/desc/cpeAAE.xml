@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+        
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+        
+    <primitive>false</primitive>
+        
+    <delegateAnalysisEngineSpecifiers>
+                
+        <delegateAnalysisEngine key="JCoRe Abstract Database Multiplier">
+                        
+            <import location="JCoRe Abstract Database Multiplier.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCore ElasticSearch Consumer">
+                        
+            <import location="JCore ElasticSearch Consumer.xml"/>
+                    
+        </delegateAnalysisEngine>
+            
+    </delegateAnalysisEngineSpecifiers>
+        
+    <analysisEngineMetaData>
+                
+        <name/>
+                
+        <configurationParameters/>
+                
+        <configurationParameterSettings/>
+                
+        <flowConstraints>
+                        
+            <fixedFlow>
+                                
+                <node>JCoRe Abstract Database Multiplier</node>
+                                
+                <node>JCore ElasticSearch Consumer</node>
+                            
+            </fixedFlow>
+                    
+        </flowConstraints>
+                
+        <capabilities/>
+                
+        <operationalProperties>
+                        
+            <modifiesCas>true</modifiesCas>
+                        
+            <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
+                        
+            <outputsNewCASes>false</outputsNewCASes>
+                    
+        </operationalProperties>
+            
+    </analysisEngineMetaData>
+    
+</analysisEngineDescription>
