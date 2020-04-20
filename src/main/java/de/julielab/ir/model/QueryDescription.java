@@ -4,6 +4,7 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -108,8 +109,8 @@ public abstract class QueryDescription {
      */
     public Map<String, String> getAttributes() {
         Map<String, String> ret = new HashMap<>();
-        Field[] fields = getClass().getFields();
-        for (Field f : fields) {
+        Stream<Field> fields = Stream.concat(Arrays.stream(getClass().getDeclaredFields()), Arrays.stream(getClass().getSuperclass().getDeclaredFields()));
+        for (Field f : (Iterable<Field>)() -> fields.iterator()) {
             QueryDescriptionAttribute annotation = f.getAnnotation(QueryDescriptionAttribute.class);
             try {
                 if (annotation != null) {

@@ -68,12 +68,24 @@ public class CovidTopic extends QueryDescription {
         return element.getAttribute(name);
     }
 
+    public String getQuery() {
+        return query;
+    }
+
     public void setQuery(String query) {
         this.query = query;
     }
 
+    public String getQuestion() {
+        return question;
+    }
+
     public void setQuestion(String question) {
         this.question = question;
+    }
+
+    public String getNarrative() {
+        return narrative;
     }
 
     public void setNarrative(String narrative) {

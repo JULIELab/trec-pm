@@ -64,7 +64,7 @@ public class TopicMatchFeatureGroupTest {
             FeatureControlCenter.reconfigure(featureConfig);
 
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
-        final Topic testTopic = topicSet.getTopics().get(4);
+        final Topic testTopic = topicSet.get(4);
         // This topic matches to the document text
         // The following topic expansions are semantic nonsense and just serve the test.
         testTopic.withDiseaseSynonym("membrane");
