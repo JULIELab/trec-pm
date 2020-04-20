@@ -5,11 +5,11 @@ task('download-costosys') {
 }
 
 task('install-framework', type: Exec) {
-	inputs.dir '../src/main'
-	inputs.file '../pom.xml'
-	outputs.dir '../target'
+	inputs.dir '../../src/main'
+	inputs.file '../../pom.xml'
+	outputs.dir '../../target'
 	executable 'bash'
-	args '-c', 'mvn clean install -f ../pom.xml -DskipTests=true'
+	args '-c', 'mvn clean install -f ../../pom.xml -DskipTests=true'
 }
 
 task('install-uima-components', type: Exec) {
