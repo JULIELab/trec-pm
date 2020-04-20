@@ -10,27 +10,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.CLIInteractionUtilities;
-import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
-import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsAction;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequestBuilder;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.cluster.health.ClusterShardHealth;
 import org.elasticsearch.common.settings.Settings;
@@ -79,7 +73,7 @@ public class ElasticSearchSetup {
 
     ;
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
           createPubmedIndices();
         createCtIndices();
 //        deletePubmedIndices();
@@ -98,7 +92,7 @@ public class ElasticSearchSetup {
         try {
             final boolean doDelete = CLIInteractionUtilities.readYesNoFromStdInWithMessage("WARNING: You are about to delete all " + indexbaseName + " indices. Are you sure?", false);
             if (doDelete) {
-                final Client client = ElasticClientFactory.getClient();
+                final RestHighLevelClient client = ElasticClientFactory.getClient();
                 for (String similarity : allSimilarities) {
                     for (String copy : independentCopies) {
                         String indexName = indexbaseName + "_" + similarity + "_" + copy;
@@ -111,25 +105,25 @@ public class ElasticSearchSetup {
         }
     }
 
-    private static void deleteIndex(Client client, String indexName) {
+    private static void deleteIndex(RestHighLevelClient client, String indexName) throws IOException {
         log.info("Deleting index {}.", indexName);
         final DeleteIndexRequest deleteIndexRequest = Requests.deleteIndexRequest(indexName);
-        final DeleteIndexResponse deleteIndexResponse = client.admin().indices().delete(deleteIndexRequest).actionGet();
+        AcknowledgedResponse deleteIndexResponse = client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
         if (!deleteIndexResponse.isAcknowledged())
             throw new IllegalArgumentException("Could not delete index " + indexName + ", ES did not acknowledge.");
     }
 
-    public static void createPubmedIndices() {
+    public static void createPubmedIndices() throws IOException {
         String esConfigTemplate = Path.of("es-mappings", "cikm19-pubmed-template.json").toFile().getAbsolutePath();
         createIndices(TrecConfig.ELASTIC_BA_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
     }
 
-    public static void createCtIndices() {
+    public static void createCtIndices() throws IOException {
         String esConfigTemplate = Path.of("es-mappings", "cikm19-ct-template.json").toFile().getAbsolutePath();
         createIndices(TrecConfig.ELASTIC_CT_INDEX, esConfigTemplate, defaultProperties, TrecConfig.ELASTIC_CT_TYPE);
     }
 
-    public static void createIndices(String indexBasename, String configurationTemplateFile, Map<String, String> properties, String esType) {
+    public static void createIndices(String indexBasename, String configurationTemplateFile, Map<String, String> properties, String esType) throws IOException {
         Map<String, String> parameters = new HashMap<>(properties);
         for (String similarity : allSimilarities) {
             for (String copy : independentCopies) {
@@ -149,7 +143,7 @@ public class ElasticSearchSetup {
         }
     }
 
-    public static void configureSimilarity(String indexBasename, boolean isExactIndexName, SimilarityParameters parameters, String esType) {
+    public static void configureSimilarity(String indexBasename, boolean isExactIndexName, SimilarityParameters parameters, String esType) throws IOException {
         log.trace("Got desired similarity parameters for index {}: {}", indexBasename, parameters);
         // Strategy: We "mis"use the TemplateQueryDecorator to inject the similarity setting parameters into the JSON template that otherwise adheres to the ElasticSearch required format
         // For this to work we must create a map with the template property keys and the desired values
@@ -174,9 +168,10 @@ public class ElasticSearchSetup {
         JSONObject map = new JSONObject();
         map.put("similarity", settingsObject);
 
-        final Client client = ElasticClientFactory.getClient();
+        final RestHighLevelClient client = ElasticClientFactory.getClient();
         final String indexName = isExactIndexName ? indexBasename : indexBasename + "_" + parameters.getBaseSimilarity();
-        GetSettingsResponse getSettingsResponse = client.admin().indices().getSettings(new GetSettingsRequestBuilder(client, GetSettingsAction.INSTANCE, indexName).request()).actionGet();
+
+        GetSettingsResponse getSettingsResponse = client.indices().getSettings(new GetSettingsRequest().indices(indexName), RequestOptions.DEFAULT);
         Settings s = getSettingsResponse.getIndexToSettings().get(indexName);
         boolean unequalSettingFound = false;
         log.trace("Checking if similarity settings for index {} must be adapted to desired settings {}", indexBasename, settingsObject);
@@ -221,25 +216,23 @@ public class ElasticSearchSetup {
      * @param esType           The index type.
      * @param similarity       The base similarity used by the index. Is used as a index name suffix.
      */
-    private static void configureIndex(String indexBasename, boolean isExactIndexName, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) {
-        final Client client = ElasticClientFactory.getClient();
+    private static void configureIndex(String indexBasename, boolean isExactIndexName, JSONObject settingsJson, JSONObject mappingJson, String esType, String similarity) throws IOException {
+        final RestHighLevelClient client = ElasticClientFactory.getClient();
         final String indexName = isExactIndexName ? indexBasename : indexBasename + "_" + similarity;
         boolean indexExisted = false;
 
-        final IndicesExistsRequest indicesExistsRequest = Requests.indicesExistsRequest(indexName);
-        final IndicesExistsResponse indicesExistsResponse = client.admin().indices().exists(indicesExistsRequest).actionGet();
-        if (!indicesExistsResponse.isExists()) {
+        GetIndexRequest getIndexRequest = new GetIndexRequest(indexName);
+        if (!client.indices().exists(getIndexRequest, RequestOptions.DEFAULT)) {
             log.info("Index {} does not exist and is created.", indexName);
-            final CreateIndexRequest indexRequest = Requests.createIndexRequest(indexName);
-            indexRequest.settings(settingsJson.toString(), XContentType.JSON);
-            final CreateIndexResponse createIndexResponse = client.admin().indices().create(indexRequest).actionGet();
+            org.elasticsearch.client.indices.CreateIndexRequest createIndexRequest = new org.elasticsearch.client.indices.CreateIndexRequest(indexName);
+            CreateIndexResponse createIndexResponse = client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
             if (!createIndexResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not create index " + indexName);
         } else {
             indexExisted = true;
             log.info("Closing index {} for settings/mapping update.", indexName);
             final CloseIndexRequest closeIndexRequest = Requests.closeIndexRequest(indexName);
-            final CloseIndexResponse closeIndexResponse = client.admin().indices().close(closeIndexRequest).actionGet();
+            AcknowledgedResponse closeIndexResponse = client.indices().close(closeIndexRequest, RequestOptions.DEFAULT);
             if (!closeIndexResponse.isAcknowledged())
                 throw new IllegalStateException("Could not close index " + indexName + ", ES did not acknowledge.");
         }
@@ -250,7 +243,7 @@ public class ElasticSearchSetup {
             final JSONObject similaritySettings = new JSONObject();
             similaritySettings.put("similarity", similarityJson);
             updateSettingsRequest.settings(similaritySettings.toString(), XContentType.JSON);
-            final UpdateSettingsResponse updateSettingsResponse = client.admin().indices().updateSettings(updateSettingsRequest).actionGet();
+            AcknowledgedResponse updateSettingsResponse = client.indices().putSettings(updateSettingsRequest, RequestOptions.DEFAULT);
             if (!updateSettingsResponse.isAcknowledged())
                 throw new IllegalStateException("Could not update index settings for index" + indexName + ", ES did not acknowledge.");
         }
@@ -259,21 +252,20 @@ public class ElasticSearchSetup {
             final PutMappingRequest putMappingRequest = Requests.putMappingRequest(indexName);
             putMappingRequest.source(mappingJson.toString(), XContentType.JSON);
             putMappingRequest.type(esType);
-            final PutMappingResponse putMappingResponse = client.admin().indices().putMapping(putMappingRequest).actionGet();
+            AcknowledgedResponse putMappingResponse = client.indices().putMapping(putMappingRequest, RequestOptions.DEFAULT);
             if (!putMappingResponse.isAcknowledged())
                 throw new IllegalArgumentException("Could not put mapping " + mappingJson + ", ES did not acknowledge.");
         }
         if (indexExisted) {
             log.info("Reopening index {}.", indexName);
             final OpenIndexRequest openIndexRequest = Requests.openIndexRequest(indexName);
-            ActionFuture<OpenIndexResponse> future = client.admin().indices().open(openIndexRequest);
-            final OpenIndexResponse openIndexResponse = future.actionGet();
+            OpenIndexResponse openIndexResponse = client.indices().open(openIndexRequest, RequestOptions.DEFAULT);
             // The sleep is necessary because there will be a connection error with the ES5.4 transport client
             // when we connect too quickly again to the index
             log.trace("Waiting for index {} to have recovered all shards from closing/opening", indexName);
             int numRed = Integer.MAX_VALUE;
             while (numRed > 0) {
-                Map<Integer, ClusterShardHealth> shardHealth = client.admin().cluster().health(new ClusterHealthRequest(indexName)).actionGet().getIndices().get(indexName).getShards();
+                Map<Integer, ClusterShardHealth> shardHealth = client.cluster().health(new ClusterHealthRequest(indexName), RequestOptions.DEFAULT).getIndices().get(indexName).getShards();
                 for (Integer shardNum : shardHealth.keySet()) {
                     if (ClusterHealthStatus.RED == shardHealth.get(shardNum).getStatus())
                         ++numRed;

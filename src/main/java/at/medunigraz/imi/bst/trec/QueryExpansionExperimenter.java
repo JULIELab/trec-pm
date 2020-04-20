@@ -11,6 +11,7 @@ import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class QueryExpansionExperimenter {
     private static final GoldStandard<Topic> BA_GOLD_STANDARD = TrecPMGoldStandardFactory.pubmedOfficialAggregated();
     private static final GoldStandard<Topic> CT_GOLD_STANDARD = TrecPMGoldStandardFactory.trialsOfficialAggregated();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Biomedical Articles
         TrecPmRetrieval baBaseline = new TrecPmRetrieval(TrecConfig.ELASTIC_BA_INDEX, TrecConfig.SIZE)
                 .withExperimentName("ba-baseline")
