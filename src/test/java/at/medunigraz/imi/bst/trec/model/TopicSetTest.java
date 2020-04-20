@@ -13,7 +13,7 @@ public class TopicSetTest {
 	@Test
 	public void testFromXML() {
 		String topicsFile ="/topics/topics2017.xml";
-		List<Topic> topics = (new TopicSet(topicsFile, Challenge.TREC_PM, 2017)).getTopics();
+		List<Topic> topics = (new TopicSet(topicsFile, Challenge.TREC_PM, 2017));
 		
 		assertEquals(30, topics.size());
 		assertTrue(topics.contains(new Topic().withChallenge(Challenge.TREC_PM).withYear(2017).withNumber(30)));

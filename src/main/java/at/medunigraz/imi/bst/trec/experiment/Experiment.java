@@ -110,7 +110,7 @@ public class Experiment<Q extends QueryDescription> {
      */
     public boolean isCalculateTrecEvalWithMissingResults() {
         // If are querying just a subset of the GS, we won't get metrics for all topics and thus need to set -c to false.
-        if (topicSet.getTopics().size() < goldStandard.getQueriesAsList().size()) {
+        if (topicSet.size() < goldStandard.getQueriesAsList().size()) {
             return false;
         }
         return true;
@@ -157,7 +157,7 @@ public class Experiment<Q extends QueryDescription> {
 
         LOG.info("Running collection " + longExperimentId + "...");
 
-        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics());
+        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet);
         if (reRanker != null)
             lastResultListSet = rerank(lastResultListSet);
 

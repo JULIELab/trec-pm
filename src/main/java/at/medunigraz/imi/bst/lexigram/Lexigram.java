@@ -215,7 +215,7 @@ public class Lexigram {
 
         Set<String> diseaseSet = new HashSet<>();
 
-        for (Topic topic : topicSet.getTopics()) {
+        for (Topic topic : topicSet) {
             String disease = topic.getDisease();
 
             // Do not repeat diseases
