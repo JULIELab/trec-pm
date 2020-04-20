@@ -3,6 +3,8 @@ package de.julielab.ir.model;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import java.util.stream.Stream;
 public abstract class QueryDescription {
     protected Challenge challenge;
     protected int year;
+    @QueryDescriptionAttribute
     protected int number;
     protected String index;
 
@@ -103,7 +106,22 @@ public abstract class QueryDescription {
      *
      * @return The query attributes.
      */
-    public abstract Map<String, String> getAttributes();
+    public Map<String, String> getAttributes() {
+        Map<String, String> ret = new HashMap<>();
+        Field[] fields = getClass().getFields();
+        for (Field f : fields) {
+            QueryDescriptionAttribute annotation = f.getAnnotation(QueryDescriptionAttribute.class);
+            try {
+                if (annotation != null) {
+                    f.setAccessible(true);
+                    ret.put(f.getName(), String.valueOf(f.get(this)));
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns a copy of this query description without any expansions or other modifications.
