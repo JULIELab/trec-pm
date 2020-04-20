@@ -28,7 +28,7 @@ public class RetrievalTest {
     @Test
     public void withSize() {
         final String indexName = TrecConfig.ELASTIC_BA_INDEX;
-        final List<Topic> topics = TrecPMTopicSetFactory.topics2019().getTopics();
+        final List<Topic> topics = TrecPMTopicSetFactory.topics2019();
         final int SIZE = 10;
 
         ResultList<Topic> firstTopicResults = new TrecPmRetrieval(indexName, SIZE)

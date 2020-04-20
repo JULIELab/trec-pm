@@ -66,7 +66,7 @@ public final class TrecPMGoldStandardFactory {
      * @return
      */
     private static TrecQrelGoldStandard<Topic> gs(Task task, int year, GoldStandardType type, String qrels, File documentDbConfiguration) {
-        TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, task, year, type, TrecPMTopicSetFactory.topics(year).getTopics(), qrels);
+        TrecQrelGoldStandard<Topic> gs = new TrecQrelGoldStandard<>(Challenge.TREC_PM, task, year, type, TrecPMTopicSetFactory.topics(year), qrels);
         try {
             if (documentDbConfiguration != null)
                 gs.setDocumentDatabaseConfiguration(documentDbConfiguration);

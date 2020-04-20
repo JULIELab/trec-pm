@@ -30,7 +30,7 @@ public class DiseaseUmlsHypernymQueryDecoratorTest {
         decorator.setSynsetProvider(new UmlsSynsetTestProvider());
         decorator.setRelationsProvider(new UmlsRelationsTestProvider());
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
-        for (Topic topic : topicSet.getTopics()) {
+        for (Topic topic : topicSet) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))
                 assertThat(topic.getDiseaseHypernyms()).contains("melanoma parent");
