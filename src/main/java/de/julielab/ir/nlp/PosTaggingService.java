@@ -1,6 +1,5 @@
 package de.julielab.ir.nlp;
 
-import de.julielab.jcore.ae.jtbd.main.TokenAnnotator;
 import de.julielab.jcore.types.Sentence;
 import de.julielab.jcore.types.Token;
 import org.apache.uima.UIMAException;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class PosTaggingService {
