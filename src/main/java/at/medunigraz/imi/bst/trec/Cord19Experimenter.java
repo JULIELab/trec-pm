@@ -19,6 +19,7 @@ import de.julielab.ir.model.CovidTopic;
 import de.julielab.ir.model.CovidTopicSet;
 import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.elasticsearch.client.ElasticsearchClient;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -36,9 +37,7 @@ public final class Cord19Experimenter {
         Experiment<CovidTopic> exp = new Experiment<>(null, Cord19RetrievalRegistry.defaultRun(), TrecCovidTopicSetFactory.topicsRound1());
         exp.run();
 
-        OriginalDocumentRetrieval.getInstance().shutdown();
         CacheService.getInstance().commitAllCaches();
-
     }
 
 }
