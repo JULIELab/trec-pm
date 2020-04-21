@@ -19,6 +19,7 @@ public final class TrecConfig {
     public static final String ELASTIC_CT_INDEX_2018 = getString("ELASTIC_CT_INDEX_2018");
     public static final String ELASTIC_CT_INDEX_2019 = getString("ELASTIC_CT_INDEX_2019");
     public static final String ELASTIC_CT_TYPE = getString("ELASTIC_CT_TYPE");
+    public static final String ELASTIC_CORD19_INDEX = getString("ELASTIC_CORD19_INDEX");
     public static final String ELASTIC_HOSTNAME = getString("ELASTIC_HOSTNAME");
     public static final int ELASTIC_PORT = getInteger("ELASTIC_PORT");
     public static final String ELASTIC_CLUSTER = getString("ELASTIC_CLUSTER");

@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Topic;
+import at.medunigraz.imi.bst.trec.model.TopicSet;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -68,7 +69,7 @@ public class GoldStandardTest {
     @Test
     public void testBalancedSplit() {
         AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
-        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getGeneField));
+        List<TopicSet> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getGeneField), TopicSet::new);
         for (List<Topic> l : geneBalancedPartioning) {
             long c = l.stream().map(Topic::getGeneField).filter(gene -> gene.contains("BRAF")).count();
             assertTrue(c > 0);
@@ -78,7 +79,7 @@ public class GoldStandardTest {
     @Test
     public void testMultiplyBalancedSplit() {
         AggregatedGoldStandard<Topic> gs = new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
-        List<List<Topic>> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getDisease));
+        List<TopicSet> geneBalancedPartioning = gs.createPropertyBalancedQueryPartitioning(10, Arrays.asList(Topic::getDisease), TopicSet::new);
         for (List<Topic> l : geneBalancedPartioning) {
             System.out.println(l.stream().map(t -> t.getDisease() + ", " + t.getGeneField()).collect(Collectors.joining("-")));
             long c = l.stream().map(Topic::getDisease).filter(d -> d.toLowerCase().contains("melanoma")).count();
