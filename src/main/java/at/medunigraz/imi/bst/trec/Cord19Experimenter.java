@@ -34,6 +34,7 @@ public final class Cord19Experimenter {
         CacheService.initialize(new TrecCacheConfiguration());
 
         Experiment<CovidTopic> exp = new Experiment<>(null, Cord19RetrievalRegistry.defaultRun(), TrecCovidTopicSetFactory.topicsRound1());
+        exp.run();
 
         OriginalDocumentRetrieval.getInstance().shutdown();
         CacheService.getInstance().commitAllCaches();
