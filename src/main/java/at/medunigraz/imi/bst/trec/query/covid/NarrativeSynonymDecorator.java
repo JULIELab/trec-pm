@@ -43,13 +43,36 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
 
     private boolean removeFromBoW(String word) {
-        // TODO check those words that should be removed from the query and be replaced by synonyms like coronavirus
-        return false;
+        // check those words that should be removed from the query and be replaced by synonyms like coronavirus
+        if (word.equals("coronavirus"))
+            return true;
+        else if (word.equals("animal"))
+            return true;
+        else if (word.equals("virus"))
+            return true;
+        else
+            return false;
     }
 
     private Set<String> getSynonyms(String word) {
-        // TODO return synonyms of this word like coronavirus -> Covid19
-        return Collections.emptySet();
+        // return synonyms of this word like coronavirus -> Covid19
+        Set<String> synonyms = new HashSet<>();
+        if (word.equals("coronavirus")) {
+            synonyms.add("COVID19");
+            synonyms.add("Covid19");
+            synonyms.add("COVID-19");
+            synonyms.add("Covid-19");
+            synonyms.add("SARS-CoV-2");
+            synonyms.add("SARS-CoV2");
+            synonyms.add("2019-nCoV");
+        } else if (word.equals("virus")){
+            synonyms.add("SARS-CoV-2");
+            synonyms.add("SARS-CoV2");
+            synonyms.add("2019-nCoV");
+        } else if (word.equals("animal")){
+            synonyms.add("mouse");
+        }
+        return synonyms;
     }
 
 
