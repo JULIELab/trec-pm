@@ -7,7 +7,7 @@ import at.medunigraz.imi.bst.trec.model.TopicGene;
 
 import java.util.Set;
 
-public class ResistantDrugsQueryDecorator extends DynamicQueryDecorator {
+public class ResistantDrugsQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private static final Cosmic cosmic = Cosmic.getInstance();
 

@@ -6,7 +6,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.List;
 
-public class DiseaseHypernymQueryDecorator extends DynamicQueryDecorator {
+public class DiseaseHypernymQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     public DiseaseHypernymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);

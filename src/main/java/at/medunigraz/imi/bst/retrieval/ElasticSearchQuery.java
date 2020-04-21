@@ -27,6 +27,11 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     private Collection<String> filterValues;
     // This suffix is appended to the index name given or retrieved from the query
     private String indexSuffix;
+    /**
+     * When not null, for each value in the given field only the first document in a result list will be returned.
+     */
+    private String unifyingField;
+    private int resultListeSizeCutoff;
 
     public ElasticSearchQuery(int size, String index) {
         this.size = size;
@@ -61,6 +66,10 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         this.filterValues = null;
     }
 
+    public void setUnifyingField(String unifyingField) {
+        this.unifyingField = unifyingField;
+    }
+
     @Override
     public List<Result> query(T topic) {
         String index = topic.getIndex() != null ? topic.getIndex() : this.index;
@@ -75,6 +84,12 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         }
         if (filterField != null) {
             es.setFilterOnFieldValues(filterField, filterValues);
+        }
+        if (unifyingField != null) {
+            es.setUnifyingField(unifyingField);
+        }
+        if (resultListeSizeCutoff > 0) {
+            es.setResultListeSizeCutoff(resultListeSizeCutoff);
         }
         return es.query(new JSONObject(jsonQuery), size);
     }
@@ -110,5 +125,9 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         indexSuffix = suffix;
     }
 
+
+    public void setResultListeSizeCutoff(int resultListeSizeCutoff) {
+        this.resultListeSizeCutoff = resultListeSizeCutoff;
+    }
 
 }

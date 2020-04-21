@@ -4,7 +4,7 @@ import at.medunigraz.imi.bst.lexigram.Lexigram;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 
-public class DiseasePreferredTermQueryDecorator extends DynamicQueryDecorator {
+public class DiseasePreferredTermQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     public DiseasePreferredTermQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);

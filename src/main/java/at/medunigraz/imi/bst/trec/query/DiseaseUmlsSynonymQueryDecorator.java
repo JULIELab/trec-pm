@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator {
+public class DiseaseUmlsSynonymQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private transient UmlsSynsetProvider umlsSynsetProvider;
     private transient Matcher parenthesisM;
