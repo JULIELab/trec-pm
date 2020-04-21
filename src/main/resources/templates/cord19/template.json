@@ -1,0 +1,10 @@
+{
+	"bool": {
+		"must": [
+			{{cord19/query.json}}
+		],
+		"should": [
+			{{cord19/question.json}}
+		]
+	}
+}

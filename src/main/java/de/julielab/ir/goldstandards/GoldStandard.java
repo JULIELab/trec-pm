@@ -1,6 +1,7 @@
 package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
+import at.medunigraz.imi.bst.trec.model.QueryDescriptionSet;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
@@ -8,6 +9,7 @@ import de.julielab.ir.model.QueryDescription;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +35,7 @@ public interface GoldStandard<Q extends QueryDescription> {
      * @param topicProperties The functions returning the property to sort the queries by.
      * @return The query-property-balanced partitions.
      */
-    default List<List<Q>> createPropertyBalancedQueryPartitioning(int nPartitions, List<Function<Q, String>> topicProperties) {
+    default<S extends List<Q>> List<S> createPropertyBalancedQueryPartitioning(int nPartitions, List<Function<Q, String>> topicProperties, Supplier<S> querySetSupplier) {
         Stream<Q> sortedQueries = getQueries().sorted((q1, q2) -> {
             int comparison = 0;
             int numProp = 0;
@@ -47,9 +49,9 @@ public interface GoldStandard<Q extends QueryDescription> {
             return comparison;
         });
 
-        List<List<Q>> partitioning = new ArrayList<>();
+        List<S> partitioning = new ArrayList<>();
         for (int i = 0; i < nPartitions; i++)
-            partitioning.add(new ArrayList<>());
+            partitioning.add(querySetSupplier.get());
 
         int i = 0;
         Iterator<Q> qIt = sortedQueries.iterator();
@@ -85,7 +87,7 @@ public interface GoldStandard<Q extends QueryDescription> {
         return partitioning;
     }
 
-    List<Q> getQueriesAsList();
+    QueryDescriptionSet<Q> getQueriesAsList();
 
     Map<Q, DocumentList<Q>> getQrelDocumentsPerQuery();
 

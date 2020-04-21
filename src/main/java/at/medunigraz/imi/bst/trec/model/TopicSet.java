@@ -12,13 +12,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class TopicSet extends QueryDescriptionSet<Topic>{
 
 	private static final String TAGNAME = "topic";
 
+	public TopicSet() {
+		super();
+	}
+
 	public TopicSet(Collection<Topic> topics) {
 		super(topics);
+	}
+
+	@Override
+	public Supplier<QueryDescriptionSet<Topic>> getSupplier() {
+		return TopicSet::new;
 	}
 
 	public TopicSet(String xmlFile, Challenge challenge, int year) {

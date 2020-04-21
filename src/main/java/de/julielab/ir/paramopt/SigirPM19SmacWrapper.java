@@ -38,7 +38,7 @@ public class SigirPM19SmacWrapper extends SmacWrapperBase {
         FeatureControlCenter.initialize(config);
         //TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2Generic(TrecConfig.SIZE);
         TrecPmRetrieval trecPmRetrieval = LiteratureArticlesRetrievalRegistry.jlpmcommon2paramopt(TrecConfig.SIZE);
-        Experiment<QueryDescription> exp = new Experiment<>(GOLD_STANDARD, trecPmRetrieval);
+        Experiment<Topic> exp = new Experiment<>(GOLD_STANDARD, trecPmRetrieval);
         Metrics metrics = exp.run();
         logMetrics(config, metrics);
         // SMAC always minimizes the objective
