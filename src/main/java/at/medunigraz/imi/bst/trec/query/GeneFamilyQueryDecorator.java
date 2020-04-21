@@ -5,7 +5,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.regex.Pattern;
 
-public class GeneFamilyQueryDecorator extends DynamicQueryDecorator {
+public class GeneFamilyQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     /**
      * Matches patterns for removal, normally including numbers. E.g.:

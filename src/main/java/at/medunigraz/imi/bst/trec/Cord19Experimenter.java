@@ -9,6 +9,8 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.model.TrecCovidTopicSetFactory;
+import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
+import de.julielab.ir.Multithreading;
 import de.julielab.ir.OriginalDocumentRetrieval;
 import de.julielab.ir.TrecCacheConfiguration;
 import de.julielab.ir.goldstandards.TrecPMGoldStandardFactory;
@@ -38,6 +40,7 @@ public final class Cord19Experimenter {
         exp.run();
 
         CacheService.getInstance().commitAllCaches();
+        ElasticClientFactory.getClient().close();
     }
 
 }

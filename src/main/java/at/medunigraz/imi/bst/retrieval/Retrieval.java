@@ -303,4 +303,30 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
             throw new IllegalArgumentException(e);
         }
     }
+
+    /**
+     * Causes the result list to be unique with respect to values of the given field. Only the first document
+     * with a specific value will be included in the result list.
+     * @param fieldname The name of the field from which each value should appear almost once in the results.
+     * @return
+     */
+    public T withUnifyingField(String fieldname) {
+        esQuery.setUnifyingField(fieldname);
+        return (T) this;
+    }
+
+    /**
+     * <p>
+     * Cuts the size of the returned result lists to <tt>cutoffSize</tt> even if ElasticSearch returned more
+     * results due to a higher setting of {@link #withSize(int)} or the default {@link TrecConfig#SIZE}.
+     * </p>
+     * <p>This is useful when filtering out duplicate field values. Then, {@link #withSize(int)} is set higher than the
+     * ultimately desired number as a buffer for filtered-away duplicates.</p>
+     * @param cutoffSize
+     * @return
+     */
+    public T withResultListSizeCutoff(int cutoffSize) {
+        esQuery.setResultListeSizeCutoff(cutoffSize);
+        return (T) this;
+    }
 }

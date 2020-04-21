@@ -8,7 +8,7 @@ import de.julielab.ir.umls.UmlsSynsetProvider;
 import java.util.Collection;
 import java.util.Set;
 
-public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator {
+public class DiseaseUmlsHypernymQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private transient UmlsSynsetProvider synsetProvider;
     private transient UmlsRelationsProvider relationsProvider;

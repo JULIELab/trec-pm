@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileBasedQueryDecorator extends DynamicQueryDecorator {
+public class FileBasedQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileBasedQueryDecorator.class);
 

@@ -6,7 +6,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.Optional;
 
-public class GeneDescriptionQueryDecorator extends DynamicQueryDecorator {
+public class GeneDescriptionQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private static final NCBIGeneInfo NCBI_GENE_INFO = NCBIGeneInfo.getInstance();
 

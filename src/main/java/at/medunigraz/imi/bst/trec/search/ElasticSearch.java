@@ -41,6 +41,11 @@ public class ElasticSearch implements SearchEngine {
     // document IDs.
     private BoolQueryBuilder filterQuery;
     private String[] storedFields;
+    /**
+     * When not null, for each value in the given field only the first document in a result list will be returned.
+     */
+    private String unifyingField;
+    private int resultListeSizeCutoff;
 
     public ElasticSearch() {
         cache = cacheMap.compute(Thread.currentThread(), (k, v) ->
@@ -61,6 +66,10 @@ public class ElasticSearch implements SearchEngine {
     public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
         this(index, parameters);
         this.types = types;
+    }
+
+    public void setUnifyingField(String unifyingField) {
+        this.unifyingField = unifyingField;
     }
 
     public void setStoredFields(String[] storedFields) {
@@ -92,7 +101,7 @@ public class ElasticSearch implements SearchEngine {
         if (filterQuery != null) {
             qb = filterQuery.must(qb);
         }
-        String idString = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "");
+        String idString = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "")+unifyingField;
         idString = idString.replaceAll("\\s+", " ");
         final String cacheKey = DigestUtils.md5Hex(idString);
         LOG.trace("Query ID for cache: {}", cacheKey);
@@ -157,11 +166,17 @@ public class ElasticSearch implements SearchEngine {
                 //LOG.trace(JsonUtils.prettify(response.toString()));
                 SearchHit[] results = response.getHits().getHits();
 
+                Set<String> uniqueFieldValues = unifyingField != null ? new HashSet<>() : null;
                 List<Result> ret = new ArrayList<>();
                 for (SearchHit hit : results) {
                     Result result = new Result(hit.getId(), hit.getScore());
                     result.setSourceFields(hit.getSourceAsMap());
-                    ret.add(result);
+                    if (unifyingField != null && result.getSourceFields().get(unifyingField) != null && uniqueFieldValues.add((String) result.getSourceFields().get(unifyingField)))
+                        ret.add(result);
+                    else if (unifyingField == null)
+                        ret.add(result);
+                    if (resultListeSizeCutoff > 0 && ret.size() >= resultListeSizeCutoff)
+                        break;
                 }
                 return ret;
             }
@@ -171,4 +186,7 @@ public class ElasticSearch implements SearchEngine {
         return null;
     }
 
+    public void setResultListeSizeCutoff(int resultListeSizeCutoff) {
+        this.resultListeSizeCutoff = resultListeSizeCutoff;
+    }
 }
