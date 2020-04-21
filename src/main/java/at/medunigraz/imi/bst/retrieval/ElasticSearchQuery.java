@@ -11,12 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchQuery.class);
     private String jsonQuery;
-
-    private String[] types = null;
 
     private String index;
     private SimilarityParameters parameters;
@@ -29,15 +28,13 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     // This suffix is appended to the index name given or retrieved from the query
     private String indexSuffix;
 
-    public ElasticSearchQuery(int size, String index, String... types) {
+    public ElasticSearchQuery(int size, String index) {
         this.size = size;
         this.index = index;
-        this.types = types;
     }
 
-    public ElasticSearchQuery(String index, String... types) {
+    public ElasticSearchQuery(String index) {
         this.index = index;
-        this.types = types;
     }
 
     public void setStoredFields(String[] storedFields) {
@@ -66,18 +63,13 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
 
     @Override
     public List<Result> query(T topic) {
-        ElasticSearch es;
         String index = topic.getIndex() != null ? topic.getIndex() : this.index;
         if (indexSuffix != null && !indexSuffix.isBlank())
             index = index + indexSuffix;
         log.trace("Searching on index {} for query {}", index, topic);
         if (index == null)
             throw new IllegalStateException("No index was specified for this ElasticSearchQuery and the given topic does also not specify an index.");
-        if (this.types != null) {
-            es = new ElasticSearch(index, parameters, this.types);
-        } else {
-            es = new ElasticSearch(index, parameters);
-        }
+        ElasticSearch es = new ElasticSearch(index, parameters);
         if (storedFields != null) {
             es.setStoredFields(storedFields);
         }
@@ -117,4 +109,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     public void setIndexSuffix(String suffix) {
         indexSuffix = suffix;
     }
+
+
 }

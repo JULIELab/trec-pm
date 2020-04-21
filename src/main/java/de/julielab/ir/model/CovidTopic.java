@@ -6,6 +6,8 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
 public class CovidTopic extends QueryDescription {
     @QueryDescriptionAttribute
@@ -15,17 +17,63 @@ public class CovidTopic extends QueryDescription {
     @QueryDescriptionAttribute
     private String narrative;
 
+    public List<Set<String>> getMandatorySynonymWords() {
+        return mandatorySynonymWords;
+    }
+
+    public void setMandatorySynonymWords(List<Set<String>> mandatorySynonymWords) {
+        this.mandatorySynonymWords = mandatorySynonymWords;
+    }
+
+    public List<Set<String>> getOptionalSynonymWords() {
+        return optionalSynonymWords;
+    }
+
+    public void setOptionalSynonymWords(List<Set<String>> optionalSynonymWords) {
+        this.optionalSynonymWords = optionalSynonymWords;
+    }
+
+    /**
+     * <p>
+     * This field should contain parts of the query that pose alternatives to each other. They will be used in a
+     * dismax query. This causes documents to be checked for the best match of one these words instead of
+     * matches for all of these words while summing the scores for each alternative appearance.
+     * </p>
+     * <p>
+     * Each element of this list represents one set of alternatives.
+     * </p>
+     */
+    @QueryDescriptionAttribute
+    private List<Set<String>> mandatorySynonymWords;
+    /**
+     * This field should contain those parts of the query that are not reflected in {@link #mandatorySynonymWords}.
+     * Thus, the bulk of the query terms will go into this field.
+     */
+    @QueryDescriptionAttribute
+    private Set<String> mandatoryBoW;
+    /**
+     * This field is analogous to {@link #mandatorySynonymWords} but will be searched as optional relevance boosters.
+     * Thus, documents can still be returned as a hit when they do not contain any of the words herein.
+     */
+    @QueryDescriptionAttribute
+    private List<Set<String>> optionalSynonymWords;
+    /**
+     * This field is analogous to {@link #mandatoryBoW} but will be searched as optional relevance boosters.
+     * Thus, documents can still be returned as a hit when they do not contain any of the words herein.
+     */
+    @QueryDescriptionAttribute
+    private Set<String> optionalBoW;
+
     /**
      * Builds a Topic out of a XML file in the format:
      *
      * <pre>
      * {@code
-     * <topic number="1">
-     *     <disease>Acute lymphoblastic leukemia</disease>
-     *     <gene>ABL1, PTPN11</gene>
-     *     <demographic>12-year-old male</demographic>
-     *     <other>No relevant factors</other>
-     * </topic>
+     *  <topic number="3">
+     *     <query>coronavirus immunity</query>
+     *     <question>will SARS-CoV2 infected people develop immunity? Is cross protection possible?</question>
+     *     <narrative>seeking studies of immunity developed due to infection with SARS-CoV2 or cross protection gained due to infection with other coronavirus types</narrative>
+     *   </topic>
      * }
      * </pre>
      *
@@ -66,6 +114,22 @@ public class CovidTopic extends QueryDescription {
 
     private static String getAttribute(Element element, String name) {
         return element.getAttribute(name);
+    }
+
+    public Set<String> getMandatoryBoW() {
+        return mandatoryBoW;
+    }
+
+    public void setMandatoryBoW(Set<String> mandatoryBoW) {
+        this.mandatoryBoW = mandatoryBoW;
+    }
+
+    public Set<String> getOptionalBoW() {
+        return optionalBoW;
+    }
+
+    public void setOptionalBoW(Set<String> optionalBoW) {
+        this.optionalBoW = optionalBoW;
     }
 
     public String getQuery() {
