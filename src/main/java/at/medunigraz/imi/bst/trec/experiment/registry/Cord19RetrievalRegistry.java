@@ -24,6 +24,8 @@ public final class Cord19RetrievalRegistry {
 
     public static Cord19Retrieval defaultRun() {
         return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("cord19def")
+                .withStoredFields("cord19_uid")
+                .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
                 .withSubTemplate(TEMPLATE);
     }
 }

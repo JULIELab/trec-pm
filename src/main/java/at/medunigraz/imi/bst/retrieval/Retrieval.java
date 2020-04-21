@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
+import at.medunigraz.imi.bst.trec.experiment.Cord19Retrieval;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
@@ -34,6 +35,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
     private List<Retrieval<T, Q>> negativeBoosts;
     private IRScoreFeatureKey scoreKey;
     private String indexSuffix;
+    private Function<Result, String> docIdFunction;
 
     public Retrieval(String indexName) {
         this(indexName, new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL));
@@ -282,5 +284,14 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         }
 
         return experimentName;
+    }
+
+    public T withDocIdFunction(Function<Result, String> docIdFunction) {
+        this.docIdFunction = docIdFunction;
+        return (T) this;
+    }
+
+    public Function<Result, String> getDocIdFunction() {
+        return docIdFunction;
     }
 }
