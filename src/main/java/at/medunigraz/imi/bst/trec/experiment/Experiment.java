@@ -4,10 +4,7 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.Metrics;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.Ranker;
@@ -30,7 +27,7 @@ public class Experiment<Q extends QueryDescription> {
     private GoldStandard goldStandard;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
-    private TopicSet topicSet;
+    private QueryDescriptionSet<Q> topicSet;
     private int k = TrecConfig.SIZE;
     private List<ResultList<Q>> lastResultListSet;
     // This ranker will be applied to retrieved results, if it is present.
@@ -44,8 +41,8 @@ public class Experiment<Q extends QueryDescription> {
      * @param goldStandard
      * @param retrieval
      */
-    public Experiment(GoldStandard goldStandard, Retrieval retrieval) {
-        this(goldStandard, retrieval, new TopicSet(goldStandard.getQueriesAsList()));
+    public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval) {
+        this(goldStandard, retrieval, goldStandard.getQueriesAsList());
     }
 
     /**
@@ -55,7 +52,7 @@ public class Experiment<Q extends QueryDescription> {
      * @param retrieval
      * @param topics
      */
-    public Experiment(GoldStandard goldStandard, Retrieval retrieval, TopicSet topics) {
+    public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval, QueryDescriptionSet<Q> topics) {
         this.goldStandard = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
@@ -94,11 +91,11 @@ public class Experiment<Q extends QueryDescription> {
         return retrieval.getExperimentId();
     }
 
-    public TopicSet getTopicSet() {
+    public QueryDescriptionSet<Q> getTopicSet() {
         return topicSet;
     }
 
-    public void setTopicSet(TopicSet topicSet) {
+    public void setTopicSet(QueryDescriptionSet<Q> topicSet) {
         this.topicSet = topicSet;
     }
 

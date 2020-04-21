@@ -14,8 +14,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class QueryDescriptionSet<T extends QueryDescription> extends ArrayList<T> {
+public abstract class QueryDescriptionSet<T extends QueryDescription> extends ArrayList<T> {
 
 	public QueryDescriptionSet(Collection<T> topics) {
 		super(topics);
@@ -42,5 +43,17 @@ public class QueryDescriptionSet<T extends QueryDescription> extends ArrayList<T
 			t.setYear(year);
 			add(t);
 		}
+	}
+
+	public QueryDescriptionSet() {
+
+	}
+
+	public abstract Supplier<QueryDescriptionSet<T>> getSupplier();
+
+    public QueryDescriptionSet<T> getCleanCopy() {
+		QueryDescriptionSet<T> copy = getSupplier().get();
+		stream().map(QueryDescription::getCleanCopy).map(q -> (T)q).forEach(copy::add);
+		return copy;
 	}
 }

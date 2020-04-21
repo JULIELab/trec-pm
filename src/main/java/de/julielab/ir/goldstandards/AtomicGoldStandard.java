@@ -2,6 +2,7 @@ package de.julielab.ir.goldstandards;
 
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
+import at.medunigraz.imi.bst.trec.model.QueryDescriptionSet;
 import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -29,7 +30,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
     /**
      * All queries.
      */
-    protected List<Q> queries;
+    protected QueryDescriptionSet<Q> queries;
     protected Challenge challenge;
     protected Task task;
     protected int year;
@@ -45,8 +46,8 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
      */
     protected Map<Integer, Q> queriesByNumber;
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries) {
-        this.queries = queries.stream().map(q -> (Q)q.getCleanCopy()).collect(Collectors.toList());
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, QueryDescriptionSet<Q> queries) {
+        this.queries = queries.getCleanCopy();
         this.challenge = challenge;
         this.task = task;
         this.year = year;
@@ -54,18 +55,18 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         this.queries.forEach(this::setIndexToQuery);
     }
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, String qrelsFile, BiFunction<String, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, QueryDescriptionSet<Q> queries, String qrelsFile, BiFunction<String, Map<Integer, Q>, DocumentList<Q>> qrelsReader) {
         this(challenge, task ,year, type, queries);
         qrelDocuments = qrelsReader.apply(qrelsFile, getQueriesByNumber());
     }
 
-    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, List<Q> queries, DocumentList<Q> qrelDocuments) {
+    public AtomicGoldStandard(Challenge challenge, Task task, int year, GoldStandardType type, QueryDescriptionSet<Q> queries, DocumentList<Q> qrelDocuments) {
         this(challenge, task ,year, type, queries);
         this.qrelDocuments = qrelDocuments;
     }
 
     @Override
-    public List<Q> getQueriesAsList() {
+    public QueryDescriptionSet<Q> getQueriesAsList() {
         return queries;
     }
 
@@ -138,7 +139,7 @@ public abstract class AtomicGoldStandard<Q extends QueryDescription> implements 
         return queries.stream();
     }
 
-    public void setQueries(List<Q> queries) {
+    public void setQueries(QueryDescriptionSet<Q> queries) {
         this.queries = queries;
     }
 

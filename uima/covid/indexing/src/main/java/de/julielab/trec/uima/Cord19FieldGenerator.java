@@ -10,6 +10,7 @@ import de.julielab.jcore.types.Title;
 import de.julielab.jcore.types.pubmed.AbstractText;
 import de.julielab.jcore.types.pubmed.Header;
 import de.julielab.jcore.types.pubmed.OtherID;
+import org.apache.commons.lang.StringUtils;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.text.AnnotationIndex;
@@ -20,11 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Cord19FieldGenerator extends FieldGenerator {
+    private final static Logger log = LoggerFactory.getLogger(Cord19FieldGenerator.class);
+
     public Cord19FieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
     }
 
-    private final static Logger log = LoggerFactory.getLogger(Cord19FieldGenerator.class);
     @Override
     public Document addFields(JCas aJCas, Document doc) throws CASException, FieldGenerationException {
         addDocumentIds(aJCas, doc);
@@ -41,7 +43,7 @@ public class Cord19FieldGenerator extends FieldGenerator {
             String captionType = c.getCaptionType();
             if (captionType == null)
                 captionType = "none";
-            doc.addField("caption_"+captionType, c.getCoveredText());
+            doc.addField("caption_" + captionType, c.getCoveredText());
         }
     }
 
@@ -49,7 +51,8 @@ public class Cord19FieldGenerator extends FieldGenerator {
         AnnotationIndex<Section> sectionIndex = aJCas.getAnnotationIndex(Section.type);
         for (Section s : sectionIndex) {
             Title sectionHeading = s.getSectionHeading();
-            doc.addField("section",  s.getCoveredText());
+            doc.addField("section_title", sectionHeading.getCoveredText());
+            doc.addField("section_text", s.getCoveredText());
         }
     }
 
@@ -61,7 +64,7 @@ public class Cord19FieldGenerator extends FieldGenerator {
             ++i;
         }
         if (i != 1) {
-            log.warn("There were {} abstracts in document {}", i, doc.get("paper_id"));
+            log.warn("There were {} abstracts in document {}", i, doc.getId());
         }
     }
 
@@ -77,14 +80,16 @@ public class Cord19FieldGenerator extends FieldGenerator {
 
     private void addDocumentIds(JCas aJCas, Document doc) {
         Header h = JCasUtil.selectSingle(aJCas, Header.class);
-        doc.addField("paper_id", h.getId());
+        doc.addField("paper_id", h.getDocId());
+        doc.setId(h.getDocId());
         FSArray otherIDs = h.getOtherIDs();
         if (otherIDs != null) {
             for (FeatureStructure fs : otherIDs) {
                 OtherID otherID = (OtherID) fs;
                 String source = otherID.getSource().toLowerCase().replaceAll("-|\\s+", "_");
                 String id = otherID.getId();
-                doc.addField(source, id);
+                if (!StringUtils.isBlank(id))
+                    doc.addField(source, id);
             }
         }
     }

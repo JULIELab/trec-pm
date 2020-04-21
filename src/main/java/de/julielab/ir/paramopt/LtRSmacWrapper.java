@@ -71,13 +71,13 @@ public class LtRSmacWrapper extends SmacWrapperBase {
     @Override
     protected String calculateScore(HierarchicalConfiguration<ImmutableNode> config, String[] metricsToReturn, String instance, int seed) {
         FeatureControlCenter.initialize(config.configurationAt(FCConstants.LTRFEATURES));
-        final List<List<Topic>> splits = gs.createPropertyBalancedQueryPartitioning(nPartitions, Arrays.asList(t -> t.getDisease()));
+        final List<TopicSet> splits = gs.createPropertyBalancedQueryPartitioning(nPartitions, Arrays.asList(t -> t.getDisease()), TopicSet::new);
         int splitNum = Integer.valueOf(instance.replace("crossval-", ""));
 
         return calculateScoreForSplit(config, splitNum, splits);
     }
 
-    protected String calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<List<Topic>> splits) {
+    protected String calculateScoreForSplit(HierarchicalConfiguration<ImmutableNode> config, int splitNum, List<TopicSet> splits) {
         try {
             List<Topic> test = splits.get(splitNum);
             final List<Topic> train = IntStream.range(0, nPartitions).filter(round -> round != splitNum).mapToObj(splits::get).flatMap(Collection::stream).collect(Collectors.toList());
