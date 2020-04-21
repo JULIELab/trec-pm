@@ -93,8 +93,8 @@ public class CovidTopic extends QueryDescription {
     }
 
     @Override
-    public <Q extends QueryDescription> Q getCleanCopy() {
-        return null;
+    public CovidTopic getCleanCopy() {
+        return new CovidTopic().withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
     }
 
     public CovidTopic withNarrative(String narrative) {
