@@ -34,7 +34,6 @@ public class NarrativeSynonymDecoratorTest {
         decorator.query(topic);
 
         Map<String, String> actual = dummyQuery.getTopic().getAttributes();
-        System.out.println(actual.toString());
         Assert.assertThat(actual, IsMapContaining.hasEntry("mandatoryBoW", "[model]"));
         Assert.assertThat(actual, IsMapContaining.hasEntry("mandatorySynonymWords", "[[COVID-19, SARS-CoV2, SARS-CoV-2, COVID19, Covid-19, Covid19, 2019-nCoV], [mouse], []]"));
     }

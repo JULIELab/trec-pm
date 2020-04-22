@@ -14,14 +14,13 @@ import java.util.*;
 
 public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic> {
 
-    public NarrativeSynonymDecorator(Query decoratedQuery) {
+    public NarrativeSynonymDecorator(Query<CovidTopic> decoratedQuery) {
         super(decoratedQuery);
     }
 
 
     @Override
     public CovidTopic expandTopic(CovidTopic topic) {
-        //System.out.println(topic.getMandatoryBoW().toString());
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
         if (topic.getOptionalBoW() != null) {
@@ -48,24 +47,26 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
     private boolean removeFromBoW(String word) {
         // check those words that should be removed from the query and be replaced by synonyms like coronavirus
-        if (word.toLowerCase().equals("coronavirus"))
-            return true;
-        else if (word.toLowerCase().equals("animal"))
-            return true;
-        else if (word.toLowerCase().equals("virus"))
-            return true;
-        else if (word.toLowerCase().equals("covid19"))
-            return true;
-        else if (word.toLowerCase().equals("covid-19"))
-            return true;
-        else if (word.toLowerCase().equals("sars-cov-2"))
-            return true;
-        else if (word.toLowerCase().equals("sars-cov2"))
-            return true;
-        else if (word.toLowerCase().equals("2019-ncov"))
-            return true;
-        else
-            return false;
+        switch (word.toLowerCase()) {
+            case "coronavirus":
+                return true;
+            case "animal":
+                return true;
+            case "virus":
+                return true;
+            case "covid19":
+                return true;
+            case "covid-19":
+                return true;
+            case "sars-cov-2":
+                return true;
+            case "sars-cov2":
+                return true;
+            case "2019-ncov":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private Set<String> getSynonyms(String word) {
