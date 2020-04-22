@@ -44,7 +44,7 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         DOMAIN_STOPWORDS.add("patients");
     }
 
-    public WordRemovalQueryDecorator(Query decoratedQuery) {
+    public WordRemovalQueryDecorator(Query<CovidTopic> decoratedQuery) {
         super(decoratedQuery);
         readStopwords();
     }
@@ -61,7 +61,6 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         // filter the narrative
         unfilteredWords.removeAll(DOMAIN_STOPWORDS);
         topic.setMandatoryBoW(unfilteredWords);
-        //System.out.println(decoratedQuery.query(topic).get(0));
         return decoratedQuery.query(topic);
     }
 
