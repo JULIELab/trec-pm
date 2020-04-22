@@ -21,10 +21,14 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
     @Override
     public CovidTopic expandTopic(CovidTopic topic) {
+        //System.out.println(topic.getMandatoryBoW().toString());
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
-        List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
-        topic.setOptionalSynonymWords(optionalSynonyms);
+        if (topic.getOptionalBoW() != null) {
+            List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
+            topic.setOptionalSynonymWords(optionalSynonyms);
+        }
+
         return topic;
     }
 
@@ -44,11 +48,21 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
     private boolean removeFromBoW(String word) {
         // check those words that should be removed from the query and be replaced by synonyms like coronavirus
-        if (word.equals("coronavirus"))
+        if (word.toLowerCase().equals("coronavirus"))
             return true;
-        else if (word.equals("animal"))
+        else if (word.toLowerCase().equals("animal"))
             return true;
-        else if (word.equals("virus"))
+        else if (word.toLowerCase().equals("virus"))
+            return true;
+        else if (word.toLowerCase().equals("covid19"))
+            return true;
+        else if (word.toLowerCase().equals("covid-19"))
+            return true;
+        else if (word.toLowerCase().equals("sars-cov-2"))
+            return true;
+        else if (word.toLowerCase().equals("sars-cov2"))
+            return true;
+        else if (word.toLowerCase().equals("2019-ncov"))
             return true;
         else
             return false;
@@ -57,20 +71,44 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
     private Set<String> getSynonyms(String word) {
         // return synonyms of this word like coronavirus -> Covid19
         Set<String> synonyms = new HashSet<>();
-        if (word.equals("coronavirus")) {
-            synonyms.add("COVID19");
-            synonyms.add("Covid19");
-            synonyms.add("COVID-19");
-            synonyms.add("Covid-19");
-            synonyms.add("SARS-CoV-2");
-            synonyms.add("SARS-CoV2");
-            synonyms.add("2019-nCoV");
-        } else if (word.equals("virus")){
-            synonyms.add("SARS-CoV-2");
-            synonyms.add("SARS-CoV2");
-            synonyms.add("2019-nCoV");
-        } else if (word.equals("animal")){
-            synonyms.add("mouse");
+        switch (word.toLowerCase()) {
+            case "coronavirus":
+                synonyms.add("COVID19");
+                synonyms.add("Covid19");
+                synonyms.add("COVID-19");
+                synonyms.add("Covid-19");
+                synonyms.add("SARS-CoV-2");
+                synonyms.add("SARS-CoV2");
+                synonyms.add("2019-nCoV");
+                break;
+            case "virus":
+                synonyms.add("SARS-CoV-2");
+                synonyms.add("SARS-CoV2");
+                synonyms.add("2019-nCoV");
+                break;
+            case "animal":
+                synonyms.add("mouse");
+                break;
+            case "covid19":
+                synonyms.add("covid-19");
+                synonyms.add("2019-ncov");
+                break;
+            case "covid-19":
+                synonyms.add("covid19");
+                synonyms.add("2019-ncov");
+                break;
+            case "sars-cov-2":
+                synonyms.add("2019-ncov");
+                synonyms.add("sars-cov2");
+                break;
+            case "sars-cov2":
+                synonyms.add("2019-ncov");
+                synonyms.add("sars-cov-2");
+                break;
+            case "2019-ncov":
+                synonyms.add("sars-cov-2");
+                synonyms.add("sars-cov2");
+                break;
         }
         return synonyms;
     }

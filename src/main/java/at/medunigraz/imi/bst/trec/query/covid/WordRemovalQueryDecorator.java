@@ -26,6 +26,8 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
     static {
         // replace by covid-related stop words
         DOMAIN_STOPWORDS.add("range");
+        DOMAIN_STOPWORDS.add("types");
+        DOMAIN_STOPWORDS.add("seeking");
         DOMAIN_STOPWORDS.add("information");
         DOMAIN_STOPWORDS.add("studies");
         DOMAIN_STOPWORDS.add("study");
@@ -53,12 +55,13 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         Set<String> unfilteredWords = new HashSet<>();
         NLPSentence narrativeTokens = PosTaggingService.getInstance().tag(narrative);
         for (NLPToken token : narrativeTokens) {
-            if (token.getPosTag().equals("NN"))
-                unfilteredWords.add(token.getToken());
+            if (token.getPosTag().equals("NN") || token.getPosTag().equals("NNS"))
+                unfilteredWords.add(token.getToken().toLowerCase());
         }
         // filter the narrative
         unfilteredWords.removeAll(DOMAIN_STOPWORDS);
         topic.setMandatoryBoW(unfilteredWords);
+        //System.out.println(decoratedQuery.query(topic).get(0));
         return decoratedQuery.query(topic);
     }
 
