@@ -15,7 +15,6 @@ import java.util.*;
 public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic> {
 
     public NarrativeSynonymDecorator(Query<CovidTopic> decoratedQuery) {
-        super(decoratedQuery);
     }
 
 
@@ -27,7 +26,6 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
             List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
             topic.setOptionalSynonymWords(optionalSynonyms);
         }
-
         return topic;
     }
 
