@@ -50,7 +50,7 @@ public class UmlsSynsetProvider {
         this.useCache = useCache;
 
         if (useCache) {
-            synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
+            synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets-"+umlsSynsetFile, CacheAccess.STRING, CacheAccess.JAVA);
             cuisForTermCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIsForTerms", CacheAccess.STRING, CacheAccess.JAVA);
             cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
             semanticTypesCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISymanticTypes", CacheAccess.STRING, CacheAccess.JAVA);
@@ -94,7 +94,7 @@ public class UmlsSynsetProvider {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);
                 // The first element of the record is the CUI so let's start at the second index
-                Set<String> synset = java.util.Arrays.stream(record, 1, record.length).collect(Collectors.toSet());
+                Set<String> synset = java.util.Arrays.stream(record, 1, record.length).map(String::toLowerCase).collect(Collectors.toSet());
                 if (synset.contains(inputTerm)) {
                     if (!containTermInSynset)
                         synset.remove(inputTerm);
