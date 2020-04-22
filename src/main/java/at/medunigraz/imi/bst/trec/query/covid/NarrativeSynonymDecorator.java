@@ -14,8 +14,7 @@ import java.util.*;
 
 public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic> {
 
-    public NarrativeSynonymDecorator(Query decoratedQuery) {
-        super(decoratedQuery);
+    public NarrativeSynonymDecorator(Query<CovidTopic> decoratedQuery) {
     }
 
 
@@ -23,8 +22,10 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
     public CovidTopic expandTopic(CovidTopic topic) {
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
-        List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
-        topic.setOptionalSynonymWords(optionalSynonyms);
+        if (topic.getOptionalBoW() != null) {
+            List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
+            topic.setOptionalSynonymWords(optionalSynonyms);
+        }
         return topic;
     }
 
@@ -43,13 +44,72 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
 
     private boolean removeFromBoW(String word) {
-        // TODO check those words that should be removed from the query and be replaced by synonyms like coronavirus
-        return false;
+        // check those words that should be removed from the query and be replaced by synonyms like coronavirus
+        switch (word.toLowerCase()) {
+            case "coronavirus":
+                return true;
+            case "animal":
+                return true;
+            case "virus":
+                return true;
+            case "covid19":
+                return true;
+            case "covid-19":
+                return true;
+            case "sars-cov-2":
+                return true;
+            case "sars-cov2":
+                return true;
+            case "2019-ncov":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private Set<String> getSynonyms(String word) {
-        // TODO return synonyms of this word like coronavirus -> Covid19
-        return Collections.emptySet();
+        // return synonyms of this word like coronavirus -> Covid19
+        Set<String> synonyms = new HashSet<>();
+        switch (word.toLowerCase()) {
+            case "coronavirus":
+                synonyms.add("COVID19");
+                synonyms.add("Covid19");
+                synonyms.add("COVID-19");
+                synonyms.add("Covid-19");
+                synonyms.add("SARS-CoV-2");
+                synonyms.add("SARS-CoV2");
+                synonyms.add("2019-nCoV");
+                break;
+            case "virus":
+                synonyms.add("SARS-CoV-2");
+                synonyms.add("SARS-CoV2");
+                synonyms.add("2019-nCoV");
+                break;
+            case "animal":
+                synonyms.add("mouse");
+                break;
+            case "covid19":
+                synonyms.add("covid-19");
+                synonyms.add("2019-ncov");
+                break;
+            case "covid-19":
+                synonyms.add("covid19");
+                synonyms.add("2019-ncov");
+                break;
+            case "sars-cov-2":
+                synonyms.add("2019-ncov");
+                synonyms.add("sars-cov2");
+                break;
+            case "sars-cov2":
+                synonyms.add("2019-ncov");
+                synonyms.add("sars-cov-2");
+                break;
+            case "2019-ncov":
+                synonyms.add("sars-cov-2");
+                synonyms.add("sars-cov2");
+                break;
+        }
+        return synonyms;
     }
 
 

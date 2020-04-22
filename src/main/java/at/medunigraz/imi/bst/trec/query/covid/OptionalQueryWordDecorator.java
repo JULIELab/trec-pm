@@ -42,7 +42,7 @@ public class OptionalQueryWordDecorator extends DynamicQueryDecorator<CovidTopic
     }
 
     private boolean isOptional(String word) {
-        // TODO if there should be words that fulfull the criteria of the class description, find them here
+        // TODO if there should be words that fulfill the criteria of the class description, find them here
         return false;
     }
 
