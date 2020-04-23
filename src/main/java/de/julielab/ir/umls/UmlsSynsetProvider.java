@@ -50,7 +50,7 @@ public class UmlsSynsetProvider {
         this.useCache = useCache;
 
         if (useCache) {
-            synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets", CacheAccess.STRING, CacheAccess.JAVA);
+            synsetCache = CacheService.getInstance().getCacheAccess("umls.db", "UmlsSynsets-"+umlsSynsetFile, CacheAccess.STRING, CacheAccess.JAVA);
             cuisForTermCache = CacheService.getInstance().getCacheAccess("umls.db", "CUIsForTerms", CacheAccess.STRING, CacheAccess.JAVA);
             cuiSynsetCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISynsets", CacheAccess.STRING, CacheAccess.JAVA);
             semanticTypesCache = CacheService.getInstance().getCacheAccess("umls.db", "CUISymanticTypes", CacheAccess.STRING, CacheAccess.JAVA);
@@ -90,14 +90,15 @@ public class UmlsSynsetProvider {
     private Set<UmlsSynset> getSynsetsFromFile(String umlsSynsetFile, String separator, boolean containTermInSynset, String inputTerm) throws IOException {
         Set<UmlsSynset> ret = new HashSet<>();
         log.trace("Reading file {} to obtain synsets for {}", umlsSynsetFile, inputTerm);
+        String lcinput = inputTerm.toLowerCase();
         try (final BufferedReader br = FileUtilities.getReaderFromFile(new File(umlsSynsetFile))) {
             br.lines().forEach(line -> {
                 final String[] record = line.split(separator);
                 // The first element of the record is the CUI so let's start at the second index
-                Set<String> synset = java.util.Arrays.stream(record, 1, record.length).collect(Collectors.toSet());
-                if (synset.contains(inputTerm)) {
+                Set<String> synset = java.util.Arrays.stream(record, 1, record.length).map(String::toLowerCase).collect(Collectors.toSet());
+                if (synset.contains(lcinput)) {
                     if (!containTermInSynset)
-                        synset.remove(inputTerm);
+                        synset.remove(lcinput);
                     final UmlsSynset umlsSynset = new UmlsSynset(synset, record[0]);
                     ret.add(umlsSynset);
                     if (useCache)

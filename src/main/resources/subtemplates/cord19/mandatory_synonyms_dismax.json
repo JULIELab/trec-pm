@@ -1,0 +1,8 @@
+{
+  "dis_max": {
+    "boost": 1,
+    "queries": [
+      {{mandatorySynonymWords:cord19/mandatory_synonyms.json}}
+    ]
+  }
+}

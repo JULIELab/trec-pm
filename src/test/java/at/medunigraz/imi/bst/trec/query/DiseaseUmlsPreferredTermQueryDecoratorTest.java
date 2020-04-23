@@ -15,7 +15,7 @@ public class DiseaseUmlsPreferredTermQueryDecoratorTest {
         final DiseaseUmlsSynonymQueryDecorator decorator = new DiseaseUmlsSynonymQueryDecorator(dummyQuery);
         decorator.setUmlsSynsetProvider(new UmlsSynsetTestProvider(false));
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
-        for (Topic topic : topicSet.getTopics()) {
+        for (Topic topic : topicSet) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))
                 assertThat(topic.getDiseaseSynonyms()).contains("melanoma synonym");

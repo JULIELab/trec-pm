@@ -12,42 +12,27 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 
-public class TopicSet {
+public class TopicSet extends QueryDescriptionSet<Topic>{
 
 	private static final String TAGNAME = "topic";
 
-    private List<Topic> topics = new ArrayList<>();
+	public TopicSet() {
+		super();
+	}
 
 	public TopicSet(Collection<Topic> topics) {
-		this.topics = new ArrayList<>(topics);
+		super(topics);
+	}
+
+	@Override
+	public Supplier<QueryDescriptionSet<Topic>> getSupplier() {
+		return TopicSet::new;
 	}
 
 	public TopicSet(String xmlFile, Challenge challenge, int year) {
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-
-		Document doc;
-		try {
-			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-			doc = documentBuilder.parse(FileUtilities.findResource(xmlFile));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-
-		NodeList xmlTopics = doc.getElementsByTagName(TAGNAME);
-
-		for (int i = 0; i < xmlTopics.getLength(); i++) {
-			Element element = (Element) xmlTopics.item(i);
-			Topic t = Topic.fromElement(element);
-			t.setChallenge(challenge);
-			t.setYear(year);
-			topics.add(t);
-		}
-	}
-
-	public List<Topic> getTopics() {
-		return topics;
+		super(xmlFile, challenge, year, TAGNAME, Topic::fromElement);
 	}
 
 	/**
@@ -69,7 +54,7 @@ public class TopicSet {
 
 	private static void toCSV(TopicSet topicSet, File output) throws IOException {
 		CSVWriter writer = new CSVWriter(new FileWriter(output), '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\', System.getProperty("line.separator"));
-		for (Topic topic : topicSet.getTopics()) {
+		for (Topic topic : topicSet) {
 			String id = String.valueOf(topic.getNumber());
 			String disease = topic.getDisease();
 			String gene = topic.getGeneField();
@@ -84,7 +69,7 @@ public class TopicSet {
 
 		Set<String> diseaseSet = new HashSet<>();
 
-		for (Topic topic : topicSet.getTopics()) {
+		for (Topic topic : topicSet) {
 			String disease = topic.getDisease();
 
 			// Do not repeat diseases
@@ -104,7 +89,7 @@ public class TopicSet {
 
 		Set<String> geneSet = new HashSet<>();
 
-		for (Topic topic : topicSet.getTopics()) {
+		for (Topic topic : topicSet) {
 			TopicGene[] genes = topic.getGenes();
 			for (TopicGene gene : genes) {
 				String geneSymbol = gene.getGeneSymbol();

@@ -98,10 +98,12 @@ public class SubTemplateQueryDecorator<T extends QueryDescription> extends Templ
 
         // Uses reflection to get field value
         try {
-            Class topicClass = Topic.class;
-            Field field = topicClass.getField(fieldName);
+            Class topicClass = topic.getClass();
+            Field field = topicClass.getDeclaredField(fieldName);
+            field.setAccessible(true);
             List<String> values = (List<String>) field.get(topic);
-            numExpansions = values.size();
+            if (values != null)
+                numExpansions = values.size();
         } catch (ReflectiveOperationException e) {
             throw new IllegalArgumentException(e);
         }

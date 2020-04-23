@@ -1,5 +1,6 @@
 package de.julielab.ir.goldstandards;
 
+import at.medunigraz.imi.bst.trec.model.QueryDescriptionSet;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
@@ -10,10 +11,7 @@ import org.slf4j.Logger;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,10 +21,10 @@ import java.util.stream.Stream;
  */
 public abstract class AggregatedGoldStandard<Q extends QueryDescription> implements GoldStandard<Q> {
 
+    protected Map<String, AtomicGoldStandard<Q>> goldStandards;
     private Map<String, Q> queriesByCrossDatasetId;
     private Logger log;
-    protected Map<String, AtomicGoldStandard<Q>> goldStandards;
-    private List<Q> queryList;
+    private QueryDescriptionSet<Q> queryList;
     private Map<Q, DocumentList<Q>> documentsByQuery;
 
     public AggregatedGoldStandard(Logger log, AtomicGoldStandard<Q>... goldStandards) {
@@ -73,9 +71,14 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     }
 
     @Override
-    public List<Q> getQueriesAsList() {
-        if (queryList == null)
-            queryList = goldStandards.values().stream().flatMap(GoldStandard::getQueries).collect(Collectors.toList());
+    public QueryDescriptionSet<Q> getQueriesAsList() {
+        if (queryList == null) {
+            Optional<AtomicGoldStandard<Q>> anyAgsWithQueries = goldStandards.values().stream().filter(ags -> ags.getQueriesAsList() != null && !ags.getQueriesAsList().isEmpty()).findAny();
+            if (anyAgsWithQueries.isPresent()) {
+                queryList = anyAgsWithQueries.get().getQueriesAsList().getSupplier().get();
+                goldStandards.values().stream().flatMap(GoldStandard::getQueries).forEach(queryList::add);
+            }
+        }
         return queryList;
     }
 
@@ -83,7 +86,7 @@ public abstract class AggregatedGoldStandard<Q extends QueryDescription> impleme
     public DocumentList<Q> getQrelDocumentsForQuery(QueryDescription query) {
         DocumentList documentList = getQrelDocumentsPerQuery().get(query);
         if (documentList == null)
-            throw new IllegalArgumentException("The dataset \""+getDatasetId()+"\" does not contain the query " + query);
+            throw new IllegalArgumentException("The dataset \"" + getDatasetId() + "\" does not contain the query " + query);
         return documentList;
     }
 

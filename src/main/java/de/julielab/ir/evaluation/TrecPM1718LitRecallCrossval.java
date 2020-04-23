@@ -39,13 +39,13 @@ public class TrecPM1718LitRecallCrossval {
         final TrecQrelGoldStandard<Topic> trecPmLit2018 = TrecPMGoldStandardFactory.pubmedOfficial2018();
         final AggregatedTrecQrelGoldStandard<Topic> aggregatedGoldStandard = new AggregatedTrecQrelGoldStandard<>(trecPmLit2017, trecPmLit2018);
 
-        final List<List<Topic>> topicPartitioning = aggregatedGoldStandard.createPropertyBalancedQueryPartitioning(CROSSVAL_SIZE, Arrays.asList(Topic::getDisease));
+        final List<TopicSet> topicPartitioning = aggregatedGoldStandard.createPropertyBalancedQueryPartitioning(CROSSVAL_SIZE, Arrays.asList(Topic::getDisease), TopicSet::new);
 
 
         runRecallExperiment(retrieval, experimentName, new File("recallResults"), aggregatedGoldStandard, topicPartitioning);
     }
 
-    private static void runRecallExperiment(TrecPmRetrieval retrieval, String experimentName, File resultDir, de.julielab.ir.goldstandards.GoldStandard<Topic> aggregatedGoldStandard, List<List<Topic>> topicPartitioning) {
+    private static void runRecallExperiment(TrecPmRetrieval retrieval, String experimentName, File resultDir, de.julielab.ir.goldstandards.GoldStandard<Topic> aggregatedGoldStandard, List<TopicSet> topicPartitioning) {
         List<Metrics> allESMetrics = new ArrayList<>();
         Map<Topic, Double> allRecall = new HashMap<>();
         List<Double> meanRecallPerRound = new ArrayList<>();

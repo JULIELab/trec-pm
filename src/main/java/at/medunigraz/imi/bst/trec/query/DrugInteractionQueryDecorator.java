@@ -6,7 +6,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.Set;
 
-public class DrugInteractionQueryDecorator extends DynamicQueryDecorator {
+public class DrugInteractionQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     private static final DGIdb dgidb = new DGIdb();
 

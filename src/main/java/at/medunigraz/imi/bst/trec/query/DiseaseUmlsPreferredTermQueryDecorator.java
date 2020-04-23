@@ -4,7 +4,7 @@ import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.umls.UmlsSynsetProvider;
 
-public class DiseaseUmlsPreferredTermQueryDecorator extends DynamicQueryDecorator {
+public class DiseaseUmlsPreferredTermQueryDecorator extends DynamicQueryDecorator<Topic> {
     private transient UmlsSynsetProvider umlsSynsetProvider;
     public DiseaseUmlsPreferredTermQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);

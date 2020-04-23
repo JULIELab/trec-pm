@@ -4,10 +4,7 @@ import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.model.Metrics;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.ResultList;
-import at.medunigraz.imi.bst.trec.model.TopicSet;
+import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.Ranker;
@@ -16,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,7 +28,7 @@ public class Experiment<Q extends QueryDescription> {
     private GoldStandard goldStandard;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
-    private TopicSet topicSet;
+    private QueryDescriptionSet<Q> topicSet;
     private int k = TrecConfig.SIZE;
     private List<ResultList<Q>> lastResultListSet;
     // This ranker will be applied to retrieved results, if it is present.
@@ -44,8 +42,8 @@ public class Experiment<Q extends QueryDescription> {
      * @param goldStandard
      * @param retrieval
      */
-    public Experiment(GoldStandard goldStandard, Retrieval retrieval) {
-        this(goldStandard, retrieval, new TopicSet(goldStandard.getQueriesAsList()));
+    public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval) {
+        this(goldStandard, retrieval, goldStandard.getQueriesAsList());
     }
 
     /**
@@ -55,7 +53,7 @@ public class Experiment<Q extends QueryDescription> {
      * @param retrieval
      * @param topics
      */
-    public Experiment(GoldStandard goldStandard, Retrieval retrieval, TopicSet topics) {
+    public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval, QueryDescriptionSet<Q> topics) {
         this.goldStandard = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
@@ -94,11 +92,11 @@ public class Experiment<Q extends QueryDescription> {
         return retrieval.getExperimentId();
     }
 
-    public TopicSet getTopicSet() {
+    public QueryDescriptionSet<Q> getTopicSet() {
         return topicSet;
     }
 
-    public void setTopicSet(TopicSet topicSet) {
+    public void setTopicSet(QueryDescriptionSet<Q> topicSet) {
         this.topicSet = topicSet;
     }
 
@@ -109,8 +107,8 @@ public class Experiment<Q extends QueryDescription> {
      * @return Whether or not to calculate the evaluation scores including or excluding missing result documents.
      */
     public boolean isCalculateTrecEvalWithMissingResults() {
-        // If are querying just a subset of the GS, we won't get metrics for all topics and thus need to set -c to false.
-        if (topicSet.getTopics().size() < goldStandard.getQueriesAsList().size()) {
+        // If we are querying just a subset of the GS, we won't get metrics for all topics and thus need to set -c to false.
+        if (goldStandard == null || topicSet.size() < goldStandard.getQueriesAsList().size()) {
             return false;
         }
         return true;
@@ -157,7 +155,7 @@ public class Experiment<Q extends QueryDescription> {
 
         LOG.info("Running collection " + longExperimentId + "...");
 
-        lastResultListSet = retrieval.retrieve((Collection<Q>) topicSet.getTopics());
+        lastResultListSet = retrieval.retrieve(topicSet);
         if (reRanker != null)
             lastResultListSet = rerank(lastResultListSet);
 
@@ -166,7 +164,7 @@ public class Experiment<Q extends QueryDescription> {
         boolean calculateTrecEvalWithMissingResults = isCalculateTrecEvalWithMissingResults();
         String statsDir = this.statsDir;
 
-        TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard.getType(), getSampleQrelFile());
+        TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard != null ? goldStandard.getType() : GoldStandardType.UNKNOWN, getSampleQrelFile());
         Metrics allMetrics = trecMetricsCreator.computeMetrics();
         metricsByTopic = trecMetricsCreator.getMetricsPerTopic();
 
@@ -183,7 +181,9 @@ public class Experiment<Q extends QueryDescription> {
         File output = new File(resultsDir.getAbsolutePath(), experimentId + ".trec_results");
         final String runName = experimentId;  // TODO generate from experimentID, but respecting TREC syntax
         TrecWriter tw = new TrecWriter(output, runName);
-        tw.write(resultLists, goldStandard.getQueryIdFunction());
+
+        Function<QueryDescription, String> queryIdFunction = goldStandard != null ? goldStandard.getQueryIdFunction() : qd -> String.valueOf(qd.getNumber());
+        tw.write(resultLists, retrieval.getDocIdFunction(), queryIdFunction);
         tw.close();
         return output;
     }
@@ -214,12 +214,23 @@ public class Experiment<Q extends QueryDescription> {
 
     private File getQrelFile() {
         File qrelFile = new File("qrels", String.format("%s.qrels", getExperimentId()));
-        goldStandard.writeQrelFile(qrelFile);
+        try {
+            if (goldStandard != null)
+                goldStandard.writeQrelFile(qrelFile);
+            else {
+                if (!qrelFile.getParentFile().exists())
+                    qrelFile.getParentFile().mkdirs();
+                qrelFile.createNewFile();
+            }
+        } catch (IOException e) {
+            LOG.error("Could not create Qrel file at {}", qrelFile, e);
+            throw new IllegalStateException(e);
+        }
         return qrelFile;
     }
 
     private File getSampleQrelFile() {
-        if (goldStandard.isSampleGoldStandard()) {
+        if (goldStandard != null && goldStandard.isSampleGoldStandard()) {
             final File sampleQrelFile = new File("qrels", String.format("sample-%s.qrels", getExperimentId()));
             goldStandard.writeSampleQrelFile(sampleQrelFile);
             return sampleQrelFile;

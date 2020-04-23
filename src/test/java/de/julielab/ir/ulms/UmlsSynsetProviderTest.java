@@ -23,7 +23,7 @@ public class UmlsSynsetProviderTest {
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
         assertEquals(3, u.getSynsets("A").size());
-        assertEquals(Sets.newHashSet(Sets.newHashSet("A"), Sets.newHashSet("A", "B", "C"), Sets.newHashSet("A", "F", "G")), u.getSynsets("A"));
+        assertEquals(Sets.newHashSet(Sets.newHashSet("a"), Sets.newHashSet("a", "b", "c"), Sets.newHashSet("a", "f", "g")), u.getSynsets("a"));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class UmlsSynsetProviderTest {
         assertEquals(0, u.getSynsets("X").size());
         assertEquals(1, u.getSynsets("F").size());
         assertEquals(3, u.getSynsets("A").size());
-        assertEquals(Sets.newHashSet(Collections.emptySet(), Sets.newHashSet("B", "C"), Sets.newHashSet("F", "G")), u.getSynsets("A"));
+        assertEquals(Sets.newHashSet(Collections.emptySet(), Sets.newHashSet("b", "c"), Sets.newHashSet("f", "g")), u.getSynsets("a"));
     }
 
     @Test

@@ -1,0 +1,7 @@
+[
+  "title^2.0",
+  "abstract^1.5",
+  "section_title^1.5",
+  "section_text_*^1.0",
+  "caption_*^1.0"
+]

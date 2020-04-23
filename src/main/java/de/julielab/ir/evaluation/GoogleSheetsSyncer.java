@@ -35,7 +35,7 @@ public class GoogleSheetsSyncer {
     }
 
     private static GoogleSheetsGoldStandard<Topic> download(Task task) {
-        final List<Topic> topics = TrecPMTopicSetFactory.topics(YEAR).getTopics();
+        final TopicSet topics = TrecPMTopicSetFactory.topics(YEAR);
 
         String[] readRange = null;
         String writeRange = null;

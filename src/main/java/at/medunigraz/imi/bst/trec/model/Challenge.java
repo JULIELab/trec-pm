@@ -5,5 +5,5 @@ package at.medunigraz.imi.bst.trec.model;
  * {@link Topic} belongs to. This is not restricted to TREC but might also be, e.g. CLEF.
  */
 public enum Challenge {
-    TREC_PM
+    TREC_PM, COVID
 }

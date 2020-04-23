@@ -19,7 +19,7 @@ public class DiseaseUmlsSynonymQueryDecoratorTest {
         final DiseaseUmlsPreferredTermQueryDecorator decorator = new DiseaseUmlsPreferredTermQueryDecorator(dummyQuery);
         decorator.setUmlsSynsetProvider(new UmlsSynsetTestProvider(false));
         final TopicSet topicSet = TrecPMTopicSetFactory.topics2018();
-        for (Topic topic : topicSet.getTopics()) {
+        for (Topic topic : topicSet) {
             decorator.expandTopic(topic);
             if (topic.getDisease().equals("melanoma"))
                 assertThat(topic.getDiseasePreferredTerm()).contains("Apref");

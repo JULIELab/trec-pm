@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
+import at.medunigraz.imi.bst.trec.experiment.Cord19Retrieval;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
@@ -13,11 +14,14 @@ import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.java.utilities.FileUtilities;
+import de.julielab.java.utilities.IOStreamUtilities;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
@@ -34,12 +38,9 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
     private List<Retrieval<T, Q>> negativeBoosts;
     private IRScoreFeatureKey scoreKey;
     private String indexSuffix;
+    private Function<Result, String> docIdFunction;
 
     public Retrieval(String indexName) {
-        this(indexName, new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL));
-    }
-
-    public Retrieval(String indexName, IRScoreFeatureKey featureKey) {
         this.indexName = indexName;
         this.esQuery = new ElasticSearchQuery(size, indexName);
         this.query = esQuery;
@@ -282,5 +283,50 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         }
 
         return experimentName;
+    }
+
+    public T withDocIdFunction(Function<Result, String> docIdFunction) {
+        this.docIdFunction = docIdFunction;
+        return (T) this;
+    }
+
+    public Function<Result, String> getDocIdFunction() {
+        return docIdFunction;
+    }
+
+    public T withValidDocIds(String docIdFile, String docIdFieldName) {
+        try {
+            esQuery.setTermFilter(docIdFieldName, IOStreamUtilities.getReaderFromInputStream(FileUtilities.findResource(docIdFile)).lines().collect(Collectors.toSet()));
+            return (T) this;
+        } catch (IOException e) {
+            log.error("Could not read the set of valid document IDs from {}", docIdFile);
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Causes the result list to be unique with respect to values of the given field. Only the first document
+     * with a specific value will be included in the result list.
+     * @param fieldname The name of the field from which each value should appear almost once in the results.
+     * @return
+     */
+    public T withUnifyingField(String fieldname) {
+        esQuery.setUnifyingField(fieldname);
+        return (T) this;
+    }
+
+    /**
+     * <p>
+     * Cuts the size of the returned result lists to <tt>cutoffSize</tt> even if ElasticSearch returned more
+     * results due to a higher setting of {@link #withSize(int)} or the default {@link TrecConfig#SIZE}.
+     * </p>
+     * <p>This is useful when filtering out duplicate field values. Then, {@link #withSize(int)} is set higher than the
+     * ultimately desired number as a buffer for filtered-away duplicates.</p>
+     * @param cutoffSize
+     * @return
+     */
+    public T withResultListSizeCutoff(int cutoffSize) {
+        esQuery.setResultListeSizeCutoff(cutoffSize);
+        return (T) this;
     }
 }

@@ -6,7 +6,7 @@ import at.medunigraz.imi.bst.trec.model.Topic;
 
 import java.util.List;
 
-public class DiseaseSynonymQueryDecorator extends DynamicQueryDecorator {
+public class DiseaseSynonymQueryDecorator extends DynamicQueryDecorator<Topic> {
 
     public DiseaseSynonymQueryDecorator(Query decoratedQuery) {
         super(decoratedQuery);

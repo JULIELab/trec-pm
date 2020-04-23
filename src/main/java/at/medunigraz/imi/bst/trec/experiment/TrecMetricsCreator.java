@@ -44,8 +44,12 @@ public class TrecMetricsCreator {
     }
 
     public Metrics computeMetrics() {
+        if (goldStandard == null)
+            return new Metrics();
         final String filename = goldStandardType + "_" + experimentId;
         final File trecEvalOutput = new File(statsDir, filename + ".trec_eval");
+        if (!trecEvalOutput.getParentFile().exists())
+            trecEvalOutput.getParentFile().mkdirs();
         try {
             TrecEval te = new TrecEval(goldStandard, results, trecEvalOutput, k, calculateTrecEvalWithMissingResults);
             metricsPerTopic = te.getMetrics();

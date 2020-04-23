@@ -3,6 +3,9 @@ package de.julielab.ir.model;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,20 +17,9 @@ import java.util.stream.Stream;
 public abstract class QueryDescription {
     protected Challenge challenge;
     protected int year;
+    @QueryDescriptionAttribute
     protected int number;
     protected String index;
-
-    /**
-     * The index in which to search this query.
-     * @return The index with the data for this query.
-     */
-    public String getIndex() {
-        return index;
-    }
-
-    public void setIndex(String index) {
-        this.index = index;
-    }
 
     public QueryDescription(Challenge challenge, int year, int number) {
         this();
@@ -40,6 +32,18 @@ public abstract class QueryDescription {
 
     }
 
+    /**
+     * The index in which to search this query.
+     *
+     * @return The index with the data for this query.
+     */
+    public String getIndex() {
+        return index;
+    }
+
+    public void setIndex(String index) {
+        this.index = index;
+    }
 
     public Challenge getChallenge() {
         return challenge;
@@ -103,10 +107,37 @@ public abstract class QueryDescription {
      *
      * @return The query attributes.
      */
-    public abstract Map<String, String> getAttributes();
+    public Map<String, String> getAttributes() {
+        Map<String, String> ret = new HashMap<>();
+        Stream<Field> fields = Stream.concat(Arrays.stream(getClass().getDeclaredFields()), Arrays.stream(getClass().getSuperclass().getDeclaredFields()));
+        for (Field f : (Iterable<Field>) () -> fields.iterator()) {
+            QueryDescriptionAttribute annotation = f.getAnnotation(QueryDescriptionAttribute.class);
+            try {
+                if (annotation != null) {
+                    f.setAccessible(true);
+                    Object o = f.get(this);
+                    String fieldName = f.getName();
+//                    if (o instanceof Collection) {
+//                        Collection<?> c = (Collection<?>) o;
+//                        int counter = 0;
+//                        for (Object item : c) {
+//                            ret.put(fieldName + counter, String.valueOf(item));
+//                            ++counter;
+//                        }
+//                    } else {
+                        ret.put(fieldName, String.valueOf(o));
+//                    }
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns a copy of this query description without any expansions or other modifications.
+     *
      * @return An copy of this description without modifications.
      */
     public abstract <Q extends QueryDescription> Q getCleanCopy();
