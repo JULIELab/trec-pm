@@ -1,0 +1,12 @@
+{
+	"bool": {
+		"must": [
+			{{cord19/covid.json}}
+		],
+		"should": [
+			{{cord19/mandatory_bow.json}},
+			{{optionalSynonymWords:cord19/optional_synonyms.json}},
+			{{cord19/question.json}}
+		]
+	}
+}

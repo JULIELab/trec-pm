@@ -1,6 +1,7 @@
 {
 	"bool": {
 		"must": [
+			{{cord19/covid.json}},
 			{{cord19/query.json}}
 		],
 		"should": [

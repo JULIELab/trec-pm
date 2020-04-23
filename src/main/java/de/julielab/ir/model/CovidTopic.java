@@ -16,23 +16,6 @@ public class CovidTopic extends QueryDescription {
     private String question;
     @QueryDescriptionAttribute
     private String narrative;
-
-    public List<Set<String>> getMandatorySynonymWords() {
-        return mandatorySynonymWords;
-    }
-
-    public void setMandatorySynonymWords(List<Set<String>> mandatorySynonymWords) {
-        this.mandatorySynonymWords = mandatorySynonymWords;
-    }
-
-    public List<Set<String>> getOptionalSynonymWords() {
-        return optionalSynonymWords;
-    }
-
-    public void setOptionalSynonymWords(List<Set<String>> optionalSynonymWords) {
-        this.optionalSynonymWords = optionalSynonymWords;
-    }
-
     /**
      * <p>
      * This field should contain parts of the query that pose alternatives to each other. They will be used in a
@@ -51,6 +34,11 @@ public class CovidTopic extends QueryDescription {
      */
     @QueryDescriptionAttribute
     private Set<String> mandatoryBoW;
+    /**
+     * @deprecated This is just a hack - handle collections correctly
+     */
+    @QueryDescriptionAttribute
+    private String mandatoryBoWString;
     /**
      * This field is analogous to {@link #mandatorySynonymWords} but will be searched as optional relevance boosters.
      * Thus, documents can still be returned as a hit when they do not contain any of the words herein.
@@ -116,12 +104,29 @@ public class CovidTopic extends QueryDescription {
         return element.getAttribute(name);
     }
 
+    public List<Set<String>> getMandatorySynonymWords() {
+        return mandatorySynonymWords;
+    }
+
+    public void setMandatorySynonymWords(List<Set<String>> mandatorySynonymWords) {
+        this.mandatorySynonymWords = mandatorySynonymWords;
+    }
+
+    public List<Set<String>> getOptionalSynonymWords() {
+        return optionalSynonymWords;
+    }
+
+    public void setOptionalSynonymWords(List<Set<String>> optionalSynonymWords) {
+        this.optionalSynonymWords = optionalSynonymWords;
+    }
+
     public Set<String> getMandatoryBoW() {
         return mandatoryBoW;
     }
 
     public void setMandatoryBoW(Set<String> mandatoryBoW) {
         this.mandatoryBoW = mandatoryBoW;
+        mandatoryBoWString = String.join(" ", mandatoryBoW);
     }
 
     public Set<String> getOptionalBoW() {

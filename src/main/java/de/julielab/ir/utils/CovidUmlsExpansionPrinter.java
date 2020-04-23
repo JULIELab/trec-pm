@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class CovidUmlsExpansionPrinter {
     public static void main(String args[]) {
         CacheService.initialize(new TrecCacheConfiguration());
+        UmlsSynsetProvider.setDefaultSynsetFile("resources/umlsCovidSynsets.txt.gz");
         UmlsSynsetProvider provider = UmlsSynsetProvider.getInstance();
         CovidTopicSet topics = TrecCovidTopicSetFactory.topicsRound1();
         Set<String> allMappings = new TreeSet<>();

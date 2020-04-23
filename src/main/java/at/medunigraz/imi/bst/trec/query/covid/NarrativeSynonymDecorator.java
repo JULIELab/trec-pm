@@ -15,6 +15,7 @@ import java.util.*;
 public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic> {
 
     public NarrativeSynonymDecorator(Query<CovidTopic> decoratedQuery) {
+        super(decoratedQuery);
     }
 
 
@@ -22,6 +23,14 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
     public CovidTopic expandTopic(CovidTopic topic) {
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
+        // TODO remove this as soon as we can model the synonyms in DISMAX queries
+        Set<String> bowWithSynonyms = new HashSet<>();
+        bowWithSynonyms.addAll(topic.getMandatoryBoW());
+        for (Set<String> synSet : mandatorySynonyms ) {
+            bowWithSynonyms.addAll(synSet);
+        }
+        topic.setMandatoryBoW(bowWithSynonyms);
+        // END TODO
         if (topic.getOptionalBoW() != null) {
             List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());
             topic.setOptionalSynonymWords(optionalSynonyms);
