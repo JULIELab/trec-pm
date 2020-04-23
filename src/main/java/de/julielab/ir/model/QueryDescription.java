@@ -4,7 +4,10 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import de.julielab.ir.goldstandards.AtomicGoldStandard;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -114,16 +117,16 @@ public abstract class QueryDescription {
                     f.setAccessible(true);
                     Object o = f.get(this);
                     String fieldName = f.getName();
-                    if (o instanceof Collection) {
-                        Collection<?> c = (Collection<?>) o;
-                        int counter = 0;
-                        for (Object item : c) {
-                            ret.put(fieldName + counter, String.valueOf(item));
-                            ++counter;
-                        }
-                    } else {
+//                    if (o instanceof Collection) {
+//                        Collection<?> c = (Collection<?>) o;
+//                        int counter = 0;
+//                        for (Object item : c) {
+//                            ret.put(fieldName + counter, String.valueOf(item));
+//                            ++counter;
+//                        }
+//                    } else {
                         ret.put(fieldName, String.valueOf(o));
-                    }
+//                    }
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);

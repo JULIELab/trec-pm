@@ -1,13 +1,8 @@
 package at.medunigraz.imi.bst.trec.query.covid;
 
 import at.medunigraz.imi.bst.retrieval.Query;
-import at.medunigraz.imi.bst.retrieval.QueryDecorator;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
 import at.medunigraz.imi.bst.trec.query.DynamicQueryDecorator;
 import de.julielab.ir.model.CovidTopic;
-import de.julielab.ir.umls.UmlsRelationsProvider;
-import de.julielab.ir.umls.UmlsSynsetProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -24,12 +19,12 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
         // TODO remove this as soon as we can model the synonyms in DISMAX queries
-        Set<String> bowWithSynonyms = new HashSet<>();
-        bowWithSynonyms.addAll(topic.getMandatoryBoW());
-        for (Set<String> synSet : mandatorySynonyms ) {
-            bowWithSynonyms.addAll(synSet);
-        }
-        topic.setMandatoryBoW(bowWithSynonyms);
+//        Set<String> bowWithSynonyms = new HashSet<>();
+//        bowWithSynonyms.addAll(topic.getMandatoryBoW());
+//        for (Set<String> synSet : mandatorySynonyms ) {
+//            bowWithSynonyms.addAll(synSet);
+//        }
+//        topic.setMandatoryBoW(bowWithSynonyms);
         // END TODO
         if (topic.getOptionalBoW() != null) {
             List<Set<String>> optionalSynonyms = filterWords(topic.getOptionalBoW());

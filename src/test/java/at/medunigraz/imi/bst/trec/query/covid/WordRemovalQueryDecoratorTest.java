@@ -1,21 +1,10 @@
 package at.medunigraz.imi.bst.trec.query.covid;
 
-import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.retrieval.ElasticSearchQuery;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator;
-import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
-import de.julielab.ir.model.CovidTopic;
 import at.medunigraz.imi.bst.trec.query.DummyElasticSearchQuery;
-import at.medunigraz.imi.bst.trec.query.QueryDecoratorTest;
-import at.medunigraz.imi.bst.trec.query.covid.WordRemovalQueryDecorator;
-import de.julielab.ir.model.QueryDescription;
+import de.julielab.ir.model.CovidTopic;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,7 +21,7 @@ public class WordRemovalQueryDecoratorTest {
     public void testQuery() {
         CovidTopic topic = new CovidTopic().withNarrative(NARRATIVE);
         Query<CovidTopic> decoratedQuery = new WordRemovalQueryDecorator(
-                new TemplateQueryDecorator<CovidTopic> (template, new DummyElasticSearchQuery<CovidTopic> ()));
+                new TemplateQueryDecorator<> (template, new DummyElasticSearchQuery<CovidTopic> ()));
         decoratedQuery.query(topic);
 
 
