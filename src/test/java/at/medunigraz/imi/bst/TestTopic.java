@@ -13,6 +13,8 @@ public class TestTopic extends QueryDescription {
     private List<String> stopFilteredTermList;
     @QueryDescriptionAttribute
     private String[] stopFilteredTermArray;
+    @QueryDescriptionAttribute
+    private double weight;
 
     public String getQuery() {
         return query;
@@ -37,5 +39,10 @@ public class TestTopic extends QueryDescription {
     @Override
     public TestTopic getCleanCopy() {
         return new TestTopic().withQuery(query);
+    }
+
+    public TestTopic withWeight(double weight) {
+        this.weight = weight;
+        return this;
     }
 }
