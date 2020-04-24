@@ -65,8 +65,9 @@ public abstract class QueryDescription {
         return number;
     }
 
-    public void setNumber(int number) {
+    public <Q extends QueryDescription> Q withNumber(int number) {
         this.number = number;
+        return (Q) this;
     }
 
     @Override
@@ -107,7 +108,36 @@ public abstract class QueryDescription {
      *
      * @return The query attributes.
      */
-    public Map<String, String> getAttributes() {
+    public Map<String, Object> getAttributes() {
+        Map<String, Object> ret = new HashMap<>();
+        Stream<Field> fields = Stream.concat(Arrays.stream(getClass().getDeclaredFields()), Arrays.stream(getClass().getSuperclass().getDeclaredFields()));
+        for (Field f : (Iterable<Field>) () -> fields.iterator()) {
+            QueryDescriptionAttribute annotation = f.getAnnotation(QueryDescriptionAttribute.class);
+            try {
+                if (annotation != null) {
+                    f.setAccessible(true);
+                    String fieldName = f.getName();
+                    Object o = f.get(this);
+                    ret.put(fieldName, o);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * <p>Returns a structured description of the original gold standard query as much as structure was defined
+     * by the gold standard authors.</p>
+     * <p>For queries consisting of well defined fields or query parts, those parts are returned, like
+     * <tt>the disease to be queried</tt> or <tt>the gene of the topic</tt>.
+     * </p>
+     * <p>This method returns all field values as String via {@link String#valueOf(Object)}.</p>
+     *
+     * @return The query attributes.
+     */
+    public Map<String, String> getFlattenedAttributes() {
         Map<String, String> ret = new HashMap<>();
         Stream<Field> fields = Stream.concat(Arrays.stream(getClass().getDeclaredFields()), Arrays.stream(getClass().getSuperclass().getDeclaredFields()));
         for (Field f : (Iterable<Field>) () -> fields.iterator()) {
@@ -117,16 +147,7 @@ public abstract class QueryDescription {
                     f.setAccessible(true);
                     Object o = f.get(this);
                     String fieldName = f.getName();
-//                    if (o instanceof Collection) {
-//                        Collection<?> c = (Collection<?>) o;
-//                        int counter = 0;
-//                        for (Object item : c) {
-//                            ret.put(fieldName + counter, String.valueOf(item));
-//                            ++counter;
-//                        }
-//                    } else {
-                        ret.put(fieldName, String.valueOf(o));
-//                    }
+                    ret.put(fieldName, String.valueOf(o));
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);

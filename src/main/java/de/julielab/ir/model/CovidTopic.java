@@ -182,7 +182,7 @@ public class CovidTopic extends QueryDescription {
     }
 
     public CovidTopic withNumber(int number) {
-        setNumber(number);
+        this.withNumber(number);
         return this;
     }
 }

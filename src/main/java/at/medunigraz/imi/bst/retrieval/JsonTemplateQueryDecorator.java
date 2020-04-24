@@ -17,8 +17,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TemplateQueryDecorator<T extends QueryDescription> extends MapQueryDecorator<T> {
-	private static final Logger LOG = LoggerFactory.getLogger(TemplateQueryDecorator.class);
+public class JsonTemplateQueryDecorator<T extends QueryDescription> extends JsonMapQueryDecorator<T> {
+	private static final Logger LOG = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
 	protected String template;
 
 	/**
@@ -33,7 +33,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	 *                 curly braces to be correctly filled with the desired values.
 	 * @param decoratedQuery The query to be decorated
 	 */
-	public TemplateQueryDecorator(String template, Query decoratedQuery) {
+	public JsonTemplateQueryDecorator(String template, Query decoratedQuery) {
 		super(decoratedQuery);
 		if (template == null)
             throw new IllegalArgumentException("The passed template is null");
@@ -46,7 +46,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	public List<Result> query(T topic) {
 	    // We reload the template for each new query, as the jsonQuery has been filled with the previous topic data
 		loadTemplate(topic);
-		map(topic.getFlattenedAttributes());
+		map(topic.getFlattenedAttributes(), -1);
 		setJSONQuery(cleanup(getJSONQuery()));
 		try {
 			return decoratedQuery.query(topic);

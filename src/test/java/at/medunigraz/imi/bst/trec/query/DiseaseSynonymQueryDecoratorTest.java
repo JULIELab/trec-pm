@@ -12,7 +12,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Map;
 
 public class DiseaseSynonymQueryDecoratorTest extends QueryDecoratorTest {
@@ -38,7 +37,7 @@ public class DiseaseSynonymQueryDecoratorTest extends QueryDecoratorTest {
 
 		decorator.query(new Topic().withDisease(DISEASE));
 
-		Map<String, String> actual = dummyQuery.getTopic().getAttributes();
+		Map<String, String> actual = dummyQuery.getTopic().getFlattenedAttributes();
 		Assert.assertThat(actual, Matchers.hasEntry("diseaseSynonyms0", "cholangiocellular carcinoma"));
 		Assert.assertThat(actual, Matchers.hasEntry("diseaseSynonyms1", "bile duct carcinoma"));
 	}

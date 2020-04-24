@@ -26,7 +26,7 @@ public class CovidTopicSetTest {
                         "seeking range of information on the SARS-CoV-2's virus's survival in different environments (surfaces, liquids, etc.) outside the human body while still being viable for transmission to another human"
                 );
         CovidTopic topic29 = covidTopics.get(29);
-        assertThat(topic29.getAttributes()).containsEntry("number", "30")
+        assertThat(topic29.getFlattenedAttributes()).containsEntry("number", "30")
                 .containsEntry("query", "coronavirus remdesivir")
                 .containsEntry("question", "is remdesivir an effective treatment for COVID-19")
                 .containsEntry("narrative", "seeking specific information on clinical outcomes in COVID-19 patients treated with remdesivir");

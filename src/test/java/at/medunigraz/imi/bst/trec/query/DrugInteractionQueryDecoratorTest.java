@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -37,7 +36,7 @@ public class DrugInteractionQueryDecoratorTest extends QueryDecoratorTest {
 
         decorator.query(new Topic().withGeneField(GENE));
 
-        Map<String, String> actual = dummyQuery.getTopic().getAttributes();
+        Map<String, String> actual = dummyQuery.getTopic().getFlattenedAttributes();
         Assert.assertThat(actual, Matchers.hasValue("selumetinib"));
         Assert.assertThat(actual, Matchers.hasValue("dabrafenib"));
         Assert.assertThat(actual, Matchers.hasValue("bevacizumab"));
