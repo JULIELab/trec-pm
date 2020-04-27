@@ -6,16 +6,14 @@ import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +21,16 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
     private static final Logger log = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
     private static final Pattern LOOP_PATTERN = Pattern.compile("\\$\\{FOR\\s+INDEX\\s+IN\\s(\\w+)(\\[(\\$INDEX|[0-9]+)])?\\s+REPEAT\\s+(\\w+\\.json)}");
     protected String template;
+    private boolean prettyPrint;
+    private boolean checkSyntax;
+
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+    }
+
+    public void setCheckSyntax(boolean checkSyntax) {
+        this.checkSyntax = checkSyntax;
+    }
 
     /**
      * @param template       File to the JSON template. Elements of the topic or the passed properties must be enclosed by double
@@ -30,7 +38,17 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
      * @param decoratedQuery The query to be decorated
      */
     public JsonTemplateQueryDecorator(String template, Query<T> decoratedQuery) {
+        this(template, decoratedQuery, false, false);
+    }
+    /**
+     * @param template       File to the JSON template. Elements of the topic or the passed properties must be enclosed by double
+     *                       curly braces to be correctly filled with the desired values.
+     * @param decoratedQuery The query to be decorated
+     */
+    public JsonTemplateQueryDecorator(String template, Query<T> decoratedQuery, boolean prettyPrint, boolean checkSyntax) {
         super(decoratedQuery);
+        this.prettyPrint = prettyPrint;
+        this.checkSyntax = checkSyntax;
         if (template == null)
             throw new IllegalArgumentException("The passed template is null");
         this.template = readTemplate(template);
@@ -96,8 +114,17 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         }
         m.appendTail(sb);
         String templateWithExpandedSubTemplates = sb.toString();
-        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, -1);
+        // TODO pass correct index array
+        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, Collections.emptyList());
         // TODO checkDanglingTemplateExpressions
+        if (prettyPrint || checkSyntax) {
+            try {
+                mappedTemplate = new JSONObject(mappedTemplate).toString();
+            } catch (JSONException e) {
+                log.error("The created JSON document is invalid. The document is {}", mappedTemplate, e);
+                throw e;
+            }
+        }
         return mappedTemplate;
     }
 

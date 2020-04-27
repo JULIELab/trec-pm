@@ -27,7 +27,7 @@ public class JsonTemplateQueryDecoratorTest {
     @Test
     public void loopList() {
         TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
-        String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "nestedList.json").toString(), new DummyElasticSearchQuery<>()).expandTemplateExpressions(topic);
+        String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "nestedList.json").toString(), new DummyElasticSearchQuery<>(), true, true).expandTemplateExpressions(topic);
         System.out.println(mappedTemplate);
     }
 }
