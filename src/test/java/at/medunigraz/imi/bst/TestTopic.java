@@ -15,6 +15,13 @@ public class TestTopic extends QueryDescription {
     private String[] stopFilteredTermArray;
     @QueryDescriptionAttribute
     private double weight;
+    @QueryDescriptionAttribute
+    private List<String[]> friends;
+
+    public TestTopic withFriends(String[]... friends) {
+        this.friends = Arrays.asList(friends);
+        return this;
+    }
 
     public String getQuery() {
         return query;

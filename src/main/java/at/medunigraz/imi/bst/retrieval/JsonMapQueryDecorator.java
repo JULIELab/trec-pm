@@ -25,7 +25,7 @@ import java.util.stream.StreamSupport;
  * @param <T>
  */
 public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends QueryDecorator<T> {
-    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")\\$\\{(((QUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+)(\\[(\\$INDEX|[0-9]+)])?}(\")", Pattern.CASE_INSENSITIVE);
+    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+)(\\[(\\$INDEX|[0-9]+)])?}(\")?", Pattern.CASE_INSENSITIVE);
     private final static Logger log = LoggerFactory.getLogger(JsonMapQueryDecorator.class);
 
     public JsonMapQueryDecorator(Query<T> decoratedQuery) {
@@ -39,9 +39,9 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         StringBuffer sb = new StringBuffer();
         Matcher m = VALUE_PATTERN.matcher(jsonQuery);
         while (m.find()) {
+            // QUOTE, JSONLIST et
             boolean hasBeginQuote = m.group(1) != null;
             boolean hasEndQuote = m.group(8) != null;
-            // QUOTE, JSONLIST etc
             Set<Modifier> modifiers = parseModifiers(m.group(2), m);
             String indexGroup = m.group(7);
             boolean useIndex = indexGroup != null;
@@ -55,15 +55,28 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
                 // We have got our value, do the actual replacement.
                 if (replacement == null)
                     throw new IllegalStateException("Neither was a replacement value found nor was an error detected previously.");
-                if (replacement instanceof CharSequence || modifiers.contains(Modifier.QUOTE))
+                // We need to take care of the quoting. The template expression must always be a string to create a valid JSON document. However, the template expression
+                // can also just be a part of an actual JSON string. The latter is detected by checking if the expression was surrounded by quotes to begin with (if yes it means
+                // that the whole expression is the string, thus the quotes belong to the expression). We also obey fixed (NO)QUOTE modifiers.
+                if ((hasBeginQuote && hasEndQuote && !modifiers.contains(Modifier.NOQUOTE) && replacement instanceof CharSequence) || modifiers.contains(Modifier.QUOTE))
                     replacement = "\"" + replacement + "\"";
+                else if (!modifiers.contains(Modifier.NOQUOTE) && hasBeginQuote && !hasEndQuote)
+                    replacement = "\"" + replacement;
+                else if (!modifiers.contains(Modifier.NOQUOTE) && !hasBeginQuote && hasEndQuote)
+                    replacement = replacement + "\"";
                 m.appendReplacement(sb, String.valueOf(replacement));
             } else {
-                log.warn("A template contains the topic field reference '{}'. However, the value for such a field was provided. The full template expressio is {}", field, m.group());
+                throwTopicFieldDoesNotExist(m, field);
             }
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    protected void throwTopicFieldDoesNotExist(Matcher m, String field) {
+        String msg = String.format("A template contains the topic field reference '%s'. However, no value for such a field was provided. The full template expression is '%s'. Perhaps the @QueryDescriptionAttribute annotation is missing?", field, m.group());
+        log.warn(msg);
+        throw new IllegalArgumentException(msg);
     }
 
     private Set<Modifier> parseModifiers(String modifierGroup, Matcher m) {
@@ -78,6 +91,12 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
                 log.error("Illegal modifier in JSON template expression {}: {}", m.group(), modifierString);
             }
         }
+
+        if (modifiers.contains(Modifier.QUOTE) && modifiers.contains(Modifier.NOQUOTE)) {
+            String msg = String.format("The template expression %s contains the modifiers QUOTE and NOQUOTE. However, only one of both is allowed.", m.group());
+            throw new IllegalArgumentException(msg);
+        }
+
         return modifiers;
     }
 
@@ -94,7 +113,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
 
     @Nullable
     private Object getReplacementValue(String field, Object fieldValue, Set<Modifier> modifiers, Matcher m, boolean useIndex, boolean indexWasGiven, int effectiveIndex) {
-        Object replacement = null;
+        Object replacement;
         boolean isIterable = fieldValue instanceof Iterable;
         boolean isArray = fieldValue.getClass().isArray();
         if (!useIndex && !isIterable && !isArray) {
@@ -102,8 +121,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         } else if (!useIndex && (isIterable || isArray)) {
             if (modifiers.contains(Modifier.CONCAT)) {
                 replacement = getElementStream(fieldValue).map(String::valueOf).collect(Collectors.joining(" "));
-            }
-            else if (modifiers.contains(Modifier.JSONARRAY)) {
+            } else if (modifiers.contains(Modifier.JSONARRAY)) {
                 replacement = isArray ? new JSONArray(fieldValue) : new JSONArray(StreamSupport.stream(((Iterable<?>) fieldValue).spliterator(), false).collect(Collectors.toList()));
             } else {
                 String msg = String.format("The template expression '%s' refers to the Iterable or Array field %s. However, no template modifier is given as to how the array should be retreated. Please specify one of JSONARRAY or CONCAT.", m.group(), field);
@@ -121,38 +139,60 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
                 log.error(msg);
                 throw new IllegalArgumentException(msg);
             }
-            try {
-                if (isArray) {
-                    replacement = Array.get(fieldValue, effectiveIndex);
-                } else {
-                    Iterable<?> c = (Iterable<?>) fieldValue;
-                    // lists are quick and easy
-                    if (c instanceof List) {
-                        replacement = ((List<?>) c).get(effectiveIndex);
-                    } else {
-                        // for non-random-access collection we need to iterate to the sought element
-                        Iterator<?> it = c.iterator();
-                        int i = 0;
-                        while (it.hasNext() && i <= effectiveIndex) {
-                            Object o = it.next();
-                            if (i == effectiveIndex)
-                                replacement = o;
-                            i++;
-                        }
-                    }
-                }
-            } catch (ClassCastException e) {
-                log.error("The template expression {} refers to a Collection or Array. However, the value of the field '{}' is neither.", m.group(), field);
-                throw e;
-            }
+            replacement = getCollectionElement(fieldValue, effectiveIndex, field, m);
         }
         return replacement;
     }
 
-    protected void map(Map<String, ?> keymap, int index) {
-        setJSONQuery(map(getJSONQuery(), keymap, index));
+    protected Object getCollectionElement(Object collection, int index, String fieldName, Matcher templateExpressionMatcher) {
+        Object replacement = null;
+        try {
+            if (collection.getClass().isArray()) {
+                replacement = Array.get(collection, index);
+            } else {
+                Iterable<?> c = (Iterable<?>) collection;
+                // lists are quick and easy
+                if (c instanceof List) {
+                    replacement = ((List<?>) c).get(index);
+                } else {
+                    // for non-random-access collection we need to iterate to the sought element
+                    Iterator<?> it = c.iterator();
+                    int i = 0;
+                    while (it.hasNext() && i <= index) {
+                        Object o = it.next();
+                        if (i == index)
+                            replacement = o;
+                        i++;
+                    }
+                }
+            }
+        } catch (ClassCastException e) {
+            log.error("The template expression {} refers to a Collection or Array. However, the value of the field '{}' is neither.", templateExpressionMatcher.group(), fieldName);
+            throw e;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            String msg = String.format("The template expression %s refers to the index %d. However, the value of the field '%s' has only %d elements.", templateExpressionMatcher.group(), index, fieldName, getCollectionSize(collection, fieldName, templateExpressionMatcher));
+            log.error(msg);
+            throw new ArrayIndexOutOfBoundsException(msg);
+        }
+        return replacement;
     }
 
-    private enum Modifier {JSONARRAY, QUOTE, CONCAT}
+    protected int getCollectionSize(Object collection, String fieldName, Matcher templateExpressionMatcher) {
+        if (collection.getClass().isArray())
+            return Array.getLength(collection);
+        else if (collection instanceof Collection)
+            return ((Collection<?>) collection).size();
+        else {
+            String msg = String.format("The template expression %s refers to a Collection or Array. However, the value of the field '%s' is neither.", templateExpressionMatcher.group(), fieldName);
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    protected String map(Map<String, ?> keymap, int index) {
+        return map(getJSONQuery(), keymap, index);
+    }
+
+    private enum Modifier {JSONARRAY, QUOTE, NOQUOTE, CONCAT}
 
 }

@@ -7,9 +7,9 @@ import java.util.List;
 
 public class QueryDecorator<T extends QueryDescription> implements Query<T> {
 
-	protected Query decoratedQuery;
+	protected Query<T> decoratedQuery;
 
-	public QueryDecorator(Query decoratedQuery) {
+	public QueryDecorator(Query<T> decoratedQuery) {
 		this.decoratedQuery = decoratedQuery;
 	}
 

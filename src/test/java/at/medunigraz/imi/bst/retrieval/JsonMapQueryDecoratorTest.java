@@ -4,7 +4,8 @@ import at.medunigraz.imi.bst.TestTopic;
 import at.medunigraz.imi.bst.trec.query.DummyElasticSearchQuery;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
+
 public class JsonMapQueryDecoratorTest {
 
     @Test
@@ -80,6 +81,14 @@ public class JsonMapQueryDecoratorTest {
     }
 
     @Test
+    public void mapEmbeddedJoinedArray() {
+        TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
+        String template = "{\"title\":\"goblet of fire ${CONCAT stopFilteredTermArray}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), -1);
+        assertThat(mappedTemplate).contains("\"goblet of fire wand harry snape\"");
+    }
+
+    @Test
     public void mapJsonArray() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermArray}\"}";
@@ -93,5 +102,20 @@ public class JsonMapQueryDecoratorTest {
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermList}\"}";
         String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), -1);
         assertThat(mappedTemplate).contains(":[\"wand\",\"harry\",\"snape\"]");
+    }
+
+    @Test
+    public void mapNonExistingArrayField() {
+        TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
+        String template = "{\"title\":\"${JSONARRAY doesNotExist}\"}";
+        assertThatIllegalArgumentException().isThrownBy(() -> new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()) {
+        }.map(template, topic.getAttributes(), -1)).withMessageContaining("A template contains the topic field reference 'doesNotExist'. However, no value for such a field was provided.");
+    }
+
+    @Test
+    public void mapIndexOutOfBounds() {
+        TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
+        String template = "{\"title\":\"${stopFilteredTermList[7]}\"}";
+        assertThatExceptionOfType(ArrayIndexOutOfBoundsException.class).isThrownBy(() -> new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), -1)).withMessage("The template expression \"${stopFilteredTermList[7]}\" refers to the index 7. However, the value of the field 'stopFilteredTermList' has only 3 elements.");
     }
 }
