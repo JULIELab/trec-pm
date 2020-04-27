@@ -18,10 +18,7 @@ import java.util.stream.StreamSupport;
 /**
  * <p>This class handles the following template elements:
  * <ul>
- * <li>"${topicField}" - the value of <tt>topicField></tt> injected as a String value - single values, collections flattened (all levels)</li>
- * <li>"${QUOTE topicField}" - value in quotes, even when the datatype is not a string</li>
- * <li>"${topicField[$INDEX]}" - must be subtemplate of FOR statement; INDEX is the passed index</li>
- * <li>"${topicField[10]}" - refers constantly to the 10th element of <tt>topicField</tt></li>
+ * <li>TODO</li>
  * </ul>
  * </p>
  *
@@ -73,6 +70,8 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         Set<Modifier> modifiers = new HashSet<>();
 
         for (String modifierString : modifierGroup.split("\\s+")) {
+            if (modifierString.isBlank())
+                continue;
             try {
                 modifiers.add(Modifier.valueOf(modifierString.toUpperCase()));
             } catch (IllegalArgumentException e) {

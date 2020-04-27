@@ -48,6 +48,22 @@ public class JsonMapQueryDecoratorTest {
     }
 
     @Test
+    public void mapExternalListIndex() {
+        TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
+        String template = "{\"title\":\"${stopFilteredTermList[$INDEX]}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), 1);
+        assertThat(mappedTemplate).contains("\"harry\"");
+    }
+
+    @Test
+    public void mapExternalArrayIndex() {
+        TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
+        String template = "{\"title\":\"${stopFilteredTermArray[$INDEX]}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), 2);
+        assertThat(mappedTemplate).contains("\"snape\"");
+    }
+
+    @Test
     public void mapJoinedList() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${CONCAT stopFilteredTermList}\"}";

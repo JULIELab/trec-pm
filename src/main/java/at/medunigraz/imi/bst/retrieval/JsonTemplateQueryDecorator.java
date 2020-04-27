@@ -21,11 +21,6 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
 	private static final Logger LOG = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
 	protected String template;
 
-	/**
-	 * Matches double+ commas with any whitespace in between (this happens when two dynamic subtemplates are not expanded).
-	 * @todo cleanup double curly braces
-	 */
-	private static final Pattern DOUBLE_COMMA = Pattern.compile("(\\p{javaWhitespace}*,){2,}");
 
 	/**
 	 *
@@ -38,8 +33,6 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
 		if (template == null)
             throw new IllegalArgumentException("The passed template is null");
 		this.template = template;
-		// XXX This cannot be called here anymore, as the final template generated may depend on the topic
-		//loadTemplate(null);
 	}
 
 	@Override
@@ -47,7 +40,7 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
 	    // We reload the template for each new query, as the jsonQuery has been filled with the previous topic data
 		loadTemplate(topic);
 		map(topic.getFlattenedAttributes(), -1);
-		setJSONQuery(cleanup(getJSONQuery()));
+		setJSONQuery(getJSONQuery());
 		try {
 			return decoratedQuery.query(topic);
 		} catch (JSONException e) {
@@ -84,10 +77,7 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
 		setJSONQuery(readTemplate(template));
 	}
 
-	private static String cleanup(String template) {
-		return DOUBLE_COMMA.matcher(template).replaceAll(",");
-	}
-	
+
 	@Override
 	protected String getMyName() {
 		return getSimpleClassName() + "(" + template + ")";
