@@ -1,7 +1,6 @@
 package at.medunigraz.imi.bst.retrieval;
 
 import de.julielab.ir.model.QueryDescription;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import java.util.stream.StreamSupport;
  */
 public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends QueryDecorator<T> {
     private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+)((\\[([^]]+)?])*)}(\")?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern INDICES_PATTERN = Pattern.compile("\\[([^]]+)?]");
+    private static final Pattern INDICES_PATTERN = Pattern.compile("\\[([^]]+)?]", Pattern.CASE_INSENSITIVE);
 
     private final static Logger log = LoggerFactory.getLogger(JsonMapQueryDecorator.class);
 
@@ -45,8 +44,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
             boolean hasBeginQuote = m.group(1) != null;
             boolean hasEndQuote = m.group(9) != null;
             Set<Modifier> modifiers = parseModifiers(m.group(2), m);
-            List<Integer> specifiedIndices = parseIndices(m.group(6), m);
-            List<Integer> effectiveIndices = mergeIndices(indices, specifiedIndices, m);
+            List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 6);
 //            boolean useIndex = specifiedIndices.size() == recursiveDepth;
 //            boolean indexWasGiven = useIndex && specifiedIndices.get(recursiveDepth) != -1;
 //            int givenIndex = indexWasGiven ? specifiedIndices.get(recursiveDepth) : -1;
@@ -76,19 +74,30 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         return sb.toString();
     }
 
+    protected List<Integer> getEffectiveIndices(List<Integer> implicitIndices, Matcher m, int indexGroupNumber) {
+        List<Integer> specifiedIndices = parseIndices(m.group(indexGroupNumber), m);
+        return mergeIndices(implicitIndices, specifiedIndices, m);
+    }
+
     protected List<Integer> mergeIndices(List<Integer> indices, List<Integer> specifiedIndices, Matcher m) {
         List<Integer> effectiveIndices = new ArrayList<>(specifiedIndices);
-        for (int i = 0; i < indices.size(); i++) {
+        // The Math.min here allows references to index levels that are above the current recursion depth.
+        // This might be confusing but it seems also wrong to just forbid it. Why shouldn't one want to
+        // use all values of a collection in one field and only specific values in another?
+        for (int i = 0; i < Math.min(effectiveIndices.size(), indices.size()); i++) {
             Integer index = indices.get(i);
-            if (index >= 0)
+            if (index >= 0) {
                 effectiveIndices.set(i, index);
+            }
             if (effectiveIndices.get(0) < 0)
                 throw new IllegalArgumentException("The index at position " + i + " is unspecified for template expression " + m.group());
         }
         return effectiveIndices;
     }
 
-    private List<Integer> parseIndices(String indexGroup, Matcher templateExpressionMatcher) {
+    protected List<Integer> parseIndices(String indexGroup, Matcher templateExpressionMatcher) {
+        if (indexGroup == null)
+            return Collections.emptyList();
         Matcher m = INDICES_PATTERN.matcher(indexGroup);
         List<Integer> indices = new ArrayList<>();
         while (m.find()) {
@@ -142,7 +151,6 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         return stream;
     }
 
-    @Nullable
     private Object getReplacementValue(String field, Object fieldValue, Set<Modifier> modifiers, Matcher m, List<Integer> effectiveIndices) {
         Object denotedObject = getValueAtIndex(fieldValue, field, m, effectiveIndices, 0);
         Object replacement;
@@ -151,7 +159,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         boolean isArray = denotedObject.getClass().isArray();
         if (!isIterable && !isArray) {
             replacement = denotedObject;
-        } else if (isIterable || isArray) {
+        } else {
             if (modifiers.contains(Modifier.CONCAT)) {
                 replacement = getElementStream(denotedObject).map(String::valueOf).collect(Collectors.joining(" "));
             } else if (modifiers.contains(Modifier.JSONARRAY)) {
@@ -161,22 +169,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
                 log.error(msg);
                 throw new IllegalArgumentException(msg);
             }
-        } else {
-            throw new IllegalArgumentException();
         }
-//        else {
-//            // the field value is a collection or array and we should use a specific element
-//            if (effectiveIndices < 0) {
-//                String msg;
-//                if (!indexWasGiven)
-//                    msg = String.format("The template expression '%s' refers to a Collection. However, the current subtemplate is not embedded into a another template that would specify the index of the collection to get a value from. The containing template needs to contain a ${FOR INDEX in topicField REPEAT template} expression for this. Alternatively, you can just pass a constant number as an index to this template, e.g. ${topicField[2]}.", m.group());
-//                else
-//                    msg = String.format("The template expression '%s' specifies a constant index. However, this index is required to be >= 0.", m.group());
-//                log.error(msg);
-//                throw new IllegalArgumentException(msg);
-//            }
-//            replacement = getCollectionElement(denotedObject, effectiveIndices, field, m);
-//        }
         return replacement;
     }
 

@@ -1,5 +1,5 @@
 {
   "dis_max": {
-    "queries": ["${FOR INDEX IN friends[$INDEX] REPEAT friendsMatch.json}"]
+    "queries": ["${FOR INDEX IN friends[] REPEAT friendsMatch.json}"]
   }
 }

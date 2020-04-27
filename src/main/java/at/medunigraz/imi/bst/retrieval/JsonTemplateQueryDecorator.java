@@ -19,18 +19,10 @@ import java.util.regex.Pattern;
 
 public class JsonTemplateQueryDecorator<T extends QueryDescription> extends JsonMapQueryDecorator<T> {
     private static final Logger log = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
-    private static final Pattern LOOP_PATTERN = Pattern.compile("\\$\\{FOR\\s+INDEX\\s+IN\\s(\\w+)(\\[(\\$INDEX|[0-9]+)])?\\s+REPEAT\\s+(\\w+\\.json)}");
+    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\$\\{FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT\\s+(\\w+\\.json)}(\")", Pattern.CASE_INSENSITIVE);
     protected String template;
     private boolean prettyPrint;
     private boolean checkSyntax;
-
-    public void setPrettyPrint(boolean prettyPrint) {
-        this.prettyPrint = prettyPrint;
-    }
-
-    public void setCheckSyntax(boolean checkSyntax) {
-        this.checkSyntax = checkSyntax;
-    }
 
     /**
      * @param template       File to the JSON template. Elements of the topic or the passed properties must be enclosed by double
@@ -40,6 +32,7 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
     public JsonTemplateQueryDecorator(String template, Query<T> decoratedQuery) {
         this(template, decoratedQuery, false, false);
     }
+
     /**
      * @param template       File to the JSON template. Elements of the topic or the passed properties must be enclosed by double
      *                       curly braces to be correctly filled with the desired values.
@@ -79,33 +72,34 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
             throw e;
         }
     }
+
     public String expandTemplateExpressions(T topic) {
-        return expandTemplateExpressions(topic, template, -1);
+        return expandTemplateExpressions(topic, template, new ArrayList<>());
     }
 
-    private String expandTemplateExpressions(T topic, String template, int index) {
+    private String expandTemplateExpressions(T topic, String template, List<Integer> indices) {
         StringBuilder sb = new StringBuilder();
         Matcher m = LOOP_PATTERN.matcher(template);
         Map<String, Object> topicAttributes = topic.getAttributes();
         while (m.find()) {
-            String field = m.group(1);
-            String indexSpec = m.group(3);
-            String templatePath = m.group(4);
-            boolean constantIndexGiven = indexSpec != null && indexSpec.matches("[0-9]+");
-            int constantIndex = constantIndexGiven ? Integer.parseInt(indexSpec) : -1;
-            // if a constant index was specified it takes precedence over the dynamic index
-            int effectiveIndex = constantIndexGiven ? constantIndex : index;
+            String field = m.group(2);
+            List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 3);
+            String indexSpec = m.group(4);
+            String templatePath = m.group(5);
             Object objectToIterateOver = topicAttributes.get(field);
             if (objectToIterateOver == null)
                 throwTopicFieldDoesNotExist(m, field);
             if (indexSpec != null)
-                objectToIterateOver = getCollectionElement(objectToIterateOver, effectiveIndex, field, m);
+                objectToIterateOver = getValueAtIndex(topicAttributes.get(field), field, m, effectiveIndices, 0);
             String subtemplate = readTemplate(TrecConfig.SUBTEMPLATES_FOLDER + templatePath);
             StringBuilder filledSubtemplates = new StringBuilder();
+            assert objectToIterateOver != null;
             int collectionSize = getCollectionSize(objectToIterateOver, field, m);
             String ls = System.getProperty("line.separator");
             for (int i = 0; i < collectionSize; i++) {
-                filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, i));
+                ArrayList<Integer> recursiveIndices = new ArrayList<>(effectiveIndices);
+                recursiveIndices.add(i);
+                filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices));
                 if (i < collectionSize - 1) {
                     filledSubtemplates.append(",").append(ls);
                 }
@@ -115,11 +109,11 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         m.appendTail(sb);
         String templateWithExpandedSubTemplates = sb.toString();
         // TODO pass correct index array
-        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, Collections.emptyList());
+        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, indices);
         // TODO checkDanglingTemplateExpressions
         if (prettyPrint || checkSyntax) {
             try {
-                mappedTemplate = new JSONObject(mappedTemplate).toString();
+                mappedTemplate = new JSONObject(mappedTemplate).toString(prettyPrint ? 4 : 0);
             } catch (JSONException e) {
                 log.error("The created JSON document is invalid. The document is {}", mappedTemplate, e);
                 throw e;

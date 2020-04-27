@@ -28,6 +28,6 @@ public class JsonTemplateQueryDecoratorTest {
     public void loopList() {
         TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
         String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "nestedList.json").toString(), new DummyElasticSearchQuery<>(), true, true).expandTemplateExpressions(topic);
-        System.out.println(mappedTemplate);
+        assertThat(mappedTemplate).isEqualTo("{\"bool\":{\"must\":[{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"hermione\"}}},{\"match\":{\"title\":{\"query\":\"ron\"}}}]}},{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"mcgonagall\"}}},{\"match\":{\"title\":{\"query\":\"dumbledore\"}}}]}}]}}");
     }
 }
