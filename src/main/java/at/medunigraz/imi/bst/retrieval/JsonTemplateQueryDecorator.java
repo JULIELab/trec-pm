@@ -88,6 +88,9 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
             if (modusGroup.contains("for")) {
                 String field = m.group(3);
                 List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 4);
+                // Check if the current expression needs to access implicit indices from FOR INDEX IN expression
+                // up the chain. This decides if this starts a new index list or extends the existing.
+                boolean hasImplicitIndices = parseIndices(m.group(4), m).contains(-1);
                 String indexSpec = m.group(5);
                 Object objectToIterateOver = topicAttributes.get(field);
                 if (objectToIterateOver == null)
@@ -101,8 +104,15 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
                 int collectionSize = getCollectionSize(objectToIterateOver, field, m);
                 String ls = System.getProperty("line.separator");
                 for (int i = 0; i < collectionSize; i++) {
-                    ArrayList<Integer> recursiveIndices = new ArrayList<>(effectiveIndices);
-                    recursiveIndices.add(i);
+                    List<Integer> recursiveIndices;
+                    if (hasImplicitIndices) {
+                        // This expression belongs to an existing chain of subindex accesses
+                        recursiveIndices = new ArrayList<>(effectiveIndices);
+                        recursiveIndices.add(i);
+                    } else {
+                        // This expression is independent of upstream applications of FOR INDEX IN expressions.
+                        recursiveIndices = Collections.singletonList(i);
+                    }
                     filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices));
                     if (i < collectionSize - 1) {
                         filledSubtemplates.append(",").append(ls);

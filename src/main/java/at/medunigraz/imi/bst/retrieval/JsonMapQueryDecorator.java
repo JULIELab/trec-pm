@@ -24,7 +24,7 @@ import java.util.stream.StreamSupport;
  * @param <T>
  */
 public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends QueryDecorator<T> {
-    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+)((\\[([^]]+)?])*)}(\")?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+|\\$ELEMENT)((\\[([^]]+)?])*)}(\")?", Pattern.CASE_INSENSITIVE);
     private static final Pattern INDICES_PATTERN = Pattern.compile("\\[([^]]+)?]", Pattern.CASE_INSENSITIVE);
 
     private final static Logger log = LoggerFactory.getLogger(JsonMapQueryDecorator.class);
