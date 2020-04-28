@@ -44,4 +44,11 @@ public class JsonTemplateQueryDecoratorTest {
         String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "simpleTemplateInsertion.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic);
         assertThat(mappedTemplate).isEqualTo("{\"title\":{\"match\":{\"title\":{\"query\":\"hogwards england\"}}}}");
     }
+
+    @Test
+    public void simpleDoubleForIndexInWithElementReference() {
+        TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"}).withStopFilteredTermArray("expelliarmus", "spark");
+        String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "doubleForIndexInExpression.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic);
+        assertThat(mappedTemplate).isEqualTo("{\"bool\":{\"should\":[{\"match\":{\"title\":{\"query\":\"expelliarmus\"}}},{\"match\":{\"title\":{\"query\":\"spark\"}}}],\"must\":[{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"hermione\"}}},{\"match\":{\"title\":{\"query\":\"ron\"}}}]}},{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"mcgonagall\"}}},{\"match\":{\"title\":{\"query\":\"dumbledore\"}}}]}}]}}");
+    }
 }
