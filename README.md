@@ -45,6 +45,10 @@ We distinguish between value injecting template expressions and template injecti
 is the one that refers to actual topic values to be inserted into the template. The latter kind refers to expressions
 that load a sub template, resolve its template expressions (which is a recursive action) and than replace the
 original template expression with the expression-resolved subtemplate.
+
+Note that all template expressions discussed here are case-insensitive with respect to the expression keywords, e.g.
+modifiers. The field names and template paths must be written with correct case since they directly refer to Java
+object fields and file paths.
  
 ### Value Injecting Template Expressions 
 Template expressions of this type access values in the topic for actual insertion into the template that contains the
@@ -57,8 +61,10 @@ The following template expressions are offered for value injection:
 |  expression    |   description   |
 |:--------------|:-------------:|
 |   `"${topicField}"      ` |   Inserts the value of the topic object field `topicField`. If that value is an array or a collection, a modifier is required, see below.    |
+|   `"${topicField[i]}"    ` |   Requires that `topicField` is a collection or an array and `i >= 0` is an explicitly given constant (e.g. `3`). Inserts the `ith` value of `topicField`. It is not a requirement that the underlying data structures offers random access. If not, the data structure will be iterated to reach the `ith` value.    |
 |   `"${topicField[]}"    ` |   Requires that the template containing this expression was referenced by an iterative template-injecting expression in another template. Requires that `topicField` is a collection or an array. Inserts the `ith` value of `topicField` where `i` is an index that is dynamically passed by the iterative parent expression.    |
-|   `"${$ELEMENT}"        ` |   Requires that the template containing this expression was referenced by an iterative template-injecting expression in another template. Inserts the value referenced in the current iteration of the parent expression.   |
+|   `"${topicField[][j][]}"    ` |   Requires that the template containing this expression is at the end of a two-level iterative template-injecting expression chain from two other templates (this, this template would be the third). Requires that `topicField` is a collection or an array and `j >= 0` is an explicitly given constant (e.g. `3`). Inserts the value of `topicField` at position `[i][j][k]` where `i` and `k` are indices dynamically passed by the iterative parent expressions.   |
+|   `"${$ELEMENT}"        ` |   Requires that the template containing this expression was referenced by an iterative template-injecting expression in another template. Inserts the value referenced in the current iteration of the direct parent expression. Cannot have implicit index specifications (`[]`) as this is the current iteration element itself. Can, however, have explicit index specifications (e.g. `[2]`) if the value is a collection or array. |
 
 In addition to those expressions there exists a set of template modifiers. Those modifiers are only valid within
 value-injecting template expressions. They influence the exact way a referenced topic value is rendered into the
@@ -68,10 +74,24 @@ following table gives an overview over the existing modifiers.
 |  modified expression    |   description   |
 |:-------------:|:-------------:|
 |   `"${CONCAT topicField}" ` |   If the `topicField` value is a collection or array, its contents will be concatenated into a single whitespace-delimited string. This also works with multi-dimensional data structures.    |
-|   `"${JSONARRAY topicField}" ` |   The value if `topicField` will be rendered as a JSON array, including the brackets. This works    |
+|   `"${JSONARRAY topicField}" ` |   The value if `topicField` will be rendered as a (possibly nested) JSON array, including the brackets. This works also with multi-dimensional data structures.    |
+|   `"${FLAT JSONARRAY topicField}" ` |   The value if `topicField` will be flattened into one single array and rendered as a JSON array, including the brackets. This works also with multi-dimensional data structures.    |
 |   `"${QUOTE topicField}"` |   Rarely needed. Forces the injected value to be surrounded by quotes. Should be handled automatically.    |
 |   `"${NOQUOTE topicField}"` |   Rarely needed. Prohibits the injected value to be surrounded by quotes. Should be handled automatically.    |
 
+### Template Injecting Template Expressions
+
+The expressions discussed here have in common that they reference the name of subtemplate. A subtemplate is insofar
+different from a "normal" template that is resides in a specific resources folder which is configuration in the
+configuration.
+
+The possible options are
+
+|  expression    |   description   |
+|:--------------|:-------------:|
+|  `"${INSERT templatePath.json}"` | Inserts the given subtemplate after injecting topic values, if any are referenced in the subtemplate. |
+| `["${FOR INDEX IN topicField REPEAT templatePath.json}"]` | Requires that `topicField` is a collection or array. For each value in `topicField`, the subtemplate at `templatePath.json` will be subject to template expression resolution with respect to the index and value of the current iteration. The value of the current iteration can be accessed in the subtemplate via `topicField[]` or `$ELEMENT`. For nested applications of this expression, the subtemplate can specify multiple indices, e.g `topicField[][]`. |
+|  `"[${FOR INDEX IN topicField[] REPEAT templatePath.json}]"` | Requires that `topicField` is at least two-dimensional. Recursive FOR INDEX IN application. |
 
 ## Other resources
 
