@@ -1,0 +1,10 @@
+{
+  "bool": {
+    "must": [
+      "${FOR INDEX IN friends[] REPEAT friendsMatch.json}"
+    ],
+    "should": [
+      "${FOR INDEX in friends REPEAT friendsDisjunction.json}"
+    ]
+  }
+}

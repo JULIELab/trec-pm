@@ -46,9 +46,19 @@ public class JsonTemplateQueryDecoratorTest {
     }
 
     @Test
-    public void simpleDoubleForIndexInWithElementReference() {
+    public void doubleForIndexInWithElementReference() {
         TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"}).withStopFilteredTermArray("expelliarmus", "spark");
         String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "doubleForIndexInExpression.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic);
         assertThat(mappedTemplate).isEqualTo("{\"bool\":{\"should\":[{\"match\":{\"title\":{\"query\":\"expelliarmus\"}}},{\"match\":{\"title\":{\"query\":\"spark\"}}}],\"must\":[{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"hermione\"}}},{\"match\":{\"title\":{\"query\":\"ron\"}}}]}},{\"dis_max\":{\"queries\":[{\"match\":{\"title\":{\"query\":\"mcgonagall\"}}},{\"match\":{\"title\":{\"query\":\"dumbledore\"}}}]}}]}}");
+    }
+
+    @Test
+    public void nestedDoubleForIndexInWithElementReference() {
+        // This test is a bit confusing because the templates are overly complex just in order to prove the case.
+        // The thing to watch out for is that match queries work independent from their sibling bool queries.
+        // We just want to make sure that nested FOR INDEX IN structures don't influence one another.
+        TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"}).withStopFilteredTermArray("expelliarmus", "spark");
+        String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "nestedForIndexIn.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic);
+        assertThat(mappedTemplate).isEqualTo("{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"bool\":{\"should\":\"hermione ron\"}},{\"bool\":{\"should\":\"mcgonagall dumbledore\"}}],\"must\":[{\"match\":{\"title\":{\"query\":\"hermione\"}}},{\"match\":{\"title\":{\"query\":\"ron\"}}}]}},{\"bool\":{\"should\":[{\"bool\":{\"should\":\"hermione ron\"}},{\"bool\":{\"should\":\"mcgonagall dumbledore\"}}],\"must\":[{\"match\":{\"title\":{\"query\":\"mcgonagall\"}}},{\"match\":{\"title\":{\"query\":\"dumbledore\"}}}]}}]}}");
     }
 }
