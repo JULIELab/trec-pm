@@ -14,7 +14,7 @@ public class JsonMapQueryDecoratorTest {
     public void map() {
         TestTopic topic = new TestTopic().withQuery("unicorn");
         String template = "{\"title\":\"${query}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"unicorn\"");
     }
 
@@ -22,7 +22,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapQuote() {
         TestTopic topic = new TestTopic().withNumber(42);
         String template = "{\"title\":\"${QUOTE number}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains(":\"42\"");
     }
 
@@ -30,7 +30,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapFloat() {
         TestTopic topic = new TestTopic().withWeight(3.7);
         String template = "{\"title\":\"${weight}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains(":3.7");
     }
 
@@ -38,7 +38,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapConstantListIndex() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${stopFilteredTermList[1]}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"harry\"");
     }
 
@@ -46,7 +46,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapConstantArrayIndex() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${stopFilteredTermArray[2]}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"snape\"");
     }
 
@@ -54,7 +54,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapExternalListIndex() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${stopFilteredTermList[]}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.singletonList(1));
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.singletonList(1));
         assertThat(mappedTemplate).contains("\"harry\"");
     }
 
@@ -62,7 +62,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapExternalArrayIndex() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${stopFilteredTermArray[]}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.singletonList(2));
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.singletonList(2));
         assertThat(mappedTemplate).contains("\"snape\"");
     }
 
@@ -70,7 +70,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapJoinedList() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${CONCAT stopFilteredTermList}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"wand harry snape\"");
     }
 
@@ -78,7 +78,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapJoinedArray() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${CONCAT stopFilteredTermArray}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"wand harry snape\"");
     }
 
@@ -86,7 +86,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapEmbeddedJoinedArray() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"goblet of fire ${CONCAT stopFilteredTermArray}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"goblet of fire wand harry snape\"");
     }
 
@@ -94,7 +94,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapJsonArray() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermArray}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains(":[\"wand\",\"harry\",\"snape\"]");
     }
 
@@ -102,7 +102,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapJsonList() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermList}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains(":[\"wand\",\"harry\",\"snape\"]");
     }
 
@@ -110,7 +110,7 @@ public class JsonMapQueryDecoratorTest {
     public void mapTwoDimensions() {
         TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
         String template = "{\"title\":\"${friends[1][0]}\"}";
-        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList());
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains("\"mcgonagall\"");
     }
 
@@ -119,13 +119,13 @@ public class JsonMapQueryDecoratorTest {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY doesNotExist}\"}";
         assertThatIllegalArgumentException().isThrownBy(() -> new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()) {
-        }.map(template, topic.getAttributes(), Collections.emptyList())).withMessageContaining("A template contains the topic field reference 'doesNotExist'. However, no value for such a field was provided.");
+        }.map(template, topic.getAttributes(), null, Collections.emptyList())).withMessageContaining("A template contains the topic field reference 'doesNotExist'. However, no value for such a field was provided.");
     }
 
     @Test
     public void mapIndexOutOfBounds() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${stopFilteredTermList[7]}\"}";
-        assertThatExceptionOfType(ArrayIndexOutOfBoundsException.class).isThrownBy(() -> new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), Collections.emptyList())).withMessage("The template expression \"${stopFilteredTermList[7]}\" refers to the index 7. However, the value of the field 'stopFilteredTermList' has only 3 elements.");
+        assertThatExceptionOfType(ArrayIndexOutOfBoundsException.class).isThrownBy(() -> new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList())).withMessage("The template expression \"${stopFilteredTermList[7]}\" refers to the index 7. However, the value of the field 'stopFilteredTermList' has only 3 elements.");
     }
 }

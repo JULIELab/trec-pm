@@ -1,0 +1,6 @@
+{
+  "bool": {
+    "must": ["${FOR INDEX IN friends REPEAT friendsDismax.json}"],
+    "should": ["${FOR INDEX IN stopFilteredTermArray REPEAT parentElementMatch.json}"]
+  }
+}

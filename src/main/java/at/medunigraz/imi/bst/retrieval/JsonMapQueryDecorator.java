@@ -33,7 +33,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         super(decoratedQuery);
     }
 
-    public String map(String jsonQuery, Map<String, ?> keymap, List<Integer> indices) {
+    public String map(String jsonQuery, Map<String, ?> keymap, Object parentValue, List<Integer> indices) {
         if (jsonQuery == null)
             throw new IllegalStateException("Cannot find a template. When using the decorator chaining API, make sure to first set the parameters and then the template. The template loading decorator must be a delegate of this decorater that accesses the template.");
 
@@ -45,14 +45,16 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
             boolean hasEndQuote = m.group(9) != null;
             Set<Modifier> modifiers = parseModifiers(m.group(2), m);
             List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 6);
-//            boolean useIndex = specifiedIndices.size() == recursiveDepth;
-//            boolean indexWasGiven = useIndex && specifiedIndices.get(recursiveDepth) != -1;
-//            int givenIndex = indexWasGiven ? specifiedIndices.get(recursiveDepth) : -1;
-//            int effectiveIndex = givenIndex >= 0 ? givenIndex : index;
             String field = m.group(5);
-            Object fieldValue = keymap.get(field);
+            boolean useParentValue = field.equalsIgnoreCase("$element");
+            if (useParentValue && parentValue == null) {
+                String msg = String.format("The template expression %s refers to the value specified a parent template with a FOR INDEX IN expression. However, the current template is not embedded in such a parent expression.", m.group());
+                log.error(msg);
+                throw new IllegalArgumentException(msg);
+            }
+            Object fieldValue = useParentValue ? parentValue : keymap.get(field);
             if (fieldValue != null) {
-                Object replacement = getReplacementValue(field, fieldValue, modifiers, m, effectiveIndices);
+                Object replacement = useParentValue ? fieldValue : getReplacementValue(field, fieldValue, modifiers, m, effectiveIndices);
                 // We have got our value, do the actual replacement.
                 if (replacement == null)
                     throw new IllegalStateException("Neither was a replacement value found nor was an error detected previously.");
@@ -229,11 +231,11 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
     }
 
     protected String map(Map<String, ?> keymap) {
-        return map(getJSONQuery(), keymap, Collections.emptyList());
+        return map(getJSONQuery(), keymap, null, Collections.emptyList());
     }
 
     protected String map(Map<String, ?> keymap, List<Integer> recursiveIndices) {
-        return map(getJSONQuery(), keymap, recursiveIndices);
+        return map(getJSONQuery(), keymap, null, recursiveIndices);
     }
 
     private enum Modifier {JSONARRAY, QUOTE, NOQUOTE, CONCAT}

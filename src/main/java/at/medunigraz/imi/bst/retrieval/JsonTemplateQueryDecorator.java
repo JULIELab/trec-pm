@@ -74,10 +74,10 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
     }
 
     public String expandTemplateExpressions(T topic) {
-        return expandTemplateExpressions(topic, template, new ArrayList<>());
+        return expandTemplateExpressions(topic, template, new ArrayList<>(), null);
     }
 
-    private String expandTemplateExpressions(T topic, String template, List<Integer> indices) {
+    private String expandTemplateExpressions(T topic, String template, List<Integer> indices, Object parentValue) {
         StringBuilder sb = new StringBuilder();
         Matcher m = LOOP_PATTERN.matcher(template);
         Map<String, Object> topicAttributes = topic.getAttributes();
@@ -113,7 +113,7 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
                         // This expression is independent of upstream applications of FOR INDEX IN expressions.
                         recursiveIndices = Collections.singletonList(i);
                     }
-                    filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices));
+                    filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices, getCollectionElement(objectToIterateOver, i, field, m)));
                     if (i < collectionSize - 1) {
                         filledSubtemplates.append(",").append(ls);
                     }
@@ -121,13 +121,13 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
                 m.appendReplacement(sb, filledSubtemplates.toString());
             } else {
                 // "INSERT"
-                String filledSubtemplate = expandTemplateExpressions(topic, subtemplate, indices);
+                String filledSubtemplate = expandTemplateExpressions(topic, subtemplate, indices, null);
                 m.appendReplacement(sb, filledSubtemplate);
             }
         }
         m.appendTail(sb);
         String templateWithExpandedSubTemplates = sb.toString();
-        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, indices);
+        String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, parentValue, indices);
         // TODO checkDanglingTemplateExpressions
         if (prettyPrint || checkSyntax) {
             try {
