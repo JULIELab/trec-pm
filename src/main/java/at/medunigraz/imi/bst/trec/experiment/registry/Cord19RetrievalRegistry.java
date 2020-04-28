@@ -41,6 +41,18 @@ public final class Cord19RetrievalRegistry {
                 .withUnifyingField("cord19_uid")
                 .withSubTemplate(TEMPLATE_RECALL)
                 .withQueryQuestionSynonyms();
+    }
 
+    public static Cord19Retrieval jlprecRound2() {
+        return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("jlprec")
+                .withSize(1500)
+                .withResultListSizeCutoff(1000)
+                .withStoredFields("cord19_uid")
+                .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
+                .withValidDocIds("/valid-result-docs/docids-rnd1.txt", "cord19_uid")
+                .withUnifyingField("cord19_uid")
+                .withJsonTemplate(TEMPLATE_PREC)
+                .withNarrativeSynonymDecorator()
+                .withWordRemoval();
     }
 }

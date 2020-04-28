@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class JsonTemplateQueryDecorator<T extends QueryDescription> extends JsonMapQueryDecorator<T> {
     private static final Logger log = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
-    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\$\\{FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT\\s+(\\w+\\.json)}(\")", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\$\\{(FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT|INSERT)\\s+(\\w+\\.json)}(\")", Pattern.CASE_INSENSITIVE);
     protected String template;
     private boolean prettyPrint;
     private boolean checkSyntax;
@@ -82,33 +82,41 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         Matcher m = LOOP_PATTERN.matcher(template);
         Map<String, Object> topicAttributes = topic.getAttributes();
         while (m.find()) {
-            String field = m.group(2);
-            List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 3);
-            String indexSpec = m.group(4);
-            String templatePath = m.group(5);
-            Object objectToIterateOver = topicAttributes.get(field);
-            if (objectToIterateOver == null)
-                throwTopicFieldDoesNotExist(m, field);
-            if (indexSpec != null)
-                objectToIterateOver = getValueAtIndex(topicAttributes.get(field), field, m, effectiveIndices, 0);
+            String modusGroup = m.group(2).toLowerCase();
+            String templatePath = m.group(6);
             String subtemplate = readTemplate(TrecConfig.SUBTEMPLATES_FOLDER + templatePath);
-            StringBuilder filledSubtemplates = new StringBuilder();
-            assert objectToIterateOver != null;
-            int collectionSize = getCollectionSize(objectToIterateOver, field, m);
-            String ls = System.getProperty("line.separator");
-            for (int i = 0; i < collectionSize; i++) {
-                ArrayList<Integer> recursiveIndices = new ArrayList<>(effectiveIndices);
-                recursiveIndices.add(i);
-                filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices));
-                if (i < collectionSize - 1) {
-                    filledSubtemplates.append(",").append(ls);
+            if (modusGroup.contains("for")) {
+                String field = m.group(3);
+                List<Integer> effectiveIndices = getEffectiveIndices(indices, m, 4);
+                String indexSpec = m.group(5);
+                Object objectToIterateOver = topicAttributes.get(field);
+                if (objectToIterateOver == null)
+                    throwTopicFieldDoesNotExist(m, field);
+                if (indexSpec != null)
+                    objectToIterateOver = getValueAtIndex(topicAttributes.get(field), field, m, effectiveIndices, 0);
+                StringBuilder filledSubtemplates = new StringBuilder();
+                // This is here to calm down IntelliJ which doesn't infer that objectToIterateOver can actually
+                // not be null here.
+                assert objectToIterateOver != null;
+                int collectionSize = getCollectionSize(objectToIterateOver, field, m);
+                String ls = System.getProperty("line.separator");
+                for (int i = 0; i < collectionSize; i++) {
+                    ArrayList<Integer> recursiveIndices = new ArrayList<>(effectiveIndices);
+                    recursiveIndices.add(i);
+                    filledSubtemplates.append(expandTemplateExpressions(topic, subtemplate, recursiveIndices));
+                    if (i < collectionSize - 1) {
+                        filledSubtemplates.append(",").append(ls);
+                    }
                 }
+                m.appendReplacement(sb, filledSubtemplates.toString());
+            } else {
+                // "INSERT"
+                String filledSubtemplate = expandTemplateExpressions(topic, subtemplate, indices);
+                m.appendReplacement(sb, filledSubtemplate);
             }
-            m.appendReplacement(sb, filledSubtemplates.toString());
         }
         m.appendTail(sb);
         String templateWithExpandedSubTemplates = sb.toString();
-        // TODO pass correct index array
         String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, indices);
         // TODO checkDanglingTemplateExpressions
         if (prettyPrint || checkSyntax) {

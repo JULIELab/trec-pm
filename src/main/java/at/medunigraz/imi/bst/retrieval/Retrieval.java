@@ -2,7 +2,6 @@ package at.medunigraz.imi.bst.retrieval;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
-import at.medunigraz.imi.bst.trec.experiment.Cord19Retrieval;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
@@ -10,9 +9,7 @@ import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.SimilarityParameters;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
-import de.julielab.ir.ltr.features.IRScore;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
-import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
@@ -42,7 +39,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     public Retrieval(String indexName) {
         this.indexName = indexName;
-        this.esQuery = new ElasticSearchQuery(size, indexName);
+        this.esQuery = new ElasticSearchQuery<Q>(size, indexName);
         this.query = esQuery;
         this.negativeBoosts = new ArrayList<>();
     }
@@ -82,18 +79,18 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         return (T) this;
     }
 
-    public T withDecorator(Query decorator) {
+    public T withDecorator(Query<Q> decorator) {
         query = decorator;
         return (T) this;
     }
 
     public T withTemplate(String template) {
-        query = new TemplateQueryDecorator(template, query);
+        query = new TemplateQueryDecorator<Q>(template, query);
         return (T) this;
     }
 
     public T withSubTemplate(String template) {
-        query = new SubTemplateQueryDecorator(template, query);
+        query = new SubTemplateQueryDecorator<Q>(template, query);
         return (T) this;
     }
 
@@ -111,7 +108,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * @return This T.
      */
     public T withProperties(Map<String, String> templateProperties) {
-        query = new StaticMapQueryDecorator(templateProperties, query);
+        query = new StaticMapQueryDecorator<Q>(templateProperties, query);
 
         return (T) this;
     }
@@ -126,7 +123,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * @return This T.
      */
     public T withProperties(String... templatePropertiesAndValues) {
-        query = new StaticMapQueryDecorator(array2Map(templatePropertiesAndValues), query);
+        query = new StaticMapQueryDecorator<Q>(array2Map(templatePropertiesAndValues), query);
 
         return (T) this;
     }
@@ -234,7 +231,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
                 String index = topic.getIndex() != null ? topic.getIndex() : indexName;
                 if (indexSuffix != null && !indexSuffix.isBlank())
                     index = index + indexSuffix;
-                log.debug("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index,Thread.currentThread(), new JSONObject(query.getJSONQuery()));
+                log.debug("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index, Thread.currentThread(), new JSONObject(query.getJSONQuery()));
             }
 
 
@@ -307,6 +304,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
     /**
      * Causes the result list to be unique with respect to values of the given field. Only the first document
      * with a specific value will be included in the result list.
+     *
      * @param fieldname The name of the field from which each value should appear almost once in the results.
      * @return
      */
@@ -322,11 +320,17 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * </p>
      * <p>This is useful when filtering out duplicate field values. Then, {@link #withSize(int)} is set higher than the
      * ultimately desired number as a buffer for filtered-away duplicates.</p>
+     *
      * @param cutoffSize
      * @return
      */
     public T withResultListSizeCutoff(int cutoffSize) {
         esQuery.setResultListeSizeCutoff(cutoffSize);
+        return (T) this;
+    }
+
+    public T withJsonTemplate(String templatePath) {
+        query = new JsonTemplateQueryDecorator<>(templatePath, query);
         return (T) this;
     }
 }
