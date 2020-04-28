@@ -17,9 +17,18 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * <p>Handles the following template expressions:
+ * <ul>
+ * <li>"${FOR INDEX IN topicField REPEAT templatePath.json}" - topicField must be collection; one copy of 'templatePath' for each value from 'topicField'</li>
+ * <li>"${FOR INDEX IN topicField[] REPEAT templatePath.json}" - recursive FOREACH application</li>
+ * <li>"${INSERT templatePath.json}" - inserts the given template (after injecting topic values, if any are referenced)</li>
+ * </ul>
+ * </p>
+ */
 public class JsonTemplateQueryDecorator<T extends QueryDescription> extends JsonMapQueryDecorator<T> {
     private static final Logger log = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
-    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\$\\{(FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT|INSERT)\\s+(\\w+\\.json)}(\")", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\s*\\$\\{(FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT|INSERT)\\s+(\\w+\\.json)}\\s*(\")", Pattern.CASE_INSENSITIVE);
     protected String template;
     private boolean prettyPrint;
     private boolean checkSyntax;

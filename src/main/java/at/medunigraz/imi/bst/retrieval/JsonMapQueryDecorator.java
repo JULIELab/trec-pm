@@ -17,14 +17,17 @@ import java.util.stream.StreamSupport;
 /**
  * <p>This class handles the following template elements:
  * <ul>
- * <li>TODO</li>
+ * <li>"${topicField}": String value - single values, collections flattened (all levels)</li>
+ * <li>"${QUOTE topicField}": value in quotes, even when the datatype is not a string</li>
+ * <li>"${topicField[]}" - must be subtemplate of FOR INDEX IN expression; index given by this expression</li>
+ * <li>"${$ELEMENT}" - the value pointed to by a parent FOR INDEX IN template expression</li>
  * </ul>
  * </p>
  *
  * @param <T>
  */
 public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends QueryDecorator<T> {
-    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|JSONARRAY|CONCAT)\\s+)*)(\\w+|\\$ELEMENT)((\\[([^]]+)?])*)}(\")?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern VALUE_PATTERN = Pattern.compile("(\")?\\$\\{(((QUOTE|NOQUOTE|FLAT|JSONARRAY|CONCAT)\\s+)*)(\\w+|\\$ELEMENT)((\\[([^]]+)?])*)}(\")?", Pattern.CASE_INSENSITIVE);
     private static final Pattern INDICES_PATTERN = Pattern.compile("\\[([^]]+)?]", Pattern.CASE_INSENSITIVE);
 
     private final static Logger log = LoggerFactory.getLogger(JsonMapQueryDecorator.class);
@@ -145,11 +148,11 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
     private Stream<?> getElementStream(Object fieldValue) {
         Stream<?> stream;
         if (fieldValue instanceof Iterable)
-            stream = StreamSupport.stream(((Iterable<?>) fieldValue).spliterator(), false);
+            stream = StreamSupport.stream(((Iterable<?>) fieldValue).spliterator(), false).flatMap(this::getElementStream);
         else if (fieldValue.getClass().isArray())
-            stream = IntStream.range(0, Array.getLength(fieldValue)).mapToObj(i -> Array.get(fieldValue, i));
+            stream = IntStream.range(0, Array.getLength(fieldValue)).mapToObj(i -> Array.get(fieldValue, i)).flatMap(this::getElementStream);
         else
-            throw new IllegalArgumentException("Unexpected exception: The given field value is neither an Iterable nor an Array.");
+            return Stream.of(fieldValue);
         return stream;
     }
 
@@ -161,12 +164,17 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         boolean isArray = denotedObject.getClass().isArray();
         if (!isIterable && !isArray) {
             replacement = denotedObject;
+            if (modifiers.contains(Modifier.JSONARRAY))
+                replacement = new JSONArray(Arrays.asList(replacement));
         } else {
             if (modifiers.contains(Modifier.CONCAT)) {
                 replacement = getElementStream(denotedObject).map(String::valueOf).collect(Collectors.joining(" "));
+            } else if (modifiers.contains(Modifier.JSONARRAY) && modifiers.contains(Modifier.FLAT)) {
+                replacement = new JSONArray(getElementStream(denotedObject).toArray());
             } else if (modifiers.contains(Modifier.JSONARRAY)) {
                 replacement = isArray ? new JSONArray(denotedObject) : new JSONArray(StreamSupport.stream(((Iterable<?>) denotedObject).spliterator(), false).collect(Collectors.toList()));
-            } else {
+            }
+            else{
                 String msg = String.format("The template expression '%s' refers to the Iterable or Array field %s. However, no template modifier is given as to how the array should be retreated. Please specify one of JSONARRAY or CONCAT.", m.group(), field);
                 log.error(msg);
                 throw new IllegalArgumentException(msg);
@@ -238,6 +246,6 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         return map(getJSONQuery(), keymap, null, recursiveIndices);
     }
 
-    private enum Modifier {JSONARRAY, QUOTE, NOQUOTE, CONCAT}
+    private enum Modifier {FLAT, JSONARRAY, QUOTE, NOQUOTE, CONCAT}
 
 }

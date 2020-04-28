@@ -91,6 +91,14 @@ public class JsonMapQueryDecoratorTest {
     }
 
     @Test
+    public void mapJoinedArrayMultiDimensional() {
+        TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
+        String template = "{\"title\":\"${CONCAT friends}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
+        assertThat(mappedTemplate).contains("\"hermione ron mcgonagall dumbledore\"");
+    }
+
+    @Test
     public void mapJsonArray() {
         TestTopic topic = new TestTopic().withStopFilteredTermArray("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermArray}\"}";
@@ -99,11 +107,35 @@ public class JsonMapQueryDecoratorTest {
     }
 
     @Test
+    public void mapJsonArrayPrimitiveValue() {
+        TestTopic topic = new TestTopic().withQuery("magic");
+        String template = "{\"title\":\"${JSONARRAY query}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
+        assertThat(mappedTemplate).contains(":[\"magic\"]");
+    }
+
+    @Test
+    public void mapJsonArrayMultiDimensions() {
+        TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
+        String template = "{\"title\":\"${JSONARRAY friends}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
+        assertThat(mappedTemplate).isEqualTo("{\"title\":[[\"hermione\",\"ron\"],[\"mcgonagall\",\"dumbledore\"]]}");
+    }
+
+    @Test
     public void mapJsonList() {
         TestTopic topic = new TestTopic().withStopFilteredTermList("wand", "harry", "snape");
         String template = "{\"title\":\"${JSONARRAY stopFilteredTermList}\"}";
         String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
         assertThat(mappedTemplate).contains(":[\"wand\",\"harry\",\"snape\"]");
+    }
+
+    @Test
+    public void mapFlattenedJsonArray() {
+        TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"});
+        String template = "{\"title\":\"${FLAT JSONARRAY friends}\"}";
+        String mappedTemplate = new JsonMapQueryDecorator<>(new DummyElasticSearchQuery<>()){}.map(template, topic.getAttributes(), null, Collections.emptyList());
+        assertThat(mappedTemplate).isEqualTo("{\"title\":[\"hermione\",\"ron\",\"mcgonagall\",\"dumbledore\"]}");
     }
 
     @Test

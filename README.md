@@ -14,6 +14,65 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 
 *HPI-DHC at TREC 2018 Precision Medicine Track. Michel Oleynik, Erik Faessler, Ariane Morassi Sasso, et. al. Text REtrieval Conference, Gaithersburg, MD. 2018. Available at https://trec.nist.gov/pubs/trec27/papers/hpi-dhc-PM.pdf.*
 
+## Elastic Search JSON Templating Engine
+
+For easier query formulation, this project contains a custom engine to fill JSON templates with contents from the search
+topics. The idea is to fix the query structure (e.g. `{"query":{"match":{"title":"${disease}"}}}`) and to dynamically
+ add the value of a specific topic (the TREC query) at the specified position. In the previous example, `${disease
+ }` will access the field `disease`) of the provided topic.
+ 
+There are currently two templating engines contained in this project. A legacy one and a newer that should replace
+ the legacy approach in the future.
+  
+The classes realizing the legacy approach are
+* `at.medunigraz.imi.bst.retrieval.MapQueryDecorator`
+* `at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator`
+* `at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator`
+
+The new approach is encoded in
+* `at.medunigraz.imi.bst.retrieval.JsonMapQueryDecorator`
+* `at.medunigraz.imi.bst.retrieval.JsonTemplateQueryDecorator`
+
+These "decorators" are applied to a given topic and a file containing a template. They will then replace the
+_template expressions_ with the referenced values from the topic. As a template expression we denote a special
+syntax that should set apart the fixed JSON contents from a topic value injection directive.
+  
+The syntax of the template expressions for the newer approach are explained in the following. The legacy approach
+will not be documented here. In case it is needed we refer to the code (tests and existing experimental code) to
+demonstrate its usage.
+ 
+We distinguish between value injecting template expressions and template injecting expressions. The first kind
+is the one that refers to actual topic values to be inserted into the template. The latter kind refers to expressions
+that load a sub template, resolve its template expressions (which is a recursive action) and than replace the
+original template expression with the expression-resolved subtemplate.
+ 
+### Value Injecting Template Expressions 
+Template expressions of this type access values in the topic for actual insertion into the template that contains the
+expression. All expressions are JSON strings or part of a JSON string. The quotes surrounding the template will be
+removed if necessary, i.e. for non-string values of the referenced topic field. If one quote is missing, it will be
+assumed that the expression part of longer string and the quoting will be left untouched.
+ 
+The following template expressions are offered for value injection:
+
+|  expression    |   description   |
+|:--------------|:-------------:|
+|   `"${topicField}"      ` |   Inserts the value of the topic object field `topicField`. If that value is an array or a collection, a modifier is required, see below.    |
+|   `"${topicField[]}"    ` |   Requires that the template containing this expression was referenced by an iterative template-injecting expression in another template. Requires that `topicField` is a collection or an array. Inserts the `ith` value of `topicField` where `i` is an index that is dynamically passed by the iterative parent expression.    |
+|   `"${$ELEMENT}"        ` |   Requires that the template containing this expression was referenced by an iterative template-injecting expression in another template. Inserts the value referenced in the current iteration of the parent expression.   |
+
+In addition to those expressions there exists a set of template modifiers. Those modifiers are only valid within
+value-injecting template expressions. They influence the exact way a referenced topic value is rendered into the
+JSON template. The modifiers are directly prepended to the name of the topic field or the `$ELEMENT` reference. The
+following table gives an overview over the existing modifiers.
+
+|  modified expression    |   description   |
+|:-------------:|:-------------:|
+|   `"${CONCAT topicField}" ` |   If the `topicField` value is a collection or array, its contents will be concatenated into a single whitespace-delimited string. This also works with multi-dimensional data structures.    |
+|   `"${JSONARRAY topicField}" ` |   The value if `topicField` will be rendered as a JSON array, including the brackets. This works    |
+|   `"${QUOTE topicField}"` |   Rarely needed. Forces the injected value to be surrounded by quotes. Should be handled automatically.    |
+|   `"${NOQUOTE topicField}"` |   Rarely needed. Prohibits the injected value to be surrounded by quotes. Should be handled automatically.    |
+
+
 ## Other resources
 
 ### 2017
