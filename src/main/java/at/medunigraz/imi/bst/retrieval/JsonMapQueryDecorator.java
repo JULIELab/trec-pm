@@ -61,15 +61,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
                 // We have got our value, do the actual replacement.
                 if (replacement == null)
                     throw new IllegalStateException("Neither was a replacement value found nor was an error detected previously.");
-                // We need to take care of the quoting. The template expression must always be a string to create a valid JSON document. However, the template expression
-                // can also just be a part of an actual JSON string. The latter is detected by checking if the expression was surrounded by quotes to begin with (if yes it means
-                // that the whole expression is the string, thus the quotes belong to the expression). We also obey fixed (NO)QUOTE modifiers.
-                if ((hasBeginQuote && hasEndQuote && !modifiers.contains(Modifier.NOQUOTE) && replacement instanceof CharSequence) || modifiers.contains(Modifier.QUOTE))
-                    replacement = "\"" + replacement + "\"";
-                else if (!modifiers.contains(Modifier.NOQUOTE) && hasBeginQuote && !hasEndQuote)
-                    replacement = "\"" + replacement;
-                else if (!modifiers.contains(Modifier.NOQUOTE) && !hasBeginQuote && hasEndQuote)
-                    replacement = replacement + "\"";
+                replacement = handleQuoting(hasBeginQuote, hasEndQuote, modifiers, replacement);
                 m.appendReplacement(sb, String.valueOf(replacement));
             } else {
                 throwTopicFieldDoesNotExist(m, field);
@@ -77,6 +69,19 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         }
         m.appendTail(sb);
         return sb.toString();
+    }
+
+    private Object handleQuoting(boolean hasBeginQuote, boolean hasEndQuote, Set<Modifier> modifiers, Object replacement) {
+        // We need to take care of the quoting. The template expression must always be a string to create a valid JSON document. However, the template expression
+        // can also just be a part of an actual JSON string. The latter is detected by checking if the expression was surrounded by quotes to begin with (if yes it means
+        // that the whole expression is the string, thus the quotes belong to the expression). We also obey fixed (NO)QUOTE modifiers.
+        if ((hasBeginQuote && hasEndQuote && !modifiers.contains(Modifier.NOQUOTE) && replacement instanceof CharSequence) || modifiers.contains(Modifier.QUOTE))
+            replacement = "\"" + replacement + "\"";
+        else if (!modifiers.contains(Modifier.NOQUOTE) && hasBeginQuote && !hasEndQuote)
+            replacement = "\"" + replacement;
+        else if (!modifiers.contains(Modifier.NOQUOTE) && !hasBeginQuote && hasEndQuote)
+            replacement = replacement + "\"";
+        return replacement;
     }
 
     protected List<Integer> getEffectiveIndices(List<Integer> implicitIndices, Matcher m, int indexGroupNumber) {
@@ -165,7 +170,7 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
         if (!isIterable && !isArray) {
             replacement = denotedObject;
             if (modifiers.contains(Modifier.JSONARRAY))
-                replacement = new JSONArray(Arrays.asList(replacement));
+                replacement = new JSONArray(Collections.singleton(replacement));
         } else {
             if (modifiers.contains(Modifier.CONCAT)) {
                 replacement = getElementStream(denotedObject).map(String::valueOf).collect(Collectors.joining(" "));

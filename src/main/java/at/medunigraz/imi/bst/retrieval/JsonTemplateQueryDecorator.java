@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -137,7 +140,6 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         m.appendTail(sb);
         String templateWithExpandedSubTemplates = sb.toString();
         String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, parentValue, indices);
-        // TODO checkDanglingTemplateExpressions
         if (prettyPrint || checkSyntax) {
             try {
                 mappedTemplate = new JSONObject(mappedTemplate).toString(prettyPrint ? 4 : 0);
@@ -148,18 +150,6 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         }
         return mappedTemplate;
     }
-
-    private void checkDanglingTemplateExpressions(String jsonQuery) {
-        Pattern p = Pattern.compile("\\{\\{([^}]+)}}");
-        final Matcher matcher = p.matcher(jsonQuery);
-        Set<String> missingTemplates = new HashSet<>();
-        while (matcher.find()) {
-            missingTemplates.add(matcher.group(1));
-        }
-        if (!missingTemplates.isEmpty())
-            throw new IllegalStateException("The following template properties have not been set: " + missingTemplates);
-    }
-
 
     @Override
     protected String getMyName() {

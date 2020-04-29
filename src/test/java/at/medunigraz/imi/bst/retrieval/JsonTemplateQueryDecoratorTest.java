@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class JsonTemplateQueryDecoratorTest {
 
@@ -60,5 +61,12 @@ public class JsonTemplateQueryDecoratorTest {
         TestTopic topic = new TestTopic().withFriends(new String[]{"hermione", "ron"}, new String[]{"mcgonagall", "dumbledore"}).withStopFilteredTermArray("expelliarmus", "spark");
         String mappedTemplate = new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "nestedForIndexIn.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic);
         assertThat(mappedTemplate).isEqualTo("{\"bool\":{\"must\":[{\"bool\":{\"should\":[{\"bool\":{\"should\":\"hermione ron\"}},{\"bool\":{\"should\":\"mcgonagall dumbledore\"}}],\"must\":[{\"match\":{\"title\":{\"query\":\"hermione\"}}},{\"match\":{\"title\":{\"query\":\"ron\"}}}]}},{\"bool\":{\"should\":[{\"bool\":{\"should\":\"hermione ron\"}},{\"bool\":{\"should\":\"mcgonagall dumbledore\"}}],\"must\":[{\"match\":{\"title\":{\"query\":\"mcgonagall\"}}},{\"match\":{\"title\":{\"query\":\"dumbledore\"}}}]}}]}}");
+    }
+
+    @Test
+    public void checkDangling() {
+        TestTopic topic = new TestTopic().withQuery("school of magic");
+        assertThatIllegalArgumentException().isThrownBy(() -> new JsonTemplateQueryDecorator<>(Path.of("src", "test", "resources", "test-templates-truejson", "simple.json").toString(), new DummyElasticSearchQuery<>(), false, true).expandTemplateExpressions(topic)).withMessageContaining("A template contains the topic field reference 'stopFilteredTermList'. However, no value for such a field was provided.");
+
     }
 }

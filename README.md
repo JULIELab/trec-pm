@@ -25,13 +25,13 @@ There are currently two templating engines contained in this project. A legacy o
  the legacy approach in the future.
   
 The classes realizing the legacy approach are
-* `at.medunigraz.imi.bst.retrieval.MapQueryDecorator`
-* `at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator`
-* `at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator`
+  * `at.medunigraz.imi.bst.retrieval.MapQueryDecorator`
+  * `at.medunigraz.imi.bst.retrieval.TemplateQueryDecorator`
+  * `at.medunigraz.imi.bst.retrieval.SubTemplateQueryDecorator`
 
 The new approach is encoded in
-* `at.medunigraz.imi.bst.retrieval.JsonMapQueryDecorator`
-* `at.medunigraz.imi.bst.retrieval.JsonTemplateQueryDecorator`
+  * `at.medunigraz.imi.bst.retrieval.JsonMapQueryDecorator`
+  * `at.medunigraz.imi.bst.retrieval.JsonTemplateQueryDecorator`
 
 These "decorators" are applied to a given topic and a file containing a template. They will then replace the
 _template expressions_ with the referenced values from the topic. As a template expression we denote a special
