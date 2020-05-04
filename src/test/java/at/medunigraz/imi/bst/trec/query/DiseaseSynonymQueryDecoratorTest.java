@@ -12,6 +12,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class DiseaseSynonymQueryDecoratorTest extends QueryDecoratorTest {
@@ -20,7 +21,7 @@ public class DiseaseSynonymQueryDecoratorTest extends QueryDecoratorTest {
 	private final String template ="/templates/match-title-expansion.json";
 
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		Assume.assumeTrue(Lexigram.isAPIKeyLoaded());
 	}
 

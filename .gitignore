@@ -1,7 +1,13 @@
 # Lexigraph API key
 apikey.txt
 
+# Lexigram API key
+lexigram-key.txt
+
 *.class
+
+# GSheets credentials
+credentials.json
 
 # Server SSH Key
 google-cloud-trec-key

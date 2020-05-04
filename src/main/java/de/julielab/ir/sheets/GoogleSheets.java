@@ -1,5 +1,6 @@
 package de.julielab.ir.sheets;
 
+import at.medunigraz.imi.bst.config.TrecConfig;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -42,7 +43,7 @@ public class GoogleSheets implements Sheet {
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private static final String CREDENTIALS_FILE_PATH = TrecConfig.GSHEETS_CREDENTIALS;
 
     public GoogleSheets() {
         try {

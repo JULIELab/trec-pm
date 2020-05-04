@@ -33,6 +33,7 @@ public final class TrecConfig {
     public static final String CACHE_HOST = getString("CACHE_HOST");
     public static final int CACHE_PORT = getInteger("CACHE_PORT");
     public static final String GSHEETS_SHEETID = getString("GSHEETS_SHEETID");
+    public static final String GSHEETS_CREDENTIALS = getString("GSHEETS_CREDENTIALS");
     public static final int CONCURRENCY_MAX = getInteger("CONCURRENCY_MAX");
     public static final int EVALSERVER_PORT = getInteger("EVALSERVER_PORT");
     public static final int SIZE = 1000;

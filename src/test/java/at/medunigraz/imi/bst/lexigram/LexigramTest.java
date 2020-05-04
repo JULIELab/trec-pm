@@ -5,6 +5,8 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -13,15 +15,8 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 public class LexigramTest {
 
     @Before
-    public void SetUp() {
+    public void SetUp() throws IOException {
         Assume.assumeTrue(Lexigram.isAPIKeyLoaded());
-    }
-
-    @Test
-    public void muh() {
-        System.out.println(Lexigram.getPreferredTerm("cervical cancer"));
-        System.out.println(Lexigram.getSynonymsFromBestConceptMatch("cervical cancer"));
-        System.out.println(Lexigram.getAncestorsFromBestConceptMatch("cervical cancer"));
     }
 
     @Test

@@ -11,7 +11,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,9 +38,10 @@ public class Lexigram {
         NOISE.add("ca - ");
     }
 
-    public static boolean isAPIKeyLoaded() {
+    public static boolean isAPIKeyLoaded() throws IOException {
         final int MIN_API_KEY_LENGTH = 20;
-        return TrecConfig.LEXIGRAM_APIKEY.length() > MIN_API_KEY_LENGTH;
+        Path keyFilePath = Path.of(TrecConfig.LEXIGRAM_APIKEY);
+        return keyFilePath.toFile().exists() && Files.readString(keyFilePath, StandardCharsets.UTF_8).length() >= MIN_API_KEY_LENGTH;
     }
 
     /**
@@ -118,44 +123,59 @@ public class Lexigram {
     }
 
     private static List<String> ancestors(String conceptId) {
-        // TODO pagination
-        JSONObject body = get(ENDPOINT + "concepts/" + conceptId + "/ancestors");
+        try {
+            // TODO pagination
+            JSONObject body = get(ENDPOINT + "concepts/" + conceptId + "/ancestors");
 
-        List<String> ancestors = new ArrayList<>();
-        JSONArray results = body.getJSONArray("results");
-        for(int i = 0; i < results.length(); i++) {
-            ancestors.add(cleanUpString(results.getJSONObject(i).getString("label")));
+            List<String> ancestors = new ArrayList<>();
+            JSONArray results = body.getJSONArray("results");
+            for(int i = 0; i < results.length(); i++) {
+                ancestors.add(cleanUpString(results.getJSONObject(i).getString("label")));
+            }
+
+            return ancestors;
+        } catch (IOException e) {
+            LOG.error("Could not query Lexigram API", e);
+            throw new IllegalArgumentException(e);
         }
-
-        return ancestors;
     }
 
     private static Concept concept(String conceptId) {
-        /* Get info (label and synonyms) of concept */
-        JSONObject body = get(ENDPOINT + "concepts/" + conceptId);
+        try {
+            /* Get info (label and synonyms) of concept */
+            JSONObject body = get(ENDPOINT + "concepts/" + conceptId);
 
-        Concept concept = new Concept();
-        concept.label = cleanUpString(body.getString("label"));
+            Concept concept = new Concept();
+            concept.label = cleanUpString(body.getString("label"));
 
-        JSONArray synonymsJson = body.getJSONArray("synonyms");
-        for(int i = 0; i < synonymsJson.length(); i++) {
-            concept.synonyms.add(cleanUpString(synonymsJson.get(i).toString()));
+            JSONArray synonymsJson = body.getJSONArray("synonyms");
+            for(int i = 0; i < synonymsJson.length(); i++) {
+                concept.synonyms.add(cleanUpString(synonymsJson.get(i).toString()));
+            }
+
+            return concept;
+        } catch (IOException e) {
+            LOG.error("Could not query Lexigram API", e);
+            throw new IllegalArgumentException(e);
         }
-
-        return concept;
     }
 
     private static Optional<String> search(String label) {
-        JSONObject body = get(ENDPOINT + "search?q="+ URLEncoder.encode(label));
-        JSONArray results = body.getJSONArray("conceptSearchHits");
-        if (results.length() == 0) {
-            return Optional.empty();
-        }
+        try {
+            JSONObject body = get(ENDPOINT + "search?q="+ URLEncoder.encode(label, StandardCharsets.UTF_8));
+            JSONArray results = body.getJSONArray("conceptSearchHits");
+            if (results.length() == 0) {
+                return Optional.empty();
+            }
 
-        /* Get first concept (most relevant search hit) */
-        JSONObject item = results.getJSONObject(0);
-        JSONObject concept = item.getJSONObject("concept");
-        return Optional.of(concept.getString("id"));
+            /* Get first concept (most relevant search hit) */
+            JSONObject item = results.getJSONObject(0);
+            JSONObject concept = item.getJSONObject("concept");
+            return Optional.of(concept.getString("id"));
+        } catch (IOException e) {
+            LOG.error("Could not query Lexigram API", e);
+            throw new IllegalArgumentException(e);
+        }
     }
 
     private static List<String> cleanUpList(List<String> labels) {
@@ -194,8 +214,10 @@ public class Lexigram {
         return cleanLabel.trim();
     }
 
-    private static JSONObject get(String url) {
-        return new JSONObject(REQUESTER.get(url, TrecConfig.LEXIGRAM_APIKEY));
+    private static JSONObject get(String url) throws IOException {
+        Path keyfilePath = Path.of(TrecConfig.LEXIGRAM_APIKEY);
+        String apiKey = Files.readString(keyfilePath, StandardCharsets.UTF_8).trim();
+        return new JSONObject(REQUESTER.get(url, apiKey));
     }
 
     /**
