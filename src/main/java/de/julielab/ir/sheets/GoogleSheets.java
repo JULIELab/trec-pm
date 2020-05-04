@@ -13,9 +13,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.BatchGetValuesResponse;
-import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 import de.julielab.java.utilities.FileUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,16 +34,14 @@ public class GoogleSheets implements Sheet {
     private static final String APPLICATION_NAME = "Google Sheets API";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
-
-    private final NetHttpTransport HTTP_TRANSPORT;
-    private final Sheets SERVICE;
-
     /**
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = TrecConfig.GSHEETS_CREDENTIALS;
+    private final NetHttpTransport HTTP_TRANSPORT;
+    private final Sheets SERVICE;
 
     public GoogleSheets() {
         try {
@@ -61,6 +58,7 @@ public class GoogleSheets implements Sheet {
 
     /**
      * Creates an authorized Credential object.
+     *
      * @param HTTP_TRANSPORT The network HTTP Transport.
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
@@ -111,6 +109,22 @@ public class GoogleSheets implements Sheet {
         }
 
         return ret;
+    }
+
+    // values: range - row - column
+    @Override
+    public int write(String spreadsheetId, String[] ranges, List<List<List<Object>>> values) throws IOException {
+        BatchUpdateValuesRequest batchUpdate = new BatchUpdateValuesRequest();
+        batchUpdate.setValueInputOption("RAW");
+        List<ValueRange> valueRanges = new ArrayList<>(ranges.length);
+        for (int i = 0; i < ranges.length; i++) {
+            String range = ranges[i];
+            ValueRange valueRange = new ValueRange().setRange(range).setValues(values.get(i));
+            valueRanges.add(valueRange);
+        }
+        batchUpdate.setData(valueRanges);
+        BatchUpdateValuesResponse response = SERVICE.spreadsheets().values().batchUpdate(spreadsheetId, batchUpdate).execute();
+        return response.getTotalUpdatedCells();
     }
 
     @Override

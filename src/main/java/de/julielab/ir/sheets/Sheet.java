@@ -9,5 +9,7 @@ public interface Sheet {
 
     List<List<Object>> read(String spreadsheetId, String... ranges) throws IOException;
 
+    int write(String spreadsheetId, String[] ranges, List<List<List<Object>>> values) throws IOException;
+
     int write(String spreadsheetId, String range, List<List<Object>> values) throws IOException;
 }

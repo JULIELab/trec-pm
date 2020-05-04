@@ -49,23 +49,23 @@ public class GoogleSheetsSyncer {
 
     private static <Q extends QueryDescription> GoogleSheetsGoldStandard<Q> download(Task task, QueryDescriptionSet<Q> topics) {
 
-        String[] readRange = null;
-        String writeRange = null;
+        String[] readRange ;
+        String[] writeRange;
         File file = null;
         switch (task) {
             case PUBMED:
                 readRange = new String[]{"Scientific Abstracts!B:D", "Scientific Abstracts!F:F"};
-                writeRange = "Scientific Abstracts!B:E";
+                writeRange = new String[]{"Scientific Abstracts!B:E"};
                 file = ABSTRACTS;
                 break;
             case CLINICAL_TRIALS:
                 readRange = new String[]{"Clinical Trials!B:D", "Clinical Trials!F:F"};
-                writeRange = "Clinical Trials!B:E";
+                writeRange = new String[]{"Clinical Trials!B:E"};
                 file = TRIALS;
                 break;
             case CORD19:
                 readRange = new String[]{"B:D", "F:F"};
-                writeRange = "B:G";
+                writeRange = new String[]{"B:E", "G:G"};
                 file = CORD19;
                 break;
             default:

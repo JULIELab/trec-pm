@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
     private static final Logger LOG = LoggerFactory.getLogger(GoogleSheetsGoldStandard.class);
@@ -31,11 +30,11 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
 
     private final String spreadsheetId;
     private final String[] readRange;
-    private final String writeRange;
+    private final String[] writeRange;
 
     private final GoogleSheets sheet = new GoogleSheets();
 
-    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, QueryDescriptionSet<Q> queries, String spreadsheetId, String[] readRange, String writeRange) {
+    public GoogleSheetsGoldStandard(Challenge challenge, Task task, int year, QueryDescriptionSet<Q> queries, String spreadsheetId, String[] readRange, String[] writeRange) {
         super(challenge, task, year, GoldStandardType.INTERNAL, queries, new DocumentList<>());
         this.spreadsheetId = spreadsheetId;
         this.readRange = readRange;
@@ -79,22 +78,25 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
      * Sync the data in memory to the underlying representation, in this case, a Google Spreadsheet.
      */
     public void sync() {
-        List<Object[]> values = new ArrayList<>();
-
-        String[] fromColToCol = writeRange.split(":");
-        int numCols = fromColToCol[1].charAt(0) - fromColToCol[0].charAt(0) + 1;
+        List<List<List<Object>>> values = new ArrayList<>();
 
         // Header
-        values.add(Arrays.copyOf(new Object[]{"Topic", "Q0", "ID", "Rel", "RelFixed", "URL"}, numCols));
+        values.add(new ArrayList<>());
+        values.add(new ArrayList<>());
+        values.get(0).add(Arrays.asList("Topic", "Q0", "ID", "Rel"));
+        if (writeRange.length > 1)
+            values.get(1).add(Arrays.asList("URL"));
 
         // Don't write duplicates to the gold standard.
         for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueTopicDocumentIds()) {
-            values.add(Arrays.copyOf(new Object[]{doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance(), "", doc.getUrl()}, numCols));
+            values.get(0).add(Arrays.asList(doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance()));
+            if (writeRange.length > 1)
+                values.get(1).add(Arrays.asList(doc.getUrl()));
         }
 
         int rowsUpdated = -1;
         try {
-            rowsUpdated = sheet.write(spreadsheetId, writeRange, values.stream().map(Arrays::asList).collect(Collectors.toList()));
+            rowsUpdated = sheet.write(spreadsheetId, writeRange, values);
         } catch (IOException e) {
             throw new RuntimeException("Could not write to Google spreadsheet.", e);
         }
