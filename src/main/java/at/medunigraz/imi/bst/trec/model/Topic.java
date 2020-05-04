@@ -298,7 +298,7 @@ public class Topic extends QueryDescription {
     }
 
     @Override
-    public Map<String, String> getAttributes() {
+    public Map<String, String> getFlattenedAttributes() {
         Map<String, String> ret = new HashMap<>();
 
         // TODO use reflection to read the fields of this class and put this code into QueryDescription

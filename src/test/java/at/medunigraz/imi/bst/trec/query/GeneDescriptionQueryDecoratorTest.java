@@ -9,28 +9,26 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.Map;
 
 public class GeneDescriptionQueryDecoratorTest extends QueryDecoratorTest {
     private static final String GENE = "TP53";
 
-    private final String template ="/test-templates/match-title-gene-description.json";
-
     public GeneDescriptionQueryDecoratorTest() {
+        String template = "/test-templates/match-title-gene-description.json";
         this.decoratedQuery = new GeneDescriptionQueryDecorator(
-                new SubTemplateQueryDecorator(template, new ElasticSearchQuery(TrecConfig.ELASTIC_BA_INDEX)));
+                new SubTemplateQueryDecorator<>(template, new ElasticSearchQuery<>(TrecConfig.ELASTIC_BA_INDEX)));
         this.topic = new Topic().withGeneField(GENE);
     }
 
     @Test
     public void testGetTopic() {
-        DummyElasticSearchQuery dummyQuery = new DummyElasticSearchQuery();
-        Query decorator = new GeneDescriptionQueryDecorator(dummyQuery);
+        DummyElasticSearchQuery<Topic> dummyQuery = new DummyElasticSearchQuery<>();
+        Query<Topic> decorator = new GeneDescriptionQueryDecorator(dummyQuery);
 
         decorator.query(new Topic().withGeneField(GENE));
 
-        Map<String, String> actual = dummyQuery.getTopic().getAttributes();
+        Map<String, String> actual = dummyQuery.getTopic().getFlattenedAttributes();
         Assert.assertThat(actual, Matchers.hasEntry("geneDescriptions0", "tumor protein p53"));
     }
 }

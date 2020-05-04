@@ -1,0 +1,5 @@
+{
+  "bool": {
+    "must": ["${FOR INDEX IN friends REPEAT friendsDismax.json}"]
+  }
+}

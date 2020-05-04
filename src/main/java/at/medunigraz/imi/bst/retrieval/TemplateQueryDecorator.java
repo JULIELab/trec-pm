@@ -46,7 +46,7 @@ public class TemplateQueryDecorator<T extends QueryDescription> extends MapQuery
 	public List<Result> query(T topic) {
 	    // We reload the template for each new query, as the jsonQuery has been filled with the previous topic data
 		loadTemplate(topic);
-		map(topic.getAttributes());
+		map(topic.getFlattenedAttributes());
 		setJSONQuery(cleanup(getJSONQuery()));
 		try {
 			return decoratedQuery.query(topic);
