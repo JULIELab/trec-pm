@@ -23,6 +23,8 @@ public class Metrics implements Serializable {
         ZERO.put("P_10", 0);
         ZERO.put("P_15", 0);
         ZERO.put("set_F", 0);
+        ZERO.put("Bpref", 0);
+        ZERO.put("MAP", 0);
         ZERO.put("set_recall", 0);
     }
 
@@ -36,11 +38,14 @@ public class Metrics implements Serializable {
         if (name.equalsIgnoreCase("ndcg")) return "ndcg";
         if (name.equalsIgnoreCase("infndcg")) return "infNDCG";
         if (name.equalsIgnoreCase("rprec")) return "Rprec";
+        if (name.equalsIgnoreCase("r-prec")) return "Rprec";
         if (name.equalsIgnoreCase("infap")) return "infAP";
         if (name.equalsIgnoreCase("p_5")) return "P_5";
         if (name.equalsIgnoreCase("p_10")) return "P_10";
         if (name.equalsIgnoreCase("p_15")) return "P_15";
         if (name.equalsIgnoreCase("set_f")) return "set_F";
+        if (name.equalsIgnoreCase("Bpref")) return "bpref";
+        if (name.equalsIgnoreCase("map")) return "map";
         if (name.equalsIgnoreCase("set_recall")) return "set_recall";
         return name;
     }

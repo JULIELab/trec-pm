@@ -34,7 +34,7 @@ public class Experiment<Q extends QueryDescription> {
     // This ranker will be applied to retrieved results, if it is present.
     private Ranker<Q> reRanker;
     private Map<String, Metrics> metricsByTopic;
-
+    private String[] requestedMetrics;
 
     /**
      * Build an Experiment using the topics provided by the gold standard.
@@ -165,6 +165,7 @@ public class Experiment<Q extends QueryDescription> {
         String statsDir = this.statsDir;
 
         TrecMetricsCreator trecMetricsCreator = new TrecMetricsCreator(experimentId, longExperimentId, output, getQrelFile(), k, calculateTrecEvalWithMissingResults, statsDir, goldStandard != null ? goldStandard.getType() : GoldStandardType.UNKNOWN, getSampleQrelFile());
+        trecMetricsCreator.setRequestedMetrics(requestedMetrics);
         Metrics allMetrics = trecMetricsCreator.computeMetrics();
         metricsByTopic = trecMetricsCreator.getMetricsPerTopic();
 
@@ -244,5 +245,9 @@ public class Experiment<Q extends QueryDescription> {
 
     public void setGoldStandard(GoldStandard goldStandard) {
         this.goldStandard = goldStandard;
+    }
+
+    public void setRequestedMetrics(String[] requestedMetrics) {
+        this.requestedMetrics = requestedMetrics;
     }
 }

@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class TrecMetricsCreator {
@@ -26,6 +28,11 @@ public class TrecMetricsCreator {
     private File sampleGoldStandard;
     private Metrics metrics;
     private Map<String, Metrics> metricsPerTopic;
+    private String[] requestedMetrics;
+
+    public void setRequestedMetrics(String[] requestedMetrics) {
+        this.requestedMetrics = requestedMetrics;
+    }
 
     public TrecMetricsCreator(String shortExperimentId, String longExperimentId, File results, File goldStandard, int k, boolean calculateTrecEvalWithMissingResults, String statsDir, GoldStandardType goldStandardType, File sampleGoldStandard) {
         this.experimentId = shortExperimentId;
@@ -37,6 +44,7 @@ public class TrecMetricsCreator {
         this.statsDir = statsDir;
         this.goldStandardType = goldStandardType;
         this.sampleGoldStandard = sampleGoldStandard;
+        this.requestedMetrics = new String[]{"NDCG", "infNDCG@", "P_5", "P_10", "P_15", "R-Prec", "set_recall"};
     }
 
     public Map<String, Metrics> getMetricsPerTopic() {
@@ -82,9 +90,11 @@ public class TrecMetricsCreator {
             csw.close();
 
             Metrics allMetrics = metricsPerTopic.get("all");
-            LOG.info("Got NDCG = {}, infNDCG = {},  P@5 = {}, P@10 = {}, P@15 = {}, R-Prec = {}, set_recall = {} for collection {}",
-                    allMetrics.getNDCG(), allMetrics.getInfNDCG(), allMetrics.getP5(), allMetrics.getP10(), allMetrics.getP15(), allMetrics.getRPrec(), allMetrics.getSetRecall(),
-                    longExperimentId);
+            List<String> metricValues = new ArrayList<>();
+            for (String metric : requestedMetrics) {
+                metricValues.add(metric.replaceAll("[Pp]_", "P@") + " = " + allMetrics.getMetric(metric));
+            }
+            LOG.info("Got {} for collection {}", String.join(", ", metricValues), longExperimentId);
             metrics = allMetrics;
             LOG.trace("All metrics: {}", allMetrics);
             return allMetrics;
