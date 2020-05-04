@@ -1,8 +1,8 @@
 {
 	"bool": {
 		"must": [
-			{{cord19/covid.json}}
-			{{cord19/mandatory_bow.json}},
+			{{cord19/covid.json}},
+			{{cord19/mandatory_bow.json}}
 		],
 		"should": [
 			{{optionalSynonymWords:cord19/optional_synonyms.json}},

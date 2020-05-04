@@ -21,13 +21,16 @@ public final class Cord19Experimenter {
 
         Experiment<CovidTopic> exp = new Experiment<>(TrecCovidGoldStandardFactory.round1(), Cord19RetrievalRegistry.jlbaseRound1(), TrecCovidTopicSetFactory.topicsRound1());
         exp.setRequestedMetrics(new String[]{"NDCG", "P_5", "P_10", "Bpref", "MAP"});
+//        exp.setK(5);
         exp.run();
-//
-//        Experiment<CovidTopic> exp2 = new Experiment<>(null, Cord19RetrievalRegistry.jlprecRound1(), TrecCovidTopicSetFactory.topicsRound1());
-//        exp2.run();
 
-//        Experiment<CovidTopic> exp3 = new Experiment<>(null, Cord19RetrievalRegistry.jlrecallRound1(), TrecCovidTopicSetFactory.topicsRound1());
-//        exp3.run();
+        Experiment<CovidTopic> exp2 = new Experiment<>(TrecCovidGoldStandardFactory.round1(), Cord19RetrievalRegistry.jlprecRound1(), TrecCovidTopicSetFactory.topicsRound1());
+        exp2.setRequestedMetrics(new String[]{"NDCG", "P_5", "P_10", "Bpref", "MAP"});
+        exp2.run();
+
+        Experiment<CovidTopic> exp3 = new Experiment<>(TrecCovidGoldStandardFactory.round1(), Cord19RetrievalRegistry.jlrecallRound1(), TrecCovidTopicSetFactory.topicsRound1());
+        exp3.setRequestedMetrics(new String[]{"NDCG", "P_5", "P_10", "Bpref", "MAP"});
+        exp3.run();
 
         CacheService.getInstance().commitAllCaches();
         ElasticClientFactory.getClient().close();

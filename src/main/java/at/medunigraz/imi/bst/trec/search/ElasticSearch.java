@@ -2,7 +2,6 @@ package at.medunigraz.imi.bst.trec.search;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.utils.JsonUtils;
 import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
 import de.julielab.ir.es.SimilarityParameters;
@@ -95,7 +94,7 @@ public class ElasticSearch implements SearchEngine {
 
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
-        System.out.println(json);
+//        System.out.println(json);
         LOG.trace("Sending query: {}", Thread.currentThread().getName() + ", " + index + ": " + json);
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
@@ -136,7 +135,7 @@ public class ElasticSearch implements SearchEngine {
             final SearchSourceBuilder sb = new SearchSourceBuilder().query(qb).size(size).storedField("_id");
             if (storedFields != null)
                 sb.fetchSource(storedFields, null);
-            System.out.println(sb);
+//            System.out.println(sb);
             SearchResponse response = null;
             int retries = 0;
             ExecutionException lastException = null;
