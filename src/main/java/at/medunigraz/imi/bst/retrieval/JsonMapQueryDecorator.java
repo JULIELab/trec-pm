@@ -72,16 +72,17 @@ public abstract class JsonMapQueryDecorator<T extends QueryDescription> extends 
     }
 
     private Object handleQuoting(boolean hasBeginQuote, boolean hasEndQuote, Set<Modifier> modifiers, Object replacement) {
+        Object ret = replacement;
         // We need to take care of the quoting. The template expression must always be a string to create a valid JSON document. However, the template expression
         // can also just be a part of an actual JSON string. The latter is detected by checking if the expression was surrounded by quotes to begin with (if yes it means
         // that the whole expression is the string, thus the quotes belong to the expression). We also obey fixed (NO)QUOTE modifiers.
-        if ((hasBeginQuote && hasEndQuote && !modifiers.contains(Modifier.NOQUOTE) && replacement instanceof CharSequence) || modifiers.contains(Modifier.QUOTE))
-            replacement = "\"" + replacement + "\"";
+        if ((hasBeginQuote && hasEndQuote && !modifiers.contains(Modifier.NOQUOTE) && ret instanceof CharSequence) || modifiers.contains(Modifier.QUOTE))
+            ret = "\"" + ret + "\"";
         else if (!modifiers.contains(Modifier.NOQUOTE) && hasBeginQuote && !hasEndQuote)
-            replacement = "\"" + replacement;
+            ret = "\"" + ret;
         else if (!modifiers.contains(Modifier.NOQUOTE) && !hasBeginQuote && hasEndQuote)
-            replacement = replacement + "\"";
-        return replacement;
+            ret = ret + "\"";
+        return ret;
     }
 
     protected List<Integer> getEffectiveIndices(List<Integer> implicitIndices, Matcher m, int indexGroupNumber) {
