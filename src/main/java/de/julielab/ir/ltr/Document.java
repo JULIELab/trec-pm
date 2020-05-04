@@ -33,6 +33,20 @@ public class Document<Q extends QueryDescription> {
     private String id;
     private Q queryDescription;
     private String type;
+    private String url;
+
+    /**
+     * URL to the actual document represented by this object.
+     * @return An URL to find the document text at. May be null.
+     */
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     /**
      * The gold standard given relevance level, e.g. -1, 0, 1, 2 for not judged, not relevant, partially relevant and definitively relevant.
      */

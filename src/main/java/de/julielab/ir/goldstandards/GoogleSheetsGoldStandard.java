@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends AtomicGoldStandard<Q> {
     private static final Logger LOG = LoggerFactory.getLogger(GoogleSheetsGoldStandard.class);
@@ -78,19 +79,22 @@ public class GoogleSheetsGoldStandard<Q extends QueryDescription> extends Atomic
      * Sync the data in memory to the underlying representation, in this case, a Google Spreadsheet.
      */
     public void sync() {
-        List<List<Object>> values = new ArrayList<>();
+        List<Object[]> values = new ArrayList<>();
+
+        String[] fromColToCol = writeRange.split(":");
+        int numCols = fromColToCol[1].charAt(0) - fromColToCol[0].charAt(0) + 1;
 
         // Header
-        values.add(Arrays.asList("Topic", "Q0", "ID", "Rel"));
+        values.add(Arrays.copyOf(new Object[]{"Topic", "Q0", "ID", "Rel", "RelFixed", "URL"}, numCols));
 
         // Don't write duplicates to the gold standard.
         for (Document<Q> doc : qrelDocuments.getSubsetWithUniqueTopicDocumentIds()) {
-            values.add(Arrays.asList(doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance()));
+            values.add(Arrays.copyOf(new Object[]{doc.getQueryDescription().getNumber(), "0", doc.getId(), doc.getRelevance(), "", doc.getUrl()}, numCols));
         }
 
         int rowsUpdated = -1;
         try {
-            rowsUpdated = sheet.write(spreadsheetId, writeRange, values);
+            rowsUpdated = sheet.write(spreadsheetId, writeRange, values.stream().map(Arrays::asList).collect(Collectors.toList()));
         } catch (IOException e) {
             throw new RuntimeException("Could not write to Google spreadsheet.", e);
         }

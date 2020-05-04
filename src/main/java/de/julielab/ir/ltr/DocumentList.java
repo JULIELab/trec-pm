@@ -8,6 +8,7 @@ import de.julielab.ir.ltr.features.TrecPmQueryPart;
 import de.julielab.ir.model.QueryDescription;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -22,14 +23,20 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
     }
 
     public static <Q extends QueryDescription> DocumentList<Q> fromRetrievalResultList(ResultList<Q> list) {
+        return fromRetrievalResultList(list, r -> r.getId(), null);
+    }
+
+    public static <Q extends QueryDescription> DocumentList<Q> fromRetrievalResultList(ResultList<Q> list, Function<Result, String> docIdFunction, Function<Result, String> urlFunction) {
         final DocumentList<Q> documents = new DocumentList<>();
         for (Result r : list.getResults()) {
             final Document<Q> doc = new Document<>();
-            doc.setId(r.getId());
+            doc.setId(docIdFunction.apply(r));
             doc.setScore(new IRScoreFeatureKey(IRScore.BM25, TrecPmQueryPart.FULL), r.getScore());
             doc.setSourceFields(r.getSourceFields());
             doc.setTreatments(r.getTreatments());
             doc.setQueryDescription(list.getTopic());
+            if (urlFunction != null)
+                doc.setUrl(urlFunction.apply(r));
             documents.add(doc);
         }
         return documents;
@@ -45,6 +52,7 @@ public class DocumentList<Q extends QueryDescription> extends ArrayList<Document
      * <p>Since a {@link Document} foremost represents a query-document pair, an original text document might
      * appear for multiple queries. This method serves to get a list of documents such that each text document
      * ID present in this list appears exactly once in the return value.</p>
+     *
      * @return A reduced <code>DocumentList</code> such that each underlying text document is represented exactly once.
      */
     public DocumentList<Q> getSubsetWithUniqueDocumentIds() {

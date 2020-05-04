@@ -181,6 +181,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
             } else {
                 throw new IllegalArgumentException("Unknown TREC PM task " + task);
             }
+        } else if (challenge == Challenge.COVID) {
+            index = TrecConfig.ELASTIC_CORD19_INDEX;
         } else {
             throw new IllegalArgumentException("Unknown challenge " + challenge);
         }

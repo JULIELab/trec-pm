@@ -19,14 +19,14 @@ public final class Cord19Experimenter {
         CacheService.initialize(new TrecCacheConfiguration());
         UmlsSynsetProvider.setDefaultSynsetFile("resources/umlsCovidSynsets.txt.gz");
 
-//        Experiment<CovidTopic> exp = new Experiment<>(null, Cord19RetrievalRegistry.jlbaseRound1(), TrecCovidTopicSetFactory.topicsRound1());
-//        exp.run();
+        Experiment<CovidTopic> exp = new Experiment<>(null, Cord19RetrievalRegistry.jlbaseRound1(), TrecCovidTopicSetFactory.topicsRound1());
+        exp.run();
 //
 //        Experiment<CovidTopic> exp2 = new Experiment<>(null, Cord19RetrievalRegistry.jlprecRound1(), TrecCovidTopicSetFactory.topicsRound1());
 //        exp2.run();
 
-        Experiment<CovidTopic> exp3 = new Experiment<>(null, Cord19RetrievalRegistry.jlrecallRound1(), TrecCovidTopicSetFactory.topicsRound1());
-        exp3.run();
+//        Experiment<CovidTopic> exp3 = new Experiment<>(null, Cord19RetrievalRegistry.jlrecallRound1(), TrecCovidTopicSetFactory.topicsRound1());
+//        exp3.run();
 
         CacheService.getInstance().commitAllCaches();
         ElasticClientFactory.getClient().close();

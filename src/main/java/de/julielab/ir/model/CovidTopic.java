@@ -1,5 +1,6 @@
 package de.julielab.ir.model;
 
+import at.medunigraz.imi.bst.trec.model.Challenge;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -163,7 +164,7 @@ public class CovidTopic extends QueryDescription {
 
     @Override
     public CovidTopic getCleanCopy() {
-        return new CovidTopic().withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
+        return new CovidTopic().withChallenge(challenge).withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
     }
 
     public CovidTopic withNarrative(String narrative) {
@@ -183,6 +184,11 @@ public class CovidTopic extends QueryDescription {
 
     public CovidTopic withNumber(int number) {
         super.withNumber(number);
+        return this;
+    }
+
+    public CovidTopic withChallenge(Challenge challenge) {
+        setChallenge(challenge);
         return this;
     }
 }
