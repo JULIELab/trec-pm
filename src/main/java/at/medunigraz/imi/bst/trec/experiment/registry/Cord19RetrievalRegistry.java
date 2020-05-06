@@ -45,9 +45,9 @@ public final class Cord19RetrievalRegistry {
                 .withQueryQuestionSynonyms();
     }
 
-    public static Cord19Retrieval jlprecRound2() {
+    public static Cord19Retrieval jlbasernd2() {
         return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX.split(","))
-                .withExperimentName("jlprec")
+                .withExperimentName("jlbasernd2")
                 .withSize(1500)
                 .withResultListSizeCutoff(1000)
                 .withStoredFields("cord19_uid")
@@ -56,4 +56,5 @@ public final class Cord19RetrievalRegistry {
                 .withUnifyingField("cord19_uid")
                 .withJsonTemplate(TEMPLATE_BASE_RND2, true, true);
     }
+
 }

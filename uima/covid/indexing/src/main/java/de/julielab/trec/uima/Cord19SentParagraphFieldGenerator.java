@@ -13,6 +13,7 @@ import de.julielab.jcore.types.pubmed.OtherID;
 import org.apache.commons.lang.StringUtils;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
+import org.apache.uima.cas.text.AnnotationIndex;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.cas.FSArray;
@@ -57,10 +58,32 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
             if (heading != null) {
                 doc.addField("heading", heading.getCoveredText());
             }
+            addTitle(jCas, doc);
+            addAbstract(jCas, doc);
         }
         return docs;
     }
+    private void addAbstract(JCas aJCas, Document doc) {
+        AnnotationIndex<AbstractText> abstractIndex = aJCas.getAnnotationIndex(AbstractText.type);
+        int i = 0;
+        for (AbstractText at : abstractIndex) {
+            doc.addField("abstract", at.getCoveredText());
+            ++i;
+        }
+        if (i != 1) {
+            log.warn("There were {} abstracts in document {}", i, doc.getId());
+        }
+    }
 
+    private void addTitle(JCas aJCas, Document doc) {
+        AnnotationIndex<Title> titleIndex = aJCas.getAnnotationIndex(Title.type);
+        for (Title t : titleIndex) {
+            String titleType = t.getTitleType();
+            if (titleType != null && titleType.equals("document")) {
+                doc.addField("title", t.getCoveredText());
+            }
+        }
+    }
 
     private void addDocumentIds(JCas aJCas, Document doc) {
         Header h = JCasUtil.selectSingle(aJCas, Header.class);

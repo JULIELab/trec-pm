@@ -532,6 +532,22 @@
                 </value>
                             
             </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>AnnotationsToStore</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>de.julielab.jcore.types.Sentence</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
                     
         </configurationParameterSettings>
                 

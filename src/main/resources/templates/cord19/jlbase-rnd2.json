@@ -1,7 +1,7 @@
 {
 	"bool": {
 		"must": [
-			"${INSERT cord19-rnd2/query.json}"
+			"${INSERT cord19-rnd2/mandatoryBoW.json}"
 		]
 	}
 }
