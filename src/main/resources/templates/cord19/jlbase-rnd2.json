@@ -1,11 +1,7 @@
 {
 	"bool": {
 		"must": [
-			"${INSERT cord19-rnd2/covid.json}",
 			"${INSERT cord19-rnd2/query.json}"
-		],
-		"should": [
-			"${INSERT cord19-rnd2/question.json}"
 		]
 	}
 }

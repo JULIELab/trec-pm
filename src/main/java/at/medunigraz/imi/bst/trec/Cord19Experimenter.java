@@ -19,8 +19,8 @@ public final class Cord19Experimenter {
         CacheService.initialize(new TrecCacheConfiguration());
         UmlsSynsetProvider.setDefaultSynsetFile("resources/umlsCovidSynsets.txt.gz");
 
-        Experiment<CovidTopic> exp = new Experiment<>(TrecCovidGoldStandardFactory.round1(), Cord19RetrievalRegistry.jlprecRound2(), TrecCovidTopicSetFactory.topicsRound1());
-        exp.setRequestedMetrics(new String[]{"NDCG", "P_5", "P_10", "Bpref", "MAP"});
+        Experiment<CovidTopic> exp = new Experiment<>(TrecCovidGoldStandardFactory.round1(), Cord19RetrievalRegistry.jlbaseRound1(), TrecCovidTopicSetFactory.topicsRound1());
+        exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
         exp.run();
 
 
