@@ -11,13 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> {
     private static final Logger log = LoggerFactory.getLogger(ElasticSearchQuery.class);
     private String jsonQuery;
 
-    private String index;
+    private String[] indices;
     private SimilarityParameters parameters;
     private String[] storedFields;
     private int size = TrecConfig.SIZE;
@@ -34,12 +33,20 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     private int resultListeSizeCutoff;
 
     public ElasticSearchQuery(int size, String index) {
-        this.size = size;
-        this.index = index;
+        this(size, new String[]{index});
     }
 
     public ElasticSearchQuery(String index) {
-        this.index = index;
+        this.indices = new String[]{index};
+    }
+
+    public ElasticSearchQuery(int size, String[] indices) {
+        this.size = size;
+        this.indices = indices;
+    }
+
+    public ElasticSearchQuery(String[] indices) {
+        this.indices = indices;
     }
 
     public void setStoredFields(String[] storedFields) {
@@ -72,13 +79,15 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
 
     @Override
     public List<Result> query(T topic) {
-        String index = topic.getIndex() != null ? topic.getIndex() : this.index;
+        String[] indices = topic.getIndex() != null ? new String[]{topic.getIndex()} : this.indices;
         if (indexSuffix != null && !indexSuffix.isBlank())
-            index = index + indexSuffix;
-        log.trace("Searching on index {} for query {}", index, topic);
-        if (index == null)
+            for (int i = 0; i < indices.length; i++) {
+                indices[i] = indices[i] + indexSuffix;
+            }
+        log.trace("Searching on indices {} for query {}", indices, topic);
+        if (indices == null || indices.length == 0)
             throw new IllegalStateException("No index was specified for this ElasticSearchQuery and the given topic does also not specify an index.");
-        ElasticSearch es = new ElasticSearch(index, parameters);
+        ElasticSearch es = new ElasticSearch(indices, parameters);
         if (storedFields != null) {
             es.setStoredFields(storedFields);
         }

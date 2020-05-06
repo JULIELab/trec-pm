@@ -31,26 +31,30 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
-    private String indexName;
+    private String[] indexNames;
     private List<Retrieval<T, Q>> negativeBoosts;
     private IRScoreFeatureKey scoreKey;
     private String indexSuffix;
     private Function<Result, String> docIdFunction;
 
     public Retrieval(String indexName) {
-        this.indexName = indexName;
-        this.esQuery = new ElasticSearchQuery<Q>(size, indexName);
+        this(new String[]{indexName});
+    }
+
+    public Retrieval(String[] indexNames) {
+        this.indexNames = indexNames;
+        this.esQuery = new ElasticSearchQuery<Q>(size, indexNames);
         this.query = esQuery;
         this.negativeBoosts = new ArrayList<>();
     }
 
     /**
-     * @param indexName
+     * @param indexNames
      * @param resultSize
      * @deprecated Use {@link #withSize(int)} instead.
      */
-    public Retrieval(String indexName, int resultSize) {
-        this(indexName);
+    public Retrieval(String indexNames, int resultSize) {
+        this(indexNames);
         esQuery.setSize(resultSize);
     }
 
@@ -228,10 +232,14 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
             Q cleanCopy = topic.getCleanCopy();
             List<Result> results = query.query(cleanCopy);
             if (results.isEmpty()) {
-                String index = topic.getIndex() != null ? topic.getIndex() : indexName;
-                if (indexSuffix != null && !indexSuffix.isBlank())
-                    index = index + indexSuffix;
-                log.debug("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), index, Thread.currentThread(), new JSONObject(query.getJSONQuery()));
+                String[] indices = topic.getIndex() != null ? new String[]{topic.getIndex()} : indexNames;
+                if (indexSuffix != null && !indexSuffix.isBlank()) {
+                    for (int i = 0; i < indices.length; i++) {
+                        indices[i] += indexSuffix;
+                    }
+                }
+
+                log.debug("RESULT EMPTY for run {} on index {} by thread {}; query was: {}", getExperimentId(), indices, Thread.currentThread(), new JSONObject(query.getJSONQuery()));
             }
 
 
@@ -271,7 +279,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         if (experimentName != null) {
             return experimentName.replace(" ", "_");
         }
-        return String.format("%s_%s", indexName, query.getName().replace(" ", "_"));
+        return String.format("%s_%s", indexNames, query.getName().replace(" ", "_"));
     }
 
     public String getExperimentName() {
@@ -331,6 +339,11 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     public T withJsonTemplate(String templatePath) {
         query = new JsonTemplateQueryDecorator<>(templatePath, query);
+        return (T) this;
+    }
+
+    public T withJsonTemplate(String templatePath, boolean prettyPrint, boolean checkSyntax) {
+        query = new JsonTemplateQueryDecorator<>(templatePath, query, prettyPrint, checkSyntax);
         return (T) this;
     }
 }

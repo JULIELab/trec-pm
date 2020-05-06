@@ -5,6 +5,7 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -31,7 +32,8 @@ import java.util.regex.Pattern;
  */
 public class JsonTemplateQueryDecorator<T extends QueryDescription> extends JsonMapQueryDecorator<T> {
     private static final Logger log = LoggerFactory.getLogger(JsonTemplateQueryDecorator.class);
-    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\s*\\$\\{(FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT|INSERT)\\s+(\\w+\\.json)}\\s*(\")", Pattern.CASE_INSENSITIVE);
+    private static final Pattern LOOP_PATTERN = Pattern.compile("(\")\\s*\\$\\{(FOR\\s+INDEX\\s+IN\\s(\\w+)((\\[[^]]*])+)?\\s+REPEAT|INSERT)\\s+([\\w\\/_-]+\\.json)}\\s*(\")", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+    private static final Pattern DANGLING = Pattern.compile("\\$\\{[^}]+}");
     protected String template;
     private boolean prettyPrint;
     private boolean checkSyntax;
@@ -86,7 +88,16 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
     }
 
     public String expandTemplateExpressions(T topic) {
-        return expandTemplateExpressions(topic, template, new ArrayList<>(), null);
+        String resolvedTemplate = expandTemplateExpressions(topic, template, new ArrayList<>(), null);
+        Matcher m = DANGLING.matcher(resolvedTemplate);
+        boolean danglingFound = false;
+        while (m.find()) {
+            log.error("Found non-resolved template expression {}", m.group());
+            danglingFound = true;
+        }
+        if (danglingFound)
+            throw new IllegalArgumentException("Could not fully resolve the template at " + template + " with topic " + topic + ". Check the template expression syntax and the topic field names.");
+        return resolvedTemplate;
     }
 
     private String expandTemplateExpressions(T topic, String template, List<Integer> indices, Object parentValue) {
@@ -142,7 +153,10 @@ public class JsonTemplateQueryDecorator<T extends QueryDescription> extends Json
         String mappedTemplate = map(templateWithExpandedSubTemplates, topicAttributes, parentValue, indices);
         if (prettyPrint || checkSyntax) {
             try {
-                mappedTemplate = new JSONObject(mappedTemplate).toString(prettyPrint ? 4 : 0);
+                if (mappedTemplate.startsWith("{"))
+                    mappedTemplate = new JSONObject(mappedTemplate).toString(prettyPrint ? 4 : 0);
+                else
+                    mappedTemplate = new JSONArray(mappedTemplate).toString(prettyPrint ? 4 : 0);
             } catch (JSONException e) {
                 log.error("The created JSON document is invalid. The document is {}", mappedTemplate, e);
                 throw e;

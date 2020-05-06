@@ -13,9 +13,15 @@
                     
         </delegateAnalysisEngine>
                 
-        <delegateAnalysisEngine key="JCore ElasticSearch Consumer">
+        <delegateAnalysisEngine key="JCoRe Pipeline AAE">
                         
-            <import location="JCore ElasticSearch Consumer.xml"/>
+            <import location="AggregateAnalysisEngine.xml"/>
+                    
+        </delegateAnalysisEngine>
+                
+        <delegateAnalysisEngine key="JCoRe Consumer AAE">
+                        
+            <import location="AggregateConsumer.xml"/>
                     
         </delegateAnalysisEngine>
             
@@ -35,7 +41,9 @@
                                 
                 <node>JCoRe Abstract Database Multiplier</node>
                                 
-                <node>JCore ElasticSearch Consumer</node>
+                <node>JCoRe Pipeline AAE</node>
+                                
+                <node>JCoRe Consumer AAE</node>
                             
             </fixedFlow>
                     

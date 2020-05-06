@@ -22,6 +22,7 @@ public class DiseaseUmlsHypernymQueryDecoratorTest {
             super("src/test/resources/umls/melanoma.relations",  false);
         }
     }
+
     @Test
     public void testPmTopics() {
         CacheService.initialize(new TrecCacheConfiguration());

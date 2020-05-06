@@ -5,6 +5,8 @@ import at.medunigraz.imi.bst.trec.experiment.Cord19Retrieval;
 
 public final class Cord19RetrievalRegistry {
 
+    private static final String TEMPLATE_BASE_RND2 = "/templates/cord19/jlbase-rnd2.json";
+
     private static final String TEMPLATE_BASE = "/templates/cord19/jlbase.json";
     private static final String TEMPLATE_PREC = "/templates/cord19/jlprec.json";
     private static final String TEMPLATE_RECALL = "/templates/cord19/jlrecall.json";
@@ -44,15 +46,14 @@ public final class Cord19RetrievalRegistry {
     }
 
     public static Cord19Retrieval jlprecRound2() {
-        return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("jlprec")
+        return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX.split(","))
+                .withExperimentName("jlprec")
                 .withSize(1500)
                 .withResultListSizeCutoff(1000)
                 .withStoredFields("cord19_uid")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
                 .withValidDocIds("/valid-result-docs/docids-rnd1.txt", "cord19_uid")
                 .withUnifyingField("cord19_uid")
-                .withJsonTemplate(TEMPLATE_PREC)
-                .withNarrativeSynonymDecorator()
-                .withWordRemoval();
+                .withJsonTemplate(TEMPLATE_BASE_RND2, true, true);
     }
 }

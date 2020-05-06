@@ -33,9 +33,8 @@ public class ElasticSearch implements SearchEngine {
     private static Map<Thread, CacheAccess<String, List<Result>>> cacheMap = new ConcurrentHashMap<>();
     private CacheAccess<String, List<Result>> cache;
     private RestHighLevelClient client;
-    private String index = "_all";
+    private String[] indices = new String[]{"_all"};
     private SimilarityParameters parameters;
-    private String[] types = new String[0];
     // This was introduced for LtR. There, it is required to obtain IR scores for the exact documents of
     // the gold dataset. The filter query is meant to restrict the elastic search result set to the given
     // document IDs.
@@ -57,15 +56,10 @@ public class ElasticSearch implements SearchEngine {
         this.parameters = new NoParameters();
     }
 
-    public ElasticSearch(String index, SimilarityParameters parameters) {
+    public ElasticSearch(String[] indices, SimilarityParameters parameters) {
         this();
-        this.index = index;
+        this.indices = indices;
         this.parameters = parameters != null ? parameters : new NoParameters();
-    }
-
-    public ElasticSearch(String index, SimilarityParameters parameters, String... types) {
-        this(index, parameters);
-        this.types = types;
     }
 
     public void setUnifyingField(String unifyingField) {
@@ -94,15 +88,15 @@ public class ElasticSearch implements SearchEngine {
 
     public List<Result> query(JSONObject jsonQuery, int size) {
         final String json = jsonQuery.toString();
-//        System.out.println(json);
-        LOG.trace("Sending query: {}", Thread.currentThread().getName() + ", " + index + ": " + json);
+        System.out.println(json);
+        LOG.trace("Sending query: {}", Thread.currentThread().getName() + ", " + indices + ": " + json);
         QueryBuilder qb = QueryBuilders.wrapperQuery(json);
         // Mostly used for LtR: Restrict the result to a set of documents specified with
         // #setFilterOnFieldValues(String, Collection)
         if (filterQuery != null) {
             qb = filterQuery.must(qb);
         }
-        String idString = index + Arrays.toString(storedFields) + Arrays.toString(types) + size + parameters.printToString() + qb.toString().replaceAll("\n", "")+unifyingField;
+        String idString = Arrays.toString(indices) + Arrays.toString(storedFields) + size + parameters.printToString() + qb.toString().replaceAll("\n", "")+unifyingField;
         idString = idString.replaceAll("\\s+", " ");
         final String cacheKey = DigestUtils.md5Hex(idString);
         LOG.trace("Query ID for cache: {}", cacheKey);
@@ -114,13 +108,15 @@ public class ElasticSearch implements SearchEngine {
                 if (!(parameters instanceof NoParameters)) {
                     if (client == null)
                         client = ElasticClientFactory.getClient();
-                    ElasticSearchSetup.configureSimilarity(index, true, parameters, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
+                    if (indices.length > 1)
+                        throw new IllegalArgumentException("Index reconfiguration currently only works when a single index is given. Given indices: " + Arrays.asList(indices));
+                    ElasticSearchSetup.configureSimilarity(indices[0], true, parameters, TrecConfig.ELASTIC_BA_MEDLINE_TYPE);
                 }
 
                 result = query(qb, size);
                 cache.put(cacheKey, result);
             } catch (IOException e) {
-                LOG.error("Error when reconfiguring index similarity for index {} to {}", index, parameters, e);
+                LOG.error("Error when reconfiguring index similarity for index {} to {}", indices, parameters, e);
             }
         } else {
             LOG.debug("Got query result of size {} from cache", result.size());
@@ -141,7 +137,7 @@ public class ElasticSearch implements SearchEngine {
             ExecutionException lastException = null;
             while (retries < 3 && response == null) {
                 try {
-                    response = client.search(new SearchRequest(index).source(sb), RequestOptions.DEFAULT);
+                    response = client.search(new SearchRequest(indices).source(sb), RequestOptions.DEFAULT);
                 } catch (NoNodeAvailableException e) {
                     LOG.error("Could not connect to ElasticSearch cluster. Connecting will be retried every 30 seconds. Error message: {}", e.getMessage());
                     boolean connected = false;
@@ -149,7 +145,7 @@ public class ElasticSearch implements SearchEngine {
                     while (!connected) {
                         Thread.sleep(30000);
                         try {
-                            response = client.search(new SearchRequest(index).source(sb), RequestOptions.DEFAULT);
+                            response = client.search(new SearchRequest(indices).source(sb), RequestOptions.DEFAULT);
                             connected = true;
                         } catch (NoNodeAvailableException e1) {
                             LOG.debug("Could still not connect to ElasticSearch. Tried {} times.", reconnections);

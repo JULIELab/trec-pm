@@ -151,11 +151,7 @@
                                 
                 <value>
                                         
-                    <array>
-                                                
-                        <string>de.julielab.trec.uima.Cord19FieldGenerator</string>
-                                            
-                    </array>
+                    <array/>
                                     
                 </value>
                             
@@ -167,7 +163,7 @@
                                 
                 <value>
                                         
-                    <string>cord19-task1-v1</string>
+                    <string>cord19-task2-v1</string>
                                     
                 </value>
                             
@@ -184,6 +180,22 @@
                         <string>http://h5:9200</string>
                                                 
                         <string>http://h6:9200</string>
+                                            
+                    </array>
+                                    
+                </value>
+                            
+            </nameValuePair>
+                        
+            <nameValuePair>
+                                
+                <name>DocumentGenerators</name>
+                                
+                <value>
+                                        
+                    <array>
+                                                
+                        <string>de.julielab.trec.uima.Cord19SentParagraphFieldGenerator</string>
                                             
                     </array>
                                     

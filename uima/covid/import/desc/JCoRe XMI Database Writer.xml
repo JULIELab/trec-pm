@@ -440,6 +440,8 @@
                         <string>de.julielab.jcore.types.Caption</string>
                                                 
                         <string>de.julielab.jcore.types.pubmed.InternalReference</string>
+                                                
+                        <string>de.julielab.jcore.types.Paragraph</string>
                                             
                     </array>
                                     

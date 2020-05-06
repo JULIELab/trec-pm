@@ -11,6 +11,14 @@ import java.util.List;
 import java.util.Set;
 
 public class CovidTopic extends QueryDescription {
+    @Override
+    public String toString() {
+        return "CovidTopic{" +
+                "query='" + query + '\'' +
+                ", number=" + number +
+                '}';
+    }
+
     @QueryDescriptionAttribute
     private String query;
     @QueryDescriptionAttribute
