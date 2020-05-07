@@ -1,6 +1,7 @@
 package at.medunigraz.imi.bst.trec.search;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
+import at.medunigraz.imi.bst.retrieval.SearchHitReranker;
 import at.medunigraz.imi.bst.trec.model.Result;
 import de.julielab.ir.es.ElasticSearchSetup;
 import de.julielab.ir.es.NoParameters;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ElasticSearch implements SearchEngine {
 
@@ -45,6 +48,7 @@ public class ElasticSearch implements SearchEngine {
      */
     private String unifyingField;
     private int resultListeSizeCutoff;
+    private SearchHitReranker reranker;
 
     public ElasticSearch() {
         cache = cacheMap.compute(Thread.currentThread(), (k, v) ->
@@ -96,7 +100,7 @@ public class ElasticSearch implements SearchEngine {
         if (filterQuery != null) {
             qb = filterQuery.must(qb);
         }
-        String idString = Arrays.toString(indices) + Arrays.toString(storedFields) + size + parameters.printToString() + qb.toString().replaceAll("\n", "")+unifyingField;
+        String idString = Arrays.toString(indices) + Arrays.toString(storedFields) + size + parameters.printToString() + qb.toString().replaceAll("\n", "") + unifyingField;
         idString = idString.replaceAll("\\s+", " ");
         final String cacheKey = DigestUtils.md5Hex(idString);
         LOG.trace("Query ID for cache: {}", cacheKey);
@@ -122,6 +126,10 @@ public class ElasticSearch implements SearchEngine {
             LOG.debug("Got query result of size {} from cache", result.size());
         }
         return result;
+    }
+
+    public void setReranker(SearchHitReranker reranker) {
+        this.reranker = reranker;
     }
 
     private List<Result> query(QueryBuilder qb, int size) {
@@ -163,19 +171,29 @@ public class ElasticSearch implements SearchEngine {
             } else {
                 //LOG.trace(JsonUtils.prettify(response.toString()));
                 SearchHit[] results = response.getHits().getHits();
-
-                Set<String> uniqueFieldValues = unifyingField != null ? new HashSet<>() : null;
-                List<Result> ret = new ArrayList<>();
-                for (SearchHit hit : results) {
-                    Result result = new Result(hit.getId(), hit.getScore());
+                List<Result> resultObjects;
+                Stream<Result> resultStream = Arrays.stream(results).map(hit -> {
+                    Result result = new Result(hit.getId(), hit.getIndex(), hit.getScore());
                     result.setSourceFields(hit.getSourceAsMap());
-                    if (unifyingField != null && result.getSourceFields().get(unifyingField) != null && uniqueFieldValues.add((String) result.getSourceFields().get(unifyingField)))
-                        ret.add(result);
+                    return result;
+                });
+                if (reranker != null) {
+                    resultObjects = reranker.rerank(resultStream);
+                } else {
+                    resultObjects = resultStream.collect(Collectors.toList());
+                }
+                List<Result> ret = new ArrayList<>();
+                Set<String> uniqueFieldValues = unifyingField != null ? new HashSet<>() : null;
+                for (Result r : resultObjects) {
+                    if (unifyingField != null && r.getSourceFields().get(unifyingField) != null && uniqueFieldValues.add((String) r.getSourceFields().get(unifyingField)))
+                        ret.add(r);
                     else if (unifyingField == null)
-                        ret.add(result);
+                        ret.add(r);
                     if (resultListeSizeCutoff > 0 && ret.size() >= resultListeSizeCutoff)
                         break;
                 }
+                LOG.debug("Got {} results", ret.size());
+                List<String> text = ret.stream().map(r -> r.getSourceFields().get("cord19_uid") + " " + r.getSourceFields().get("text") ).map(String.class::cast).collect(Collectors.toList());
                 return ret;
             }
         } catch (InterruptedException e) {

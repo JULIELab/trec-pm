@@ -6,6 +6,8 @@ import java.util.*;
 public class Result implements Serializable {
 	private String id;
 
+	private String index;
+
 	private double score;
 
 	private Map<String, Object> sourceFields;
@@ -13,7 +15,16 @@ public class Result implements Serializable {
 	private List<String> treatments = Collections.emptyList();
 
 	public Result(String id, double score) {
+		this(id, null, score);
+	}
+
+    public String getIndex() {
+		return index;
+	}
+
+	public Result(String id, String index, double score) {
 		this.id = id;
+		this.index = index;
 		this.score = score;
 	}
 

@@ -35,6 +35,7 @@ public class CastoriniQueryDecorator extends QueryDecorator<CovidTopic> {
         Set<String> unfilteredWords = new HashSet<>();
         unfilteredWords.addAll(filter(query));
         unfilteredWords.addAll(filter(question));
+        unfilteredWords.addAll(filter(topic.getNarrative()));
         topic.setMandatoryBoW(unfilteredWords);
         return decoratedQuery.query(topic);
     }

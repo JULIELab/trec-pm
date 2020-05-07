@@ -31,6 +31,11 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
      */
     private String unifyingField;
     private int resultListeSizeCutoff;
+    private SearchHitReranker reranker;
+
+    public void setReranker(SearchHitReranker reranker) {
+        this.reranker = reranker;
+    }
 
     public ElasticSearchQuery(int size, String index) {
         this(size, new String[]{index});
@@ -100,6 +105,8 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         if (resultListeSizeCutoff > 0) {
             es.setResultListeSizeCutoff(resultListeSizeCutoff);
         }
+        if (reranker != null)
+            es.setReranker(reranker);
         return es.query(new JSONObject(jsonQuery), size);
     }
 

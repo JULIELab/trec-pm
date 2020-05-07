@@ -271,7 +271,7 @@
                                 
                 <value>
                                         
-                    <boolean>false</boolean>
+                    <boolean>true</boolean>
                                     
                 </value>
                             
@@ -295,7 +295,7 @@
                                 
                 <value>
                                         
-                    <integer>50</integer>
+                    <integer>500</integer>
                                     
                 </value>
                             

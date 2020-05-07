@@ -6,20 +6,21 @@ import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.*;
 import de.julielab.ir.goldstandards.GoldStandard;
+import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.Ranker;
 import de.julielab.ir.model.QueryDescription;
+import de.julielab.java.utilities.FileUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Experiment<Q extends QueryDescription> {
 
@@ -35,6 +36,14 @@ public class Experiment<Q extends QueryDescription> {
     private Ranker<Q> reRanker;
     private Map<String, Metrics> metricsByTopic;
     private String[] requestedMetrics;
+    private boolean writeInspectionFile;
+    private int inspectionOutputPerTopic = 10;
+
+    public void setInspectionOutputPerTopic(int inspectionOutputPerTopic) {
+        this.inspectionOutputPerTopic = inspectionOutputPerTopic;
+    }
+
+    private Function<Result, String> inspectionResultColumnGenerator;
 
     /**
      * Build an Experiment using the topics provided by the gold standard.
@@ -57,6 +66,20 @@ public class Experiment<Q extends QueryDescription> {
         this.goldStandard = goldStandard;
         this.retrieval = retrieval;
         this.topicSet = topics;
+    }
+
+    public void setWriteInspectionFile(boolean writeInspectionFile) {
+        this.writeInspectionFile = writeInspectionFile;
+    }
+
+    /**
+     * If an inspection file is written (see {@link #setWriteInspectionFile(boolean)}), each {@link Result} instance
+     * results to one row. This function determines the information to be extracted from each <tt>Result</tt>. The return
+     * value should be a String of tab-separated column values.
+     * @param inspectionResultColumnGenerator
+     */
+    public void setInspectionResultColumnGenerator(Function<Result, String> inspectionResultColumnGenerator) {
+        this.inspectionResultColumnGenerator = inspectionResultColumnGenerator;
     }
 
     /**
@@ -158,6 +181,8 @@ public class Experiment<Q extends QueryDescription> {
         lastResultListSet = retrieval.retrieve(topicSet);
         if (reRanker != null)
             lastResultListSet = rerank(lastResultListSet);
+        if (writeInspectionFile)
+            writeInspectionFile(lastResultListSet, experimentId);
 
         File output = writeResults(lastResultListSet, experimentId);
         int k = this.k;
@@ -173,6 +198,43 @@ public class Experiment<Q extends QueryDescription> {
 
         // TODO Experiment API #53
 //        System.out.println(allMetrics.getInfNDCG() + ";" + longExperimentId);
+    }
+
+    private void writeInspectionFile(List<ResultList<Q>> lastResultListSet, String experimentId) {
+        if (inspectionResultColumnGenerator == null)
+            throw new IllegalStateException("The inspection file row generator is not set, cannot create the inspection file.");
+        File inspectionFile = new File("inspections", experimentId + ".txt");
+        if (!inspectionFile.getParentFile().exists())
+            inspectionFile.getParentFile().mkdirs();
+        try (BufferedWriter bw = FileUtilities.getWriterToFile(inspectionFile)) {
+            Function<QueryDescription, String> queryIdFunction = goldStandard.getQueryIdFunction();
+            for (ResultList<Q> resultList : lastResultListSet) {
+                Q topic = resultList.getTopic();
+                Map<String, Document> id2doc = Collections.emptyMap();
+                if (goldStandard != null) {
+                    Stream<Document> stream = goldStandard.getQrelDocumentsForQuery(topic).stream();
+                    id2doc = stream.collect(Collectors.toMap(d -> d.getId(), Function.identity()));
+                }
+                int numWrittenForTopic = 0;
+                for (Result r : resultList.getResults()) {
+                    bw.write(queryIdFunction.apply(topic));
+                    bw.write("\t");
+                    Document document = id2doc.get(retrieval.getDocIdFunction().apply(r));
+                    if (document != null)
+                        bw.write(String.valueOf(document.getRelevance()));
+                    else
+                        bw.write("-1");
+                    bw.write("\t");
+                    bw.write(inspectionResultColumnGenerator.apply(r));
+                    bw.newLine();
+                    if (numWrittenForTopic >= inspectionOutputPerTopic && inspectionOutputPerTopic > 0)
+                        break;
+                    ++numWrittenForTopic;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private File writeResults(List<ResultList<Q>> resultLists, String experimentId) {

@@ -44,11 +44,11 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
 
     private List<Document> indexStructure(JCas jCas, Type type) {
         List<Document> docs = new ArrayList<>();
+        int counter = 0;
         for (Annotation a : jCas.getAnnotationIndex(type)) {
             Document doc = new Document();
             docs.add(doc);
             doc.setIndex("covid-rnd2-" + type.getShortName().toLowerCase());
-            addDocumentIds(jCas, doc);
             doc.addField("text", a.getCoveredText());
             Title heading = null;
             if (a instanceof Caption) {
@@ -58,8 +58,12 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
             if (heading != null) {
                 doc.addField("heading", heading.getCoveredText());
             }
-            addTitle(jCas, doc);
-            addAbstract(jCas, doc);
+            addDocumentIds(jCas, doc, counter, type);
+            if (type.getShortName().equals("Paragraph")) {
+                addTitle(jCas, doc);
+                addAbstract(jCas, doc);
+            }
+            ++counter;
         }
         return docs;
     }
@@ -69,9 +73,6 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
         for (AbstractText at : abstractIndex) {
             doc.addField("abstract", at.getCoveredText());
             ++i;
-        }
-        if (i != 1) {
-            log.warn("There were {} abstracts in document {}", i, doc.getId());
         }
     }
 
@@ -85,10 +86,10 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
         }
     }
 
-    private void addDocumentIds(JCas aJCas, Document doc) {
+    private void addDocumentIds(JCas aJCas, Document doc, int counter, Type type) {
         Header h = JCasUtil.selectSingle(aJCas, Header.class);
         doc.addField("paper_id", h.getDocId());
-        doc.setId(h.getDocId());
+        doc.setId(h.getDocId()+"_"+type.getShortName().toLowerCase()+"_"+counter);
         FSArray otherIDs = h.getOtherIDs();
         if (otherIDs != null) {
             for (FeatureStructure fs : otherIDs) {

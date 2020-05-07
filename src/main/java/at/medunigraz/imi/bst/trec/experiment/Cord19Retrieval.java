@@ -1,6 +1,8 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
+import at.medunigraz.imi.bst.retrieval.RRFSearchHitReranker;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
+import at.medunigraz.imi.bst.trec.query.covid.CastoriniQueryDecorator;
 import at.medunigraz.imi.bst.trec.query.covid.NarrativeSynonymDecorator;
 import at.medunigraz.imi.bst.trec.query.covid.SynonymQueryDecorator;
 import at.medunigraz.imi.bst.trec.query.covid.WordRemovalQueryDecorator;
@@ -28,6 +30,16 @@ public class Cord19Retrieval extends Retrieval<Cord19Retrieval, CovidTopic> {
 
     public Cord19Retrieval withQueryQuestionSynonyms() {
         query = new SynonymQueryDecorator(query);
+        return this;
+    }
+
+    public Cord19Retrieval withQueryQuestionBoW() {
+        query = new CastoriniQueryDecorator(query);
+        return this;
+    }
+
+    public Cord19Retrieval withResultReranker(RRFSearchHitReranker reranker) {
+        esQuery.setReranker(reranker);
         return this;
     }
 }

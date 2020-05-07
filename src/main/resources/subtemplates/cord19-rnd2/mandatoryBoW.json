@@ -1,6 +1,6 @@
 {
    "multi_match": {
-     "query": "${mandatoryBoW}",
+     "query": "${CONCAT mandatoryBoW}",
      "fields": "${INSERT cord19-rnd2/fields.json}",
      "tie_breaker": 0.3,
      "type": "best_fields",

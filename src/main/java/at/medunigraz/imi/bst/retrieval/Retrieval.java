@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
     protected Query<Q> query;
     private Logger log = LoggerFactory.getLogger(Retrieval.class);
-    private ElasticSearchQuery<Q> esQuery;
+    protected ElasticSearchQuery<Q> esQuery;
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
