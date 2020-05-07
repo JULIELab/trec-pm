@@ -1,7 +1,6 @@
 package at.medunigraz.imi.bst.trec.experiment.registry;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
-import at.medunigraz.imi.bst.retrieval.RRFSearchHitReranker;
 import at.medunigraz.imi.bst.trec.experiment.Cord19Retrieval;
 
 public final class Cord19RetrievalRegistry {
@@ -57,7 +56,7 @@ public final class Cord19RetrievalRegistry {
                 .withUnifyingField("cord19_uid")
                 .withJsonTemplate(TEMPLATE_BASE_RND2, true, true)
                 .withQueryQuestionBoW()
-                .withResultReranker(new RRFSearchHitReranker())
+//                .withResultReranker(new RRFSearchHitReranker())
                 ;
     }
 
