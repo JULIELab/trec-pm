@@ -2,6 +2,9 @@
 	"bool": {
 		"must": [
 			"${INSERT cord19-rnd2/mandatoryBoW.json}"
+		],
+		"should": [
+			"${INSERT cord19-rnd2/optionalBoW.json}"
 		]
 	}
 }

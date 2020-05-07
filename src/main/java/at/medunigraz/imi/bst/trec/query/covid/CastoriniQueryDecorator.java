@@ -30,13 +30,12 @@ public class CastoriniQueryDecorator extends QueryDecorator<CovidTopic> {
 
     @Override
     public List<Result> query(CovidTopic topic) {
-        String query = topic.getQuery();
-        String question = topic.getQuestion();
+        topic.setMandatoryBoW(filter(topic.getQuery()));
+
         Set<String> unfilteredWords = new HashSet<>();
-        unfilteredWords.addAll(filter(query));
-        unfilteredWords.addAll(filter(question));
+        unfilteredWords.addAll(filter(topic.getQuestion()));
         unfilteredWords.addAll(filter(topic.getNarrative()));
-        topic.setMandatoryBoW(unfilteredWords);
+        topic.setOptionalBoW(unfilteredWords);
         return decoratedQuery.query(topic);
     }
 
