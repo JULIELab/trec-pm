@@ -16,12 +16,27 @@ public final class Cord19RetrievalRegistry {
         return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("jlbase")
                 .withSize(1500)
                 .withResultListSizeCutoff(1000)
-                .withStoredFields("cord19_uid")
+                .withStoredFields("cord19_uid", "abstract")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
                 .withValidDocIds("/valid-result-docs/docids-rnd1.txt", "cord19_uid")
                 .withUnifyingField("cord19_uid")
                 .withSubTemplate(TEMPLATE_BASE);
     }
+
+    public static Cord19Retrieval jlQERound1() {
+        return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("jlbase-QE")
+                .withSize(1500)
+                .withResultListSizeCutoff(1000)
+                .withStoredFields("cord19_uid", "abstract")
+                .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
+                .withValidDocIds("/valid-result-docs/docids-rnd1.txt", "cord19_uid")
+                .withUnifyingField("cord19_uid")
+                .withSubTemplate(TEMPLATE_BASE)
+                //.withNarrativeSynonymDecorator()
+                .withWordRemoval()
+                ;
+    }
+
     public static Cord19Retrieval jlprecRound1() {
         return new Cord19Retrieval(TrecConfig.ELASTIC_CORD19_INDEX).withExperimentName("jlprec")
                 .withSize(1500)

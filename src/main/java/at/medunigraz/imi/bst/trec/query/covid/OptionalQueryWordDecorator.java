@@ -31,7 +31,7 @@ public class OptionalQueryWordDecorator extends DynamicQueryDecorator<CovidTopic
         Set<String> optionalBoW = new HashSet<>();
         Iterator<String> mandatoryWordsIt = mandatoryBoW.iterator();
         while (mandatoryWordsIt.hasNext()) {
-            String word =  mandatoryWordsIt.next();
+            String word = mandatoryWordsIt.next();
             if (isOptional(word)) {
                 optionalBoW.add(word);
                 mandatoryWordsIt.remove();
