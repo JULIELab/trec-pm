@@ -16,6 +16,7 @@ public class NarrativeSynonymDecorator extends DynamicQueryDecorator<CovidTopic>
 
     @Override
     public CovidTopic expandTopic(CovidTopic topic) {
+        System.out.println(topic.getMandatoryBoW());
         List<Set<String>> mandatorySynonyms = filterWords(topic.getMandatoryBoW());
         topic.setMandatorySynonymWords(mandatorySynonyms);
         if (topic.getOptionalBoW() != null) {
