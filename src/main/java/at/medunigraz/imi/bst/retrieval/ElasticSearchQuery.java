@@ -26,15 +26,7 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
     private Collection<String> filterValues;
     // This suffix is appended to the index name given or retrieved from the query
     private String indexSuffix;
-    /**
-     * When not null, for each value in the given field only the first document in a result list will be returned.
-     */
-    private String unifyingField;
-    private SearchHitReranker reranker;
 
-    public void setReranker(SearchHitReranker reranker) {
-        this.reranker = reranker;
-    }
 
     public ElasticSearchQuery(int size, String index) {
         this(size, new String[]{index});
@@ -57,6 +49,17 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         this.storedFields = storedFields;
     }
 
+    public void addStoredFields(String... additionalStoredFields) {
+        if (this.storedFields == null)
+            this.storedFields = additionalStoredFields;
+        else {
+            String[] newstoredFields = new String[this.storedFields.length + additionalStoredFields.length];
+            System.arraycopy(this.storedFields, 0, newstoredFields, 0, this.storedFields.length);
+            System.arraycopy(additionalStoredFields, 0, newstoredFields, this.storedFields.length, additionalStoredFields.length);
+            this.storedFields = newstoredFields;
+        }
+    }
+
     /**
      * <p>Used for LtR. Causes the retrieval to restrict the result sets to documents that have at least one
      * of the given values appearing in the given field.</p>
@@ -77,9 +80,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         this.filterValues = null;
     }
 
-    public void setUnifyingField(String unifyingField) {
-        this.unifyingField = unifyingField;
-    }
 
     @Override
     public List<Result> query(T topic) {
@@ -98,11 +98,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         if (filterField != null) {
             es.setFilterOnFieldValues(filterField, filterValues);
         }
-        if (unifyingField != null) {
-            es.setUnifyingField(unifyingField);
-        }
-        if (reranker != null)
-            es.setReranker(reranker);
         return es.query(new JSONObject(jsonQuery), size);
     }
 

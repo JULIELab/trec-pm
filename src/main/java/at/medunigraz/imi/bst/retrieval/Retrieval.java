@@ -317,7 +317,8 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * @return
      */
     public T withUnifyingField(String fieldname) {
-        esQuery.setUnifyingField(fieldname);
+        esQuery.addStoredFields(fieldname);
+        query = new ResultByFieldValueUnificationDecorator<>(query, fieldname);
         return (T) this;
     }
 
