@@ -7,6 +7,7 @@ import at.medunigraz.imi.bst.trec.model.Result;
 import at.medunigraz.imi.bst.trec.model.ResultList;
 import at.medunigraz.imi.bst.trec.model.Task;
 import de.julielab.ir.es.SimilarityParameters;
+import de.julielab.ir.goldstandards.GoldStandard;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
@@ -324,6 +325,9 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     /**
      * <p>
+     *     NOTE: You will probably want this decorator at the end of the decoration-pipeline, i.e. as the outermost layer. Then, the inner decorators can operate on the whole result lists first, e.g. reranking.
+     * </p>
+     * <p>
      * Cuts the size of the returned result lists to <tt>cutoffSize</tt> even if ElasticSearch returned more
      * results due to a higher setting of {@link #withSize(int)} or the default {@link TrecConfig#SIZE}.
      * </p>
@@ -345,6 +349,18 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     public T withJsonTemplate(String templatePath, boolean prettyPrint, boolean checkSyntax) {
         query = new JsonTemplateQueryDecorator<>(templatePath, query, prettyPrint, checkSyntax);
+        return (T) this;
+    }
+
+    /**
+     * <p>Removes results ocurring in the passed gold standard. This is useful for residual evaluation where the newly submitted results should not contain already rated results from a previous evaluation round.</p>
+     * <p>Adds a {@link ResultListGoldStandardFilterDecorator} with a potentially set doc ID function via {@link #withDocIdFunction(Function)}.</p>
+     *
+     * @param goldStandard
+     * @return
+     */
+    public T withGoldstandardFilter(GoldStandard<Q> goldStandard) {
+        query = new ResultListGoldStandardFilterDecorator<>(query, docIdFunction, goldStandard);
         return (T) this;
     }
 }
