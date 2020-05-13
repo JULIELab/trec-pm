@@ -333,7 +333,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * @return
      */
     public T withResultListSizeCutoff(int cutoffSize) {
-        esQuery.setResultListeSizeCutoff(cutoffSize);
+        query = new ResultListCutoffDecorator<>(query, cutoffSize);
         return (T) this;
     }
 

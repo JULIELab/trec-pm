@@ -54,7 +54,8 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
 
                 Q topic = queriesByNumber.get(topicNumber);
                 if (topic == null)
-                    throw new IllegalArgumentException("The qrels list documents for topic number " + topicNumber + " but in the topics set for the gold standard there is no topic with this number.");
+                    continue;
+//                    throw new IllegalArgumentException("The qrels list documents for topic number " + topicNumber + " but in the topics set for the gold standard there is no topic with this number.");
                 final Document<Q> document = new Document<>();
                 document.setQueryDescription(topic);
                 document.setId(documentId);

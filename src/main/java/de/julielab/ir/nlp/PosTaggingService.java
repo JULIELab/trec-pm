@@ -20,6 +20,7 @@ public class PosTaggingService {
     private static PosTaggingService instance;
     private AnalysisEngine tokenizer;
     private AnalysisEngine posTagger;
+    private AnalysisEngine lemmatizer;
     private JCas jCas;
 
     private PosTaggingService() {
@@ -27,6 +28,7 @@ public class PosTaggingService {
             jCas = JCasFactory.createJCas("de.julielab.jcore.types.jcore-morpho-syntax-types");
             tokenizer = AnalysisEngineFactory.createEngine("de.julielab.jcore.ae.jtbd.desc.jcore-jtbd-ae-biomedical-english");
             posTagger = AnalysisEngineFactory.createEngine("de.julielab.jcore.ae.opennlp.postag.desc.jcore-opennlp-postag-ae-biomedical-english");
+            lemmatizer = AnalysisEngineFactory.createEngine("de.julielab.jcore.ae.biolemmatizer.desc.jcore-biolemmatizer-ae");
         } catch (UIMAException | IOException e) {
             log.error("Could not initialize PosTaggingService", e);
             throw new IllegalStateException(e);
@@ -45,7 +47,8 @@ public class PosTaggingService {
             new Sentence(jCas, 0, sentence.length()).addToIndexes();
             tokenizer.process(jCas);
             posTagger.process(jCas);
-            return JCasUtil.select(jCas, Token.class).stream().map(t -> new NLPToken(t.getCoveredText(), t.getPosTag(0).getValue())).collect(Collectors.toCollection(NLPSentence::new));
+            lemmatizer.process(jCas);
+            return JCasUtil.select(jCas, Token.class).stream().map(t -> new NLPToken(t.getCoveredText(), t.getLemma() != null ? t.getLemma().getValue() : null, t.getPosTag(0).getValue())).collect(Collectors.toCollection(NLPSentence::new));
         } catch (AnalysisEngineProcessException e) {
             log.error("Could not PoS-tag sentence {}", sentence, e);
             throw new IllegalStateException(e);

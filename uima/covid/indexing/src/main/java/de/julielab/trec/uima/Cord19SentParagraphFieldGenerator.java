@@ -3,14 +3,12 @@ package de.julielab.trec.uima;
 import de.julielab.jcore.consumer.es.DocumentGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
-import de.julielab.jcore.types.Caption;
-import de.julielab.jcore.types.Paragraph;
-import de.julielab.jcore.types.Sentence;
-import de.julielab.jcore.types.Title;
+import de.julielab.jcore.types.*;
 import de.julielab.jcore.types.pubmed.AbstractText;
 import de.julielab.jcore.types.pubmed.Header;
 import de.julielab.jcore.types.pubmed.OtherID;
 import org.apache.commons.lang.StringUtils;
+import org.apache.uima.cas.FSIterator;
 import org.apache.uima.cas.FeatureStructure;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.text.AnnotationIndex;
@@ -26,7 +24,7 @@ import java.util.List;
 
 public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
     private final static Logger log = LoggerFactory.getLogger(Cord19SentParagraphFieldGenerator.class);
-
+private static final boolean lemmatize = true;
     public Cord19SentParagraphFieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
     }
@@ -50,6 +48,15 @@ public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
             docs.add(doc);
             doc.setIndex("covid-rnd2-" + type.getShortName().toLowerCase());
             doc.addField("text", a.getCoveredText());
+            if (lemmatize) {
+                FSIterator<Token> tokenIt = jCas.<Token>getAnnotationIndex(Token.type).subiterator(a);
+                StringBuilder sb = new StringBuilder();
+                while (tokenIt.hasNext()) {
+                    Token t = tokenIt.next();
+                    sb.append(t.getLemma().getValue()).append(" ");
+                }
+                doc.addField("text-lemmas", sb.toString());
+            }
             Title heading = null;
             if (a instanceof Caption) {
                 Caption c = (Caption) a;

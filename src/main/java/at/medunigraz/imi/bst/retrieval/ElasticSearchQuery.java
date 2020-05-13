@@ -30,7 +30,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
      * When not null, for each value in the given field only the first document in a result list will be returned.
      */
     private String unifyingField;
-    private int resultListeSizeCutoff;
     private SearchHitReranker reranker;
 
     public void setReranker(SearchHitReranker reranker) {
@@ -102,9 +101,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
         if (unifyingField != null) {
             es.setUnifyingField(unifyingField);
         }
-        if (resultListeSizeCutoff > 0) {
-            es.setResultListeSizeCutoff(resultListeSizeCutoff);
-        }
         if (reranker != null)
             es.setReranker(reranker);
         return es.query(new JSONObject(jsonQuery), size);
@@ -139,11 +135,6 @@ public class ElasticSearchQuery<T extends QueryDescription> implements Query<T> 
 
     public void setIndexSuffix(String suffix) {
         indexSuffix = suffix;
-    }
-
-
-    public void setResultListeSizeCutoff(int resultListeSizeCutoff) {
-        this.resultListeSizeCutoff = resultListeSizeCutoff;
     }
 
 }

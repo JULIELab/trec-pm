@@ -2,10 +2,16 @@ package de.julielab.ir.nlp;
 
 public class NLPToken {
     private String token;
+    private String lemma;
     private String posTag;
 
-    public NLPToken(String token, String posTag) {
+    public String getLemma() {
+        return lemma;
+    }
+
+    public NLPToken(String token, String lemma, String posTag) {
         this.token = token;
+        this.lemma = lemma;
         this.posTag = posTag;
     }
 

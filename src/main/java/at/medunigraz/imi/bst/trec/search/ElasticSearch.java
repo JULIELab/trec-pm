@@ -47,7 +47,6 @@ public class ElasticSearch implements SearchEngine {
      * When not null, for each value in the given field only the first document in a result list will be returned.
      */
     private String unifyingField;
-    private int resultListeSizeCutoff;
     private SearchHitReranker reranker;
 
     public ElasticSearch() {
@@ -189,8 +188,6 @@ public class ElasticSearch implements SearchEngine {
                         ret.add(r);
                     else if (unifyingField == null)
                         ret.add(r);
-                    if (resultListeSizeCutoff > 0 && ret.size() >= resultListeSizeCutoff)
-                        break;
                 }
                 LOG.debug("Got {} results", ret.size());
                 List<String> text = ret.stream().map(r -> r.getSourceFields().get("cord19_uid") + " " + r.getSourceFields().get("text") ).map(String.class::cast).collect(Collectors.toList());
@@ -200,9 +197,5 @@ public class ElasticSearch implements SearchEngine {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public void setResultListeSizeCutoff(int resultListeSizeCutoff) {
-        this.resultListeSizeCutoff = resultListeSizeCutoff;
     }
 }
