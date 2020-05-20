@@ -1,4 +1,4 @@
-# This is basis on which EF did calculate the search space size.
+# This is the basis on which EF did calculate the search space size.
 # It is based on a BA smac-parameters configuration file.
 # The conditional parameter numbers have been halfed because
 # the parameters conditioned on are active or non active.

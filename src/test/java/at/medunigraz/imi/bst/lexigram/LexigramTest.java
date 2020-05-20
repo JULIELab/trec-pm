@@ -18,13 +18,6 @@ public class LexigramTest {
     }
 
     @Test
-    public void muh() {
-        System.out.println(Lexigram.getPreferredTerm("cervical cancer"));
-        System.out.println(Lexigram.getSynonymsFromBestConceptMatch("cervical cancer"));
-        System.out.println(Lexigram.getAncestorsFromBestConceptMatch("cervical cancer"));
-    }
-
-    @Test
     public void preferredTerm() {
         Assert.assertEquals(Lexigram.getPreferredTerm("cervical cancer"), "carcinoma of cervix");
         Assert.assertEquals(Lexigram.getPreferredTerm("cholangiocarcinoma"), "cholangiocarcinoma of biliary tract");
