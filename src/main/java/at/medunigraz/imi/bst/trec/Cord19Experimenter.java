@@ -20,7 +20,7 @@ public final class Cord19Experimenter {
         UmlsSynsetProvider.setDefaultSynsetFile("resources/umlsCovidSynsets.txt.gz");
 
         TrecQrelGoldStandard<CovidTopic> gs = TrecCovidGoldStandardFactory.round1();
-        Experiment<CovidTopic> exp = new Experiment<>(gs, Cord19RetrievalRegistry.jlbasernd2(), gs.getQueriesAsList());
+        Experiment<CovidTopic> exp = new Experiment<>(gs, Cord19RetrievalRegistry.jlbasernd2());
         exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
         exp.setWriteInspectionFile(true);
         exp.setInspectionResultColumnGenerator(r -> r.getSourceFields().get("cord19_uid") + "\2" + r.getSourceFields().get("text"));

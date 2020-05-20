@@ -2,6 +2,7 @@ package at.medunigraz.imi.bst.trec.experiment;
 
 import at.medunigraz.imi.bst.config.TrecConfig;
 import at.medunigraz.imi.bst.retrieval.Query;
+import at.medunigraz.imi.bst.retrieval.ResultListFusion;
 import at.medunigraz.imi.bst.retrieval.Retrieval;
 import at.medunigraz.imi.bst.trec.evaluator.TrecWriter;
 import at.medunigraz.imi.bst.trec.model.*;
@@ -25,7 +26,8 @@ import java.util.stream.Stream;
 public class Experiment<Q extends QueryDescription> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Experiment.class);
-    private Retrieval<?, Q> retrieval;
+    private ResultListFusion resultFusion;
+    private List<Retrieval<?, Q>> retrievals;
     private GoldStandard goldStandard;
     private String statsDir = "stats/";
     private String resultsDir = "results/";
@@ -52,7 +54,22 @@ public class Experiment<Q extends QueryDescription> {
      * @param retrieval
      */
     public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval) {
-        this(goldStandard, retrieval, goldStandard.getQueriesAsList());
+        this(goldStandard, null, goldStandard.getQueriesAsList(), retrieval);
+    }
+
+    /**
+     * Build an Experiment using the topics provided by the gold standard.
+     *
+     * @param goldStandard
+     * @param retrievals
+     */
+    public Experiment(GoldStandard<Q> goldStandard, ResultListFusion resultFusion, QueryDescriptionSet<Q> topics, Retrieval... retrievals) {
+        if (retrievals.length > 1 && resultFusion == null)
+            throw new IllegalArgumentException("Multiple retrievals were passed but no result fusion.");
+        this.goldStandard = goldStandard;
+        this.resultFusion = resultFusion;
+        this.retrievals = Arrays.asList(retrievals);
+        this.topicSet = topics;
     }
 
     /**
@@ -63,9 +80,7 @@ public class Experiment<Q extends QueryDescription> {
      * @param topics
      */
     public Experiment(GoldStandard<Q> goldStandard, Retrieval retrieval, QueryDescriptionSet<Q> topics) {
-        this.goldStandard = goldStandard;
-        this.retrieval = retrieval;
-        this.topicSet = topics;
+        this(goldStandard, null, topics, retrieval);
     }
 
     public void setWriteInspectionFile(boolean writeInspectionFile) {
@@ -91,12 +106,12 @@ public class Experiment<Q extends QueryDescription> {
         this.reRanker = reRanker;
     }
 
-    public Retrieval getRetrieval() {
-        return retrieval;
+    public List<Retrieval<?, Q>> getRetrievals() {
+        return retrievals;
     }
 
-    public void setRetrieval(Retrieval retrieval) {
-        this.retrieval = retrieval;
+    public void setRetrievals(List<Retrieval<?, Q>> retrievals) {
+        this.retrievals = retrievals;
     }
 
     public String getStatsDir() {
@@ -112,7 +127,7 @@ public class Experiment<Q extends QueryDescription> {
     }
 
     public String getExperimentId() {
-        return retrieval.getExperimentId();
+        return retrievals.stream().map(Retrieval::getExperimentId).collect(Collectors.joining("-"));
     }
 
     public QueryDescriptionSet<Q> getTopicSet() {
@@ -173,12 +188,23 @@ public class Experiment<Q extends QueryDescription> {
     }
 
     public Metrics run() {
-        final String experimentId = retrieval.getExperimentId();
-        final String longExperimentId = experimentId + " with decorators " + retrieval.getQuery().getName();
+        final String experimentId = getExperimentId();
+        final String longExperimentId = retrievals.stream().map(retrieval -> experimentId + " with decorators " + retrieval.getQuery().getName()).collect(Collectors.joining("-"));
 
         LOG.info("Running collection " + longExperimentId + "...");
 
-        lastResultListSet = retrieval.retrieve(topicSet);
+        List<List<ResultList<Q>>> allResultLists = new ArrayList<>(retrievals.size());
+        for (Retrieval<?, Q> retrieval : retrievals) {
+            List<ResultList<Q>> resultListSet = retrieval.retrieve(topicSet);
+            allResultLists.add(resultListSet);
+        }
+        List<ResultList<Q>> finalResultList = new ArrayList<>();
+        if (resultFusion != null)
+            finalResultList = resultFusion.fuseMultipleTopics(allResultLists);
+        else
+            finalResultList = allResultLists.get(0);
+
+        lastResultListSet = finalResultList;
         if (reRanker != null)
             lastResultListSet = rerank(lastResultListSet);
         if (writeInspectionFile)
@@ -219,7 +245,7 @@ public class Experiment<Q extends QueryDescription> {
                 for (Result r : resultList.getResults()) {
                     bw.write(queryIdFunction.apply(topic));
                     bw.write("\t");
-                    Document document = id2doc.get(retrieval.getDocIdFunction().apply(r));
+                    Document document = id2doc.get(retrievals.get(0).getDocIdFunction().apply(r));
                     if (document != null)
                         bw.write(String.valueOf(document.getRelevance()));
                     else
@@ -246,7 +272,7 @@ public class Experiment<Q extends QueryDescription> {
         TrecWriter tw = new TrecWriter(output, runName);
 
         Function<QueryDescription, String> queryIdFunction = goldStandard != null ? goldStandard.getQueryIdFunction() : qd -> String.valueOf(qd.getNumber());
-        tw.write(resultLists, retrieval.getDocIdFunction(), queryIdFunction);
+        tw.write(resultLists, retrievals.get(0).getDocIdFunction(), queryIdFunction);
         tw.close();
         return output;
     }
@@ -301,8 +327,8 @@ public class Experiment<Q extends QueryDescription> {
         return null;
     }
 
-    public Query getDecorator() {
-        return retrieval.getQuery();
+    public List<Query> getDecorators() {
+        return retrievals.stream().map(Retrieval::getQuery).collect(Collectors.toList());
     }
 
     public void setGoldStandard(GoldStandard goldStandard) {

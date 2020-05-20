@@ -9,10 +9,14 @@ import java.util.List;
 public class ResultList<T extends QueryDescription> {
 	private T topic;
 	
-	private List<Result> results = new ArrayList<>();
+	private List<Result> results;
 	
 	public ResultList(T topic) {
-		this.topic = topic;
+		this(topic, 10);
+	}
+
+	public ResultList(T topic, int initialSize) {
+		results = new ArrayList<>(initialSize);
 	}
 	
 	public boolean add(Result result) {
