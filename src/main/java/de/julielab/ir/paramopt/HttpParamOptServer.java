@@ -41,15 +41,23 @@ public class HttpParamOptServer {
     public static void main(String[] args) {
         int port = TrecConfig.EVALSERVER_PORT;
 
+        boolean exclude2019 = false;
+        // Optionally, we can exclude the 2019 data. The reason is that then we can use this code to find good parameters on the 2017/2018 data
+        // and test the found parameters on 2019 then.
+        if (args.length > 0)
+            exclude2019 = Boolean.parseBoolean(args[0]);
+
         HttpParamOptServer server = new HttpParamOptServer(port);
-        server.startServer();
+        server.startServer(exclude2019);
     }
 
-    public void startServer() {
+    public void startServer(boolean exclude2019) {
         CacheService.initialize(new TrecCacheConfiguration());
 
-        post("/" + GET_CONFIG_SCORE_PM, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019()), Challenge.TREC_PM, Task.PUBMED, GoldStandardType.OFFICIAL));
-        post("/" + GET_CONFIG_SCORE_CT, new EvaluateConfigurationRoute( new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.trialsOfficial2018(), TrecPMGoldStandardFactory.trialsOfficial2019()), Challenge.TREC_PM, Task.CLINICAL_TRIALS, GoldStandardType.OFFICIAL));
+        AggregatedTrecQrelGoldStandard pmGs = exclude2019 ? new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018()) : new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.pubmedOfficial2017(), TrecPMGoldStandardFactory.pubmedOfficial2018(), TrecPMGoldStandardFactory.pubmedOfficial2019());
+        AggregatedTrecQrelGoldStandard ctGs = exclude2019 ? new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.trialsOfficial2018()) : new AggregatedTrecQrelGoldStandard(TrecPMGoldStandardFactory.trialsOfficial2018(), TrecPMGoldStandardFactory.trialsOfficial2019());
+        post("/" + GET_CONFIG_SCORE_PM, new EvaluateConfigurationRoute(pmGs, Challenge.TREC_PM, Task.PUBMED, GoldStandardType.OFFICIAL));
+        post("/" + GET_CONFIG_SCORE_CT, new EvaluateConfigurationRoute(ctGs, Challenge.TREC_PM, Task.CLINICAL_TRIALS, GoldStandardType.OFFICIAL));
 
         log.info("Server is ready for requests.");
     }
