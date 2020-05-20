@@ -28,6 +28,9 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 * [hpi_dhc TREC 2018 Data Artifacts](https://figshare.com/projects/TREC_PM_2018_Data_hpi-dhc_/56882)
 * [TREC 2018 proceedings](https://trec.nist.gov/pubs/trec27/trec2018.html).
 
+### 2019
+
+
 ## Code Dependencies
 
 - JDK 11+ (won't compile with JDK8)
@@ -40,56 +43,30 @@ If you use any of the improvements mentioned above, please also cite our [TREC 2
 
 ## How to Create the Resources for the Experiments
 
-### UMLS
+### UMLS (for disease query expansion)
 
-You require the `MRCONSO.RRF` which can be obtained from the official UMLS downloads.
-Then, adapt the paths in the `scripts/createUmlsTermSynsets.py` script to read from your `MRCONSO.RRF` file and
-create the `resources/umlsSynsets.txt` file. Framework classes making use of the UMLS synsets will expect
-the file at this location.
+You require the `MRCONSO.RRF` and `MRSTY.RRF` files which can be obtained from the official UMLS downloads.
+For the SIGIR2020 paper we used the UMLS 2019A release.
+Then, execute the following scripts:
+*   `<repository_root>/scripts/createUmlsPreferredTerms.py`
+*   `<repository_root>/scripts/createUmlsRelations.py`
+*   `<repository_root>/scripts/createUmlsSemanticMapping.txt`
+*   `<repository_root>/scripts/createUmlsTermSynsets.py`
+store their output into the `<repository_root>/resources` directory and compress them using `gzip`.
+The Framework classes making use of the UMLS synsets will expect
+the files at this location.
 
+For example, to create the `umlsSynsets.txt.gz` file, do:
 - Download https://download.nlm.nih.gov/umls/kss/2019AA/umls-2019AA-mrconso.zip
 - `unzip umls-2019AA-mrconso.zip`
 - `python3 scripts/createUmlsTermSynsets.py MRCONSO.RRF ENG > resources/umlsSynsets.txt`
 - `wc -c umlsSynsets.txt` = 338449057
 - `gzip resources/umlsSynsets.txt`
 
-### FastText Embeddings for LtR
+### How to Create the Document Database and the ElasticSearch Index
 
-`FastText` embeddings are used to create document embeddings for LtR features. Note that their performance impact seemed to be minor in experiments on the TREC-PM 17/18 data and probably can be left out without great performance penalties. However, this can't be said for sure before evaluation on the 2019 gold standard.
-The emebeddings can be recreated by:
-1. Run the BANNER gene tagger from [jcore-projects](https://github.com/JULIELab/jcore-projects/tree/master/jcore-jnet-ae-biomedical-english), version>=2.4 on the Medline/PubMed 2019 baseline.
-2. Extract the document text from those document with at least one tagged gene in them. This should be around 8 million documents. The text is the title plus abstract text (e.g. by using the [JCoRe PubMed reader](https://github.com/JULIELab/jcore-projects/tree/master/jcore-pubmed-reader) and the [JCoRe To TXT consumer](https://github.com/JULIELab/jcore-base/tree/master/jcore-txt-consumer) in the `DOCUMENT` mode). No postprocessing (which should be done for better models but hasn't been done on the used embeddings).
-3. Create `FastText` word embeddings with a dimension of 300. We used the `.bin` output for LtR features.
-
-## Some Examples on How to Run Experiments
-
-```
-# All executions should be run where the pom file is, usually the root of the project
-
-# How to run the pubmed experimenter
-# Necessary to define the year and type of gold-standard (for evaluation)
-
-mvn clean install
-mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter"
-
-# How to run the clinical trials experimenter
-# Necessary to define the year and type of gold-standard (for evaluation)
-
-mvn clean install
-mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter"
-
-# How to run the KeywordExperimenter
-# Necessary to define the year and type of gold-standard (for evaluation)
-# For positive booster, in the keyword template leave boost = 1
-# For negative booster, in the keyword template leave boost = -1
-# Also, in the KeywordExperimenter the keywordsSource needs to be specified
-
-mvn clean install
-mvn exec:java -Dexec.mainClass="at.medunigraz.imi.bst.trec.KeywordExperimenter" > out.txt &
-cat out.txt | grep -e "\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)" | sed -r "s/"\(^[0-9\.]*\)\(\;.*\)\(with.*\)\(\\[.*\\]\)\(.*\)"/\1 \2 \4/" > results.txt
-```
-# How to Create the Document Database and the ElasticSearch Index
-
+NOTE: The indices used in the SIGIR2020 publication `What Makes a Top-Performing Precision Medicine Search Engine? Tracing Main System Features in a Systematic Way` can be obtained as ElasticSearch 5.4 snapshots from Zenodo.
+ 
 The databases can be re-created using the the components in the `uima` subdirectory.
 All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](https://github.com/JULIELab/jcore-pipeline-modules) in version `0.4.0`. Note that all pipelines require their libraries in the `lib/` directory which does not exist at first. It is automatically created and populated by opening the pipeline with the `JCoRe Pipeline Builder CLI` under the above link. Opening the pipeline should be enough. If this das not create and populate the `lib/` directory, try opening and saving the pipeline.
 
@@ -100,6 +77,44 @@ All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](
 5.  Configure the `pubmed-indexer` and `ct-indexer` projects to work with your ElasticSearch index using the `JCoRe Pipeline Builder`. Execute `mvn package` in both pipeline directories to build the indexing code, which is packaged as a `jar` and automatically put into the `lib` directory of the pipelines. Run the components.
 
 If all steps have been performed successfully, the indices should now be present in your ElasticSearch instance. To run the experiments, also configure the `<repository root>/config/costosys.xml`  file to point to your database. Then run the `at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter´ and `at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter` classes.
+
+### Running SMAC for Parameter Optimization
+
+For the [SMAC](https://www.automl.org/automated-algorithm-design/algorithm-configuration/smac/) parameter optimization, the query sets of the TREC-PM challenges 2017, 2018 and 2019 were combined for biomedical abstracts (BA) and clinical trials (CT) respectively. The only exceptions were the CT2017 topics because for those no sample standard is available and thus the computation of the `infNDCG` measure is not possible.
+
+The resulting topics sets for BA and CT were then split into 10 stratified cross validation splits, respectively. The stratification happened on the disease and gnee topic fields to distribute diesases and genes as evenly as possible. The respective code is called in `EvaluateConfigurationRoute` line 44:
+`List<List<Topic>> partitioning = goldStandard.createPropertyBalancedQueryPartitioning(numSplits, Arrays.asList(Topic::getDisease, Topic::getGeneField));`
+
+To save time, all 20 SMAC optimization processes were run concurrently. To save on Java startup times and to be able to read and write into the same cache files, we wrote a small web server based on Spark. This server class is `de.julielab.ir.paramopt.HttpParamOptServer`. One can send a specific hyper parameter configuration to the server and it will respond with the `infNDCG` measure achieved with this parameter set.
+
+Since the optimized parameters include the BM25 hyper parameters `b` and `k1`, we required one index for each run: The similarity hyper parameters can only be set on the index level in ElasticSearch. Also, the index must be closed for the change.
+Consequently, we copied the BA and CT indices 10 times, respectively, and run 20 independent SMAC processes, each on another index.
+
+The copying of the indices amounts to a total of 40 indices. This is because in the years 2017 and 2018 the same data was used in TREC-PM. For 2019, the datasets were updated. Thus, we have 2 indices for BA and 2 for CT. Both need to be copied 10 times for concurrent changed to the BM25 hyper paremeters. Index copied were created using the reindexing feature of ElasticSearch like this:
+
+    for i in {1..9}; do
+    curl -XPOST http://localhost:9200/_reindex -d "
+    {
+      \"source\": {
+        \"index\": \"trecpm19_ct\"
+      },
+      \"dest\": {
+        \"index\": \"trecpm19_ct_bm25_copy$i\"
+      }
+    }"
+    done
+
+The correct access to the different index copies within SMAC runs was achieved by a setting in the `scenario.txt` file of the SMAC runs (located in the subdirectories of `config/smac`). The algorithm call looks like this:
+
+    algo = bash scripts/smacOverHttpWrapper.sh 32100 pm _copy0
+    
+ Here, we call a shell scripts with 3 parameters: The evaluation server HTTP port, the task type (pm=PubMed; we use pm synonymously to ba) and an _index suffix_. Those parameters are then sent to the HTTP evaluation server. The server queries a different copy of the respective index (ba or ct) according to the index suffix.
+ 
+ To finally start the optimization, the HTTP evaluation server was started with the `scripts/runSmacHttpServer.sh` script. Then, the `runSmacBaOptimizationOverHttp.sh` and `runSmacCtOptimizationOverHttp.sh` scripts were called to start the SMAC runs on all topic splits concurrently as [SLURM](https://slurm.schedmd.com/documentation.html) jobs.
+ 
+ ### Running the Ablation Study
+ 
+ The ablation is run by calling the `scripts/runSigir20AblationExperiments.sh` script. The `de.julielab.ir.experiments.ablation.sigir20.Sigir20AblationExperiments` reads the best performing SMAC runs from the `smac-output` directory (the original SMAC output files are contained in the Zenodo package). Then, predefined sets of hyper parameters are reset to their default settings or completely deactivated as defined in the classes `de.julielab.ir.experiments.ablation.sigir20.Sigir20TopDownAblationBAParameters` and `de.julielab.ir.experiments.ablation.sigir20.Sigir20TopDownAblationCTParameters`. Resulting ablation scores and a preliminary LaTeX table for those are written to `sigir20-ablation-results`.
 
 # Important Java System Properties in this Framework
 
