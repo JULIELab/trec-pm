@@ -8,6 +8,7 @@ Specific to this branch is the experimental code used for the SIGIR publication
 
 Erik Faessler, Michel Oleynik, and Udo Hahn. 2020. What Makes a Top-Performing Precision Medicine Search Engine? Tracing Main System Features in a Systematic Way. _In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR ’20), July 25–30, 2020, Virtual Event, China._ ACM, New York, NY, USA, 10 pages. https://doi.org/10.1145/3397271.3401048
 
+
 ## Citing
 
 If you use `imi_mug`'s original data or code in your work, please cite their [TREC 2017 proceedings paper](https://trec.nist.gov/pubs/trec26/papers/imi_mug-PM.pdf):
@@ -71,7 +72,8 @@ For example, to create the `umlsSynsets.txt.gz` file, do:
 
 ### How to Create the Document Database and the ElasticSearch Index
 
-NOTE: The indices used in the SIGIR2020 publication `What Makes a Top-Performing Precision Medicine Search Engine? Tracing Main System Features in a Systematic Way` can be obtained as ElasticSearch 5.4 snapshots from Zenodo.
+NOTE: The indices used in the SIGIR2020 publication `What Makes a Top-Performing Precision Medicine Search Engine? Tracing Main System Features in a Systematic Way` can be obtained as ElasticSearch 5.4
+ snapshots from Zenodo at https://doi.org/10.5281/zenodo.3854458.
  
 The databases can be re-created using the the components in the `uima` subdirectory.
 All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](https://github.com/JULIELab/jcore-pipeline-modules) in version `0.4.0`. Note that all pipelines require their libraries in the `lib/` directory which does not exist at first. It is automatically created and populated by opening the pipeline with the `JCoRe Pipeline Builder CLI` under the above link. Opening the pipeline should be enough. If this does not create and populate the `lib/` directory, try opening and saving the pipeline.
