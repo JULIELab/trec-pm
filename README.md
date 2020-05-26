@@ -82,7 +82,27 @@ All UIMA pipelines have been created and run by the [JCoRe Pipeline Components](
 4.  Configure the `preprocessing` and `preprocessing_ct` pipelines with the `JCoRe Pipeline Builder` to activate nearly all (explained in a second) components. Some are deactivated in this release. Note that there are some components specific to `BANNER` gene tagging and `FLAIR` gene tagging. Use the `BANNER` components, Flair hasn't been used in our submitted runs. You might also leave the `LingScope` and `MutationFinder` components deactivated because those haven't been used either. Configure the `uima/costosys.xml` file to point to your Postgres database. Run the components. They will write the annotation data into the Postgres database. We used multiple machines for this, employing the [SLURM](https://slurm.schedmd.com/documentation.html) scheduler (not required). All in all we had 96 CPU cores available. Processing time was in the hours, much less than a day, for PubMed. The processing will accordingly take longer or shorter depending on the resources at your disposal.
 5.  Configure the `pubmed-indexer` and `ct-indexer` projects to work with your ElasticSearch index using the `JCoRe Pipeline Builder`. Execute `mvn package` in both pipeline directories to build the indexing code, which is packaged as a `jar` and automatically put into the `lib` directory of the pipelines. Run the components.
 
-If all steps have been performed successfully, the indices should now be present in your ElasticSearch instance. To run the experiments, also configure the `<repository root>/config/costosys.xml`  file to point to your database. Then run the `at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter´ and `at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter` classes.
+If all steps have been performed successfully, the indices should now be present in your ElasticSearch instance. Then run the `at.medunigraz.imi.bst.trec.LiteratureArticlesExperimenter´ and `at.medunigraz.imi.bst.trec.ClinicalTrialsExperimenter` classes for the experiments carried out for TREC.
+
+#### Additional Indexing for the SIGIR2020 Experiments
+
+To run the SIGIR2020 experiments, each index requires 10 copies (see the SMAC section below for an explanation on this). Copy the index via reindexing in the following manner:
+
+    for i in {1..9}; do
+    curl -XPOST http://localhost:9200/_reindex -d "
+    {
+      \"source\": {
+        \"index\": \"trecpm19_ct\"
+      },
+      \"dest\": {
+        \"index\": \"trecpm19_ct_bm25_copy$i\"
+      }
+    }"
+    done
+ 
+ Configure the `trec-pm.properties` file to point to the correct index base name. The is the name of the respective index as shown above without the `_copy$i` suffix.
+
+
 
 ### Running SMAC for Parameter Optimization
 
@@ -98,19 +118,7 @@ To save time, all 20 SMAC optimization processes were run concurrently. To save 
 Since the optimized parameters include the BM25 hyper parameters `b` and `k1`, we required one index for each run: The similarity hyper parameters can only be set on the index level in ElasticSearch. Also, the index must be closed for the change.
 Consequently, we copied the BA and CT indices 10 times, respectively, and run 20 independent SMAC processes, each on another index.
 
-The copying of the indices amounts to a total of 40 indices. This is because in the years 2017 and 2018 the same data was used in TREC-PM. For 2019, the datasets were updated. Thus, we have 2 indices for BA and 2 for CT. Both need to be copied 10 times for concurrent changes to the BM25 hyper parameters. Index copies were created using the reindexing feature of ElasticSearch like this:
-
-    for i in {1..9}; do
-    curl -XPOST http://localhost:9200/_reindex -d "
-    {
-      \"source\": {
-        \"index\": \"trecpm19_ct\"
-      },
-      \"dest\": {
-        \"index\": \"trecpm19_ct_bm25_copy$i\"
-      }
-    }"
-    done
+The copying of the indices amounts to a total of 40 indices. This is because in the years 2017 and 2018 the same data was used in TREC-PM. For 2019, the datasets were updated. Thus, we have 2 indices for BA and 2 for CT. Both need to be copied 10 times for concurrent changes to the BM25 hyper parameters. Index copies were created using the reindexing feature of ElasticSearch as shown in the previous section.
 
 Correct access to the different index copies within SMAC runs was achieved by a setting in the `scenario.txt` file of the SMAC runs (located in the subdirectories of `config/smac`). The algorithm call looks like this:
 

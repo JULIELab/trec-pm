@@ -20,7 +20,7 @@
     <logger name="at.medunigraz.imi.bst.trec.search.ElasticSearch" level="INFO"/>
     <logger name="de.julielab.ir.es.ElasticSearchSetup" level="WARN"/>
     <logger name="de.julielab.ir.paramopt.EvaluateConfigurationRoute" level="INFO"/>
-    <logger name="de.julielab.ir.experiments.ablation.AblationExperiments" level="INFO"/>
+    <logger name="de.julielab.ir.experiments.ablation.AblationExperiments" level="DEBUG"/>
     <logger name="de.julielab.java.utilities.cache" level="INFO"/>
     <logger name="de.julielab.ir.experiments.ablation.sigir20.Sigir20AblationExperiments" level="INFO"/>
     <logger name="de.julielab.ir.experiments.ablation.sigir20.ConfigurationReproduction" level="INFO"/>

@@ -29,17 +29,19 @@ public class AblationLatexTableBuilder {
             if (topDownTableInfo != null && topDownTableInfo.addMidruleAfter(r.getAblationGroupName()))
                 sb.append("\\midrule\n");
         }
-        sb.append("\\midrule\n" +
-                "\\multicolumn{3}{c}{\\textbf{bottom-up}} \\\\\n" +
-                "\\midrule\n");
-        appendReferenceTableLine(sb, "DISMAX (ref)", bottomUpResults.values().iterator().next());
-        sb.append("\\midrule\n");
-        for (AblationCrossValResult r : bottomUpResults.values()) {
-            if (bottomUpTableInfo != null && bottomUpTableInfo.indent(r.getAblationGroupName()))
-                sb.append("\\quad");
-            getAblationResultTableLine(sb, r);
-            if (bottomUpTableInfo != null && bottomUpTableInfo.addMidruleAfter(r.getAblationGroupName()))
-                sb.append("\\midrule\n");
+        if (bottomUpResults != null) {
+            sb.append("\\midrule\n" +
+                    "\\multicolumn{3}{c}{\\textbf{bottom-up}} \\\\\n" +
+                    "\\midrule\n");
+            appendReferenceTableLine(sb, "DISMAX (ref)", bottomUpResults.values().iterator().next());
+            sb.append("\\midrule\n");
+            for (AblationCrossValResult r : bottomUpResults.values()) {
+                if (bottomUpTableInfo != null && bottomUpTableInfo.indent(r.getAblationGroupName()))
+                    sb.append("\\quad");
+                getAblationResultTableLine(sb, r);
+                if (bottomUpTableInfo != null && bottomUpTableInfo.addMidruleAfter(r.getAblationGroupName()))
+                    sb.append("\\midrule\n");
+            }
         }
         sb.append("\\bottomrule\n" +
                 "\\end{tabular}\n" +

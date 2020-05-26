@@ -27,7 +27,7 @@ public class ReducedModelScorer {
     public static void main(String args[]) throws IOException {
         CacheService.initialize(new TrecCacheConfiguration());
         ReducedModelScorer scorer = new ReducedModelScorer();
-        scorer.run("ba");
+//        scorer.run("ba");
         scorer.run("ct");
         Multithreading.getInstance().shutdown();
         CacheService.getInstance().commitAllCaches();
@@ -62,7 +62,7 @@ public class ReducedModelScorer {
         Map<String, Map<String, String>> reducedModelParameterOverrides = corpus.equals("ba") ? new Sigir20ReducedBaModel() : new Sigir20ReducedCtModel();
         Map<String, AblationCrossValResult> topDownAblationResults = ablationExperiments.getAblationCrossValResult(Collections.singletonList(reducedModelParameterOverrides), topDownReferenceParameters, instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
         AblationCrossValResult reducedModelResults = topDownAblationResults.get("reduced");
-        log.info("[{}] reference: {}", corpus, reducedModelResults.getMeanReferenceScore(METRICS_TO_RETURN));
+        log.info("[{}] reference (best SMAC configurations): {}", corpus, reducedModelResults.getMeanReferenceScore(METRICS_TO_RETURN));
         log.info("[{}] reduced model: {}", corpus, reducedModelResults.getMeanAblationScore(METRICS_TO_RETURN));
     }
 }

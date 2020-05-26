@@ -4,6 +4,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * This class represents the model reduced to those parameter settings that where found to significantly worsen the
+ * reference configuration when being removed for clinical trials.
+ * Also activated here is query filtering and gene synonyms. While those two features did not worsen
+ * the results statistically significant (p = 0.1130 and 0.1547, respectively), those are very important features
+ * in our experience and should be included in an PM search engine.
+ */
 public class Sigir20ReducedCtModel extends LinkedHashMap<String, Map<String, String>> {
     public Sigir20ReducedCtModel() {
         Map<String, String> nonSignificatParameterResets = new HashMap<>();
@@ -11,9 +18,14 @@ public class Sigir20ReducedCtModel extends LinkedHashMap<String, Map<String, Str
 
         // neutralize/deactivate the non-significant features
         nonSignificatParameterResets.put("retrievalparameters.template", "/templates/clinical_trials_generic/jlctgeneric_no_non_melanoma.json");
-        nonSignificatParameterResets.put("indexparameters.bm25.k1","1.2");
         nonSignificatParameterResets.put("indexparameters.bm25.b","0.75");
+        nonSignificatParameterResets.put("retrievalparameters.queryfiltering","true");
+        nonSignificatParameterResets.put("retrievalparameters.diseaseexpansion.hypernyms", "false");
+        nonSignificatParameterResets.put("retrievalparameters.geneexpansion.synonyms",   "true");
         nonSignificatParameterResets.put("retrievalparameters.geneexpansion.description",   "false");
+        nonSignificatParameterResets.put("retrievalparameters.geneexpansion.custom",   "false");
+        nonSignificatParameterResets.put("retrievalparameters.geneexpansion.hypernyms",   "false");
+        nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "0.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_disease_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_gene_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.brief_title_field_kw_boost", "1.0");
@@ -23,7 +35,6 @@ public class Sigir20ReducedCtModel extends LinkedHashMap<String, Map<String, Str
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.description_field_disease_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.description_field_gene_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.description_field_kw_boost", "1.0");
-        nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.genes_field_boost", "0.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_disease_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_gene_boost", "1.0");
         nonSignificatParameterResets.put("retrievalparameters.templateparameters.fieldboosts.inclusion_field_kw_boost", "1.0");

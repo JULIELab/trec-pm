@@ -185,11 +185,18 @@ public class Sigir20AblationExperiments {
                 // result set. Thus, we a) iterate over the union of all topics and b) check in the loop if a topic
                 // value is present.
                 // For safety we also do this for the reference.
+                Double previousScore;
                 for (String topic : Sets.union(p.getReferenceMetrics().keySet(), p.getAblationMetrics().keySet())) {
-                    if (p.getAblationMetrics().containsKey(topic))
-                        groupValues.put(topic, p.getAblationMetrics().get(topic).getInfNDCG());
-                    if (p.getReferenceMetrics().containsKey(topic))
-                        refValues.put(topic, p.getReferenceMetrics().get(topic).getInfNDCG());
+                    if (p.getAblationMetrics().containsKey(topic)) {
+                        if ((previousScore = groupValues.put(topic, p.getAblationMetrics().get(topic).getInfNDCG())) != null && !topic.equals("all"))
+                            log.warn("[{}] Overwriting ablation score {} for topic {} with {}", corpus, previousScore, topic, groupValues.get(topic));
+                    } else
+                        log.warn("[{}] Ablation misses result for topic {}", corpus, topic);
+                    if (p.getReferenceMetrics().containsKey(topic)) {
+                        if ((previousScore = refValues.put(topic, p.getReferenceMetrics().get(topic).getInfNDCG())) != null && !topic.equals("all"))
+                            log.warn("[{}] Overwriting reference score {} for topic {} with {}", corpus, previousScore, topic, groupValues.get(topic));
+                    } else
+                        log.warn("[{}] Reference misses result for topic {}", corpus, topic);
                 }
             }
             if (!referenceWritten) {
@@ -215,35 +222,9 @@ public class Sigir20AblationExperiments {
         }
 
 
-        List<Map<String, Map<String, String>>> bottomUpAblationParameters = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Map<String, Map<String, String>> bottomUpAblationThisSplit = corpus.equals("ba") ? new Sigir20BottomUpAblationBAParameters(topDownReferenceParameters.get(i)) : new Sigir20BottomUpAblationCTParameters(topDownReferenceParameters.get(i));
-            bottomUpAblationParameters.add(bottomUpAblationThisSplit);
-        }
-        Map<String, String> bottomUpReferenceParameters = corpus.equals("ba") ? new Sigir20BaBottomUpRefParameters() : new Sigir20CtBottomUpRefParameters();
-        Map<String, AblationCrossValResult> bottomUpAblationResults = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(bottomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
-
-
         String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
         String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
-        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) topDownAblationParams, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
-
-        // Topic wise result logging for statistical tests
-        File bottomuptopicscoresFile = new File(sigirExperimentResults, corpus + "-scoresPerTopicBottomUp.tsv");
-        FileUtils.write(bottomuptopicscoresFile, "ablationgroup\t" + String.join("\t", topics) + "\n", UTF_8);
-        for (String groupName : bottomUpAblationResults.keySet()) {
-            Map<String, Double> groupValues = new HashMap<>();
-            Map<String, Double> refValues = new HashMap<>();
-            AblationCrossValResult pairs = bottomUpAblationResults.get(groupName);
-            for (AblationComparisonPair p : pairs) {
-                for (String topic : p.getAblationMetrics().keySet()) {
-                    groupValues.put(topic, p.getAblationMetrics().get(topic).getInfNDCG());
-                    refValues.put(topic, p.getReferenceMetrics().get(topic).getInfNDCG());
-                }
-            }
-
-            FileUtils.write(bottomuptopicscoresFile, groupName + "\t" + topics.stream().map(groupValues::get).map(String::valueOf).collect(Collectors.joining("\t")) + "\n", UTF_8, true);
-        }
+        StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, null, caption, label, (AblationLatexTableInfo) topDownAblationParams, null);
 
 
         File tablefile = new File(sigirExperimentResults, corpus + "-" + splitType + ".tex");

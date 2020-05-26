@@ -69,6 +69,7 @@ public class AblationExperiments {
         for (int i = 0; i < instances.size(); i++) {
             final int finalI = i;
             Future<Map<String, AblationComparisonPair>> future = Multithreading.getInstance().submit(() -> {
+                log.debug("Starting job {} to {}", finalI, endpoint);
                 try {
                     Map<String, AblationComparisonPair> pairs = new LinkedHashMap<>();
                     Map<String, Map<String, String>> ablationParameterMap = ablationParameterMaps.size() > 1 ? ablationParameterMaps.get(finalI) : ablationParameterMaps.get(0);
@@ -88,8 +89,10 @@ public class AblationExperiments {
                         log.debug("Finished ablation group {} on instance {}", ablationGroupName, instance);
                         pairs.put(ablationGroupName, comparison);
                     }
+                    log.debug("Finishing job {} to {}", finalI, endpoint);
                     return pairs;
                 } catch (IOException e) {
+                    log.error("Got error in job {} to {}", finalI, endpoint, e);
                     throw new RuntimeException(e);
                 }
             });
@@ -108,6 +111,7 @@ public class AblationExperiments {
                 e.printStackTrace();
             }
         }
+        log.debug("Finished ablation experiment to {}.", endpoint);
         return ablationResult;
     }
 
