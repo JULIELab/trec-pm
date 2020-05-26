@@ -8,20 +8,18 @@ import de.julielab.ir.experiments.ablation.*;
 import de.julielab.ir.paramopt.HttpParamOptServer;
 import de.julielab.ir.paramopt.SmacLiveRundataEntry;
 import de.julielab.ir.paramopt.SmacLiveRundataReader;
-import de.julielab.ir.paramopt.SmacParameterConfiguration;
-import de.julielab.java.utilities.ConfigurationUtilities;
 import de.julielab.java.utilities.cache.CacheService;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.io.FileBased;
 import org.apache.commons.configuration2.io.FileHandler;
 import org.apache.commons.io.FileUtils;
+import org.elasticsearch.common.util.set.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -94,7 +92,7 @@ public class Sigir20AblationExperiments {
         SmacLiveRundataReader smacLiveRundataReader = new SmacLiveRundataReader();
         List<Map<String, String>> evalParams = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            File smacRunFile = Path.of("smac-output", String.format("allparams_%s_split%s", corpus, i), String.format("live-rundata-%s.json", SMAC_RUN_NUMBER)).toFile();
+            File smacRunFile = Path.of("final-smac-output", String.format("allparams_%s_split%s", corpus, i), String.format("live-rundata-%s.json", SMAC_RUN_NUMBER)).toFile();
             SmacLiveRundataEntry entryWithBestScore = smacLiveRundataReader.read(smacRunFile).getEntryWithBestScore();
             Map<String, String> params = new HashMap<>();
             params.putAll(entryWithBestScore.getRunInfo().getConfiguration().getSettings());
@@ -127,7 +125,7 @@ public class Sigir20AblationExperiments {
         List<SmacLiveRundataEntry> bestRuns = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             instances.add(String.format(instanceFmtStr, instancePrefix, i, splitType));
-            File smacRunFile = Path.of("smac-output", String.format("allparams_%s_split%s", corpus, i), String.format("live-rundata-%s.json", smacRunNumber)).toFile();
+            File smacRunFile = Path.of("final-smac-output", String.format("allparams_%s_split%s", corpus, i), String.format("live-rundata-%s.json", smacRunNumber)).toFile();
             SmacLiveRundataEntry entryWithBestScore = smacLiveRundataReader.read(smacRunFile).getEntryWithBestScore();
             bestRuns.add(entryWithBestScore);
             if (log.isDebugEnabled()) {
@@ -148,11 +146,11 @@ public class Sigir20AblationExperiments {
             topDownReferenceParameters.add(optimizedSettings);
         }
         // Result logging
-        File crossvalResults = new File(sigirExperimentResults, corpus+"-crossvalScores.tsv");
-        FileUtils.write(crossvalResults, Stream.concat(Stream.of("source", "corpustype"), IntStream.range(0, 10).mapToObj(i -> "split"+i)).collect(Collectors.joining("\t"))+"\n", UTF_8);
+        File crossvalResults = new File(sigirExperimentResults, corpus + "-crossvalScores.tsv");
+        FileUtils.write(crossvalResults, Stream.concat(Stream.of("source", "corpustype"), IntStream.range(0, 10).mapToObj(i -> "split" + i)).collect(Collectors.joining("\t")) + "\n", UTF_8);
         Stream<String> crossvalSmacResults = bestRuns.stream().map(SmacLiveRundataEntry::getrQuality).map(String::valueOf);
         String resultString = Stream.concat(Stream.of("smac", corpus), crossvalSmacResults).collect(Collectors.joining("\t"));
-        FileUtils.write(crossvalResults, resultString+"\n", UTF_8, true);
+        FileUtils.write(crossvalResults, resultString + "\n", UTF_8, true);
         log.info("[{}] Best SMAC configuration crossval scores for train: {}", corpus, resultString);
 
         String endpoint = corpus.equals("ba") ? HttpParamOptServer.GET_CONFIG_SCORE_PM : HttpParamOptServer.GET_CONFIG_SCORE_CT;
@@ -164,34 +162,41 @@ public class Sigir20AblationExperiments {
         // Result logging
         Stream<String> crossvalReferenceAblationResults = topDownAblationResults.values().iterator().next().stream().map(c -> String.valueOf(c.getReferenceScore(INFNDCG)));
         String ablationResultString = Stream.concat(Stream.of("experiments", corpus), crossvalReferenceAblationResults).collect(Collectors.joining("\t"));
-        FileUtils.write(crossvalResults, ablationResultString+"\n", UTF_8, true);
+        FileUtils.write(crossvalResults, ablationResultString + "\n", UTF_8, true);
         for (String ablationGroup : topDownAblationResults.keySet()) {
             AblationCrossValResult ablationGroupResult = topDownAblationResults.get(ablationGroup);
             String ablationCrossValResultString = Stream.concat(Stream.of(ablationGroup, corpus), ablationGroupResult.stream().map(c -> String.valueOf(c.getAblationScore(INFNDCG)))).collect(Collectors.joining("\t"));
-            FileUtils.write(crossvalResults, ablationCrossValResultString+"\n", UTF_8, true);
+            FileUtils.write(crossvalResults, ablationCrossValResultString + "\n", UTF_8, true);
         }
-        log.info("[{}] Reference crossval scores as obtained in ablation experiments for {}: {}",corpus, splitType, ablationResultString);
+        log.info("[{}] Reference crossval scores as obtained in ablation experiments for {}: {}", corpus, splitType, ablationResultString);
 
         // Topic wise result logging for statistical tests
-        File topicscoresFile = new File(sigirExperimentResults, corpus+"-scoresPerTopic.tsv");
+        File topicscoresFile = new File(sigirExperimentResults, corpus + "-scoresPerTopic.tsv");
         List<String> topics = topDownAblationResults.values().iterator().next().stream().flatMap(p -> p.getReferenceMetrics().keySet().stream()).sorted().collect(Collectors.toList());
-        FileUtils.write(topicscoresFile, "ablationgroup\t" + String.join("\t", topics)+"\n", UTF_8);
+        FileUtils.write(topicscoresFile, "ablationgroup\t" + String.join("\t", topics) + "\n", UTF_8);
         boolean referenceWritten = false;
         for (String groupName : topDownAblationResults.keySet()) {
             Map<String, Double> groupValues = new HashMap<>();
             Map<String, Double> refValues = new HashMap<>();
             AblationCrossValResult pairs = topDownAblationResults.get(groupName);
             for (AblationComparisonPair p : pairs) {
-                for (String topic : p.getAblationMetrics().keySet()) {
-                    groupValues.put(topic, p.getAblationMetrics().get(topic).getInfNDCG());
-                    refValues.put(topic, p.getReferenceMetrics().get(topic).getInfNDCG());
+                // In rare cases, an ablation does not have a value for a topic because no documents were returned.
+                // An example is CT 2018 topic 39 where the deactivation of disease synonyms does lead to an empty
+                // result set. Thus, we a) iterate over the union of all topics and b) check in the loop if a topic
+                // value is present.
+                // For safety we also do this for the reference.
+                for (String topic : Sets.union(p.getReferenceMetrics().keySet(), p.getAblationMetrics().keySet())) {
+                    if (p.getAblationMetrics().containsKey(topic))
+                        groupValues.put(topic, p.getAblationMetrics().get(topic).getInfNDCG());
+                    if (p.getReferenceMetrics().containsKey(topic))
+                        refValues.put(topic, p.getReferenceMetrics().get(topic).getInfNDCG());
                 }
             }
             if (!referenceWritten) {
-                FileUtils.write(topicscoresFile, "reference\t" + topics.stream().map(refValues::get).map(String::valueOf).collect(Collectors.joining("\t"))+"\n", UTF_8, true);
+                FileUtils.write(topicscoresFile, "reference\t" + topics.stream().map(refValues::get).map(String::valueOf).collect(Collectors.joining("\t")) + "\n", UTF_8, true);
                 referenceWritten = true;
             }
-            FileUtils.write(topicscoresFile, groupName+"\t" + topics.stream().map(groupValues::get).map(String::valueOf).collect(Collectors.joining("\t"))+"\n", UTF_8, true);
+            FileUtils.write(topicscoresFile, groupName + "\t" + topics.stream().map(groupValues::get).map(String::valueOf).collect(Collectors.joining("\t")) + "\n", UTF_8, true);
         }
         //----------------
 
@@ -219,14 +224,13 @@ public class Sigir20AblationExperiments {
         Map<String, AblationCrossValResult> bottomUpAblationResults = ablationExperiments.getAblationCrossValResult(bottomUpAblationParameters, Collections.singletonList(bottomUpReferenceParameters), instances, indexSuffixes, METRICS_TO_RETURN, true, endpoint);
 
 
-
         String caption = corpus.equals("ba") ? "This table shows the impact of individual system features for the biomedical abstracts task from two perspectives, namely a top-down and a bottom-up approach. In the top-down approach, the best performing system configuration is used as the reference configuration. In the bottom-up approach, no feature is active accept the usage of the disjunction max query structure for query expansion. When no query expansion is active, this has no effect. In each row, a feature is disabled (-) or enabled (+). Indented items are added or removed relative to their parent item." : "This table shows the impact of individual system features for the clinical trials task analogously to Table \\ref{tab:bafeatureablation}.";
         String label = corpus.equals("ba") ? "tab:bafeatureablation" : "tab:ctfeatureablation";
         StringBuilder sb = AblationLatexTableBuilder.buildLatexTable(topDownAblationResults, bottomUpAblationResults, caption, label, (AblationLatexTableInfo) topDownAblationParams, (AblationLatexTableInfo) bottomUpAblationParameters.get(0));
 
         // Topic wise result logging for statistical tests
-        File bottomuptopicscoresFile = new File(sigirExperimentResults, corpus+"-scoresPerTopicBottomUp.tsv");
-        FileUtils.write(bottomuptopicscoresFile, "ablationgroup\t" + String.join("\t", topics)+"\n", UTF_8);
+        File bottomuptopicscoresFile = new File(sigirExperimentResults, corpus + "-scoresPerTopicBottomUp.tsv");
+        FileUtils.write(bottomuptopicscoresFile, "ablationgroup\t" + String.join("\t", topics) + "\n", UTF_8);
         for (String groupName : bottomUpAblationResults.keySet()) {
             Map<String, Double> groupValues = new HashMap<>();
             Map<String, Double> refValues = new HashMap<>();
@@ -238,10 +242,8 @@ public class Sigir20AblationExperiments {
                 }
             }
 
-            FileUtils.write(bottomuptopicscoresFile, groupName+"\t" + topics.stream().map(groupValues::get).map(String::valueOf).collect(Collectors.joining("\t"))+"\n", UTF_8, true);
+            FileUtils.write(bottomuptopicscoresFile, groupName + "\t" + topics.stream().map(groupValues::get).map(String::valueOf).collect(Collectors.joining("\t")) + "\n", UTF_8, true);
         }
-
-
 
 
         File tablefile = new File(sigirExperimentResults, corpus + "-" + splitType + ".tex");

@@ -68,9 +68,9 @@ public class Sigir20TopDownAblationBAParameters extends LinkedHashMap<String, Ma
         put(String.format("-%s", BM25), params(
                 "indexparameters.bm25.b", "0.75",
                 "indexparameters.bm25.k1", "1.2"));
-        put(String.format("-%s", BM25+"_bdefault"), params(
+        put(String.format("-%s", BM25+"\\_bdefault"), params(
                 "indexparameters.bm25.b", "0.75"));
-        put(String.format("-%s", BM25+"_k1default"), params(
+        put(String.format("-%s", BM25+"\\_k1default"), params(
                 "indexparameters.bm25.k1", "1.2"));
         put(String.format("-%s", CLSWT), params(
                 "retrievalparameters.templateparameters.clauseboosts.conditional_cancer_boost", "1.0",

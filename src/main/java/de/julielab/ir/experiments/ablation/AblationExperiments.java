@@ -3,11 +3,12 @@ package de.julielab.ir.experiments.ablation;
 import at.medunigraz.imi.bst.trec.model.Metrics;
 import de.julielab.ir.Multithreading;
 import de.julielab.java.utilities.cache.CacheAccess;
+import de.julielab.java.utilities.cache.CacheMapSettings;
 import de.julielab.java.utilities.cache.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -23,7 +24,8 @@ public class AblationExperiments {
     public AblationExperiments() {
         if (cache == null) {
             log.debug("Creating new cache access");
-            cache = CacheService.getInstance().getCacheAccess("AblationCache", "AblationPairs", CacheAccess.JAVA, CacheAccess.JAVA);
+            CacheMapSettings settings = new CacheMapSettings(CacheMapSettings.MAP_TYPE, CacheService.CacheMapDataType.HTREE, CacheMapSettings.MEM_CACHE_SIZE, 1000);
+            cache = CacheService.getInstance().getCacheAccess("AblationCache", "AblationPairs", CacheAccess.JAVA, CacheAccess.JAVA, settings);
         }
     }
 

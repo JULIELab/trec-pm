@@ -134,7 +134,7 @@ public final class ClinicalTrialsRetrievalRegistry {
         templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, BOOSTS)));
         // Gene (sub)query match types
         templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, MATCHTYPES)));
-        // Gene query clauses phrase slopts
+        // Gene query clauses phrase slops
         templateProperties.putAll(FeatureControlCenter.getValuesFromFeatureConfiguration(retrievalConfig, slash(TEMPLATEPARAMETERS, GENE, PHRASESLOPS)));
         ret.withProperties(templateProperties);
 
