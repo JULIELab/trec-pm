@@ -355,7 +355,7 @@
                                 
                 <value>
                                         
-                    <integer>50</integer>
+                    <integer>10</integer>
                                     
                 </value>
                             
@@ -542,6 +542,8 @@
                     <array>
                                                 
                         <string>de.julielab.jcore.types.Sentence</string>
+                                                
+                        <string>de.julielab.jcore.types.Token</string>
                                             
                     </array>
                                     

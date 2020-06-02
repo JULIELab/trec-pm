@@ -16,6 +16,7 @@ public class ResultList<T extends QueryDescription> {
 	}
 
 	public ResultList(T topic, int initialSize) {
+		this.topic = topic;
 		results = new ArrayList<>(initialSize);
 	}
 	

@@ -7,7 +7,7 @@ import de.julielab.ir.model.QueryDescription;
 import java.util.*;
 import java.util.function.Function;
 
-public class RRFResultListFusion implements ResultListFusion{
+public class RRFResultListFusion implements ResultListFusion {
     private Function<Result, String> docIdFunction;
 
     public RRFResultListFusion() {
@@ -36,20 +36,20 @@ public class RRFResultListFusion implements ResultListFusion{
 
     @Override
     public <Q extends QueryDescription> ResultList<Q> fuse(List<ResultList<Q>> resultlists) {
-        if(resultlists.stream().map(ResultList::getTopic).distinct().count() > 1)
+        if (resultlists.stream().map(ResultList::getTopic).distinct().count() > 1)
             throw new IllegalArgumentException("Trying to merge result lists for different topics.");
         List<Map<String, Double>> rankScoreMaps = new ArrayList<>();
         Map<String, Result> retrievedDocIds = new HashMap<>();
         // Compute the reciprocal rank scores
         for (ResultList<Q> list : resultlists) {
-            Map<String, Double> rankScoreMap = new HashMap<>();
-            rankScoreMaps.add(rankScoreMap);
+            Map<String, Double> reciprocalScores = new HashMap<>();
+            rankScoreMaps.add(reciprocalScores);
             List<Result> results = list.getResults();
             for (int i = 0; i < results.size(); i++) {
                 Result result = results.get(i);
                 String docId = docIdFunction != null ? docIdFunction.apply(result) : result.getId();
                 double score = 1d / (60 + i);
-                rankScoreMap.put(docId, score);
+                reciprocalScores.put(docId, score);
                 // this will override the value for a specific docId most of the time. We are just interested
                 // in retaining any one result object for each doc ID.
                 retrievedDocIds.put(docId, result);
@@ -59,8 +59,11 @@ public class RRFResultListFusion implements ResultListFusion{
         ResultList<Q> fusedList = new ResultList<>(resultlists.get(0).getTopic(), resultlists.stream().mapToInt(rl -> rl.getResults().size()).max().getAsInt());
         for (String docId : retrievedDocIds.keySet()) {
             double score = 0;
-            for (Map<String, Double> reciprocalScores : rankScoreMaps)
-                score += reciprocalScores.get(docId);
+            for (Map<String, Double> reciprocalScores : rankScoreMaps) {
+                Double scoreFromList = reciprocalScores.get(docId);
+                if (scoreFromList != null)
+                    score += scoreFromList;
+            }
             Result result = retrievedDocIds.get(docId);
             Result resultClone = result.clone();
             resultClone.setScore(score);

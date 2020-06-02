@@ -8,8 +8,9 @@ import de.julielab.ir.model.CovidTopic;
 
 public class TrecCovidGoldStandardFactory {
     public static TrecQrelGoldStandard<CovidTopic> round1() {
-//        final String topics = String.format("/topics/topics-rnd%d-topic%d.xml", 1,19);
-//        CovidTopicSet covidTopics = new CovidTopicSet(topics, Challenge.COVID, 1);
         return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 1, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound1(), "/gold-standard/qrels-covid19-rnd1.txt");
+    }
+    public static TrecQrelGoldStandard<CovidTopic> round2() {
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 2, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound2(), "/gold-standard/qrels-covid19-rnd2.txt");
     }
 }

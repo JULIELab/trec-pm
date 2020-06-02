@@ -15,10 +15,12 @@
    </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-        <activeDBConnection>cord19</activeDBConnection>
+	    <activeDBConnection>cord19_rnd2</activeDBConnection>
 	<maxActiveDBConnections>2</maxActiveDBConnections>
         <DBConnections>
-            <DBConnection name="cord19" url="jdbc:postgresql://192.168.1.15:5432/cord19"/>
+		<DBConnection name="cord19" url="jdbc:postgresql://192.168.1.15:5432/cord19"/>
+		<DBConnection name="cord19_rnd2" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd2"/>
+		<DBConnection name="cord19_rnd3" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd3"/>
         </DBConnections>
     </DBConnectionInformation>
 </databaseConnectorConfiguration>
