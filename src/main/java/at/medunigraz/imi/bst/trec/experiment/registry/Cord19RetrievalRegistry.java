@@ -44,12 +44,10 @@ public final class Cord19RetrievalRegistry {
                 .withResultListSizeCutoff(1000)
                 .withStoredFields("cord19_uid", "abstract")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
-                .withValidDocIds("/valid-result-docs/docids-rnd2.txt", "cord19_uid")
                 .withGoldstandardFilter(TrecCovidGoldStandardFactory.round1())
                 .withUnifyingField("cord19_uid")
                 .withSubTemplate(TEMPLATE_BASE)
-                .withWordRemoval()
-                ;
+                .withWordRemoval();
     }
 
     public static Cord19Retrieval jlQERound3() {
@@ -58,7 +56,6 @@ public final class Cord19RetrievalRegistry {
                 .withResultListSizeCutoff(1000)
                 .withStoredFields("cord19_uid", "abstract")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
-                .withValidDocIds("/valid-result-docs/docids-rnd3.txt", "cord19_uid")
                 .withGoldstandardFilter(new AggregatedTrecQrelGoldStandard<>(TrecCovidGoldStandardFactory.round1(), TrecCovidGoldStandardFactory.round2()))
                 .withUnifyingField("cord19_uid")
                 .withSubTemplate(TEMPLATE_BASE)
@@ -96,7 +93,6 @@ public final class Cord19RetrievalRegistry {
                 .withSize(6000)
                 .withStoredFields("cord19_uid", "text")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
-                .withValidDocIds("/valid-result-docs/docids-rnd2.txt", "cord19_uid")
                 .withGoldstandardFilter(TrecCovidGoldStandardFactory.round1())
                 .withUnifyingField("cord19_uid")
                 .withJsonTemplate(TEMPLATE_BASE_RND2, true, true)
@@ -110,7 +106,6 @@ public final class Cord19RetrievalRegistry {
                 .withSize(6000)
                 .withStoredFields("cord19_uid", "text")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
-                .withValidDocIds("/valid-result-docs/docids-rnd3.txt", "cord19_uid")
                 .withGoldstandardFilter(new AggregatedTrecQrelGoldStandard<>(TrecCovidGoldStandardFactory.round1(), TrecCovidGoldStandardFactory.round2()))
                 .withUnifyingField("cord19_uid")
                 .withJsonTemplate(TEMPLATE_BASE_RND2, true, true)
