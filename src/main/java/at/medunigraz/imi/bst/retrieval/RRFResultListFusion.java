@@ -69,6 +69,9 @@ public class RRFResultListFusion implements ResultListFusion {
             resultClone.setScore(score);
             resultClone.setIndex(null);
             fusedList.add(resultClone);
+            // There are only 1000 final results allowed
+            if (fusedList.getResults().size() == 1000)
+                break;
         }
         Collections.sort(fusedList.getResults(), Comparator.comparingDouble(Result::getScore).reversed());
         return fusedList;

@@ -229,6 +229,9 @@ public class Experiment<Q extends QueryDescription> {
     private void writeInspectionFile(List<ResultList<Q>> lastResultListSet, String experimentId) {
         if (inspectionResultColumnGenerator == null)
             throw new IllegalStateException("The inspection file row generator is not set, cannot create the inspection file.");
+        if (goldStandard == null) {
+            return;
+        }
         File inspectionFile = new File("inspections", experimentId + ".txt");
         if (!inspectionFile.getParentFile().exists())
             inspectionFile.getParentFile().mkdirs();

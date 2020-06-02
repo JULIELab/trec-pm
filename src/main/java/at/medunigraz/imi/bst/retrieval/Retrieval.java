@@ -12,14 +12,11 @@ import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.ltr.features.IRScoreFeatureKey;
 import de.julielab.ir.model.QueryDescription;
-import de.julielab.java.utilities.FileUtilities;
-import de.julielab.java.utilities.IOStreamUtilities;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
@@ -300,14 +297,9 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
         return docIdFunction;
     }
 
-    public T withValidDocIds(String docIdFile, String docIdFieldName) {
-        try {
-            esQuery.setTermFilter(docIdFieldName, IOStreamUtilities.getReaderFromInputStream(FileUtilities.findResource(docIdFile)).lines().collect(Collectors.toSet()));
-            return (T) this;
-        } catch (IOException e) {
-            log.error("Could not read the set of valid document IDs from {}", docIdFile);
-            throw new IllegalArgumentException(e);
-        }
+    public T withValidDocIds(String docIdFile, Function<Result, String> docIdFunction) {
+        query = new ValidDocIdsFilterDecorator<>(query, docIdFunction, docIdFile);
+        return (T) this;
     }
 
     /**
