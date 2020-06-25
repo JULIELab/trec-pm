@@ -3,7 +3,10 @@ package de.julielab.trec.uima;
 import de.julielab.jcore.consumer.es.DocumentGenerator;
 import de.julielab.jcore.consumer.es.FilterRegistry;
 import de.julielab.jcore.consumer.es.preanalyzed.Document;
-import de.julielab.jcore.types.*;
+import de.julielab.jcore.types.Caption;
+import de.julielab.jcore.types.Paragraph;
+import de.julielab.jcore.types.Title;
+import de.julielab.jcore.types.Token;
 import de.julielab.jcore.types.pubmed.AbstractText;
 import de.julielab.jcore.types.pubmed.Header;
 import de.julielab.jcore.types.pubmed.OtherID;
@@ -34,9 +37,9 @@ private static final boolean lemmatize = true;
         List<Document> docs = new ArrayList<>();
         docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(AbstractText.class.getCanonicalName())));
         docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Paragraph.class.getCanonicalName())));
-        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Caption.class.getCanonicalName())));
+//        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Caption.class.getCanonicalName())));
         docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Title.class.getCanonicalName())));
-        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Sentence.class.getCanonicalName())));
+//        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Sentence.class.getCanonicalName())));
         return docs;
     }
 
