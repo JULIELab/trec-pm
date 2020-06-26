@@ -1,5 +1,6 @@
 package at.medunigraz.imi.bst.trec;
 
+import at.medunigraz.imi.bst.retrieval.RRFResultListFusion;
 import at.medunigraz.imi.bst.trec.experiment.Experiment;
 import at.medunigraz.imi.bst.trec.experiment.registry.Cord19RetrievalRegistry;
 import at.medunigraz.imi.bst.trec.model.TrecCovidTopicSetFactory;
@@ -25,15 +26,15 @@ public final class Cord19Experimenter {
         exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
         exp.run();
 
-//        exp = new Experiment<>(TrecCovidGoldStandardFactory.round3(), Cord19RetrievalRegistry.jlQERound3(), TrecCovidTopicSetFactory.topicsRound3());
-//        exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
-//        exp.run();
+        exp = new Experiment<>(TrecCovidGoldStandardFactory.round3(), Cord19RetrievalRegistry.jlQERound3(), TrecCovidTopicSetFactory.topicsRound3());
+        exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
+        exp.run();
 
-//        exp = new Experiment<>(TrecCovidGoldStandardFactory.round3(), new RRFResultListFusion(r -> (String) r.getSourceFields().get("cord19_uid")), TrecCovidTopicSetFactory.topicsRound3(), Cord19RetrievalRegistry.jlbasernd3(), Cord19RetrievalRegistry.jlQERound3());
-//        exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
-//        exp.setWriteInspectionFile(false);
-//        exp.setInspectionResultColumnGenerator(r -> r.getSourceFields().get("cord19_uid") + "\t" + r.getSourceFields().get("abstract"));
-//        exp.run();
+        exp = new Experiment<>(TrecCovidGoldStandardFactory.round3(), new RRFResultListFusion(r -> (String) r.getSourceFields().get("cord19_uid")), TrecCovidTopicSetFactory.topicsRound3(), Cord19RetrievalRegistry.jlbasernd3(), Cord19RetrievalRegistry.jlQERound3());
+        exp.setRequestedMetrics(new String[]{"ndcg_cut_10", "P_5", "P_10", "Bpref", "MAP", "set_recall"});
+        exp.setWriteInspectionFile(false);
+        exp.setInspectionResultColumnGenerator(r -> r.getSourceFields().get("cord19_uid") + "\t" + r.getSourceFields().get("abstract"));
+        exp.run();
 
         CacheService.getInstance().commitAllCaches();
         ElasticClientFactory.getClient().close();

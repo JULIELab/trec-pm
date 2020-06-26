@@ -172,7 +172,9 @@ public class CovidTopic extends QueryDescription {
 
     @Override
     public CovidTopic getCleanCopy() {
-        return new CovidTopic().withChallenge(challenge).withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
+        CovidTopic covidTopic = new CovidTopic().withChallenge(challenge).withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
+        covidTopic.setYear(year);
+        return covidTopic;
     }
 
     public CovidTopic withNarrative(String narrative) {

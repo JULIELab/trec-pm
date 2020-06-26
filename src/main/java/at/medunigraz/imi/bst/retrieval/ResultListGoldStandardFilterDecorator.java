@@ -59,7 +59,7 @@ public class ResultListGoldStandardFilterDecorator<Q extends QueryDescription> e
     public List<Result> query(Q topic) {
         List<Result> results = decoratedQuery.query(topic);
         try {
-            DocumentList<Q> qrelDocumentsForQuery = gs.getQrelDocumentsForQuery(topic);
+            DocumentList<Q> qrelDocumentsForQuery = gs.getQrelDocuments().stream().filter(d -> d.getQueryDescription().getNumber() == topic.getNumber()).collect(Collectors.toCollection(DocumentList::new));
             if (qrelDocumentsForQuery != null) {
                 Set<String> docIdsInGs4topic = qrelDocumentsForQuery.stream().map(Document::getId).map(documentIdMappingFunction).collect(Collectors.toSet());
                 List<Result> filteredresults = new ArrayList<>();

@@ -113,7 +113,7 @@ public final class Cord19RetrievalRegistry {
                 .withSize(6000)
                 .withStoredFields("cord19_uid", "text")
                 .withDocIdFunction(r -> (String) r.getSourceFields().get("cord19_uid"))
-                .withGoldstandardFilter(new AggregatedTrecQrelGoldStandard<>(TrecCovidGoldStandardFactory.round1(), TrecCovidGoldStandardFactory.round2()))
+                .withGoldstandardFilter(new AggregatedTrecQrelGoldStandard<>(TrecCovidGoldStandardFactory.round1(), TrecCovidGoldStandardFactory.round2()), "/id-map/covid-rnd3-changedIds-May19.csv")
                 .withUnifyingField("cord19_uid")
                 .withJsonTemplate(TEMPLATE_BASE_RND2, true, true)
                 .withQueryQuestionBoW()

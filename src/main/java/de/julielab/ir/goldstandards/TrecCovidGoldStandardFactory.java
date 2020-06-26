@@ -20,7 +20,7 @@ public class TrecCovidGoldStandardFactory {
      * @return The gold standard.
      */
     public static TrecQrelGoldStandard<CovidTopic> round3() {
-        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 3, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound2(), "/gold-standard/qrels-covid_d3_j2.5-3.txt");
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 3, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound3(), "/gold-standard/qrels-covid_d3_j2.5-3.txt");
     }
 
     /**

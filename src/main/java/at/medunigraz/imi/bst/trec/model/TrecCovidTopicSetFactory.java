@@ -16,6 +16,11 @@ public final class TrecCovidTopicSetFactory {
         return topics(3);
     }
 
+
+    public static CovidTopicSet topicsRound4() {
+        return topics(4);
+    }
+
     public static CovidTopicSet topics(int round) {
         final String topics = String.format("/topics/topics-rnd%d.xml", round);
         return new CovidTopicSet(topics, Challenge.COVID, round);
