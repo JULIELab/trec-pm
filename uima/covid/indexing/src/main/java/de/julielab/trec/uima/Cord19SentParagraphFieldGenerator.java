@@ -49,7 +49,7 @@ private static final boolean lemmatize = true;
         for (Annotation a : jCas.getAnnotationIndex(type)) {
             Document doc = new Document();
             docs.add(doc);
-            doc.setIndex("covid-rnd2-" + type.getShortName().toLowerCase());
+            doc.setIndex("covid-rnd3-" + type.getShortName().toLowerCase());
             doc.addField("text", a.getCoveredText());
             if (lemmatize) {
                 FSIterator<Token> tokenIt = jCas.<Token>getAnnotationIndex(Token.type).subiterator(a);

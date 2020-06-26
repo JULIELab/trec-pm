@@ -3,18 +3,19 @@ package at.medunigraz.imi.bst.trec.query.covid;
 import at.medunigraz.imi.bst.retrieval.Query;
 import at.medunigraz.imi.bst.retrieval.QueryDecorator;
 import at.medunigraz.imi.bst.trec.model.Result;
-import at.medunigraz.imi.bst.trec.model.Topic;
 import de.julielab.ir.model.CovidTopic;
 import de.julielab.ir.nlp.NLPSentence;
 import de.julielab.ir.nlp.NLPToken;
 import de.julielab.ir.nlp.PosTaggingService;
-import org.apache.lucene.queries.function.valuesource.IDFValueSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This decorator is applied to the original CovidTopic. Thus, {@link CovidTopic#getMandatoryBoW()} should be empty.
@@ -143,8 +144,8 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
 
         filteredOptionalWords.removeAll(filteredMandatoryWords);
 
-        System.out.println(filteredMandatoryWords);
-        System.out.println(filteredOptionalWords);
+//        System.out.println(filteredMandatoryWords);
+//        System.out.println(filteredOptionalWords);
 
         topic.setMandatoryBoW(filteredMandatoryWords);
         topic.setOptionalBoW(filteredMandatoryWords);

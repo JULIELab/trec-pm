@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 
 public class Retrieval<T extends Retrieval, Q extends QueryDescription> implements Serializable {
     protected Query<Q> query;
-    private Logger log = LoggerFactory.getLogger(Retrieval.class);
     protected ElasticSearchQuery<Q> esQuery;
+    private Logger log = LoggerFactory.getLogger(Retrieval.class);
     private String resultsDir;
     private String experimentName;
     private int size = TrecConfig.SIZE;
@@ -317,7 +317,7 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
 
     /**
      * <p>
-     *     NOTE: You will probably want this decorator at the end of the decoration-pipeline, i.e. as the outermost layer. Then, the inner decorators can operate on the whole result lists first, e.g. reranking.
+     * NOTE: You will probably want this decorator at the end of the decoration-pipeline, i.e. as the outermost layer. Then, the inner decorators can operate on the whole result lists first, e.g. reranking.
      * </p>
      * <p>
      * Cuts the size of the returned result lists to <tt>cutoffSize</tt> even if ElasticSearch returned more
@@ -352,7 +352,12 @@ public class Retrieval<T extends Retrieval, Q extends QueryDescription> implemen
      * @return
      */
     public T withGoldstandardFilter(GoldStandard<Q> goldStandard) {
-        query = new ResultListGoldStandardFilterDecorator<>(query, docIdFunction, goldStandard);
+        query = new ResultListGoldStandardFilterDecorator<>(query, docIdFunction, null, goldStandard);
+        return (T) this;
+    }
+
+    public T withGoldstandardFilter(GoldStandard<Q> goldStandard, String documentIdMappingFile) {
+        query = new ResultListGoldStandardFilterDecorator<>(query, docIdFunction, documentIdMappingFile, goldStandard);
         return (T) this;
     }
 }
