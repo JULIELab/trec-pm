@@ -1,0 +1,9 @@
+{
+   "multi_match": {
+     "query": "${CONCAT optionalBoW}",
+     "fields": "${INSERT cord19-rnd5/fields.json}",
+     "tie_breaker": 0.3,
+     "type": "best_fields",
+     "boost": 0.5
+   }
+}

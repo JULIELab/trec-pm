@@ -1,35 +1,5 @@
-Error happened on: Sat May 30 10:30:39 CEST 2020-------------- Failed Components -------------- 
-1. Process
+Error happened on: Sun Aug 02 16:16:50 CEST 2020-------------- Failed Components -------------- 
+1. Collection Reader Failure
 -------------- Stack Traces -------------- 
-org.apache.uima.analysis_engine.AnalysisEngineProcessException
-	at de.julielab.jcore.reader.cord19.Cord19Reader.readCord19JsonFile(Cord19Reader.java:67)
-	at de.julielab.jcore.reader.cord19.Cord19Multiplier.next(Cord19Multiplier.java:60)
-	at org.apache.uima.analysis_engine.impl.PrimitiveAnalysisEngine_impl.callAnalysisComponentNext(PrimitiveAnalysisEngine_impl.java:541)
-	at org.apache.uima.analysis_engine.impl.PrimitiveAnalysisEngine_impl$AnalysisComponentCasIterator.next(PrimitiveAnalysisEngine_impl.java:662)
-	at org.apache.uima.analysis_engine.asb.impl.ASB_impl$AggregateCasIterator.processUntilNextOutputCas(ASB_impl.java:512)
-	at org.apache.uima.analysis_engine.asb.impl.ASB_impl$AggregateCasIterator.<init>(ASB_impl.java:412)
-	at org.apache.uima.analysis_engine.asb.impl.ASB_impl.process(ASB_impl.java:344)
-	at org.apache.uima.analysis_engine.impl.AggregateAnalysisEngine_impl.processAndOutputNewCASes(AggregateAnalysisEngine_impl.java:271)
-	at org.apache.uima.analysis_engine.impl.AnalysisEngineImplBase.process(AnalysisEngineImplBase.java:269)
-	at org.apache.uima.collection.impl.cpm.engine.ProcessingUnit.processNext(ProcessingUnit.java:895)
-	at org.apache.uima.collection.impl.cpm.engine.ProcessingUnit.run(ProcessingUnit.java:575)
-Caused by: com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "html" (class de.julielab.jcore.reader.cord19.jsonformat.TabFigRef), not marked as ignorable (3 known properties: "type", "text", "latex"])
- at [Source: (URL); line: 1, column: 94078] (through reference chain: de.julielab.jcore.reader.cord19.jsonformat.Cord19Document["ref_entries"]->java.util.LinkedHashMap["TABREF0"]->de.julielab.jcore.reader.cord19.jsonformat.TabFigRef["html"])
-	at com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.from(UnrecognizedPropertyException.java:61)
-	at com.fasterxml.jackson.databind.DeserializationContext.handleUnknownProperty(DeserializationContext.java:823)
-	at com.fasterxml.jackson.databind.deser.std.StdDeserializer.handleUnknownProperty(StdDeserializer.java:1153)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.handleUnknownProperty(BeanDeserializerBase.java:1589)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.handleUnknownVanilla(BeanDeserializerBase.java:1567)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:294)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151)
-	at com.fasterxml.jackson.databind.deser.std.MapDeserializer._readAndBindStringKeyMap(MapDeserializer.java:527)
-	at com.fasterxml.jackson.databind.deser.std.MapDeserializer.deserialize(MapDeserializer.java:364)
-	at com.fasterxml.jackson.databind.deser.std.MapDeserializer.deserialize(MapDeserializer.java:29)
-	at com.fasterxml.jackson.databind.deser.impl.MethodProperty.deserializeAndSet(MethodProperty.java:129)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializer.vanillaDeserialize(BeanDeserializer.java:288)
-	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:151)
-	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4014)
-	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:2960)
-	at de.julielab.jcore.reader.cord19.Cord19Reader.readCord19JsonFile(Cord19Reader.java:54)
-	... 10 more
+java.lang.NullPointerException
 

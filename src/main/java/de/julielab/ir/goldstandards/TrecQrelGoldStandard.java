@@ -5,12 +5,22 @@ import at.medunigraz.imi.bst.trec.model.Challenge;
 import at.medunigraz.imi.bst.trec.model.GoldStandardType;
 import at.medunigraz.imi.bst.trec.model.QueryDescriptionSet;
 import at.medunigraz.imi.bst.trec.model.Task;
+import at.medunigraz.imi.bst.trec.search.ElasticClientFactory;
 import de.julielab.ir.ltr.Document;
 import de.julielab.ir.ltr.DocumentList;
 import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.io.FileUtils;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -131,6 +142,17 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         return isSample;
     }
 
+    public void writeDocumentFieldValues(File file, String index, String documentIdField, String... fields) throws IOException {
+        RestHighLevelClient client = ElasticClientFactory.getClient();
+        List<String> docIds = getQrelDocuments().stream().map(Document::getId).collect(Collectors.toList());
+        SearchSourceBuilder query = new SearchSourceBuilder().query(QueryBuilders.boolQuery().should(QueryBuilders.matchAllQuery()).filter(QueryBuilders.termsQuery(documentIdField, docIds))).size(100);
+        SearchRequest searchRequest = Requests.searchRequest(index).scroll(new TimeValue(5, TimeUnit.MINUTES)).source(query);
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        while(searchResponse.getHits().getHits().length > 0) {
+            String scrollId = searchResponse.getScrollId();
+            SearchHits hits = searchResponse.getHits();
+        }
+    }
 
 
     @Override

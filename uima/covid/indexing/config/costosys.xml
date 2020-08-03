@@ -4,23 +4,25 @@
         <activePostgresSchema>erik</activePostgresSchema>
         <activeTableSchema>cord19</activeTableSchema>
         <tableSchemas>
-		<tableSchema forEach="." name="cord19">
-			<field name="paper_id" primaryKey="true" retrieve="true" type="text"/>
-			<field gzip="true" name="xmi" retrieve="true" type="bytea"/>
-		</tableSchema>
-	 <tableSchema forEach="." name="xmi_anno_view">
+            <tableSchema forEach="." name="cord19">
+                <field name="paper_id" primaryKey="true" retrieve="true" type="text"/>
+                <field gzip="true" name="xmi" retrieve="true" type="bytea"/>
+            </tableSchema>
+            <tableSchema forEach="." name="xmi_anno_view">
                 <field name="paper_id" primaryKey="true" retrieve="true" type="text" xpath="PMID"/>
                 <field gzip="true" name="xmi" retrieve="true" returnXMLFragment="true" type="bytea" xpath="."/>
-            </tableSchema>     
-   </tableSchemas>
+            </tableSchema>
+        </tableSchemas>
     </DBSchemaInformation>
     <DBConnectionInformation>
-	    <activeDBConnection>cord19_rnd3</activeDBConnection>
-	<maxActiveDBConnections>2</maxActiveDBConnections>
+        <activeDBConnection>cord19_rnd4</activeDBConnection>
+        <maxActiveDBConnections>2</maxActiveDBConnections>
         <DBConnections>
-		<DBConnection name="cord19" url="jdbc:postgresql://192.168.1.15:5432/cord19"/>
-		<DBConnection name="cord19_rnd2" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd2"/>
-		<DBConnection name="cord19_rnd3" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd3"/>
+            <DBConnection name="cord19" url="jdbc:postgresql://192.168.1.15:5432/cord19"/>
+            <DBConnection name="cord19_rnd2" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd2"/>
+            <DBConnection name="cord19_rnd3" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd3"/>
+	    <DBConnection name="cord19_rnd4" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd4"/>
+	    <DBConnection name="cord19_rnd5" url="jdbc:postgresql://192.168.1.15:5432/cord19_rnd5"/>
         </DBConnections>
     </DBConnectionInformation>
 </databaseConnectorConfiguration>

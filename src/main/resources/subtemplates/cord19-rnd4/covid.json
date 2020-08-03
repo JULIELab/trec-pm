@@ -1,0 +1,52 @@
+{
+  "dis_max": {
+    "boost": 1,
+    "queries": [
+      {
+        "multi_match": {
+          "query": "COVID19",
+          "fields": "${INSERT cord19-rnd2/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {
+        "multi_match": {
+          "query": "COVID-19",
+          "fields": "${INSERT cord19-rnd2/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {
+        "multi_match": {
+          "query": "SARS-CoV-2",
+          "fields": "${INSERT cord19-rnd2/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {
+        "multi_match": {
+          "query": "SARS-CoV2",
+          "fields": "${INSERT cord19-rnd2/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      },
+      {
+        "multi_match": {
+          "query": "2019-nCoV",
+          "fields": "${INSERT cord19-rnd2/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1
+        }
+      }
+    ]
+  }
+}

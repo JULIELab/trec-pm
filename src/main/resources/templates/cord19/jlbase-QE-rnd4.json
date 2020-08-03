@@ -1,0 +1,11 @@
+{
+	"bool": {
+		"must": [
+			"${INSERT cord19-rnd4/mandatorySynonyms.json}",
+			"${INSERT cord19-rnd4/mandatoryBoW.json}"
+		],
+		"should": [
+			"${INSERT cord19-rnd4/optionalBoW.json}"
+		]
+	}
+}

@@ -1,10 +1,7 @@
 package at.medunigraz.imi.bst.trec.experiment;
 
 import at.medunigraz.imi.bst.retrieval.Retrieval;
-import at.medunigraz.imi.bst.trec.query.covid.CastoriniQueryDecorator;
-import at.medunigraz.imi.bst.trec.query.covid.NarrativeSynonymDecorator;
-import at.medunigraz.imi.bst.trec.query.covid.SynonymQueryDecorator;
-import at.medunigraz.imi.bst.trec.query.covid.WordRemovalQueryDecorator;
+import at.medunigraz.imi.bst.trec.query.covid.*;
 import de.julielab.ir.model.CovidTopic;
 
 public class Cord19Retrieval extends Retrieval<Cord19Retrieval, CovidTopic> {
@@ -37,4 +34,8 @@ public class Cord19Retrieval extends Retrieval<Cord19Retrieval, CovidTopic> {
         return this;
     }
 
+    public Cord19Retrieval withRound5Decorator() {
+        query = new CovidRnd5Decorator(query);
+        return this;
+    }
 }

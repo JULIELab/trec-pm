@@ -1,0 +1,5 @@
+{
+   "dis_max": {
+      "queries": ["${FOR INDEX IN mandatorySynonymWords[] REPEAT /cord19-rnd4/mandatorySynonymTerm.json}"]
+   }
+}

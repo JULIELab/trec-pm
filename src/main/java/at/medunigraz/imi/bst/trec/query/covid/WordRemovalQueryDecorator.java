@@ -12,10 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This decorator is applied to the original CovidTopic. Thus, {@link CovidTopic#getMandatoryBoW()} should be empty.
@@ -25,6 +23,8 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
     private static final Set<String> DOMAIN_STOPWORDS = new HashSet<>();
 
     private static final Set<String> STOPWORDS = new HashSet<>();
+    private static final String TOKEN_SEPARATOR = " ";
+
     static {
         try {
             List<String> words = Files.readAllLines(Paths.get("resources/stopwords.txt"));
@@ -34,10 +34,6 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
             e.printStackTrace();
         }
     }
-
-
-    private static final String TOKEN_SEPARATOR = " ";
-
 
     static {
         // replace by covid-related stop words
@@ -93,6 +89,23 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         //DOMAIN_STOPWORDS.add("coronavirus");
     }
 
+    private Set<String> COVID_SYNSET = Set.of(
+            "coronavirus",
+            "covid",
+            "covid19",
+            "covid-19",
+            "Covid19",
+            "Covid-19",
+            "SARS-CoV-2",
+            "SARS-CoV2",
+            "2019-nCoV",
+            "sars-cov-2",
+            "sars-cov2",
+            "2019-ncov",
+            "ncov");
+    private Set<String> ANIMAL_SYNSET = Set.of("animal", "mouse");
+    private List<Set<String>> SYNSETS = List.of(COVID_SYNSET, ANIMAL_SYNSET);
+
     public WordRemovalQueryDecorator(Query<CovidTopic> decoratedQuery) {
         super(decoratedQuery);
         readStopwords();
@@ -114,24 +127,24 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         for (String queryToken : queryTokens)
             mandatoryWords.add(queryToken.toLowerCase());
 
-        for (NLPToken questionToken : questionTokens){
-            if (questionToken.getPosTag().equals("NN"))// || questionToken.getPosTag().equals("NNS"))
+        for (NLPToken questionToken : questionTokens) {
+            if (questionToken.getPosTag().equals("NN"))
                 mandatoryWords.add(questionToken.getToken().toLowerCase().replace(".", ""));
             else if (questionToken.getPosTag().equals("NNS"))
                 if (questionToken.getToken().toLowerCase().endsWith("ies"))
-                    mandatoryWords.add(questionToken.getToken().toLowerCase().replace(".", "").replaceFirst("ies$","y"));
+                    mandatoryWords.add(questionToken.getToken().toLowerCase().replace(".", "").replaceFirst("ies$", "y"));
                 else
-                    mandatoryWords.add(questionToken.getToken().toLowerCase().replace(".", "").replaceFirst("s$",""));
+                    mandatoryWords.add(questionToken.getToken().toLowerCase().replace(".", "").replaceFirst("s$", ""));
         }
 
         for (NLPToken narrativeToken : narrativeTokens) {
-            if (narrativeToken.getPosTag().equals("NN"))// || narrativeToken.getPosTag().equals("NNS"))
+            if (narrativeToken.getPosTag().equals("NN"))
                 optionalWords.add(narrativeToken.getToken().toLowerCase().replace(".", ""));
             else if (narrativeToken.getPosTag().equals("NNS"))
                 if (narrativeToken.getToken().toLowerCase().endsWith("ies"))
-                    optionalWords.add(narrativeToken.getToken().toLowerCase().replace(".", "").replaceFirst("ies$","y"));
+                    optionalWords.add(narrativeToken.getToken().toLowerCase().replace(".", "").replaceFirst("ies$", "y"));
                 else
-                    optionalWords.add(narrativeToken.getToken().toLowerCase().replace(".", "").replaceFirst("s$",""));
+                    optionalWords.add(narrativeToken.getToken().toLowerCase().replace(".", "").replaceFirst("s$", ""));
         }
         // filter word list
         mandatoryWords.removeAll(STOPWORDS);
@@ -139,41 +152,51 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
         optionalWords.removeAll(STOPWORDS);
         optionalWords.removeAll(DOMAIN_STOPWORDS);
 
+        List<Set<String>> mandatorySynonyms = new ArrayList<>();
+        for (String w : mandatoryWords) {
+            Set<String> synonyms = getSynonyms(w);
+            synonyms.removeAll(DOMAIN_STOPWORDS);
+            if (!synonyms.isEmpty() && !mandatorySynonyms.contains(synonyms))
+                mandatorySynonyms.add(synonyms);
+        }
+        List<Set<String>> optionalSynonyms = new ArrayList<>();
+        for (String w : optionalWords) {
+            Set<String> synonyms = getSynonyms(w);
+            synonyms.removeAll(DOMAIN_STOPWORDS);
+            if (!synonyms.isEmpty() && !mandatorySynonyms.contains(synonyms))
+                optionalSynonyms.add(synonyms);
+        }
+
         Set<String> filteredMandatoryWords = filterWords(mandatoryWords);
         Set<String> filteredOptionalWords = filterWords(optionalWords);
 
         filteredOptionalWords.removeAll(filteredMandatoryWords);
 
-//        System.out.println(filteredMandatoryWords);
-//        System.out.println(filteredOptionalWords);
-
         topic.setMandatoryBoW(filteredMandatoryWords);
-        topic.setOptionalBoW(filteredMandatoryWords);
+        topic.setOptionalBoW(filteredOptionalWords);
+        topic.setMandatorySynonymWords(mandatorySynonyms);
+        topic.setOptionalSynonymWords(optionalSynonyms);
 
         return decoratedQuery.query(topic);
     }
 
-    private void readStopwords(){
+    private void readStopwords() {
         //TODO: read stopwords from file
     }
 
-
     @NotNull
     private Set<String> filterWords(Set<String> narrative) {
-        Set<String> synonyms = new HashSet<String>(narrative);
-        Iterator<String> narIt = narrative.iterator();
-        while (narIt.hasNext()) {
-            String word =  narIt.next();
-            synonyms.addAll(getSynonyms(word));
+        Set<String> filtered = new HashSet<>(narrative);
+        Iterator<String> filterIt = filtered.iterator();
+        while (filterIt.hasNext()) {
+            String word = filterIt.next();
             if (removeFromBoW(word)) {
-                synonyms.remove(word);
-                narIt.remove();
+                filterIt.remove();
             }
         }
 
-        return synonyms;
+        return filtered;
     }
-
 
     private boolean removeFromBoW(String word) {
         // check those words that should be removed from the query and be replaced by synonyms like coronavirus
@@ -187,70 +210,19 @@ public class WordRemovalQueryDecorator extends QueryDecorator<CovidTopic> {
             case "sars":
             case "covid":
             case "covid-19":
-                return true;
-            /*case "covid19":
-                return true;
-            case "covid-19":
-                return true;
+            case "covid19":
             case "sars-cov-2":
-                return true;
             case "sars-cov2":
-                return true;
             case "2019-ncov":
-                return true;*/
+                return true;
             default:
                 return false;
         }
     }
 
     private Set<String> getSynonyms(String word) {
-        // return synonyms of this word like coronavirus -> Covid19
-        Set<String> synonyms = new HashSet<>();
-        switch (word.toLowerCase()) {
-            /*case "coronavirus":
-            case "covid":
-                synonyms.add("covid19");
-                synonyms.add("covid-19");
-                synonyms.add("Covid19");
-                synonyms.add("Covid-19");
-                synonyms.add("SARS-CoV-2");
-                synonyms.add("SARS-CoV2");
-                synonyms.add("2019-nCoV");
-                break;*/
-            /*case "virus":
-            case "cov2":
-            case "ncov":
-                synonyms.add("sars-cov-2");
-                //synonyms.add("sars-cov2");
-                //synonyms.add("2019-ncov");
-                break;*/
-            case "animal":
-                synonyms.add("mouse");
-                break;
-                /*case "covid19":
-                synonyms.add("covid-19");
-                synonyms.add("2019-ncov");
-                break;
-            case "covid-19":
-                synonyms.add("covid19");
-                synonyms.add("2019-ncov");
-                break;
-            case "sars-cov-2":
-                synonyms.add("2019-ncov");
-                synonyms.add("sars-cov2");
-                break;
-            case "sars-cov2":
-                synonyms.add("2019-ncov");
-                synonyms.add("sars-cov-2");
-                break;
-            case "2019-ncov":
-                synonyms.add("sars-cov-2");
-                synonyms.add("sars-cov2");
-                break;*/
-        }
-        return synonyms;
+        return SYNSETS.stream().filter(c -> c.contains(word.toLowerCase())).flatMap(Collection::stream).collect(Collectors.toSet());
     }
-
 
 
 }

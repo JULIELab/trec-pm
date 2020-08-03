@@ -1,0 +1,17 @@
+{
+  "bool": {
+    "should": [
+      {
+        "multi_match": {
+          "query": "${CONCAT query}",
+          "fields": "${INSERT cord19-rnd5/fields.json}",
+          "tie_breaker": 0.3,
+          "type": "best_fields",
+          "boost": 1.0,
+          "operator": "or"
+        }
+      },
+      "${FOR INDEX IN mandatorySynonymWords REPEAT /cord19-rnd5/dismaxForList.json}"
+    ]
+  }
+}

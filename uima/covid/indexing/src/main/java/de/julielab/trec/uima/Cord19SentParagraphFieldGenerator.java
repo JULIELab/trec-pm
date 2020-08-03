@@ -27,7 +27,9 @@ import java.util.List;
 
 public class Cord19SentParagraphFieldGenerator extends DocumentGenerator {
     private final static Logger log = LoggerFactory.getLogger(Cord19SentParagraphFieldGenerator.class);
-private static final boolean lemmatize = true;
+    private static final boolean lemmatize = true;
+    private static final String BASE_INDEX_NAME = "covid-rnd5-";
+
     public Cord19SentParagraphFieldGenerator(FilterRegistry filterRegistry) {
         super(filterRegistry);
     }
@@ -35,12 +37,24 @@ private static final boolean lemmatize = true;
     @Override
     public List<Document> createDocuments(JCas jCas) {
         List<Document> docs = new ArrayList<>();
-        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(AbstractText.class.getCanonicalName())));
+        //docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(AbstractText.class.getCanonicalName())));
         docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Paragraph.class.getCanonicalName())));
 //        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Caption.class.getCanonicalName())));
-        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Title.class.getCanonicalName())));
+        //docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Title.class.getCanonicalName())));
 //        docs.addAll(indexStructure(jCas, jCas.getTypeSystem().getType(Sentence.class.getCanonicalName())));
+        docs.add(indexParagraphTitleAbstract(jCas));
         return docs;
+    }
+
+    private Document indexParagraphTitleAbstract(JCas jCas) {
+        Document doc = new Document();
+        Type paragraphType = jCas.getTypeSystem().getType(Paragraph.class.getCanonicalName());
+        String indexName = BASE_INDEX_NAME + paragraphType.getShortName().toLowerCase();
+        doc.setIndex(indexName);
+        addTitle(jCas, doc);
+        addAbstract(jCas, doc);
+        addDocumentIds(jCas, doc, 999999, paragraphType);
+        return doc;
     }
 
     private List<Document> indexStructure(JCas jCas, Type type) {
@@ -49,7 +63,7 @@ private static final boolean lemmatize = true;
         for (Annotation a : jCas.getAnnotationIndex(type)) {
             Document doc = new Document();
             docs.add(doc);
-            doc.setIndex("covid-rnd3-" + type.getShortName().toLowerCase());
+            doc.setIndex(BASE_INDEX_NAME + type.getShortName().toLowerCase());
             doc.addField("text", a.getCoveredText());
             if (lemmatize) {
                 FSIterator<Token> tokenIt = jCas.<Token>getAnnotationIndex(Token.type).subiterator(a);
@@ -77,12 +91,11 @@ private static final boolean lemmatize = true;
         }
         return docs;
     }
+
     private void addAbstract(JCas aJCas, Document doc) {
         AnnotationIndex<AbstractText> abstractIndex = aJCas.getAnnotationIndex(AbstractText.type);
-        int i = 0;
         for (AbstractText at : abstractIndex) {
             doc.addField("abstract", at.getCoveredText());
-            ++i;
         }
     }
 
@@ -99,7 +112,7 @@ private static final boolean lemmatize = true;
     private void addDocumentIds(JCas aJCas, Document doc, int counter, Type type) {
         Header h = JCasUtil.selectSingle(aJCas, Header.class);
         doc.addField("paper_id", h.getDocId());
-        doc.setId(h.getDocId()+"_"+type.getShortName().toLowerCase()+"_"+counter);
+        doc.setId(h.getDocId() + "_" + type.getShortName().toLowerCase() + "_" + counter);
         FSArray otherIDs = h.getOtherIDs();
         if (otherIDs != null) {
             for (FeatureStructure fs : otherIDs) {

@@ -1,0 +1,9 @@
+{
+   "multi_match": {
+     "query": "${mandatorySynonymWords[][]}",
+     "fields": "${INSERT cord19-rnd5/fields.json}",
+     "tie_breaker": 0.3,
+     "type": "best_fields",
+     "boost": 1.0
+   }
+}

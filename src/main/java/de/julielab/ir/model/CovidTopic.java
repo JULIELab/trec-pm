@@ -3,6 +3,7 @@ package de.julielab.ir.model;
 import at.medunigraz.imi.bst.trec.model.Challenge;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -100,13 +101,20 @@ public class CovidTopic extends QueryDescription {
         String question = getElement(element, "question");
         String narrative = getElement(element, "narrative");
 
-        CovidTopic topic = new CovidTopic().withNumber(number).withQuery(query).withQuestion(question).withNarrative(narrative);
+        CovidTopic topic = new CovidTopic().withNumber(number);
+        if (query != null)
+        topic.withQuery(query);
+        if (question != null)
+            topic.withQuestion(question);
+        if(narrative != null)
+            topic.withNarrative(narrative);
 
         return topic;
     }
 
     private static String getElement(Element element, String name) {
-        return element.getElementsByTagName(name).item(0).getTextContent();
+        Node node = element.getElementsByTagName(name).item(0);
+        return node != null ?  node.getTextContent() : null;
     }
 
     private static String getAttribute(Element element, String name) {

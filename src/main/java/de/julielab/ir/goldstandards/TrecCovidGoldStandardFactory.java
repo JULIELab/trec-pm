@@ -24,6 +24,15 @@ public class TrecCovidGoldStandardFactory {
     }
 
     /**
+     * The qrels used to score the round 4 submissions. Thus, the cord19_uids in this gold standard match the documents
+     * of the respective challenge data.
+     * @return The gold standard.
+     */
+    public static TrecQrelGoldStandard<CovidTopic> round4() {
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 4, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound4(), "/gold-standard/qrels-covid_d3_j3.5-4.txt");
+    }
+
+    /**
      * A cumulative gold standard up to round 3. It contains the complete set of relevance judgments from rounds
      * 1 to 3 mapped to the cord19_uids that were valid at round 3. So this gold standard can be used to evaluate
      * on the complete data between rounds 1 and 3, including documents that were left out from rounds 2 and 3
@@ -31,6 +40,28 @@ public class TrecCovidGoldStandardFactory {
      * @return The gold standard.
      */
     public static TrecQrelGoldStandard<CovidTopic> round3Cumulative() {
-        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 3, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound2(), "/gold-standard/qrels-covid_d3_j0.5-3.txt");
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 3, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound3(), "/gold-standard/qrels-covid_d3_j0.5-3.txt");
+    }
+
+    /**
+     * A cumulative gold standard up to round 4. It contains the complete set of relevance judgments from rounds
+     * 1 to 4 mapped to the cord19_uids that were valid at round 4. So this gold standard can be used to evaluate
+     * on the complete data between rounds 1 and 4, including documents that were left out from rounds 3 and 4
+     * due to residual evaluation.
+     * @return The gold standard.
+     */
+    public static TrecQrelGoldStandard<CovidTopic> round4Cumulative() {
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 4, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound4(), "/gold-standard/qrels-covid_d4_j0.5-4.txt");
+    }
+
+    /**
+     * A cumulative gold standard up to round 4. It contains the complete set of relevance judgments from rounds
+     * 1 to 4 mapped to the cord19_uids that were valid at round 4. So this gold standard can be used to evaluate
+     * on the complete data between rounds 1 and 4, including documents that were left out from rounds 3 and 4
+     * due to residual evaluation.
+     * @return The gold standard.
+     */
+    public static TrecQrelGoldStandard<CovidTopic> round4CumulativeUdel() {
+        return new TrecQrelGoldStandard<>(Challenge.COVID, Task.CORD19, 4, GoldStandardType.OFFICIAL, TrecCovidTopicSetFactory.topicsRound4Udel(), "/gold-standard/qrels-covid_d4_j0.5-4.txt");
     }
 }

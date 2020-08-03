@@ -1,0 +1,5 @@
+{
+   "bool": {
+      "should": ["${FOR INDEX IN mandatorySynonymWords REPEAT /cord19-rnd4/dismaxForList.json}"]
+   }
+}

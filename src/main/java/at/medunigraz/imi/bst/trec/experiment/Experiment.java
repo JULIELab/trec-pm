@@ -229,20 +229,22 @@ public class Experiment<Q extends QueryDescription> {
     private void writeInspectionFile(List<ResultList<Q>> lastResultListSet, String experimentId) {
         if (inspectionResultColumnGenerator == null)
             throw new IllegalStateException("The inspection file row generator is not set, cannot create the inspection file.");
-        if (goldStandard == null) {
-            return;
-        }
+//        if (goldStandard == null) {
+//            return;
+//        }
         File inspectionFile = new File("inspections", experimentId + ".txt");
         if (!inspectionFile.getParentFile().exists())
             inspectionFile.getParentFile().mkdirs();
         try (BufferedWriter bw = FileUtilities.getWriterToFile(inspectionFile)) {
-            Function<QueryDescription, String> queryIdFunction = goldStandard.getQueryIdFunction();
+            Function<QueryDescription, String> queryIdFunction = goldStandard != null ? goldStandard.getQueryIdFunction() : d -> String.valueOf(d.getNumber());
             for (ResultList<Q> resultList : lastResultListSet) {
                 Q topic = resultList.getTopic();
                 Map<String, Document> id2doc = Collections.emptyMap();
                 if (goldStandard != null) {
                     Stream<Document> stream = goldStandard.getQrelDocumentsForQuery(topic).stream();
                     id2doc = stream.collect(Collectors.toMap(d -> d.getId(), Function.identity()));
+                } else {
+                    id2doc = DocumentList.fromRetrievalResultList(resultList).stream().collect(Collectors.toMap(d -> d.getId(), Function.identity()));
                 }
                 int numWrittenForTopic = 0;
                 for (Result r : resultList.getResults()) {
@@ -254,7 +256,8 @@ public class Experiment<Q extends QueryDescription> {
                     else
                         bw.write("-1");
                     bw.write("\t");
-                    bw.write(inspectionResultColumnGenerator.apply(r));
+                    String row = inspectionResultColumnGenerator.apply(r);
+                    bw.write(row);
                     bw.newLine();
                     if (numWrittenForTopic >= inspectionOutputPerTopic && inspectionOutputPerTopic > 0)
                         break;

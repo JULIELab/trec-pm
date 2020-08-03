@@ -1,0 +1,55 @@
+{
+  "settings": {
+    "number_of_replicas": 0,
+    "number_of_shards": 1,
+    "max_result_window": 50000,
+    "similarity": {
+      "my_bm25": {
+        "type": "BM25",
+        "k1": 3.9,
+        "b": 0.55
+      }
+    },
+    "analysis": {
+      "analyzer": {
+        "stemming_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "en_snow"
+          ]
+        }
+      },
+      "filter": {
+        "en_snow": {
+          "type": "snowball",
+          "language": "English"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "abstract": {
+        "type": "text",
+        "analyzer": "stemming_analyzer",
+        "copy_to": "allcontent"
+      },
+      "text": {
+        "type": "text",
+        "analyzer": "stemming_analyzer",
+        "copy_to": "allcontent"
+      },
+      "title": {
+        "type": "text",
+        "analyzer": "stemming_analyzer",
+        "copy_to": "allcontent"
+      },
+      "allcontent": {
+        "type": "text",
+        "analyzer": "stemming_analyzer"
+      }
+    }
+  }
+}

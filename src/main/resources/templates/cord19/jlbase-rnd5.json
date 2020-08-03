@@ -1,0 +1,10 @@
+{
+	"bool": {
+		"must": [
+			"${INSERT cord19-rnd5/mandatoryBoW.json}"
+		],
+		"should": [
+			"${INSERT cord19-rnd5/optionalBoW.json}"
+		]
+	}
+}
