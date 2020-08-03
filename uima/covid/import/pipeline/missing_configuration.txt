@@ -1,0 +1,4 @@
+The pipeline has no collection reader.
+
+The pipeline has no analysis engine and no consumers.
+
