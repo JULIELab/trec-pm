@@ -12,6 +12,7 @@ import de.julielab.ir.model.QueryDescription;
 import de.julielab.java.utilities.FileUtilities;
 import de.julielab.java.utilities.IOStreamUtilities;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -142,6 +143,16 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
         return isSample;
     }
 
+    /**
+     * NOT FINISHED. The goal of this method is to write the contents of some fields to a file. The original idea
+     * is to write the documents' textual contents for learning transformer-based reranking models. Hasn't been finished
+     * due to time contraints.
+     * @param file
+     * @param index
+     * @param documentIdField
+     * @param fields
+     * @throws IOException
+     */
     public void writeDocumentFieldValues(File file, String index, String documentIdField, String... fields) throws IOException {
         RestHighLevelClient client = ElasticClientFactory.getClient();
         List<String> docIds = getQrelDocuments().stream().map(Document::getId).collect(Collectors.toList());
@@ -152,6 +163,7 @@ public class TrecQrelGoldStandard<Q extends QueryDescription> extends AtomicGold
             String scrollId = searchResponse.getScrollId();
             SearchHits hits = searchResponse.getHits();
         }
+        throw new NotImplementedException("This method implementation was started but not yet finished.");
     }
 
 
