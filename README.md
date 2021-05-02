@@ -4,15 +4,21 @@ A repository containing support code and resources initially developed at the [I
 
 It was then further improved for participation at the [2018 TREC Precision Medicine Track](http://trec-cds.appspot.com/2018.html). Improvements include: support for subtemplates and the possibility to use disjunctive queries (_dis\_max_) allowing e.g. synonyms and hypernyms to have different weights. Team name: **hpi-dhc**.
 
+A systematic study of query expansion and boosting mechanisms (including optimal `b` and `k1` BM25 hyperparameters) is available on the branch [sigir20](https://github.com/JULIELab/trec-pm/tree/sigir20).
+
 ## Citing
 
 If you use `imi_mug`'s original data or code in your work, please cite their [TREC 2017 proceedings paper](https://trec.nist.gov/pubs/trec26/papers/imi_mug-PM.pdf):
 
-*TREC 2017 Precision Medicine - Medical University of Graz. Pablo López-García, Michel Oleynik, Zdenko Kasáč and Stefan Schulz. Text REtrieval Conference, Gaithersburg, MD. 2017. Available at https://trec.nist.gov/pubs/trec26/papers/imi_mug-PM.pdf.*
+*Pablo López-García, Michel Oleynik, Zdenko Kasáč and Stefan Schulz. TREC 2017 Precision Medicine - Medical University of Graz. Text REtrieval Conference, Gaithersburg, MD. 2017. Available at https://trec.nist.gov/pubs/trec26/papers/imi_mug-PM.pdf.*
 
 If you use any of the improvements mentioned above, please also cite our [TREC 2018 proceedings paper](https://trec.nist.gov/pubs/trec27/papers/hpi-dhc-PM.pdf):
 
-*HPI-DHC at TREC 2018 Precision Medicine Track. Michel Oleynik, Erik Faessler, Ariane Morassi Sasso, et. al. Text REtrieval Conference, Gaithersburg, MD. 2018. Available at https://trec.nist.gov/pubs/trec27/papers/hpi-dhc-PM.pdf.*
+*Michel Oleynik, Erik Faessler, Ariane Morassi Sasso, et. al. HPI-DHC at TREC 2018 Precision Medicine Track. Text REtrieval Conference, Gaithersburg, MD. 2018. Available at https://trec.nist.gov/pubs/trec27/papers/hpi-dhc-PM.pdf.*
+
+Lastly, if you use the optimal hyperparemeters mentioned above, please cite our [SIGIR 2020 paper](https://doi.org/10.1145/3397271.3401048).
+
+*Erik Faessler, Michel Oleynik, and Udo Hahn. 2020. What Makes a Top-Performing Precision Medicine Search Engine? Tracing Main System Features in a Systematic Way. _In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR ’20), July 25–30, 2020, Virtual Event, China._ ACM, New York, NY, USA, 10 pages. https://doi.org/10.1145/3397271.3401048*
 
 ## Elastic Search JSON Templating Engine
 
